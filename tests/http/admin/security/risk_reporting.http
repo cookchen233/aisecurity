@@ -1,0 +1,41 @@
+# aisecurity
+
+###
+# group: admin
+# @name auth/role/index
+GET {{aisecurity_base_url}}admin/auth/role/index
+Referer-Policy: strict-origin-when-cross-origin
+Content-Type: multipart/form-data; boundary=WebAppBoundary
+
+--WebAppBoundary
+Content-Disposition: form-data; name="email"
+
+demo@minimals.cc
+--WebAppBoundary
+Content-Disposition: form-data; name="password"
+
+demo1234
+--WebAppBoundary
+
+###
+# group: admin
+# @name security/admin/create
+# @no-redirect
+GET {{aisecurity_base_url}}admin/auth/admin/create
+
+###
+# group: admin
+# @name security/risk-reporting/index
+# @no-redirect
+GET {{aisecurity_base_url}}admin/security/risk-reporting/get-list
+
+###
+# group: admin
+# @name security/risk-reporting/create
+# @no-redirect
+POST {{aisecurity_base_url}}admin/security/risk-reporting/create-risk-location
+Content-Type: application/json
+
+{
+    "title": "hehe3"
+}

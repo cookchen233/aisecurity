@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>小车控制手柄</title>
+    <style>
+        body {
+        }
+        .container{
+            padding: 2em;
+        }
+        .joystick {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            border: 2px solid #333;
+            border-radius: 10px;
+            padding: 10px;
+        }
+
+        .button {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            width: 200px;
+            height: 200px;
+            border: 6px solid #333;
+            border-radius: 50%;
+            margin: 15px;
+            font-size: 50px;
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .horizontal {
+            display: flex;
+        }
+
+        .button:hover {
+            background-color: #eee;
+        }
+        #page-title{
+            margin: 200px 10px;
+            font-size: 2em;
+            text-align: center;
+        }
+    </style>
+</head>
+<body onload="connect()">
+<div class="clear"></div>
+<div class="container">
+    <div id="page-title">
+        <p id="game-title">正在连接控制服务器 ... </p>
+        <p id="toycar-status">正在检查小车在线状态 ... </p>
+    </div>
+    <!-- 控制按钮 -->
+    <div class="joystick">
+        <div class="button" id="forward" ontouchstart="sendDirection('forward')" ontouchend="sendStop()">↑</div>
+        <div class="horizontal">
+            <div class="button" id="left" ontouchstart="sendDirection('left')" ontouchend="sendStop()">←</div>
+            <div class="button" id="stop" ontouchstart="sendStop()">■</div>
+            <div class="button" id="right" ontouchstart="sendDirection('right')" ontouchend="sendStop()">→</div>
+        </div>
+        <div class="button" id="backward" ontouchstart="sendDirection('backward')" ontouchend="sendStop()">↓</div>
+    </div>
+</div>
+<div class="clear"></div>
+<script>
+    let socket;
+    // 获取当前页面的域名和协议
+    const currentProtocol = window.location.protocol;
+    const currentDomain = window.location.hostname;
+    const wsProtocol = currentProtocol === 'https:' ? 'wss:' : 'ws:';
+
+    let game_title = document.getElementById('game-title');
+    let toycar_status= document.getElementById('toycar-status');
+
+    function connect() {
+        // 拼接 WebSocket 路径
+        const wsEndpoint = `${wsProtocol}//${currentDomain}/toycar/control-panel`;
+        console.log(wsEndpoint);
+        socket = new WebSocket(wsEndpoint);
+
+        socket.onopen = function(event) {
+            console.log("WebSocket connected");
+            game_title.innerText = '已成功连接到控制服务器';
+            //startHeartbeat();
+        };
+
+        socket.onclose = function(event) {
+            console.log("WebSocket disconnected");
+            game_title.innerText = '连接控制服务器失败, 3秒后重连';
+            reconnectWebSocket();
+        };
+
+        socket.onerror = function(error) {
+            console.error("WebSocket error:", error);
+            game_title.innerText = '连接控制服务器发生错误, 3秒后重连';
+            reconnectWebSocket();
+        };
+
+        socket.onmessage = function(event) {
+            let data = event.data
+            if(data === "the-toy-car-is-offline"){
+                toycar_status.innerText = '小车当前未上线';
+            }else if(data === "the-toy-car-is-online"){
+                toycar_status.innerText = '小车当前在线';
+            }
+        }
+    }
+
+    let retry_times = 0
+    function reconnectWebSocket() {
+        retry_times++
+        if(retry_times > 300){
+            return
+        }
+        setTimeout(function() {
+            console.log("Reconnecting WebSocket...");
+            connect();
+        }, 3000);
+    }
+
+    function sendCommand(command) {
+        if (socket && socket.readyState === WebSocket.OPEN) {
+            socket.send(JSON.stringify(command));
+        }
+    }
+
+    function sendStop() {
+        const stopCommand = {
+            "class": "ToyCar",
+            "class_args": {},
+            "method": "stop",
+            "method_args": {}
+        };
+        for (let i = 0; i < 10; i++) {
+            sendCommand(stopCommand);
+        }
+    }
+
+    function sendDirection(direction) {
+        let command;
+        switch (direction) {
+            case "forward":
+                command = {
+                    "class": "ToyCar",
+                    "class_args": {},
+                    "method": "go_forward",
+                    "method_args": {}
+                };
+                break;
+            case "backward":
+                command = {
+                    "class": "ToyCar",
+                    "class_args": {},
+                    "method": "go_backward",
+                    "method_args": {}
+                };
+                break;
+            case "left":
+                command = {
+                    "class": "ToyCar",
+                    "class_args": {},
+                    "method": "turn_left",
+                    "method_args": {}
+                };
+                break;
+            case "right":
+                command = {
+                    "class": "ToyCar",
+                    "class_args": {},
+                    "method": "turn_right",
+                    "method_args": {}
+                };
+                break;
+            default:
+                break;
+        }
+        if (command) {
+            for (let i = 0; i < 5; i++) {
+                sendCommand(command);
+            }
+        } else {
+            sendStop();
+        }
+    }
+
+    function startHeartbeat() {
+        setInterval(function() {
+            if (socket && socket.readyState === WebSocket.OPEN) {
+                socket.send("heartbeat");
+            }
+        }, 5000);
+    }
+</script>
+</body>
+</html>

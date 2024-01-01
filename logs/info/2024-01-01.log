@@ -1,0 +1,359 @@
+INFO 2024/01/01 10:29:26.309431 127.0.0.1 POST /admin/security/risk-reporting/create REQUEST {
+  "title": "hehe",
+  "content": "con",
+  "images": [
+    {
+      "title": "iii",
+      "url": "http://baidu_com"
+    }
+  ],
+  "risk_category_id": 2,
+  "risk_location_id": 2,
+  "marintainer": 2,
+  "mesures": "xixi",
+  "due_time": "2022-01-01T00:00:00Z"
+}
+INFO 2024/01/01 10:29:26.310737 127.0.0.1:62962 POST /admin/security/risk-reporting/create RESPONSE 400 json: cannot unmarshal string into Go struct field .images.URL of type url.URL
+INFO 2024/01/01 10:30:43.010418 127.0.0.1 POST /admin/security/risk-reporting/create REQUEST {
+  "title": "hehe",
+  "content": "con",
+  "images": [
+    {
+      "title": "iii",
+      "url": "http://baidu_com"
+    }
+  ],
+  "risk_category_id": 2,
+  "risk_location_id": 2,
+  "marintainer": 2,
+  "mesures": "xixi",
+  "due_time": "2022-01-01T00:00:00Z"
+}
+INFO 2024/01/01 10:30:43.011810 127.0.0.1:62998 POST /admin/security/risk-reporting/create RESPONSE 400 json: cannot unmarshal string into Go struct field .images.URL of type url.URL
+INFO 2024/01/01 10:43:37.020373 127.0.0.1 POST /admin/security/risk-reporting/create REQUEST {
+  "title": "hehe",
+  "content": "con",
+  "images": [
+    {
+      "title": "iii",
+      "url": "http://baidu_com"
+    }
+  ],
+  "risk_category_id": 2,
+  "risk_location_id": 2,
+  "marintainer": 2,
+  "mesures": "xixi",
+  "due_time": "2022-01-01T00:00:00Z"
+}
+INFO 2024/01/01 10:43:37.021624 127.0.0.1:64683 POST /admin/security/risk-reporting/create RESPONSE 400 json: cannot unmarshal string into Go struct field .images.URL of type url.URL
+INFO 2024/01/01 10:48:46.185037 127.0.0.1 POST /admin/security/risk-reporting/create REQUEST {
+  "title": "hehe",
+  "content": "con",
+  "images": [
+    {
+      "title": "iii",
+      "url": "http://baidu_com"
+    }
+  ],
+  "risk_category_id": 2,
+  "risk_location_id": 2,
+  "marintainer": 2,
+  "mesures": "xixi",
+  "due_time": "2022-01-01T00:00:00Z"
+}
+INFO 2024/01/01 10:48:46.190235 127.0.0.1:65099 POST /admin/security/risk-reporting/create RESPONSE 500 failed creating RiskLocation: ent: missing required field "RiskReporting.deleted_at"
+INFO 2024/01/01 10:49:11.370138 127.0.0.1 POST /admin/security/risk-reporting/create REQUEST {
+  "title": "hehe",
+  "content": "con",
+  "images": [
+    {
+      "title": "iii",
+      "url": "http://baidu_com"
+    }
+  ],
+  "risk_category_id": 2,
+  "risk_location_id": 2,
+  "marintainer": 2,
+  "mesures": "xixi",
+  "due_time": "2022-01-01T00:00:00Z"
+}
+INFO 2024/01/01 10:49:11.371754 127.0.0.1:65109 POST /admin/security/risk-reporting/create RESPONSE 500 failed creating RiskLocation: ent: missing required field "RiskReporting.deleted_at"
+INFO 2024/01/01 10:49:41.764281 127.0.0.1 POST /admin/security/risk-reporting/create REQUEST {
+  "title": "hehe",
+  "content": "con",
+  "images": [
+    {
+      "title": "iii",
+      "url": "http://baidu_com"
+    }
+  ],
+  "risk_category_id": 2,
+  "risk_location_id": 2,
+  "marintainer": 2,
+  "mesures": "xixi",
+  "due_time": "2022-01-01T00:00:00Z"
+}
+INFO 2024/01/01 10:49:41.767058 127.0.0.1:65127 POST /admin/security/risk-reporting/create RESPONSE 500 failed creating RiskLocation: ent: validator failed for field "RiskReporting.maintainer": value out of range
+INFO 2024/01/01 10:50:00.831948 127.0.0.1 POST /admin/security/risk-reporting/create REQUEST {
+  "title": "hehe",
+  "content": "con",
+  "images": [
+    {
+      "title": "iii",
+      "url": "http://baidu_com"
+    }
+  ],
+  "risk_category_id": 2,
+  "risk_location_id": 2,
+  "maintainer": 2,
+  "mesures": "xixi",
+  "due_time": "2022-01-01T00:00:00Z"
+}
+INFO 2024/01/01 10:50:00.838761 127.0.0.1:65136 POST /admin/security/risk-reporting/create RESPONSE 200 
+INFO 2024/01/01 11:03:57.029398 127.0.0.1 POST /admin/security/risk-reporting/create REQUEST {
+  "title": "hehe",
+  "content": "con",
+  "images": [
+    {
+      "title": "iii",
+      "url": "http://baidu_com"
+    }
+  ],
+  "risk_category_id": 2,
+  "risk_location_id": 2,
+  "maintainer": 2,
+  "mesures": "xixi",
+  "due_time": "2022-01-01T00:00:00Z"
+}
+INFO 2024/01/01 11:03:57.034084 127.0.0.1:49602 POST /admin/security/risk-reporting/create RESPONSE 200 
+INFO 2024/01/01 11:05:14.135671 127.0.0.1 GET /admin/security/risk-reporting/get-list REQUEST 
+INFO 2024/01/01 11:05:14.138171 127.0.0.1:49646 GET /admin/security/risk-reporting/get-list RESPONSE 200 
+INFO 2024/01/01 11:06:29.636537 127.0.0.1 GET /admin/security/risk-reporting/get-list REQUEST 
+INFO 2024/01/01 11:06:29.640016 127.0.0.1:49679 GET /admin/security/risk-reporting/get-list RESPONSE 200 
+INFO 2024/01/01 11:08:25.362628 127.0.0.1 POST /admin/security/risk-reporting/create REQUEST {
+  "title": "hehe",
+  "content": "con",
+  "images": [
+    {
+      "title": "iii",
+      "url": "http://baidu_com"
+    }
+  ],
+  "risk_category_id": 2,
+  "risk_location_id": 2,
+  "maintainer": 2,
+  "mesures": "xixi",
+  "due_time": "2022-01-01T00:00:00Z"
+}
+INFO 2024/01/01 11:08:25.366787 127.0.0.1:49764 POST /admin/security/risk-reporting/create RESPONSE 200 
+INFO 2024/01/01 11:08:36.490836 127.0.0.1 POST /admin/security/risk-reporting/create REQUEST {
+  "title": "hehe",
+  "content": "con",
+  "images": [
+    {
+      "title": "iii",
+      "url": "http://baidu_com"
+    }
+  ],
+  "risk_category_id": 2,
+  "risk_location_id": 2,
+  "maintainer": 2,
+  "mesures": "xixi",
+  "due_time": "2022-01-01T00:00:00Z"
+}
+INFO 2024/01/01 11:08:36.493502 127.0.0.1:49776 POST /admin/security/risk-reporting/create RESPONSE 500 failed creating RiskLocation: ent: missing required field "RiskReporting.measures"
+INFO 2024/01/01 11:09:12.537086 127.0.0.1 POST /admin/security/risk-reporting/create REQUEST {
+  "title": "hehe",
+  "content": "con",
+  "images": [
+    {
+      "title": "iii",
+      "url": "http://baidu_com"
+    }
+  ],
+  "risk_category_id": 2,
+  "risk_location_id": 2,
+  "maintainer": 2,
+  "mesures": "xixi",
+  "due_time": "2022-01-01T00:00:00Z"
+}
+INFO 2024/01/01 11:09:12.542066 127.0.0.1:49797 POST /admin/security/risk-reporting/create RESPONSE 200 
+INFO 2024/01/01 11:09:17.526333 127.0.0.1 GET /admin/security/risk-reporting/get-list REQUEST 
+INFO 2024/01/01 11:09:17.527906 127.0.0.1:49798 GET /admin/security/risk-reporting/get-list RESPONSE 200 
+INFO 2024/01/01 11:10:01.546916 127.0.0.1 POST /admin/security/risk-reporting/create REQUEST {
+  "title": "hehe",
+  "content": "con",
+  "images": [
+    {
+      "title": "iii",
+      "url": "http://baidu_com"
+    }
+  ],
+  "risk_category_id": 2,
+  "risk_location_id": 2,
+  "maintainer": 2,
+  "mesures": "xixi",
+  "due_time": "2022-01-01T00:00:00Z"
+}
+INFO 2024/01/01 11:10:01.551754 127.0.0.1:49825 POST /admin/security/risk-reporting/create RESPONSE 200 
+INFO 2024/01/01 11:10:04.955952 127.0.0.1 GET /admin/security/risk-reporting/get-list REQUEST 
+INFO 2024/01/01 11:10:04.959066 127.0.0.1:49827 GET /admin/security/risk-reporting/get-list RESPONSE 200 
+INFO 2024/01/01 11:10:31.173065 127.0.0.1 GET /admin/security/risk-reporting/get-list REQUEST 
+INFO 2024/01/01 11:10:31.174954 127.0.0.1:49960 GET /admin/security/risk-reporting/get-list RESPONSE 200 
+INFO 2024/01/01 11:12:21.095794 127.0.0.1 POST /admin/security/risk-reporting/create REQUEST {
+  "title": "hehe",
+  "content": "con",
+  "images": [
+    {
+      "title": "iii",
+      "url": "http://baidu_com"
+    }
+  ],
+  "risk_category_id": 2,
+  "risk_location_id": 2,
+  "maintainer": 2,
+  "mesures": "xixi",
+  "due_time": "2022-01-01T00:00:00Z"
+}
+INFO 2024/01/01 11:12:21.103416 127.0.0.1:50127 POST /admin/security/risk-reporting/create RESPONSE 200 
+INFO 2024/01/01 11:12:25.359110 127.0.0.1 GET /admin/security/risk-reporting/get-list REQUEST 
+INFO 2024/01/01 11:12:25.360610 127.0.0.1:50130 GET /admin/security/risk-reporting/get-list RESPONSE 200 
+INFO 2024/01/01 11:14:55.788219 127.0.0.1 GET /admin/security/risk-reporting/get-list REQUEST 
+INFO 2024/01/01 11:14:55.789303 127.0.0.1:50188 GET /admin/security/risk-reporting/get-list RESPONSE 200 
+INFO 2024/01/01 11:15:27.322371 127.0.0.1 GET /admin/security/risk-reporting/get-list REQUEST 
+INFO 2024/01/01 11:15:27.323411 127.0.0.1:50558 GET /admin/security/risk-reporting/get-list RESPONSE 200 
+INFO 2024/01/01 11:17:09.624836 127.0.0.1 POST /admin/security/risk-reporting/create REQUEST {
+  "title": "hehe",
+  "content": "con",
+  "images": [
+    {
+      "title": "iii",
+      "url": "http://baidu_com"
+    }
+  ],
+  "risk_category_id": 2,
+  "risk_location_id": 2,
+  "maintainer": 2,
+  "mesures": "xixi",
+  "due_time": "2022-01-01T00:00:00Z"
+}
+INFO 2024/01/01 11:19:39.642374 127.0.0.1 POST /admin/security/risk-reporting/create REQUEST {
+  "title": "hehe",
+  "content": "con",
+  "images": [
+    {
+      "title": "iii",
+      "url": "http://baidu_com"
+    }
+  ],
+  "risk_category_id": 2,
+  "risk_location_id": 2,
+  "maintainer": 2,
+  "mesures": "xixi",
+  "due_time": "2022-01-01T00:00:00Z"
+}
+INFO 2024/01/01 11:19:39.645183 127.0.0.1:51061 POST /admin/security/risk-reporting/create RESPONSE 500 failed creating RiskLocation: ent: missing required field "RiskReporting.measures"
+INFO 2024/01/01 11:21:47.949942 127.0.0.1 POST /admin/security/risk-reporting/create REQUEST {
+  "title": "hehe",
+  "content": "con",
+  "images": [
+    {
+      "title": "iii",
+      "url": "http://baidu_com"
+    }
+  ],
+  "risk_category_id": 2,
+  "risk_location_id": 2,
+  "maintainer": 2,
+  "mesures": "xixi",
+  "due_time": "2022-01-01T00:00:00Z"
+}
+INFO 2024/01/01 11:22:03.699892 127.0.0.1 POST /admin/security/risk-reporting/create REQUEST {
+  "title": "hehe",
+  "content": "con",
+  "images": [
+    {
+      "title": "iii",
+      "url": "http://baidu_com"
+    }
+  ],
+  "risk_category_id": 2,
+  "risk_location_id": 2,
+  "maintainer": 2,
+  "measures": "xixi",
+  "due_time": "2022-01-01T00:00:00Z"
+}
+INFO 2024/01/01 11:22:03.707323 127.0.0.1:51512 POST /admin/security/risk-reporting/create RESPONSE 200 
+INFO 2024/01/01 11:23:02.086099 127.0.0.1 GET /admin/security/risk-reporting/get-list REQUEST 
+INFO 2024/01/01 11:23:02.089923 127.0.0.1:51531 GET /admin/security/risk-reporting/get-list RESPONSE 200 
+INFO 2024/01/01 11:30:42.261728 127.0.0.1 POST /admin/security/risk-reporting/create REQUEST {
+  "title": "hehe",
+  "content": "con",
+  "images": [
+    {
+      "title": "iii",
+      "url": "http://baidu_com"
+    }
+  ],
+  "risk_category_id": 2,
+  "risk_location_id": 2,
+  "maintainer": 2,
+  "2measures": "",
+  "due_time": "2022-01-01T00:00:00Z"
+}
+INFO 2024/01/01 11:31:12.140206 127.0.0.1 POST /admin/security/risk-reporting/create REQUEST {
+  "title": "hehe",
+  "content": "con",
+  "images": [
+    {
+      "title": "iii",
+      "url": "http://baidu_com"
+    }
+  ],
+  "risk_category_id": 2,
+  "risk_location_id": 2,
+  "maintainer": 2,
+  "2measures": "",
+  "due_time": "2022-01-01T00:00:00Z"
+}
+INFO 2024/01/01 11:31:12.144848 127.0.0.1:52398 POST /admin/security/risk-reporting/create RESPONSE 200 
+INFO 2024/01/01 11:31:25.020180 127.0.0.1 POST /admin/security/risk-reporting/create REQUEST {
+  "title": "hehe",
+  "content": "con",
+  "images": [
+    {
+      "title": "iii",
+      "url": "http://baidu_com"
+    }
+  ],
+  "risk_category_id": 2,
+  "risk_location_id": 2,
+  "maintainer": 2,
+  "2measures": "",
+  "due_time": "2022-01-01T00:00:00Z"
+}
+INFO 2024/01/01 11:31:25.024076 127.0.0.1:52411 POST /admin/security/risk-reporting/create RESPONSE 200 
+INFO 2024/01/01 11:31:29.609533 127.0.0.1 GET /admin/security/risk-reporting/get-list REQUEST 
+INFO 2024/01/01 11:31:29.610588 127.0.0.1:52413 GET /admin/security/risk-reporting/get-list RESPONSE 200 
+INFO 2024/01/01 11:33:44.065380 127.0.0.1 GET /admin/security/risk-reporting/get-list REQUEST 
+INFO 2024/01/01 11:33:44.066555 127.0.0.1:52465 GET /admin/security/risk-reporting/get-list RESPONSE 200 
+INFO 2024/01/01 11:54:31.508103 127.0.0.1 GET /admin/security/risk-reporting/get-list REQUEST 
+INFO 2024/01/01 11:54:31.515616 127.0.0.1:54308 GET /admin/security/risk-reporting/get-list RESPONSE 200 
+INFO 2024/01/01 11:55:00.767973 127.0.0.1 GET /admin/security/risk-reporting/get-list REQUEST 
+INFO 2024/01/01 11:55:00.769574 127.0.0.1:54319 GET /admin/security/risk-reporting/get-list RESPONSE 200 
+INFO 2024/01/01 12:01:54.267711 127.0.0.1 GET /admin/security/risk-reporting/get-list REQUEST 
+INFO 2024/01/01 12:01:54.309077 127.0.0.1:54549 GET /admin/security/risk-reporting/get-list RESPONSE 200 
+INFO 2024/01/01 12:02:18.306755 127.0.0.1 GET /admin/security/risk-reporting/get-list REQUEST 
+INFO 2024/01/01 12:02:18.331123 127.0.0.1:54561 GET /admin/security/risk-reporting/get-list RESPONSE 200 
+INFO 2024/01/01 12:13:42.908337 127.0.0.1 GET /admin/security/risk-reporting/get-list REQUEST 
+INFO 2024/01/01 12:13:42.908919 127.0.0.1:55712 GET /admin/security/risk-reporting/get-list RESPONSE 500 ent: invalid field "" for query
+INFO 2024/01/01 12:19:21.975813 127.0.0.1 GET /admin/security/risk-reporting/get-list REQUEST 
+INFO 2024/01/01 12:19:22.014163 127.0.0.1:56528 GET /admin/security/risk-reporting/get-list RESPONSE 200 
+INFO 2024/01/01 12:23:45.747422 127.0.0.1 GET /admin/security/risk-reporting/get-list REQUEST 
+INFO 2024/01/01 12:23:45.750236 127.0.0.1:57162 GET /admin/security/risk-reporting/get-list RESPONSE 200 
+INFO 2024/01/01 12:23:53.656877 127.0.0.1 GET /admin/security/risk-reporting/get-list REQUEST 
+INFO 2024/01/01 12:23:53.657965 127.0.0.1:57166 GET /admin/security/risk-reporting/get-list RESPONSE 200 
+INFO 2024/01/01 12:24:54.690178 127.0.0.1 GET /admin/security/risk-reporting/get-list REQUEST 
+INFO 2024/01/01 12:24:54.692493 127.0.0.1:57203 GET /admin/security/risk-reporting/get-list RESPONSE 200 
+INFO 2024/01/01 12:39:34.702771 127.0.0.1 GET /admin/security/risk-reporting/get-list REQUEST 
+INFO 2024/01/01 12:39:34.706851 127.0.0.1:58390 GET /admin/security/risk-reporting/get-list RESPONSE 200 

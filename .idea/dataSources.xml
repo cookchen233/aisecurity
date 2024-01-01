@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="DataSourceManagerImpl" format="xml" multifile-model="true">
+    <data-source source="LOCAL" name="aisecurity@localhost" uuid="ff7c0ea4-da24-4a19-8c0c-e0eca47e1d25">
+      <driver-ref>postgresql</driver-ref>
+      <synchronize>true</synchronize>
+      <jdbc-driver>org.postgresql.Driver</jdbc-driver>
+      <jdbc-url>jdbc:postgresql://localhost:5432/aisecurity</jdbc-url>
+      <working-dir>$ProjectFileDir$</working-dir>
+      <time-zone>Asia/Shanghai</time-zone>
+    </data-source>
+  </component>
+</project>

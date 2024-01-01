@@ -1,0 +1,21 @@
+[GIN-debug] [WARNING] Creating an Engine instance with the Logger and Recovery middleware already attached.
+
+[GIN-debug] [WARNING] Running in "debug" mode. Switch to "release" mode in production.
+ - using env:	export GIN_MODE=release
+ - using code:	gin.SetMode(gin.ReleaseMode)
+
+[GIN-debug] GET    /public/*filepath         --> github.com/gin-gonic/gin.(*RouterGroup).createStaticHandler.func1 (3 handlers)
+[GIN-debug] HEAD   /public/*filepath         --> github.com/gin-gonic/gin.(*RouterGroup).createStaticHandler.func1 (3 handlers)
+[GIN-debug] GET    /toycar/accept-control    --> aisecurity/routes.(*ToycarRoutes).Setup.HandleWebSocket.func1 (3 handlers)
+[GIN-debug] GET    /toycar/control-panel     --> aisecurity/routes.(*ToycarRoutes).Setup.HandleWebSocket.func2 (3 handlers)
+[GIN-debug] GET    /admin/auth/role/index    --> aisecurity/handlers/admin/auth.(*RoleHandler).Index-fm (3 handlers)
+[GIN-debug] GET    /admin/auth/admin/create  --> aisecurity/handlers/admin/auth.(*AdminHandler).Create-fm (3 handlers)
+[GIN-debug] POST   /admin/security/risk-reporting/create --> aisecurity/handlers/admin/security.(*RiskReportingHandler).Create-fm (3 handlers)
+[GIN-debug] GET    /admin/security/risk-reporting/get-list --> aisecurity/handlers/admin/security.(*RiskReportingHandler).GetList-fm (3 handlers)
+[GIN-debug] POST   /admin/security/risk-reporting/create-risk-location --> aisecurity/handlers/admin/security.(*RiskReportingHandler).CreateRiskLocation-fm (3 handlers)
+[GIN-debug] [WARNING] You trusted all proxies, this is NOT safe. We recommend you to set a value.
+Please check https://pkg.go.dev/github.com/gin-gonic/gin#readme-don-t-trust-all-proxies for details.
+[GIN-debug] Listening and serving HTTP on 0.0.0.0:8024
+[GIN] 2024/01/01 - 10:13:21 | 400 |     702.709µs |       127.0.0.1 | POST     "/admin/security/risk-reporting/create"
+[GIN] 2024/01/01 - 10:13:22 | 400 |     269.625µs |       127.0.0.1 | POST     "/admin/security/risk-reporting/create"
+[GIN] 2024/01/01 - 10:13:23 | 400 |     197.292µs |       127.0.0.1 | POST     "/admin/security/risk-reporting/create"
