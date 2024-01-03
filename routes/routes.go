@@ -1,6 +1,9 @@
 package routes
 
 import (
+	"aisecurity/handlers"
+	"aisecurity/handlers/admin/auth"
+	"aisecurity/middlewares"
 	admin "aisecurity/routes/admin"
 	"github.com/gin-gonic/gin"
 )
@@ -15,10 +18,12 @@ func Setup(router *gin.Engine) {
 	NewToycarRoutes(router.Group("/toycar")).Setup()
 
 	// Register admin routes
-	adminRoutes := router.Group("/admin")
+	adminHandler := auth.NewAdminHandler()
+	router.POST("/admin/login", handlers.Convert(adminHandler, adminHandler.Login)) // without checking session
+	routes := router.Group("/admin", middlewares.IsAdminAuthorized())
 	{
-		// Register auth routes
-		admin.NewAuthRoutes(adminRoutes.Group("/auth")).Setup()
-		admin.NewSecurityRoutes(adminRoutes.Group("/security")).Setup()
+		admin.NewAuthRoutes(routes.Group("/auth")).Setup()
+		admin.NewSecurityRoutes(routes.Group("/security")).Setup()
+		admin.NewOrganizationRoutes(routes.Group("/organization")).Setup()
 	}
 }

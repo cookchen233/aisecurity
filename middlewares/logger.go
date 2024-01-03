@@ -11,7 +11,7 @@ import (
 	"time"
 )
 
-var LOGFILEBASE = "./logs/info/"
+var LOGFILEBASE = "./log/request/"
 var _log *log.Logger
 var _f *os.File
 var _today = time.Now()
@@ -83,7 +83,6 @@ func Logger() gin.HandlerFunc {
 				}
 			}
 		}
-
 		go _log.Println(c.Request.RemoteAddr, c.Request.Method, c.Request.RequestURI, "RESPONSE", blw.Status(), mdl.Message)
 	}
 }

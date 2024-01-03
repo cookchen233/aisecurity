@@ -1,0 +1,8 @@
+.DS_Store
+.env
+*.pem
+.idea
+logs
+log
+gin.log
+.env*.local
