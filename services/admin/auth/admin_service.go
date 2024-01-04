@@ -8,6 +8,7 @@ import (
 	"aisecurity/structs/service"
 	"aisecurity/utils/db"
 	"fmt"
+	"github.com/pkg/errors"
 	"golang.org/x/crypto/bcrypt"
 )
 
@@ -55,7 +56,7 @@ func (service *AdminService) Update(data service.Admin) (*dao.Admin, error) {
 		SetName(data.Name).
 		Save(service.Ctx)
 	if err != nil {
-		return nil, fmt.Errorf("failed updating Admin: %w", err)
+		return nil, errors.Wrap(err, "failed updating Admin")
 	}
 	return saved, nil
 }

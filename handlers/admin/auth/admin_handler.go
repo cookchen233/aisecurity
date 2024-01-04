@@ -11,7 +11,6 @@ import (
 	"fmt"
 	"github.com/gin-contrib/sessions"
 	"github.com/gin-gonic/gin"
-	"github.com/pkg/errors"
 	"golang.org/x/crypto/bcrypt"
 	"log"
 )
@@ -55,7 +54,7 @@ func (handler *AdminHandler) Create(c *gin.Context) {
 		return
 	}
 	if err := handler.Validate(req); err != nil {
-		http.Error(c, errors.WithStack(errors.Wrap(err, "x")), 900)
+		http.Error(c, err, 900)
 		return
 	}
 	role, err := auth.NewAdminRoleService().GetByID(req.AdminRoleID)
@@ -83,7 +82,7 @@ func (handler *AdminHandler) Update(c *gin.Context) {
 	}
 	saved, err := handler.service.Update(structs.ConvertTo[service.Admin](req))
 	if err != nil {
-		http.Error(c, errors.WithStack(err), 1000)
+		http.Error(c, err, 1000)
 		return
 	}
 	http.Success(c, saved)

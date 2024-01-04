@@ -8,6 +8,7 @@ import (
 	"entgo.io/ent/schema/mixin"
 	"fmt"
 	"github.com/gin-gonic/gin"
+	"github.com/pkg/errors"
 	"go.uber.org/zap"
 	"time"
 )
@@ -50,12 +51,12 @@ func AuditHook(next ent.Mutator) ent.Mutator {
 	return ent.MutateFunc(func(ctx context.Context, m ent.Mutation) (ent.Value, error) {
 		ml, ok := m.(AuditLogger)
 		if !ok {
-			return nil, fmt.Errorf("unexpected audit-log call from mutation type %T", m)
+			return nil, errors.WithStack(fmt.Errorf("unexpected audit-log call from mutation type %T", m))
 		}
 		// Extracting Gin context and ensuring its presence
 		ginCtx, ok := ctx.(*gin.Context)
 		if !ok {
-			return nil, fmt.Errorf("unexpected context type %T", ctx)
+			return nil, errors.WithStack(fmt.Errorf("unexpected context type %T", ctx))
 		}
 		// set the admin id
 		adminID := max(1, ginCtx.GetInt("admin_id"))

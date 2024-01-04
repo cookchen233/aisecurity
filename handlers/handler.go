@@ -4,6 +4,7 @@ import (
 	"aisecurity/types"
 	"context"
 	"errors"
+	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/go-playground/locales/zh_Hans_CN"
 	ut "github.com/go-playground/universal-translator"
@@ -47,8 +48,7 @@ func (handler *Handler) Validate(data interface{}) error {
 		for _, e := range errs {
 			errMsgs = append(errMsgs, e.Translate(trans))
 		}
-		//return errors.New(fmt.Sprint(errMsgs))
-		return err
+		return fmt.Errorf("%v", errMsgs)
 	}
 	return nil
 }

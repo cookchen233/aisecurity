@@ -1,6 +1,7 @@
 package middlewares
 
 import (
+	http2 "aisecurity/utils/http"
 	"bytes"
 	"encoding/json"
 	"fmt"
@@ -72,7 +73,7 @@ func RequestLogMiddleware() gin.HandlerFunc {
 		// i standartize responses with a struct called ResponseModel
 		// and unmarshalled to get the response message
 
-		var mdl = struct{ Message string }{""}
+		var mdl http2.Payload
 
 		if blw.Status() > 201 {
 			resp, err := io.ReadAll(blw.body)
@@ -83,7 +84,7 @@ func RequestLogMiddleware() gin.HandlerFunc {
 				}
 			}
 		}
-		go _log.Println(c.Request.RemoteAddr, c.Request.Method, c.Request.RequestURI, "RESPONSE", blw.Status(), mdl.Message)
+		go _log.Println(c.Request.RemoteAddr, c.Request.Method, c.Request.RequestURI, "RESPONSE", blw.Status(), mdl)
 	}
 }
 

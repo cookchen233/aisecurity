@@ -65,10 +65,14 @@ func LogMiddleware() gin.HandlerFunc {
 			tee := io.TeeReader(c.Request.Body, &buf)
 			bodyBytes, err = io.ReadAll(tee)
 			if err != nil {
+				utils.Logger.Error("Failed to read request body")
 			}
 			// Replace the request body so it can be read again
 			c.Request.Body = io.NopCloser(&buf)
 		}
+
+		blw := &bodyLogWriter{body: bytes.NewBufferString(""), ResponseWriter: c.Writer}
+		c.Writer = blw
 
 		c.Next()
 
@@ -79,15 +83,24 @@ func LogMiddleware() gin.HandlerFunc {
 			latency = latency.Truncate(time.Second)
 		}
 
-		stackTraces := make([]errors.StackTrace, 0, len(c.Errors))
+		//stackTraces := make([]errors.StackTrace, 0, len(c.Errors))
+		//for _, e := range c.Errors {
+		//	if err, ok := e.Err.(interface{ StackTrace() errors.StackTrace }); ok {
+		//		stackTraces = append(stackTraces, err.StackTrace())
+		//	}
+		//}
+		stackTraces := make([][]string, 0, len(c.Errors))
 		for _, e := range c.Errors {
-			if err, ok := e.Err.(interface{ StackTrace() errors.StackTrace }); ok {
-				stackTraces = append(stackTraces, err.StackTrace())
-			}
+			stackTraces = append(stackTraces, strings.Split(fmt.Sprintf("%+v", e.Err), "\n\t"))
 		}
 		zfs = append(zfs, zap.String("latency", fmt.Sprintf("%s", latency)))
 		if len(c.Errors) > 0 {
+			resp, err := io.ReadAll(blw.body)
+			if err != nil {
+				utils.Logger.Error("Failed to read response body")
+			}
 			zfs = append(zfs, zap.ByteString("body", bodyBytes))
+			zfs = append(zfs, zap.ByteString("resp", resp))
 			zfs = append(zfs, zap.String("error", c.Errors.ByType(gin.ErrorTypePrivate).String()))
 			if c.Writer.Status() >= 500 {
 				zfs = append(zfs, zap.Any("stack", stackTraces))
