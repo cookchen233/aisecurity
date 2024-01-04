@@ -49,7 +49,7 @@ func (handler *AdminHandler) CreateSuperAdmin(c *gin.Context) {
 
 func (handler *AdminHandler) Create(c *gin.Context) {
 	var req request.Admin
-	if err := c.BindJSON(&req); err != nil {
+	if err := c.ShouldBindJSON(&req); err != nil {
 		http.Error(c, err, 900)
 		return
 	}

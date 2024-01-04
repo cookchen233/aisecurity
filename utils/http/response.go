@@ -5,12 +5,14 @@ import (
 	"github.com/pkg/errors"
 	"net/http"
 	"reflect"
+	"strings"
 )
 
 type Payload struct {
 	Code    int         `json:"code"`
 	Message string      `json:"message"`
 	Data    interface{} `json:"data"`
+	Ref     string      `json:"ref"`
 	Traceid string      `json:"traceid"`
 }
 
@@ -53,6 +55,7 @@ func Success(c *gin.Context, data interface{}) {
 		http.StatusOK,
 		"成功",
 		respData,
+		"",
 		traceid.(string),
 	})
 }
@@ -66,16 +69,20 @@ func SuccessWithCode(c *gin.Context, data interface{}, code int) {
 		code,
 		"成功",
 		data,
+		"",
 		traceid.(string),
 	})
 }
 
 func Error(c *gin.Context, err error, code int) {
 	var statusCode = c.Writer.Status()
+	var errMessage string
 	if !c.Writer.Written() {
 		statusCode = 400
+		errMessage = "请求数据错误, 请检查"
 		if code >= 1000 {
 			statusCode = 500
+			errMessage = "服务器发生错误, 请稍后再试"
 		}
 		c.Status(statusCode)
 	}
@@ -84,10 +91,26 @@ func Error(c *gin.Context, err error, code int) {
 	if !ex {
 		traceid = ""
 	}
+	if err, ok := err.(interface{ Cause() error }); ok {
+		errMessage = err.Cause().Error()
+	}
+
+	cause := errors.Cause(err)
+	// Convert the full error message and the cause into strings
+	fullErrMsg := err.Error()
+	causeErrMsg := cause.Error()
+	if fullErrMsg != causeErrMsg {
+		// Remove the cause part from the full error message
+		errMessage = strings.TrimSuffix(fullErrMsg, causeErrMsg)
+		// Trim any leading colon or space
+		errMessage = strings.TrimRight(errMessage, ": ")
+	}
+
 	c.AbortWithStatusJSON(statusCode, Payload{
 		code,
-		err.Error(),
+		errMessage,
 		nil,
+		fullErrMsg,
 		traceid.(string),
 	})
 }
