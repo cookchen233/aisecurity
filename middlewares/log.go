@@ -3,16 +3,17 @@ package middlewares
 import (
 	"aisecurity/utils"
 	http2 "aisecurity/utils/http"
+	"bytes"
 	"fmt"
 	"github.com/gin-contrib/sessions"
 	"github.com/google/uuid"
 	"github.com/pkg/errors"
 	"hash/crc32"
+	"io"
 	"net"
 	"net/http"
 	"net/http/httputil"
 	"os"
-	"runtime/debug"
 	"strings"
 	"time"
 
@@ -21,7 +22,7 @@ import (
 )
 
 // LoggerMiddleware ref: https://github.com/gin-gonic/gin/blob/v1.9.0/logger.go#L182
-func LoggerMiddleware() gin.HandlerFunc {
+func LogMiddleware() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		// Start timer
 		start := time.Now()
@@ -44,6 +45,31 @@ func LoggerMiddleware() gin.HandlerFunc {
 		c.Set("traceid", traceid)
 		var oriLoggerL = utils.Logger.L
 		utils.Logger.L = utils.Logger.With(zap.String("traceid", traceid))
+
+		zfs := []zap.Field{
+			zap.String("start", start.Format(time.StampMicro)),
+			zap.Int("status", c.Writer.Status()),
+			zap.String("method", c.Request.Method),
+			zap.String("content_type", c.ContentType()),
+			zap.String("path", c.Request.URL.Path),
+			zap.String("raw_query", c.Request.URL.RawQuery),
+			zap.String("client_ip", c.ClientIP()),
+			zap.String("remote_ip", c.RemoteIP()),
+			zap.String("user_agent", c.Request.UserAgent()),
+		}
+		var bodyBytes []byte
+		var err error
+		if c.Request.Method == http.MethodPost {
+			// Create a buffer to hold the body data
+			var buf bytes.Buffer
+			tee := io.TeeReader(c.Request.Body, &buf)
+			bodyBytes, err = io.ReadAll(tee)
+			if err != nil {
+			}
+			// Replace the request body so it can be read again
+			c.Request.Body = io.NopCloser(&buf)
+		}
+
 		c.Next()
 
 		// Stop timer
@@ -59,30 +85,18 @@ func LoggerMiddleware() gin.HandlerFunc {
 				stackTraces = append(stackTraces, err.StackTrace())
 			}
 		}
-		zfs := []zap.Field{
-			zap.String("Start", start.Format(time.RFC3339)),
-			zap.Int("Status", c.Writer.Status()),
-			zap.String("Latency", fmt.Sprintf("%s", latency)),
-			zap.String("Method", c.Request.Method),
-			zap.String("Path", c.Request.URL.Path),
-			zap.String("RawQuery", c.Request.URL.RawQuery),
-			zap.String("ClientIP", c.ClientIP()),
-			zap.String("RemoteIP", c.RemoteIP()),
-			zap.String("userAgent", c.Request.UserAgent()),
-		}
+		zfs = append(zfs, zap.String("latency", fmt.Sprintf("%s", latency)))
 		if len(c.Errors) > 0 {
+			zfs = append(zfs, zap.ByteString("body", bodyBytes))
+			zfs = append(zfs, zap.String("error", c.Errors.ByType(gin.ErrorTypePrivate).String()))
 			if c.Writer.Status() >= 500 {
-				zfs = append(
-					zfs,
-					zap.String("Error", c.Errors.ByType(gin.ErrorTypePrivate).String()),
-					zap.Any("Stack", stackTraces),
-				)
-				utils.Logger.Error("GIN request", zfs...)
+				zfs = append(zfs, zap.Any("stack", stackTraces))
+				utils.Logger.Error("Request", zfs...)
 			} else {
-				utils.Logger.Warn("GIN request", zfs...)
+				utils.Logger.Warn("Request", zfs...)
 			}
 		} else {
-			utils.Logger.Info("GIN request", zfs...)
+			utils.Logger.Info("Request", zfs...)
 		}
 
 		// clear the with fields
@@ -92,7 +106,7 @@ func LoggerMiddleware() gin.HandlerFunc {
 }
 
 // RecoveryMiddleware ref: https://github.com/gin-gonic/gin/blob/v1.9.0/recovery.go#L33
-func RecoveryMiddleware2() gin.HandlerFunc {
+func RecoveryMiddleware() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		defer func() {
 			if err := recover(); err != nil {
@@ -137,53 +151,6 @@ func RecoveryMiddleware2() gin.HandlerFunc {
 					)
 					http2.Error(c, err.(error), http.StatusInternalServerError)
 				}
-			}
-		}()
-		c.Next()
-	}
-}
-
-// GinRecovery 用于替换gin框架的Recovery中间件，因为传入参数，再包一层
-func RecoveryMiddleware() gin.HandlerFunc {
-	logger := zap.L()
-	return func(c *gin.Context) {
-		defer func() {
-			// defer 延迟调用，出了异常，处理并恢复异常，记录日志
-			if err := recover(); err != nil {
-				//  这个不必须，检查是否存在断开的连接(broken pipe或者connection reset by peer)---------开始--------
-				var brokenPipe bool
-				if ne, ok := err.(*net.OpError); ok {
-					if se, ok := ne.Err.(*os.SyscallError); ok {
-						if strings.Contains(strings.ToLower(se.Error()), "broken pipe") || strings.Contains(strings.ToLower(se.Error()), "connection reset by peer") {
-							brokenPipe = true
-						}
-					}
-				}
-				//httputil包预先准备好的DumpRequest方法
-				httpRequest, _ := httputil.DumpRequest(c.Request, false)
-				if brokenPipe {
-					logger.Error(c.Request.URL.Path,
-						zap.Any("error", err),
-						zap.String("request", string(httpRequest)),
-					)
-					// 如果连接已断开，我们无法向其写入状态
-					c.Error(err.(error))
-					c.Abort()
-					return
-				}
-				//  这个不必须，检查是否存在断开的连接(broken pipe或者connection reset by peer)---------结束--------
-
-				// 是否打印堆栈信息，使用的是debug.Stack()，传入false，在日志中就没有堆栈信息
-
-				logger.Error("[Recovery from panic]",
-					zap.Any("error", err),
-					zap.String("request", string(httpRequest)),
-					zap.String("stack", string(debug.Stack())),
-				)
-				// 有错误，直接返回给前端错误，前端直接报错
-				//c.AbortWithStatus(http.StatusInternalServerError)
-				// 该方式前端不报错
-				c.String(200, "访问出错了")
 			}
 		}()
 		c.Next()

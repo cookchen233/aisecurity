@@ -24,13 +24,13 @@ func main() {
 	}
 	time.Local = loc
 
+	// load env
 	if err := godotenv.Load(); err != nil {
 		log.Fatal("Error loading .env file")
 	}
 
+	// Init logging
 	utils.InitLogger2()
-	// 调用内核的Sync方法，刷新所有缓冲的日志条目。
-	// 应用程序应该注意在退出之前调用Sync。
 	defer func(Logger *zap2.Logger) {
 		err := Logger.Sync()
 		if err != nil {
@@ -43,11 +43,19 @@ func main() {
 	//gin.DefaultWriter = io.MultiWriter(f)
 
 	r := gin.New()
+
 	// Set session store
 	store := cookie.NewStore([]byte(os.Getenv("SESSION_KEY")))
 	r.Use(sessions.Sessions("AISECURITYSESSIONID", store))
-	r.Use(middlewares.RecoveryMiddleware2(), middlewares.LoggerMiddleware())
-	r.Use(middlewares.Logger(), middlewares.AuditMiddleware())
+
+	// Register middlewares
+	r.Use(
+		middlewares.RecoveryMiddleware(),
+		middlewares.LogMiddleware(),
+		middlewares.RequestLogMiddleware(),
+		middlewares.AuditMiddleware(),
+	)
+
 	// Open the database connection
 	db.InitEntClient("postgres")
 	defer func() {

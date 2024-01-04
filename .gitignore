@@ -2,7 +2,7 @@
 .env
 *.pem
 .idea
-logs
-log
+/logs/
+/log/
 gin.log
 .env*.local

@@ -55,7 +55,7 @@ func (handler *AdminHandler) Create(c *gin.Context) {
 		return
 	}
 	if err := handler.Validate(req); err != nil {
-		http.Error(c, err, 900)
+		http.Error(c, errors.WithStack(errors.Wrap(err, "x")), 900)
 		return
 	}
 	role, err := auth.NewAdminRoleService().GetByID(req.AdminRoleID)
