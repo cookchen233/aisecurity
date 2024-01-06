@@ -3204,11 +3204,11 @@ type DepartmentMutation struct {
 	typ                        string
 	id                         *int
 	created_at                 *time.Time
-	title                      *string
 	deleted_at                 *time.Time
 	updated_by                 *int
 	addupdated_by              *int
 	updated_at                 *time.Time
+	title                      *string
 	clearedFields              map[string]struct{}
 	creator                    *int
 	clearedcreator             bool
@@ -3395,91 +3395,6 @@ func (m *DepartmentMutation) ResetCreatedBy() {
 	m.creator = nil
 }
 
-// SetTitle sets the "title" field.
-func (m *DepartmentMutation) SetTitle(s string) {
-	m.title = &s
-}
-
-// Title returns the value of the "title" field in the mutation.
-func (m *DepartmentMutation) Title() (r string, exists bool) {
-	v := m.title
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// OldTitle returns the old "title" field's value of the Department entity.
-// If the Department object wasn't provided to the builder, the object is fetched from the database.
-// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *DepartmentMutation) OldTitle(ctx context.Context) (v string, err error) {
-	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldTitle is only allowed on UpdateOne operations")
-	}
-	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldTitle requires an ID field in the mutation")
-	}
-	oldValue, err := m.oldValue(ctx)
-	if err != nil {
-		return v, fmt.Errorf("querying old value for OldTitle: %w", err)
-	}
-	return oldValue.Title, nil
-}
-
-// ResetTitle resets all changes to the "title" field.
-func (m *DepartmentMutation) ResetTitle() {
-	m.title = nil
-}
-
-// SetParentID sets the "parent_id" field.
-func (m *DepartmentMutation) SetParentID(i int) {
-	m.parent = &i
-}
-
-// ParentID returns the value of the "parent_id" field in the mutation.
-func (m *DepartmentMutation) ParentID() (r int, exists bool) {
-	v := m.parent
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// OldParentID returns the old "parent_id" field's value of the Department entity.
-// If the Department object wasn't provided to the builder, the object is fetched from the database.
-// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *DepartmentMutation) OldParentID(ctx context.Context) (v int, err error) {
-	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldParentID is only allowed on UpdateOne operations")
-	}
-	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldParentID requires an ID field in the mutation")
-	}
-	oldValue, err := m.oldValue(ctx)
-	if err != nil {
-		return v, fmt.Errorf("querying old value for OldParentID: %w", err)
-	}
-	return oldValue.ParentID, nil
-}
-
-// ClearParentID clears the value of the "parent_id" field.
-func (m *DepartmentMutation) ClearParentID() {
-	m.parent = nil
-	m.clearedFields[department.FieldParentID] = struct{}{}
-}
-
-// ParentIDCleared returns if the "parent_id" field was cleared in this mutation.
-func (m *DepartmentMutation) ParentIDCleared() bool {
-	_, ok := m.clearedFields[department.FieldParentID]
-	return ok
-}
-
-// ResetParentID resets all changes to the "parent_id" field.
-func (m *DepartmentMutation) ResetParentID() {
-	m.parent = nil
-	delete(m.clearedFields, department.FieldParentID)
-}
-
 // SetDeletedAt sets the "deleted_at" field.
 func (m *DepartmentMutation) SetDeletedAt(t time.Time) {
 	m.deleted_at = &t
@@ -3621,6 +3536,78 @@ func (m *DepartmentMutation) ResetUpdatedAt() {
 	m.updated_at = nil
 }
 
+// SetTitle sets the "title" field.
+func (m *DepartmentMutation) SetTitle(s string) {
+	m.title = &s
+}
+
+// Title returns the value of the "title" field in the mutation.
+func (m *DepartmentMutation) Title() (r string, exists bool) {
+	v := m.title
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldTitle returns the old "title" field's value of the Department entity.
+// If the Department object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *DepartmentMutation) OldTitle(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldTitle is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldTitle requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldTitle: %w", err)
+	}
+	return oldValue.Title, nil
+}
+
+// ResetTitle resets all changes to the "title" field.
+func (m *DepartmentMutation) ResetTitle() {
+	m.title = nil
+}
+
+// SetParentID sets the "parent_id" field.
+func (m *DepartmentMutation) SetParentID(i int) {
+	m.parent = &i
+}
+
+// ParentID returns the value of the "parent_id" field in the mutation.
+func (m *DepartmentMutation) ParentID() (r int, exists bool) {
+	v := m.parent
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldParentID returns the old "parent_id" field's value of the Department entity.
+// If the Department object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *DepartmentMutation) OldParentID(ctx context.Context) (v int, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldParentID is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldParentID requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldParentID: %w", err)
+	}
+	return oldValue.ParentID, nil
+}
+
+// ResetParentID resets all changes to the "parent_id" field.
+func (m *DepartmentMutation) ResetParentID() {
+	m.parent = nil
+}
+
 // SetCreatorID sets the "creator" edge to the Admin entity by id.
 func (m *DepartmentMutation) SetCreatorID(id int) {
 	m.creator = &id
@@ -3669,7 +3656,7 @@ func (m *DepartmentMutation) ClearParent() {
 
 // ParentCleared reports if the "parent" edge to the Department entity was cleared.
 func (m *DepartmentMutation) ParentCleared() bool {
-	return m.ParentIDCleared() || m.clearedparent
+	return m.clearedparent
 }
 
 // ParentIDs returns the "parent" edge IDs in the mutation.
@@ -3837,12 +3824,6 @@ func (m *DepartmentMutation) Fields() []string {
 	if m.creator != nil {
 		fields = append(fields, department.FieldCreatedBy)
 	}
-	if m.title != nil {
-		fields = append(fields, department.FieldTitle)
-	}
-	if m.parent != nil {
-		fields = append(fields, department.FieldParentID)
-	}
 	if m.deleted_at != nil {
 		fields = append(fields, department.FieldDeletedAt)
 	}
@@ -3851,6 +3832,12 @@ func (m *DepartmentMutation) Fields() []string {
 	}
 	if m.updated_at != nil {
 		fields = append(fields, department.FieldUpdatedAt)
+	}
+	if m.title != nil {
+		fields = append(fields, department.FieldTitle)
+	}
+	if m.parent != nil {
+		fields = append(fields, department.FieldParentID)
 	}
 	return fields
 }
@@ -3864,16 +3851,16 @@ func (m *DepartmentMutation) Field(name string) (ent.Value, bool) {
 		return m.CreatedAt()
 	case department.FieldCreatedBy:
 		return m.CreatedBy()
-	case department.FieldTitle:
-		return m.Title()
-	case department.FieldParentID:
-		return m.ParentID()
 	case department.FieldDeletedAt:
 		return m.DeletedAt()
 	case department.FieldUpdatedBy:
 		return m.UpdatedBy()
 	case department.FieldUpdatedAt:
 		return m.UpdatedAt()
+	case department.FieldTitle:
+		return m.Title()
+	case department.FieldParentID:
+		return m.ParentID()
 	}
 	return nil, false
 }
@@ -3887,16 +3874,16 @@ func (m *DepartmentMutation) OldField(ctx context.Context, name string) (ent.Val
 		return m.OldCreatedAt(ctx)
 	case department.FieldCreatedBy:
 		return m.OldCreatedBy(ctx)
-	case department.FieldTitle:
-		return m.OldTitle(ctx)
-	case department.FieldParentID:
-		return m.OldParentID(ctx)
 	case department.FieldDeletedAt:
 		return m.OldDeletedAt(ctx)
 	case department.FieldUpdatedBy:
 		return m.OldUpdatedBy(ctx)
 	case department.FieldUpdatedAt:
 		return m.OldUpdatedAt(ctx)
+	case department.FieldTitle:
+		return m.OldTitle(ctx)
+	case department.FieldParentID:
+		return m.OldParentID(ctx)
 	}
 	return nil, fmt.Errorf("unknown Department field %s", name)
 }
@@ -3920,20 +3907,6 @@ func (m *DepartmentMutation) SetField(name string, value ent.Value) error {
 		}
 		m.SetCreatedBy(v)
 		return nil
-	case department.FieldTitle:
-		v, ok := value.(string)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.SetTitle(v)
-		return nil
-	case department.FieldParentID:
-		v, ok := value.(int)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.SetParentID(v)
-		return nil
 	case department.FieldDeletedAt:
 		v, ok := value.(time.Time)
 		if !ok {
@@ -3954,6 +3927,20 @@ func (m *DepartmentMutation) SetField(name string, value ent.Value) error {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetUpdatedAt(v)
+		return nil
+	case department.FieldTitle:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetTitle(v)
+		return nil
+	case department.FieldParentID:
+		v, ok := value.(int)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetParentID(v)
 		return nil
 	}
 	return fmt.Errorf("unknown Department field %s", name)
@@ -4000,9 +3987,6 @@ func (m *DepartmentMutation) AddField(name string, value ent.Value) error {
 // mutation.
 func (m *DepartmentMutation) ClearedFields() []string {
 	var fields []string
-	if m.FieldCleared(department.FieldParentID) {
-		fields = append(fields, department.FieldParentID)
-	}
 	if m.FieldCleared(department.FieldDeletedAt) {
 		fields = append(fields, department.FieldDeletedAt)
 	}
@@ -4020,9 +4004,6 @@ func (m *DepartmentMutation) FieldCleared(name string) bool {
 // error if the field is not defined in the schema.
 func (m *DepartmentMutation) ClearField(name string) error {
 	switch name {
-	case department.FieldParentID:
-		m.ClearParentID()
-		return nil
 	case department.FieldDeletedAt:
 		m.ClearDeletedAt()
 		return nil
@@ -4040,12 +4021,6 @@ func (m *DepartmentMutation) ResetField(name string) error {
 	case department.FieldCreatedBy:
 		m.ResetCreatedBy()
 		return nil
-	case department.FieldTitle:
-		m.ResetTitle()
-		return nil
-	case department.FieldParentID:
-		m.ResetParentID()
-		return nil
 	case department.FieldDeletedAt:
 		m.ResetDeletedAt()
 		return nil
@@ -4054,6 +4029,12 @@ func (m *DepartmentMutation) ResetField(name string) error {
 		return nil
 	case department.FieldUpdatedAt:
 		m.ResetUpdatedAt()
+		return nil
+	case department.FieldTitle:
+		m.ResetTitle()
+		return nil
+	case department.FieldParentID:
+		m.ResetParentID()
 		return nil
 	}
 	return fmt.Errorf("unknown Department field %s", name)
@@ -4208,24 +4189,30 @@ func (m *DepartmentMutation) ResetEdge(name string) error {
 // EmployeeMutation represents an operation that mutates the Employee nodes in the graph.
 type EmployeeMutation struct {
 	config
-	op                Op
-	typ               string
-	id                *int
-	created_at        *time.Time
-	deleted_at        *time.Time
-	updated_by        *int
-	addupdated_by     *int
-	updated_at        *time.Time
-	clearedFields     map[string]struct{}
-	creator           *int
-	clearedcreator    bool
-	admin             *int
-	clearedadmin      bool
-	department        *int
-	cleareddepartment bool
-	done              bool
-	oldValue          func(context.Context) (*Employee, error)
-	predicates        []predicate.Employee
+	op                     Op
+	typ                    string
+	id                     *int
+	created_at             *time.Time
+	deleted_at             *time.Time
+	updated_by             *int
+	addupdated_by          *int
+	updated_at             *time.Time
+	clearedFields          map[string]struct{}
+	creator                *int
+	clearedcreator         bool
+	admin                  *int
+	clearedadmin           bool
+	department             *int
+	cleareddepartment      bool
+	risk_maintainer        map[int]struct{}
+	removedrisk_maintainer map[int]struct{}
+	clearedrisk_maintainer bool
+	risk_creator           map[int]struct{}
+	removedrisk_creator    map[int]struct{}
+	clearedrisk_creator    bool
+	done                   bool
+	oldValue               func(context.Context) (*Employee, error)
+	predicates             []predicate.Employee
 }
 
 var _ ent.Mutation = (*EmployeeMutation)(nil)
@@ -4398,78 +4385,6 @@ func (m *EmployeeMutation) ResetCreatedBy() {
 	m.creator = nil
 }
 
-// SetAdminID sets the "admin_id" field.
-func (m *EmployeeMutation) SetAdminID(i int) {
-	m.admin = &i
-}
-
-// AdminID returns the value of the "admin_id" field in the mutation.
-func (m *EmployeeMutation) AdminID() (r int, exists bool) {
-	v := m.admin
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// OldAdminID returns the old "admin_id" field's value of the Employee entity.
-// If the Employee object wasn't provided to the builder, the object is fetched from the database.
-// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *EmployeeMutation) OldAdminID(ctx context.Context) (v int, err error) {
-	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldAdminID is only allowed on UpdateOne operations")
-	}
-	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldAdminID requires an ID field in the mutation")
-	}
-	oldValue, err := m.oldValue(ctx)
-	if err != nil {
-		return v, fmt.Errorf("querying old value for OldAdminID: %w", err)
-	}
-	return oldValue.AdminID, nil
-}
-
-// ResetAdminID resets all changes to the "admin_id" field.
-func (m *EmployeeMutation) ResetAdminID() {
-	m.admin = nil
-}
-
-// SetDepartmentID sets the "department_id" field.
-func (m *EmployeeMutation) SetDepartmentID(i int) {
-	m.department = &i
-}
-
-// DepartmentID returns the value of the "department_id" field in the mutation.
-func (m *EmployeeMutation) DepartmentID() (r int, exists bool) {
-	v := m.department
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// OldDepartmentID returns the old "department_id" field's value of the Employee entity.
-// If the Employee object wasn't provided to the builder, the object is fetched from the database.
-// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *EmployeeMutation) OldDepartmentID(ctx context.Context) (v int, err error) {
-	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldDepartmentID is only allowed on UpdateOne operations")
-	}
-	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldDepartmentID requires an ID field in the mutation")
-	}
-	oldValue, err := m.oldValue(ctx)
-	if err != nil {
-		return v, fmt.Errorf("querying old value for OldDepartmentID: %w", err)
-	}
-	return oldValue.DepartmentID, nil
-}
-
-// ResetDepartmentID resets all changes to the "department_id" field.
-func (m *EmployeeMutation) ResetDepartmentID() {
-	m.department = nil
-}
-
 // SetDeletedAt sets the "deleted_at" field.
 func (m *EmployeeMutation) SetDeletedAt(t time.Time) {
 	m.deleted_at = &t
@@ -4611,6 +4526,78 @@ func (m *EmployeeMutation) ResetUpdatedAt() {
 	m.updated_at = nil
 }
 
+// SetAdminID sets the "admin_id" field.
+func (m *EmployeeMutation) SetAdminID(i int) {
+	m.admin = &i
+}
+
+// AdminID returns the value of the "admin_id" field in the mutation.
+func (m *EmployeeMutation) AdminID() (r int, exists bool) {
+	v := m.admin
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldAdminID returns the old "admin_id" field's value of the Employee entity.
+// If the Employee object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *EmployeeMutation) OldAdminID(ctx context.Context) (v int, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldAdminID is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldAdminID requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldAdminID: %w", err)
+	}
+	return oldValue.AdminID, nil
+}
+
+// ResetAdminID resets all changes to the "admin_id" field.
+func (m *EmployeeMutation) ResetAdminID() {
+	m.admin = nil
+}
+
+// SetDepartmentID sets the "department_id" field.
+func (m *EmployeeMutation) SetDepartmentID(i int) {
+	m.department = &i
+}
+
+// DepartmentID returns the value of the "department_id" field in the mutation.
+func (m *EmployeeMutation) DepartmentID() (r int, exists bool) {
+	v := m.department
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldDepartmentID returns the old "department_id" field's value of the Employee entity.
+// If the Employee object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *EmployeeMutation) OldDepartmentID(ctx context.Context) (v int, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldDepartmentID is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldDepartmentID requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldDepartmentID: %w", err)
+	}
+	return oldValue.DepartmentID, nil
+}
+
+// ResetDepartmentID resets all changes to the "department_id" field.
+func (m *EmployeeMutation) ResetDepartmentID() {
+	m.department = nil
+}
+
 // SetCreatorID sets the "creator" edge to the Admin entity by id.
 func (m *EmployeeMutation) SetCreatorID(id int) {
 	m.creator = &id
@@ -4705,6 +4692,114 @@ func (m *EmployeeMutation) ResetDepartment() {
 	m.cleareddepartment = false
 }
 
+// AddRiskMaintainerIDs adds the "risk_maintainer" edge to the Risk entity by ids.
+func (m *EmployeeMutation) AddRiskMaintainerIDs(ids ...int) {
+	if m.risk_maintainer == nil {
+		m.risk_maintainer = make(map[int]struct{})
+	}
+	for i := range ids {
+		m.risk_maintainer[ids[i]] = struct{}{}
+	}
+}
+
+// ClearRiskMaintainer clears the "risk_maintainer" edge to the Risk entity.
+func (m *EmployeeMutation) ClearRiskMaintainer() {
+	m.clearedrisk_maintainer = true
+}
+
+// RiskMaintainerCleared reports if the "risk_maintainer" edge to the Risk entity was cleared.
+func (m *EmployeeMutation) RiskMaintainerCleared() bool {
+	return m.clearedrisk_maintainer
+}
+
+// RemoveRiskMaintainerIDs removes the "risk_maintainer" edge to the Risk entity by IDs.
+func (m *EmployeeMutation) RemoveRiskMaintainerIDs(ids ...int) {
+	if m.removedrisk_maintainer == nil {
+		m.removedrisk_maintainer = make(map[int]struct{})
+	}
+	for i := range ids {
+		delete(m.risk_maintainer, ids[i])
+		m.removedrisk_maintainer[ids[i]] = struct{}{}
+	}
+}
+
+// RemovedRiskMaintainer returns the removed IDs of the "risk_maintainer" edge to the Risk entity.
+func (m *EmployeeMutation) RemovedRiskMaintainerIDs() (ids []int) {
+	for id := range m.removedrisk_maintainer {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// RiskMaintainerIDs returns the "risk_maintainer" edge IDs in the mutation.
+func (m *EmployeeMutation) RiskMaintainerIDs() (ids []int) {
+	for id := range m.risk_maintainer {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// ResetRiskMaintainer resets all changes to the "risk_maintainer" edge.
+func (m *EmployeeMutation) ResetRiskMaintainer() {
+	m.risk_maintainer = nil
+	m.clearedrisk_maintainer = false
+	m.removedrisk_maintainer = nil
+}
+
+// AddRiskCreatorIDs adds the "risk_creator" edge to the Risk entity by ids.
+func (m *EmployeeMutation) AddRiskCreatorIDs(ids ...int) {
+	if m.risk_creator == nil {
+		m.risk_creator = make(map[int]struct{})
+	}
+	for i := range ids {
+		m.risk_creator[ids[i]] = struct{}{}
+	}
+}
+
+// ClearRiskCreator clears the "risk_creator" edge to the Risk entity.
+func (m *EmployeeMutation) ClearRiskCreator() {
+	m.clearedrisk_creator = true
+}
+
+// RiskCreatorCleared reports if the "risk_creator" edge to the Risk entity was cleared.
+func (m *EmployeeMutation) RiskCreatorCleared() bool {
+	return m.clearedrisk_creator
+}
+
+// RemoveRiskCreatorIDs removes the "risk_creator" edge to the Risk entity by IDs.
+func (m *EmployeeMutation) RemoveRiskCreatorIDs(ids ...int) {
+	if m.removedrisk_creator == nil {
+		m.removedrisk_creator = make(map[int]struct{})
+	}
+	for i := range ids {
+		delete(m.risk_creator, ids[i])
+		m.removedrisk_creator[ids[i]] = struct{}{}
+	}
+}
+
+// RemovedRiskCreator returns the removed IDs of the "risk_creator" edge to the Risk entity.
+func (m *EmployeeMutation) RemovedRiskCreatorIDs() (ids []int) {
+	for id := range m.removedrisk_creator {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// RiskCreatorIDs returns the "risk_creator" edge IDs in the mutation.
+func (m *EmployeeMutation) RiskCreatorIDs() (ids []int) {
+	for id := range m.risk_creator {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// ResetRiskCreator resets all changes to the "risk_creator" edge.
+func (m *EmployeeMutation) ResetRiskCreator() {
+	m.risk_creator = nil
+	m.clearedrisk_creator = false
+	m.removedrisk_creator = nil
+}
+
 // Where appends a list predicates to the EmployeeMutation builder.
 func (m *EmployeeMutation) Where(ps ...predicate.Employee) {
 	m.predicates = append(m.predicates, ps...)
@@ -4746,12 +4841,6 @@ func (m *EmployeeMutation) Fields() []string {
 	if m.creator != nil {
 		fields = append(fields, employee.FieldCreatedBy)
 	}
-	if m.admin != nil {
-		fields = append(fields, employee.FieldAdminID)
-	}
-	if m.department != nil {
-		fields = append(fields, employee.FieldDepartmentID)
-	}
 	if m.deleted_at != nil {
 		fields = append(fields, employee.FieldDeletedAt)
 	}
@@ -4760,6 +4849,12 @@ func (m *EmployeeMutation) Fields() []string {
 	}
 	if m.updated_at != nil {
 		fields = append(fields, employee.FieldUpdatedAt)
+	}
+	if m.admin != nil {
+		fields = append(fields, employee.FieldAdminID)
+	}
+	if m.department != nil {
+		fields = append(fields, employee.FieldDepartmentID)
 	}
 	return fields
 }
@@ -4773,16 +4868,16 @@ func (m *EmployeeMutation) Field(name string) (ent.Value, bool) {
 		return m.CreatedAt()
 	case employee.FieldCreatedBy:
 		return m.CreatedBy()
-	case employee.FieldAdminID:
-		return m.AdminID()
-	case employee.FieldDepartmentID:
-		return m.DepartmentID()
 	case employee.FieldDeletedAt:
 		return m.DeletedAt()
 	case employee.FieldUpdatedBy:
 		return m.UpdatedBy()
 	case employee.FieldUpdatedAt:
 		return m.UpdatedAt()
+	case employee.FieldAdminID:
+		return m.AdminID()
+	case employee.FieldDepartmentID:
+		return m.DepartmentID()
 	}
 	return nil, false
 }
@@ -4796,16 +4891,16 @@ func (m *EmployeeMutation) OldField(ctx context.Context, name string) (ent.Value
 		return m.OldCreatedAt(ctx)
 	case employee.FieldCreatedBy:
 		return m.OldCreatedBy(ctx)
-	case employee.FieldAdminID:
-		return m.OldAdminID(ctx)
-	case employee.FieldDepartmentID:
-		return m.OldDepartmentID(ctx)
 	case employee.FieldDeletedAt:
 		return m.OldDeletedAt(ctx)
 	case employee.FieldUpdatedBy:
 		return m.OldUpdatedBy(ctx)
 	case employee.FieldUpdatedAt:
 		return m.OldUpdatedAt(ctx)
+	case employee.FieldAdminID:
+		return m.OldAdminID(ctx)
+	case employee.FieldDepartmentID:
+		return m.OldDepartmentID(ctx)
 	}
 	return nil, fmt.Errorf("unknown Employee field %s", name)
 }
@@ -4829,20 +4924,6 @@ func (m *EmployeeMutation) SetField(name string, value ent.Value) error {
 		}
 		m.SetCreatedBy(v)
 		return nil
-	case employee.FieldAdminID:
-		v, ok := value.(int)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.SetAdminID(v)
-		return nil
-	case employee.FieldDepartmentID:
-		v, ok := value.(int)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.SetDepartmentID(v)
-		return nil
 	case employee.FieldDeletedAt:
 		v, ok := value.(time.Time)
 		if !ok {
@@ -4863,6 +4944,20 @@ func (m *EmployeeMutation) SetField(name string, value ent.Value) error {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetUpdatedAt(v)
+		return nil
+	case employee.FieldAdminID:
+		v, ok := value.(int)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetAdminID(v)
+		return nil
+	case employee.FieldDepartmentID:
+		v, ok := value.(int)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetDepartmentID(v)
 		return nil
 	}
 	return fmt.Errorf("unknown Employee field %s", name)
@@ -4943,12 +5038,6 @@ func (m *EmployeeMutation) ResetField(name string) error {
 	case employee.FieldCreatedBy:
 		m.ResetCreatedBy()
 		return nil
-	case employee.FieldAdminID:
-		m.ResetAdminID()
-		return nil
-	case employee.FieldDepartmentID:
-		m.ResetDepartmentID()
-		return nil
 	case employee.FieldDeletedAt:
 		m.ResetDeletedAt()
 		return nil
@@ -4958,13 +5047,19 @@ func (m *EmployeeMutation) ResetField(name string) error {
 	case employee.FieldUpdatedAt:
 		m.ResetUpdatedAt()
 		return nil
+	case employee.FieldAdminID:
+		m.ResetAdminID()
+		return nil
+	case employee.FieldDepartmentID:
+		m.ResetDepartmentID()
+		return nil
 	}
 	return fmt.Errorf("unknown Employee field %s", name)
 }
 
 // AddedEdges returns all edge names that were set/added in this mutation.
 func (m *EmployeeMutation) AddedEdges() []string {
-	edges := make([]string, 0, 3)
+	edges := make([]string, 0, 5)
 	if m.creator != nil {
 		edges = append(edges, employee.EdgeCreator)
 	}
@@ -4973,6 +5068,12 @@ func (m *EmployeeMutation) AddedEdges() []string {
 	}
 	if m.department != nil {
 		edges = append(edges, employee.EdgeDepartment)
+	}
+	if m.risk_maintainer != nil {
+		edges = append(edges, employee.EdgeRiskMaintainer)
+	}
+	if m.risk_creator != nil {
+		edges = append(edges, employee.EdgeRiskCreator)
 	}
 	return edges
 }
@@ -4993,25 +5094,57 @@ func (m *EmployeeMutation) AddedIDs(name string) []ent.Value {
 		if id := m.department; id != nil {
 			return []ent.Value{*id}
 		}
+	case employee.EdgeRiskMaintainer:
+		ids := make([]ent.Value, 0, len(m.risk_maintainer))
+		for id := range m.risk_maintainer {
+			ids = append(ids, id)
+		}
+		return ids
+	case employee.EdgeRiskCreator:
+		ids := make([]ent.Value, 0, len(m.risk_creator))
+		for id := range m.risk_creator {
+			ids = append(ids, id)
+		}
+		return ids
 	}
 	return nil
 }
 
 // RemovedEdges returns all edge names that were removed in this mutation.
 func (m *EmployeeMutation) RemovedEdges() []string {
-	edges := make([]string, 0, 3)
+	edges := make([]string, 0, 5)
+	if m.removedrisk_maintainer != nil {
+		edges = append(edges, employee.EdgeRiskMaintainer)
+	}
+	if m.removedrisk_creator != nil {
+		edges = append(edges, employee.EdgeRiskCreator)
+	}
 	return edges
 }
 
 // RemovedIDs returns all IDs (to other nodes) that were removed for the edge with
 // the given name in this mutation.
 func (m *EmployeeMutation) RemovedIDs(name string) []ent.Value {
+	switch name {
+	case employee.EdgeRiskMaintainer:
+		ids := make([]ent.Value, 0, len(m.removedrisk_maintainer))
+		for id := range m.removedrisk_maintainer {
+			ids = append(ids, id)
+		}
+		return ids
+	case employee.EdgeRiskCreator:
+		ids := make([]ent.Value, 0, len(m.removedrisk_creator))
+		for id := range m.removedrisk_creator {
+			ids = append(ids, id)
+		}
+		return ids
+	}
 	return nil
 }
 
 // ClearedEdges returns all edge names that were cleared in this mutation.
 func (m *EmployeeMutation) ClearedEdges() []string {
-	edges := make([]string, 0, 3)
+	edges := make([]string, 0, 5)
 	if m.clearedcreator {
 		edges = append(edges, employee.EdgeCreator)
 	}
@@ -5020,6 +5153,12 @@ func (m *EmployeeMutation) ClearedEdges() []string {
 	}
 	if m.cleareddepartment {
 		edges = append(edges, employee.EdgeDepartment)
+	}
+	if m.clearedrisk_maintainer {
+		edges = append(edges, employee.EdgeRiskMaintainer)
+	}
+	if m.clearedrisk_creator {
+		edges = append(edges, employee.EdgeRiskCreator)
 	}
 	return edges
 }
@@ -5034,6 +5173,10 @@ func (m *EmployeeMutation) EdgeCleared(name string) bool {
 		return m.clearedadmin
 	case employee.EdgeDepartment:
 		return m.cleareddepartment
+	case employee.EdgeRiskMaintainer:
+		return m.clearedrisk_maintainer
+	case employee.EdgeRiskCreator:
+		return m.clearedrisk_creator
 	}
 	return false
 }
@@ -5068,6 +5211,12 @@ func (m *EmployeeMutation) ResetEdge(name string) error {
 	case employee.EdgeDepartment:
 		m.ResetDepartment()
 		return nil
+	case employee.EdgeRiskMaintainer:
+		m.ResetRiskMaintainer()
+		return nil
+	case employee.EdgeRiskCreator:
+		m.ResetRiskCreator()
+		return nil
 	}
 	return fmt.Errorf("unknown Employee edge %s", name)
 }
@@ -5075,17 +5224,15 @@ func (m *EmployeeMutation) ResetEdge(name string) error {
 // RiskMutation represents an operation that mutates the Risk nodes in the graph.
 type RiskMutation struct {
 	config
-	op            Op
-	typ           string
-	id            *int
-	created_at    *time.Time
-	deleted_at    *time.Time
-	updated_by    *int
-	addupdated_by *int
-	updated_at    *time.Time
-	title         *string
-	content       *string
-	images        *[]struct {
+	op         Op
+	typ        string
+	id         *int
+	created_at *time.Time
+	deleted_at *time.Time
+	updated_at *time.Time
+	title      *string
+	content    *string
+	images     *[]struct {
 		Title string "json:\"title\""
 		URL   string "json:\"url\""
 	}
@@ -5093,22 +5240,24 @@ type RiskMutation struct {
 		Title string "json:\"title\""
 		URL   string "json:\"url\""
 	}
-	measures                *string
-	maintain_status         *properties.MaintainStatus
-	addmaintain_status      *properties.MaintainStatus
-	due_time                *time.Time
-	clearedFields           map[string]struct{}
-	creator                 *int
-	clearedcreator          bool
-	maintainer_admin        *int
-	clearedmaintainer_admin bool
-	category                *int
-	clearedcategory         bool
-	location                *int
-	clearedlocation         bool
-	done                    bool
-	oldValue                func(context.Context) (*Risk, error)
-	predicates              []predicate.Risk
+	measures             *string
+	maintain_status      *properties.MaintainStatus
+	addmaintain_status   *properties.MaintainStatus
+	due_time             *time.Time
+	clearedFields        map[string]struct{}
+	creator              *int
+	clearedcreator       bool
+	updator              *int
+	clearedupdator       bool
+	maintainer           *int
+	clearedmaintainer    bool
+	risk_category        *int
+	clearedrisk_category bool
+	risk_location        *int
+	clearedrisk_location bool
+	done                 bool
+	oldValue             func(context.Context) (*Risk, error)
+	predicates           []predicate.Risk
 }
 
 var _ ent.Mutation = (*RiskMutation)(nil)
@@ -5332,13 +5481,12 @@ func (m *RiskMutation) ResetDeletedAt() {
 
 // SetUpdatedBy sets the "updated_by" field.
 func (m *RiskMutation) SetUpdatedBy(i int) {
-	m.updated_by = &i
-	m.addupdated_by = nil
+	m.updator = &i
 }
 
 // UpdatedBy returns the value of the "updated_by" field in the mutation.
 func (m *RiskMutation) UpdatedBy() (r int, exists bool) {
-	v := m.updated_by
+	v := m.updator
 	if v == nil {
 		return
 	}
@@ -5362,28 +5510,9 @@ func (m *RiskMutation) OldUpdatedBy(ctx context.Context) (v int, err error) {
 	return oldValue.UpdatedBy, nil
 }
 
-// AddUpdatedBy adds i to the "updated_by" field.
-func (m *RiskMutation) AddUpdatedBy(i int) {
-	if m.addupdated_by != nil {
-		*m.addupdated_by += i
-	} else {
-		m.addupdated_by = &i
-	}
-}
-
-// AddedUpdatedBy returns the value that was added to the "updated_by" field in this mutation.
-func (m *RiskMutation) AddedUpdatedBy() (r int, exists bool) {
-	v := m.addupdated_by
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
 // ResetUpdatedBy resets all changes to the "updated_by" field.
 func (m *RiskMutation) ResetUpdatedBy() {
-	m.updated_by = nil
-	m.addupdated_by = nil
+	m.updator = nil
 }
 
 // SetUpdatedAt sets the "updated_at" field.
@@ -5576,12 +5705,12 @@ func (m *RiskMutation) ResetImages() {
 
 // SetRiskCategoryID sets the "risk_category_id" field.
 func (m *RiskMutation) SetRiskCategoryID(i int) {
-	m.category = &i
+	m.risk_category = &i
 }
 
 // RiskCategoryID returns the value of the "risk_category_id" field in the mutation.
 func (m *RiskMutation) RiskCategoryID() (r int, exists bool) {
-	v := m.category
+	v := m.risk_category
 	if v == nil {
 		return
 	}
@@ -5607,17 +5736,17 @@ func (m *RiskMutation) OldRiskCategoryID(ctx context.Context) (v int, err error)
 
 // ResetRiskCategoryID resets all changes to the "risk_category_id" field.
 func (m *RiskMutation) ResetRiskCategoryID() {
-	m.category = nil
+	m.risk_category = nil
 }
 
 // SetRiskLocationID sets the "risk_location_id" field.
 func (m *RiskMutation) SetRiskLocationID(i int) {
-	m.location = &i
+	m.risk_location = &i
 }
 
 // RiskLocationID returns the value of the "risk_location_id" field in the mutation.
 func (m *RiskMutation) RiskLocationID() (r int, exists bool) {
-	v := m.location
+	v := m.risk_location
 	if v == nil {
 		return
 	}
@@ -5643,43 +5772,43 @@ func (m *RiskMutation) OldRiskLocationID(ctx context.Context) (v int, err error)
 
 // ResetRiskLocationID resets all changes to the "risk_location_id" field.
 func (m *RiskMutation) ResetRiskLocationID() {
-	m.location = nil
+	m.risk_location = nil
 }
 
-// SetMaintainer sets the "maintainer" field.
-func (m *RiskMutation) SetMaintainer(i int) {
-	m.maintainer_admin = &i
+// SetMaintainerID sets the "maintainer_id" field.
+func (m *RiskMutation) SetMaintainerID(i int) {
+	m.maintainer = &i
 }
 
-// Maintainer returns the value of the "maintainer" field in the mutation.
-func (m *RiskMutation) Maintainer() (r int, exists bool) {
-	v := m.maintainer_admin
+// MaintainerID returns the value of the "maintainer_id" field in the mutation.
+func (m *RiskMutation) MaintainerID() (r int, exists bool) {
+	v := m.maintainer
 	if v == nil {
 		return
 	}
 	return *v, true
 }
 
-// OldMaintainer returns the old "maintainer" field's value of the Risk entity.
+// OldMaintainerID returns the old "maintainer_id" field's value of the Risk entity.
 // If the Risk object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *RiskMutation) OldMaintainer(ctx context.Context) (v int, err error) {
+func (m *RiskMutation) OldMaintainerID(ctx context.Context) (v int, err error) {
 	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldMaintainer is only allowed on UpdateOne operations")
+		return v, errors.New("OldMaintainerID is only allowed on UpdateOne operations")
 	}
 	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldMaintainer requires an ID field in the mutation")
+		return v, errors.New("OldMaintainerID requires an ID field in the mutation")
 	}
 	oldValue, err := m.oldValue(ctx)
 	if err != nil {
-		return v, fmt.Errorf("querying old value for OldMaintainer: %w", err)
+		return v, fmt.Errorf("querying old value for OldMaintainerID: %w", err)
 	}
-	return oldValue.Maintainer, nil
+	return oldValue.MaintainerID, nil
 }
 
-// ResetMaintainer resets all changes to the "maintainer" field.
-func (m *RiskMutation) ResetMaintainer() {
-	m.maintainer_admin = nil
+// ResetMaintainerID resets all changes to the "maintainer_id" field.
+func (m *RiskMutation) ResetMaintainerID() {
+	m.maintainer = nil
 }
 
 // SetMeasures sets the "measures" field.
@@ -5823,18 +5952,18 @@ func (m *RiskMutation) ResetDueTime() {
 	m.due_time = nil
 }
 
-// SetCreatorID sets the "creator" edge to the Admin entity by id.
+// SetCreatorID sets the "creator" edge to the Employee entity by id.
 func (m *RiskMutation) SetCreatorID(id int) {
 	m.creator = &id
 }
 
-// ClearCreator clears the "creator" edge to the Admin entity.
+// ClearCreator clears the "creator" edge to the Employee entity.
 func (m *RiskMutation) ClearCreator() {
 	m.clearedcreator = true
 	m.clearedFields[risk.FieldCreatedBy] = struct{}{}
 }
 
-// CreatorCleared reports if the "creator" edge to the Admin entity was cleared.
+// CreatorCleared reports if the "creator" edge to the Employee entity was cleared.
 func (m *RiskMutation) CreatorCleared() bool {
 	return m.clearedcreator
 }
@@ -5863,124 +5992,125 @@ func (m *RiskMutation) ResetCreator() {
 	m.clearedcreator = false
 }
 
-// SetMaintainerAdminID sets the "maintainer_admin" edge to the Admin entity by id.
-func (m *RiskMutation) SetMaintainerAdminID(id int) {
-	m.maintainer_admin = &id
+// SetUpdatorID sets the "updator" edge to the Admin entity by id.
+func (m *RiskMutation) SetUpdatorID(id int) {
+	m.updator = &id
 }
 
-// ClearMaintainerAdmin clears the "maintainer_admin" edge to the Admin entity.
-func (m *RiskMutation) ClearMaintainerAdmin() {
-	m.clearedmaintainer_admin = true
-	m.clearedFields[risk.FieldMaintainer] = struct{}{}
+// ClearUpdator clears the "updator" edge to the Admin entity.
+func (m *RiskMutation) ClearUpdator() {
+	m.clearedupdator = true
+	m.clearedFields[risk.FieldUpdatedBy] = struct{}{}
 }
 
-// MaintainerAdminCleared reports if the "maintainer_admin" edge to the Admin entity was cleared.
-func (m *RiskMutation) MaintainerAdminCleared() bool {
-	return m.clearedmaintainer_admin
+// UpdatorCleared reports if the "updator" edge to the Admin entity was cleared.
+func (m *RiskMutation) UpdatorCleared() bool {
+	return m.clearedupdator
 }
 
-// MaintainerAdminID returns the "maintainer_admin" edge ID in the mutation.
-func (m *RiskMutation) MaintainerAdminID() (id int, exists bool) {
-	if m.maintainer_admin != nil {
-		return *m.maintainer_admin, true
+// UpdatorID returns the "updator" edge ID in the mutation.
+func (m *RiskMutation) UpdatorID() (id int, exists bool) {
+	if m.updator != nil {
+		return *m.updator, true
 	}
 	return
 }
 
-// MaintainerAdminIDs returns the "maintainer_admin" edge IDs in the mutation.
+// UpdatorIDs returns the "updator" edge IDs in the mutation.
 // Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
-// MaintainerAdminID instead. It exists only for internal usage by the builders.
-func (m *RiskMutation) MaintainerAdminIDs() (ids []int) {
-	if id := m.maintainer_admin; id != nil {
+// UpdatorID instead. It exists only for internal usage by the builders.
+func (m *RiskMutation) UpdatorIDs() (ids []int) {
+	if id := m.updator; id != nil {
 		ids = append(ids, *id)
 	}
 	return
 }
 
-// ResetMaintainerAdmin resets all changes to the "maintainer_admin" edge.
-func (m *RiskMutation) ResetMaintainerAdmin() {
-	m.maintainer_admin = nil
-	m.clearedmaintainer_admin = false
+// ResetUpdator resets all changes to the "updator" edge.
+func (m *RiskMutation) ResetUpdator() {
+	m.updator = nil
+	m.clearedupdator = false
 }
 
-// SetCategoryID sets the "category" edge to the RiskCategory entity by id.
-func (m *RiskMutation) SetCategoryID(id int) {
-	m.category = &id
+// ClearMaintainer clears the "maintainer" edge to the Employee entity.
+func (m *RiskMutation) ClearMaintainer() {
+	m.clearedmaintainer = true
+	m.clearedFields[risk.FieldMaintainerID] = struct{}{}
 }
 
-// ClearCategory clears the "category" edge to the RiskCategory entity.
-func (m *RiskMutation) ClearCategory() {
-	m.clearedcategory = true
+// MaintainerCleared reports if the "maintainer" edge to the Employee entity was cleared.
+func (m *RiskMutation) MaintainerCleared() bool {
+	return m.clearedmaintainer
+}
+
+// MaintainerIDs returns the "maintainer" edge IDs in the mutation.
+// Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
+// MaintainerID instead. It exists only for internal usage by the builders.
+func (m *RiskMutation) MaintainerIDs() (ids []int) {
+	if id := m.maintainer; id != nil {
+		ids = append(ids, *id)
+	}
+	return
+}
+
+// ResetMaintainer resets all changes to the "maintainer" edge.
+func (m *RiskMutation) ResetMaintainer() {
+	m.maintainer = nil
+	m.clearedmaintainer = false
+}
+
+// ClearRiskCategory clears the "risk_category" edge to the RiskCategory entity.
+func (m *RiskMutation) ClearRiskCategory() {
+	m.clearedrisk_category = true
 	m.clearedFields[risk.FieldRiskCategoryID] = struct{}{}
 }
 
-// CategoryCleared reports if the "category" edge to the RiskCategory entity was cleared.
-func (m *RiskMutation) CategoryCleared() bool {
-	return m.clearedcategory
+// RiskCategoryCleared reports if the "risk_category" edge to the RiskCategory entity was cleared.
+func (m *RiskMutation) RiskCategoryCleared() bool {
+	return m.clearedrisk_category
 }
 
-// CategoryID returns the "category" edge ID in the mutation.
-func (m *RiskMutation) CategoryID() (id int, exists bool) {
-	if m.category != nil {
-		return *m.category, true
-	}
-	return
-}
-
-// CategoryIDs returns the "category" edge IDs in the mutation.
+// RiskCategoryIDs returns the "risk_category" edge IDs in the mutation.
 // Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
-// CategoryID instead. It exists only for internal usage by the builders.
-func (m *RiskMutation) CategoryIDs() (ids []int) {
-	if id := m.category; id != nil {
+// RiskCategoryID instead. It exists only for internal usage by the builders.
+func (m *RiskMutation) RiskCategoryIDs() (ids []int) {
+	if id := m.risk_category; id != nil {
 		ids = append(ids, *id)
 	}
 	return
 }
 
-// ResetCategory resets all changes to the "category" edge.
-func (m *RiskMutation) ResetCategory() {
-	m.category = nil
-	m.clearedcategory = false
+// ResetRiskCategory resets all changes to the "risk_category" edge.
+func (m *RiskMutation) ResetRiskCategory() {
+	m.risk_category = nil
+	m.clearedrisk_category = false
 }
 
-// SetLocationID sets the "location" edge to the RiskLocation entity by id.
-func (m *RiskMutation) SetLocationID(id int) {
-	m.location = &id
-}
-
-// ClearLocation clears the "location" edge to the RiskLocation entity.
-func (m *RiskMutation) ClearLocation() {
-	m.clearedlocation = true
+// ClearRiskLocation clears the "risk_location" edge to the RiskLocation entity.
+func (m *RiskMutation) ClearRiskLocation() {
+	m.clearedrisk_location = true
 	m.clearedFields[risk.FieldRiskLocationID] = struct{}{}
 }
 
-// LocationCleared reports if the "location" edge to the RiskLocation entity was cleared.
-func (m *RiskMutation) LocationCleared() bool {
-	return m.clearedlocation
+// RiskLocationCleared reports if the "risk_location" edge to the RiskLocation entity was cleared.
+func (m *RiskMutation) RiskLocationCleared() bool {
+	return m.clearedrisk_location
 }
 
-// LocationID returns the "location" edge ID in the mutation.
-func (m *RiskMutation) LocationID() (id int, exists bool) {
-	if m.location != nil {
-		return *m.location, true
-	}
-	return
-}
-
-// LocationIDs returns the "location" edge IDs in the mutation.
+// RiskLocationIDs returns the "risk_location" edge IDs in the mutation.
 // Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
-// LocationID instead. It exists only for internal usage by the builders.
-func (m *RiskMutation) LocationIDs() (ids []int) {
-	if id := m.location; id != nil {
+// RiskLocationID instead. It exists only for internal usage by the builders.
+func (m *RiskMutation) RiskLocationIDs() (ids []int) {
+	if id := m.risk_location; id != nil {
 		ids = append(ids, *id)
 	}
 	return
 }
 
-// ResetLocation resets all changes to the "location" edge.
-func (m *RiskMutation) ResetLocation() {
-	m.location = nil
-	m.clearedlocation = false
+// ResetRiskLocation resets all changes to the "risk_location" edge.
+func (m *RiskMutation) ResetRiskLocation() {
+	m.risk_location = nil
+	m.clearedrisk_location = false
 }
 
 // Where appends a list predicates to the RiskMutation builder.
@@ -6027,7 +6157,7 @@ func (m *RiskMutation) Fields() []string {
 	if m.deleted_at != nil {
 		fields = append(fields, risk.FieldDeletedAt)
 	}
-	if m.updated_by != nil {
+	if m.updator != nil {
 		fields = append(fields, risk.FieldUpdatedBy)
 	}
 	if m.updated_at != nil {
@@ -6042,14 +6172,14 @@ func (m *RiskMutation) Fields() []string {
 	if m.images != nil {
 		fields = append(fields, risk.FieldImages)
 	}
-	if m.category != nil {
+	if m.risk_category != nil {
 		fields = append(fields, risk.FieldRiskCategoryID)
 	}
-	if m.location != nil {
+	if m.risk_location != nil {
 		fields = append(fields, risk.FieldRiskLocationID)
 	}
-	if m.maintainer_admin != nil {
-		fields = append(fields, risk.FieldMaintainer)
+	if m.maintainer != nil {
+		fields = append(fields, risk.FieldMaintainerID)
 	}
 	if m.measures != nil {
 		fields = append(fields, risk.FieldMeasures)
@@ -6088,8 +6218,8 @@ func (m *RiskMutation) Field(name string) (ent.Value, bool) {
 		return m.RiskCategoryID()
 	case risk.FieldRiskLocationID:
 		return m.RiskLocationID()
-	case risk.FieldMaintainer:
-		return m.Maintainer()
+	case risk.FieldMaintainerID:
+		return m.MaintainerID()
 	case risk.FieldMeasures:
 		return m.Measures()
 	case risk.FieldMaintainStatus:
@@ -6125,8 +6255,8 @@ func (m *RiskMutation) OldField(ctx context.Context, name string) (ent.Value, er
 		return m.OldRiskCategoryID(ctx)
 	case risk.FieldRiskLocationID:
 		return m.OldRiskLocationID(ctx)
-	case risk.FieldMaintainer:
-		return m.OldMaintainer(ctx)
+	case risk.FieldMaintainerID:
+		return m.OldMaintainerID(ctx)
 	case risk.FieldMeasures:
 		return m.OldMeasures(ctx)
 	case risk.FieldMaintainStatus:
@@ -6215,12 +6345,12 @@ func (m *RiskMutation) SetField(name string, value ent.Value) error {
 		}
 		m.SetRiskLocationID(v)
 		return nil
-	case risk.FieldMaintainer:
+	case risk.FieldMaintainerID:
 		v, ok := value.(int)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
-		m.SetMaintainer(v)
+		m.SetMaintainerID(v)
 		return nil
 	case risk.FieldMeasures:
 		v, ok := value.(string)
@@ -6251,9 +6381,6 @@ func (m *RiskMutation) SetField(name string, value ent.Value) error {
 // this mutation.
 func (m *RiskMutation) AddedFields() []string {
 	var fields []string
-	if m.addupdated_by != nil {
-		fields = append(fields, risk.FieldUpdatedBy)
-	}
 	if m.addmaintain_status != nil {
 		fields = append(fields, risk.FieldMaintainStatus)
 	}
@@ -6265,8 +6392,6 @@ func (m *RiskMutation) AddedFields() []string {
 // was not set, or was not defined in the schema.
 func (m *RiskMutation) AddedField(name string) (ent.Value, bool) {
 	switch name {
-	case risk.FieldUpdatedBy:
-		return m.AddedUpdatedBy()
 	case risk.FieldMaintainStatus:
 		return m.AddedMaintainStatus()
 	}
@@ -6278,13 +6403,6 @@ func (m *RiskMutation) AddedField(name string) (ent.Value, bool) {
 // type.
 func (m *RiskMutation) AddField(name string, value ent.Value) error {
 	switch name {
-	case risk.FieldUpdatedBy:
-		v, ok := value.(int)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.AddUpdatedBy(v)
-		return nil
 	case risk.FieldMaintainStatus:
 		v, ok := value.(properties.MaintainStatus)
 		if !ok {
@@ -6370,8 +6488,8 @@ func (m *RiskMutation) ResetField(name string) error {
 	case risk.FieldRiskLocationID:
 		m.ResetRiskLocationID()
 		return nil
-	case risk.FieldMaintainer:
-		m.ResetMaintainer()
+	case risk.FieldMaintainerID:
+		m.ResetMaintainerID()
 		return nil
 	case risk.FieldMeasures:
 		m.ResetMeasures()
@@ -6388,18 +6506,21 @@ func (m *RiskMutation) ResetField(name string) error {
 
 // AddedEdges returns all edge names that were set/added in this mutation.
 func (m *RiskMutation) AddedEdges() []string {
-	edges := make([]string, 0, 4)
+	edges := make([]string, 0, 5)
 	if m.creator != nil {
 		edges = append(edges, risk.EdgeCreator)
 	}
-	if m.maintainer_admin != nil {
-		edges = append(edges, risk.EdgeMaintainerAdmin)
+	if m.updator != nil {
+		edges = append(edges, risk.EdgeUpdator)
 	}
-	if m.category != nil {
-		edges = append(edges, risk.EdgeCategory)
+	if m.maintainer != nil {
+		edges = append(edges, risk.EdgeMaintainer)
 	}
-	if m.location != nil {
-		edges = append(edges, risk.EdgeLocation)
+	if m.risk_category != nil {
+		edges = append(edges, risk.EdgeRiskCategory)
+	}
+	if m.risk_location != nil {
+		edges = append(edges, risk.EdgeRiskLocation)
 	}
 	return edges
 }
@@ -6412,16 +6533,20 @@ func (m *RiskMutation) AddedIDs(name string) []ent.Value {
 		if id := m.creator; id != nil {
 			return []ent.Value{*id}
 		}
-	case risk.EdgeMaintainerAdmin:
-		if id := m.maintainer_admin; id != nil {
+	case risk.EdgeUpdator:
+		if id := m.updator; id != nil {
 			return []ent.Value{*id}
 		}
-	case risk.EdgeCategory:
-		if id := m.category; id != nil {
+	case risk.EdgeMaintainer:
+		if id := m.maintainer; id != nil {
 			return []ent.Value{*id}
 		}
-	case risk.EdgeLocation:
-		if id := m.location; id != nil {
+	case risk.EdgeRiskCategory:
+		if id := m.risk_category; id != nil {
+			return []ent.Value{*id}
+		}
+	case risk.EdgeRiskLocation:
+		if id := m.risk_location; id != nil {
 			return []ent.Value{*id}
 		}
 	}
@@ -6430,7 +6555,7 @@ func (m *RiskMutation) AddedIDs(name string) []ent.Value {
 
 // RemovedEdges returns all edge names that were removed in this mutation.
 func (m *RiskMutation) RemovedEdges() []string {
-	edges := make([]string, 0, 4)
+	edges := make([]string, 0, 5)
 	return edges
 }
 
@@ -6442,18 +6567,21 @@ func (m *RiskMutation) RemovedIDs(name string) []ent.Value {
 
 // ClearedEdges returns all edge names that were cleared in this mutation.
 func (m *RiskMutation) ClearedEdges() []string {
-	edges := make([]string, 0, 4)
+	edges := make([]string, 0, 5)
 	if m.clearedcreator {
 		edges = append(edges, risk.EdgeCreator)
 	}
-	if m.clearedmaintainer_admin {
-		edges = append(edges, risk.EdgeMaintainerAdmin)
+	if m.clearedupdator {
+		edges = append(edges, risk.EdgeUpdator)
 	}
-	if m.clearedcategory {
-		edges = append(edges, risk.EdgeCategory)
+	if m.clearedmaintainer {
+		edges = append(edges, risk.EdgeMaintainer)
 	}
-	if m.clearedlocation {
-		edges = append(edges, risk.EdgeLocation)
+	if m.clearedrisk_category {
+		edges = append(edges, risk.EdgeRiskCategory)
+	}
+	if m.clearedrisk_location {
+		edges = append(edges, risk.EdgeRiskLocation)
 	}
 	return edges
 }
@@ -6464,12 +6592,14 @@ func (m *RiskMutation) EdgeCleared(name string) bool {
 	switch name {
 	case risk.EdgeCreator:
 		return m.clearedcreator
-	case risk.EdgeMaintainerAdmin:
-		return m.clearedmaintainer_admin
-	case risk.EdgeCategory:
-		return m.clearedcategory
-	case risk.EdgeLocation:
-		return m.clearedlocation
+	case risk.EdgeUpdator:
+		return m.clearedupdator
+	case risk.EdgeMaintainer:
+		return m.clearedmaintainer
+	case risk.EdgeRiskCategory:
+		return m.clearedrisk_category
+	case risk.EdgeRiskLocation:
+		return m.clearedrisk_location
 	}
 	return false
 }
@@ -6481,14 +6611,17 @@ func (m *RiskMutation) ClearEdge(name string) error {
 	case risk.EdgeCreator:
 		m.ClearCreator()
 		return nil
-	case risk.EdgeMaintainerAdmin:
-		m.ClearMaintainerAdmin()
+	case risk.EdgeUpdator:
+		m.ClearUpdator()
 		return nil
-	case risk.EdgeCategory:
-		m.ClearCategory()
+	case risk.EdgeMaintainer:
+		m.ClearMaintainer()
 		return nil
-	case risk.EdgeLocation:
-		m.ClearLocation()
+	case risk.EdgeRiskCategory:
+		m.ClearRiskCategory()
+		return nil
+	case risk.EdgeRiskLocation:
+		m.ClearRiskLocation()
 		return nil
 	}
 	return fmt.Errorf("unknown Risk unique edge %s", name)
@@ -6501,14 +6634,17 @@ func (m *RiskMutation) ResetEdge(name string) error {
 	case risk.EdgeCreator:
 		m.ResetCreator()
 		return nil
-	case risk.EdgeMaintainerAdmin:
-		m.ResetMaintainerAdmin()
+	case risk.EdgeUpdator:
+		m.ResetUpdator()
 		return nil
-	case risk.EdgeCategory:
-		m.ResetCategory()
+	case risk.EdgeMaintainer:
+		m.ResetMaintainer()
 		return nil
-	case risk.EdgeLocation:
-		m.ResetLocation()
+	case risk.EdgeRiskCategory:
+		m.ResetRiskCategory()
+		return nil
+	case risk.EdgeRiskLocation:
+		m.ResetRiskLocation()
 		return nil
 	}
 	return fmt.Errorf("unknown Risk edge %s", name)
@@ -6517,24 +6653,24 @@ func (m *RiskMutation) ResetEdge(name string) error {
 // RiskCategoryMutation represents an operation that mutates the RiskCategory nodes in the graph.
 type RiskCategoryMutation struct {
 	config
-	op                   Op
-	typ                  string
-	id                   *int
-	created_at           *time.Time
-	deleted_at           *time.Time
-	updated_by           *int
-	addupdated_by        *int
-	updated_at           *time.Time
-	title                *string
-	clearedFields        map[string]struct{}
-	creator              *int
-	clearedcreator       bool
-	risk_category        map[int]struct{}
-	removedrisk_category map[int]struct{}
-	clearedrisk_category bool
-	done                 bool
-	oldValue             func(context.Context) (*RiskCategory, error)
-	predicates           []predicate.RiskCategory
+	op                        Op
+	typ                       string
+	id                        *int
+	created_at                *time.Time
+	deleted_at                *time.Time
+	updated_at                *time.Time
+	title                     *string
+	clearedFields             map[string]struct{}
+	creator                   *int
+	clearedcreator            bool
+	updator                   *int
+	clearedupdator            bool
+	risk_risk_category        map[int]struct{}
+	removedrisk_risk_category map[int]struct{}
+	clearedrisk_risk_category bool
+	done                      bool
+	oldValue                  func(context.Context) (*RiskCategory, error)
+	predicates                []predicate.RiskCategory
 }
 
 var _ ent.Mutation = (*RiskCategoryMutation)(nil)
@@ -6758,13 +6894,12 @@ func (m *RiskCategoryMutation) ResetDeletedAt() {
 
 // SetUpdatedBy sets the "updated_by" field.
 func (m *RiskCategoryMutation) SetUpdatedBy(i int) {
-	m.updated_by = &i
-	m.addupdated_by = nil
+	m.updator = &i
 }
 
 // UpdatedBy returns the value of the "updated_by" field in the mutation.
 func (m *RiskCategoryMutation) UpdatedBy() (r int, exists bool) {
-	v := m.updated_by
+	v := m.updator
 	if v == nil {
 		return
 	}
@@ -6788,28 +6923,9 @@ func (m *RiskCategoryMutation) OldUpdatedBy(ctx context.Context) (v int, err err
 	return oldValue.UpdatedBy, nil
 }
 
-// AddUpdatedBy adds i to the "updated_by" field.
-func (m *RiskCategoryMutation) AddUpdatedBy(i int) {
-	if m.addupdated_by != nil {
-		*m.addupdated_by += i
-	} else {
-		m.addupdated_by = &i
-	}
-}
-
-// AddedUpdatedBy returns the value that was added to the "updated_by" field in this mutation.
-func (m *RiskCategoryMutation) AddedUpdatedBy() (r int, exists bool) {
-	v := m.addupdated_by
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
 // ResetUpdatedBy resets all changes to the "updated_by" field.
 func (m *RiskCategoryMutation) ResetUpdatedBy() {
-	m.updated_by = nil
-	m.addupdated_by = nil
+	m.updator = nil
 }
 
 // SetUpdatedAt sets the "updated_at" field.
@@ -6924,58 +7040,98 @@ func (m *RiskCategoryMutation) ResetCreator() {
 	m.clearedcreator = false
 }
 
-// AddRiskCategoryIDs adds the "risk_category" edge to the Risk entity by ids.
-func (m *RiskCategoryMutation) AddRiskCategoryIDs(ids ...int) {
-	if m.risk_category == nil {
-		m.risk_category = make(map[int]struct{})
+// SetUpdatorID sets the "updator" edge to the Admin entity by id.
+func (m *RiskCategoryMutation) SetUpdatorID(id int) {
+	m.updator = &id
+}
+
+// ClearUpdator clears the "updator" edge to the Admin entity.
+func (m *RiskCategoryMutation) ClearUpdator() {
+	m.clearedupdator = true
+	m.clearedFields[riskcategory.FieldUpdatedBy] = struct{}{}
+}
+
+// UpdatorCleared reports if the "updator" edge to the Admin entity was cleared.
+func (m *RiskCategoryMutation) UpdatorCleared() bool {
+	return m.clearedupdator
+}
+
+// UpdatorID returns the "updator" edge ID in the mutation.
+func (m *RiskCategoryMutation) UpdatorID() (id int, exists bool) {
+	if m.updator != nil {
+		return *m.updator, true
+	}
+	return
+}
+
+// UpdatorIDs returns the "updator" edge IDs in the mutation.
+// Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
+// UpdatorID instead. It exists only for internal usage by the builders.
+func (m *RiskCategoryMutation) UpdatorIDs() (ids []int) {
+	if id := m.updator; id != nil {
+		ids = append(ids, *id)
+	}
+	return
+}
+
+// ResetUpdator resets all changes to the "updator" edge.
+func (m *RiskCategoryMutation) ResetUpdator() {
+	m.updator = nil
+	m.clearedupdator = false
+}
+
+// AddRiskRiskCategoryIDs adds the "risk_risk_category" edge to the Risk entity by ids.
+func (m *RiskCategoryMutation) AddRiskRiskCategoryIDs(ids ...int) {
+	if m.risk_risk_category == nil {
+		m.risk_risk_category = make(map[int]struct{})
 	}
 	for i := range ids {
-		m.risk_category[ids[i]] = struct{}{}
+		m.risk_risk_category[ids[i]] = struct{}{}
 	}
 }
 
-// ClearRiskCategory clears the "risk_category" edge to the Risk entity.
-func (m *RiskCategoryMutation) ClearRiskCategory() {
-	m.clearedrisk_category = true
+// ClearRiskRiskCategory clears the "risk_risk_category" edge to the Risk entity.
+func (m *RiskCategoryMutation) ClearRiskRiskCategory() {
+	m.clearedrisk_risk_category = true
 }
 
-// RiskCategoryCleared reports if the "risk_category" edge to the Risk entity was cleared.
-func (m *RiskCategoryMutation) RiskCategoryCleared() bool {
-	return m.clearedrisk_category
+// RiskRiskCategoryCleared reports if the "risk_risk_category" edge to the Risk entity was cleared.
+func (m *RiskCategoryMutation) RiskRiskCategoryCleared() bool {
+	return m.clearedrisk_risk_category
 }
 
-// RemoveRiskCategoryIDs removes the "risk_category" edge to the Risk entity by IDs.
-func (m *RiskCategoryMutation) RemoveRiskCategoryIDs(ids ...int) {
-	if m.removedrisk_category == nil {
-		m.removedrisk_category = make(map[int]struct{})
+// RemoveRiskRiskCategoryIDs removes the "risk_risk_category" edge to the Risk entity by IDs.
+func (m *RiskCategoryMutation) RemoveRiskRiskCategoryIDs(ids ...int) {
+	if m.removedrisk_risk_category == nil {
+		m.removedrisk_risk_category = make(map[int]struct{})
 	}
 	for i := range ids {
-		delete(m.risk_category, ids[i])
-		m.removedrisk_category[ids[i]] = struct{}{}
+		delete(m.risk_risk_category, ids[i])
+		m.removedrisk_risk_category[ids[i]] = struct{}{}
 	}
 }
 
-// RemovedRiskCategory returns the removed IDs of the "risk_category" edge to the Risk entity.
-func (m *RiskCategoryMutation) RemovedRiskCategoryIDs() (ids []int) {
-	for id := range m.removedrisk_category {
+// RemovedRiskRiskCategory returns the removed IDs of the "risk_risk_category" edge to the Risk entity.
+func (m *RiskCategoryMutation) RemovedRiskRiskCategoryIDs() (ids []int) {
+	for id := range m.removedrisk_risk_category {
 		ids = append(ids, id)
 	}
 	return
 }
 
-// RiskCategoryIDs returns the "risk_category" edge IDs in the mutation.
-func (m *RiskCategoryMutation) RiskCategoryIDs() (ids []int) {
-	for id := range m.risk_category {
+// RiskRiskCategoryIDs returns the "risk_risk_category" edge IDs in the mutation.
+func (m *RiskCategoryMutation) RiskRiskCategoryIDs() (ids []int) {
+	for id := range m.risk_risk_category {
 		ids = append(ids, id)
 	}
 	return
 }
 
-// ResetRiskCategory resets all changes to the "risk_category" edge.
-func (m *RiskCategoryMutation) ResetRiskCategory() {
-	m.risk_category = nil
-	m.clearedrisk_category = false
-	m.removedrisk_category = nil
+// ResetRiskRiskCategory resets all changes to the "risk_risk_category" edge.
+func (m *RiskCategoryMutation) ResetRiskRiskCategory() {
+	m.risk_risk_category = nil
+	m.clearedrisk_risk_category = false
+	m.removedrisk_risk_category = nil
 }
 
 // Where appends a list predicates to the RiskCategoryMutation builder.
@@ -7022,7 +7178,7 @@ func (m *RiskCategoryMutation) Fields() []string {
 	if m.deleted_at != nil {
 		fields = append(fields, riskcategory.FieldDeletedAt)
 	}
-	if m.updated_by != nil {
+	if m.updator != nil {
 		fields = append(fields, riskcategory.FieldUpdatedBy)
 	}
 	if m.updated_at != nil {
@@ -7131,9 +7287,6 @@ func (m *RiskCategoryMutation) SetField(name string, value ent.Value) error {
 // this mutation.
 func (m *RiskCategoryMutation) AddedFields() []string {
 	var fields []string
-	if m.addupdated_by != nil {
-		fields = append(fields, riskcategory.FieldUpdatedBy)
-	}
 	return fields
 }
 
@@ -7142,8 +7295,6 @@ func (m *RiskCategoryMutation) AddedFields() []string {
 // was not set, or was not defined in the schema.
 func (m *RiskCategoryMutation) AddedField(name string) (ent.Value, bool) {
 	switch name {
-	case riskcategory.FieldUpdatedBy:
-		return m.AddedUpdatedBy()
 	}
 	return nil, false
 }
@@ -7153,13 +7304,6 @@ func (m *RiskCategoryMutation) AddedField(name string) (ent.Value, bool) {
 // type.
 func (m *RiskCategoryMutation) AddField(name string, value ent.Value) error {
 	switch name {
-	case riskcategory.FieldUpdatedBy:
-		v, ok := value.(int)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.AddUpdatedBy(v)
-		return nil
 	}
 	return fmt.Errorf("unknown RiskCategory numeric field %s", name)
 }
@@ -7220,12 +7364,15 @@ func (m *RiskCategoryMutation) ResetField(name string) error {
 
 // AddedEdges returns all edge names that were set/added in this mutation.
 func (m *RiskCategoryMutation) AddedEdges() []string {
-	edges := make([]string, 0, 2)
+	edges := make([]string, 0, 3)
 	if m.creator != nil {
 		edges = append(edges, riskcategory.EdgeCreator)
 	}
-	if m.risk_category != nil {
-		edges = append(edges, riskcategory.EdgeRiskCategory)
+	if m.updator != nil {
+		edges = append(edges, riskcategory.EdgeUpdator)
+	}
+	if m.risk_risk_category != nil {
+		edges = append(edges, riskcategory.EdgeRiskRiskCategory)
 	}
 	return edges
 }
@@ -7238,9 +7385,13 @@ func (m *RiskCategoryMutation) AddedIDs(name string) []ent.Value {
 		if id := m.creator; id != nil {
 			return []ent.Value{*id}
 		}
-	case riskcategory.EdgeRiskCategory:
-		ids := make([]ent.Value, 0, len(m.risk_category))
-		for id := range m.risk_category {
+	case riskcategory.EdgeUpdator:
+		if id := m.updator; id != nil {
+			return []ent.Value{*id}
+		}
+	case riskcategory.EdgeRiskRiskCategory:
+		ids := make([]ent.Value, 0, len(m.risk_risk_category))
+		for id := range m.risk_risk_category {
 			ids = append(ids, id)
 		}
 		return ids
@@ -7250,9 +7401,9 @@ func (m *RiskCategoryMutation) AddedIDs(name string) []ent.Value {
 
 // RemovedEdges returns all edge names that were removed in this mutation.
 func (m *RiskCategoryMutation) RemovedEdges() []string {
-	edges := make([]string, 0, 2)
-	if m.removedrisk_category != nil {
-		edges = append(edges, riskcategory.EdgeRiskCategory)
+	edges := make([]string, 0, 3)
+	if m.removedrisk_risk_category != nil {
+		edges = append(edges, riskcategory.EdgeRiskRiskCategory)
 	}
 	return edges
 }
@@ -7261,9 +7412,9 @@ func (m *RiskCategoryMutation) RemovedEdges() []string {
 // the given name in this mutation.
 func (m *RiskCategoryMutation) RemovedIDs(name string) []ent.Value {
 	switch name {
-	case riskcategory.EdgeRiskCategory:
-		ids := make([]ent.Value, 0, len(m.removedrisk_category))
-		for id := range m.removedrisk_category {
+	case riskcategory.EdgeRiskRiskCategory:
+		ids := make([]ent.Value, 0, len(m.removedrisk_risk_category))
+		for id := range m.removedrisk_risk_category {
 			ids = append(ids, id)
 		}
 		return ids
@@ -7273,12 +7424,15 @@ func (m *RiskCategoryMutation) RemovedIDs(name string) []ent.Value {
 
 // ClearedEdges returns all edge names that were cleared in this mutation.
 func (m *RiskCategoryMutation) ClearedEdges() []string {
-	edges := make([]string, 0, 2)
+	edges := make([]string, 0, 3)
 	if m.clearedcreator {
 		edges = append(edges, riskcategory.EdgeCreator)
 	}
-	if m.clearedrisk_category {
-		edges = append(edges, riskcategory.EdgeRiskCategory)
+	if m.clearedupdator {
+		edges = append(edges, riskcategory.EdgeUpdator)
+	}
+	if m.clearedrisk_risk_category {
+		edges = append(edges, riskcategory.EdgeRiskRiskCategory)
 	}
 	return edges
 }
@@ -7289,8 +7443,10 @@ func (m *RiskCategoryMutation) EdgeCleared(name string) bool {
 	switch name {
 	case riskcategory.EdgeCreator:
 		return m.clearedcreator
-	case riskcategory.EdgeRiskCategory:
-		return m.clearedrisk_category
+	case riskcategory.EdgeUpdator:
+		return m.clearedupdator
+	case riskcategory.EdgeRiskRiskCategory:
+		return m.clearedrisk_risk_category
 	}
 	return false
 }
@@ -7301,6 +7457,9 @@ func (m *RiskCategoryMutation) ClearEdge(name string) error {
 	switch name {
 	case riskcategory.EdgeCreator:
 		m.ClearCreator()
+		return nil
+	case riskcategory.EdgeUpdator:
+		m.ClearUpdator()
 		return nil
 	}
 	return fmt.Errorf("unknown RiskCategory unique edge %s", name)
@@ -7313,8 +7472,11 @@ func (m *RiskCategoryMutation) ResetEdge(name string) error {
 	case riskcategory.EdgeCreator:
 		m.ResetCreator()
 		return nil
-	case riskcategory.EdgeRiskCategory:
-		m.ResetRiskCategory()
+	case riskcategory.EdgeUpdator:
+		m.ResetUpdator()
+		return nil
+	case riskcategory.EdgeRiskRiskCategory:
+		m.ResetRiskRiskCategory()
 		return nil
 	}
 	return fmt.Errorf("unknown RiskCategory edge %s", name)
@@ -7323,24 +7485,24 @@ func (m *RiskCategoryMutation) ResetEdge(name string) error {
 // RiskLocationMutation represents an operation that mutates the RiskLocation nodes in the graph.
 type RiskLocationMutation struct {
 	config
-	op                   Op
-	typ                  string
-	id                   *int
-	created_at           *time.Time
-	deleted_at           *time.Time
-	updated_by           *int
-	addupdated_by        *int
-	updated_at           *time.Time
-	title                *string
-	clearedFields        map[string]struct{}
-	creator              *int
-	clearedcreator       bool
-	risk_location        map[int]struct{}
-	removedrisk_location map[int]struct{}
-	clearedrisk_location bool
-	done                 bool
-	oldValue             func(context.Context) (*RiskLocation, error)
-	predicates           []predicate.RiskLocation
+	op                        Op
+	typ                       string
+	id                        *int
+	created_at                *time.Time
+	deleted_at                *time.Time
+	updated_at                *time.Time
+	title                     *string
+	clearedFields             map[string]struct{}
+	creator                   *int
+	clearedcreator            bool
+	updator                   *int
+	clearedupdator            bool
+	risk_risk_location        map[int]struct{}
+	removedrisk_risk_location map[int]struct{}
+	clearedrisk_risk_location bool
+	done                      bool
+	oldValue                  func(context.Context) (*RiskLocation, error)
+	predicates                []predicate.RiskLocation
 }
 
 var _ ent.Mutation = (*RiskLocationMutation)(nil)
@@ -7564,13 +7726,12 @@ func (m *RiskLocationMutation) ResetDeletedAt() {
 
 // SetUpdatedBy sets the "updated_by" field.
 func (m *RiskLocationMutation) SetUpdatedBy(i int) {
-	m.updated_by = &i
-	m.addupdated_by = nil
+	m.updator = &i
 }
 
 // UpdatedBy returns the value of the "updated_by" field in the mutation.
 func (m *RiskLocationMutation) UpdatedBy() (r int, exists bool) {
-	v := m.updated_by
+	v := m.updator
 	if v == nil {
 		return
 	}
@@ -7594,28 +7755,9 @@ func (m *RiskLocationMutation) OldUpdatedBy(ctx context.Context) (v int, err err
 	return oldValue.UpdatedBy, nil
 }
 
-// AddUpdatedBy adds i to the "updated_by" field.
-func (m *RiskLocationMutation) AddUpdatedBy(i int) {
-	if m.addupdated_by != nil {
-		*m.addupdated_by += i
-	} else {
-		m.addupdated_by = &i
-	}
-}
-
-// AddedUpdatedBy returns the value that was added to the "updated_by" field in this mutation.
-func (m *RiskLocationMutation) AddedUpdatedBy() (r int, exists bool) {
-	v := m.addupdated_by
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
 // ResetUpdatedBy resets all changes to the "updated_by" field.
 func (m *RiskLocationMutation) ResetUpdatedBy() {
-	m.updated_by = nil
-	m.addupdated_by = nil
+	m.updator = nil
 }
 
 // SetUpdatedAt sets the "updated_at" field.
@@ -7730,58 +7872,98 @@ func (m *RiskLocationMutation) ResetCreator() {
 	m.clearedcreator = false
 }
 
-// AddRiskLocationIDs adds the "risk_location" edge to the Risk entity by ids.
-func (m *RiskLocationMutation) AddRiskLocationIDs(ids ...int) {
-	if m.risk_location == nil {
-		m.risk_location = make(map[int]struct{})
+// SetUpdatorID sets the "updator" edge to the Admin entity by id.
+func (m *RiskLocationMutation) SetUpdatorID(id int) {
+	m.updator = &id
+}
+
+// ClearUpdator clears the "updator" edge to the Admin entity.
+func (m *RiskLocationMutation) ClearUpdator() {
+	m.clearedupdator = true
+	m.clearedFields[risklocation.FieldUpdatedBy] = struct{}{}
+}
+
+// UpdatorCleared reports if the "updator" edge to the Admin entity was cleared.
+func (m *RiskLocationMutation) UpdatorCleared() bool {
+	return m.clearedupdator
+}
+
+// UpdatorID returns the "updator" edge ID in the mutation.
+func (m *RiskLocationMutation) UpdatorID() (id int, exists bool) {
+	if m.updator != nil {
+		return *m.updator, true
+	}
+	return
+}
+
+// UpdatorIDs returns the "updator" edge IDs in the mutation.
+// Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
+// UpdatorID instead. It exists only for internal usage by the builders.
+func (m *RiskLocationMutation) UpdatorIDs() (ids []int) {
+	if id := m.updator; id != nil {
+		ids = append(ids, *id)
+	}
+	return
+}
+
+// ResetUpdator resets all changes to the "updator" edge.
+func (m *RiskLocationMutation) ResetUpdator() {
+	m.updator = nil
+	m.clearedupdator = false
+}
+
+// AddRiskRiskLocationIDs adds the "risk_risk_location" edge to the Risk entity by ids.
+func (m *RiskLocationMutation) AddRiskRiskLocationIDs(ids ...int) {
+	if m.risk_risk_location == nil {
+		m.risk_risk_location = make(map[int]struct{})
 	}
 	for i := range ids {
-		m.risk_location[ids[i]] = struct{}{}
+		m.risk_risk_location[ids[i]] = struct{}{}
 	}
 }
 
-// ClearRiskLocation clears the "risk_location" edge to the Risk entity.
-func (m *RiskLocationMutation) ClearRiskLocation() {
-	m.clearedrisk_location = true
+// ClearRiskRiskLocation clears the "risk_risk_location" edge to the Risk entity.
+func (m *RiskLocationMutation) ClearRiskRiskLocation() {
+	m.clearedrisk_risk_location = true
 }
 
-// RiskLocationCleared reports if the "risk_location" edge to the Risk entity was cleared.
-func (m *RiskLocationMutation) RiskLocationCleared() bool {
-	return m.clearedrisk_location
+// RiskRiskLocationCleared reports if the "risk_risk_location" edge to the Risk entity was cleared.
+func (m *RiskLocationMutation) RiskRiskLocationCleared() bool {
+	return m.clearedrisk_risk_location
 }
 
-// RemoveRiskLocationIDs removes the "risk_location" edge to the Risk entity by IDs.
-func (m *RiskLocationMutation) RemoveRiskLocationIDs(ids ...int) {
-	if m.removedrisk_location == nil {
-		m.removedrisk_location = make(map[int]struct{})
+// RemoveRiskRiskLocationIDs removes the "risk_risk_location" edge to the Risk entity by IDs.
+func (m *RiskLocationMutation) RemoveRiskRiskLocationIDs(ids ...int) {
+	if m.removedrisk_risk_location == nil {
+		m.removedrisk_risk_location = make(map[int]struct{})
 	}
 	for i := range ids {
-		delete(m.risk_location, ids[i])
-		m.removedrisk_location[ids[i]] = struct{}{}
+		delete(m.risk_risk_location, ids[i])
+		m.removedrisk_risk_location[ids[i]] = struct{}{}
 	}
 }
 
-// RemovedRiskLocation returns the removed IDs of the "risk_location" edge to the Risk entity.
-func (m *RiskLocationMutation) RemovedRiskLocationIDs() (ids []int) {
-	for id := range m.removedrisk_location {
+// RemovedRiskRiskLocation returns the removed IDs of the "risk_risk_location" edge to the Risk entity.
+func (m *RiskLocationMutation) RemovedRiskRiskLocationIDs() (ids []int) {
+	for id := range m.removedrisk_risk_location {
 		ids = append(ids, id)
 	}
 	return
 }
 
-// RiskLocationIDs returns the "risk_location" edge IDs in the mutation.
-func (m *RiskLocationMutation) RiskLocationIDs() (ids []int) {
-	for id := range m.risk_location {
+// RiskRiskLocationIDs returns the "risk_risk_location" edge IDs in the mutation.
+func (m *RiskLocationMutation) RiskRiskLocationIDs() (ids []int) {
+	for id := range m.risk_risk_location {
 		ids = append(ids, id)
 	}
 	return
 }
 
-// ResetRiskLocation resets all changes to the "risk_location" edge.
-func (m *RiskLocationMutation) ResetRiskLocation() {
-	m.risk_location = nil
-	m.clearedrisk_location = false
-	m.removedrisk_location = nil
+// ResetRiskRiskLocation resets all changes to the "risk_risk_location" edge.
+func (m *RiskLocationMutation) ResetRiskRiskLocation() {
+	m.risk_risk_location = nil
+	m.clearedrisk_risk_location = false
+	m.removedrisk_risk_location = nil
 }
 
 // Where appends a list predicates to the RiskLocationMutation builder.
@@ -7828,7 +8010,7 @@ func (m *RiskLocationMutation) Fields() []string {
 	if m.deleted_at != nil {
 		fields = append(fields, risklocation.FieldDeletedAt)
 	}
-	if m.updated_by != nil {
+	if m.updator != nil {
 		fields = append(fields, risklocation.FieldUpdatedBy)
 	}
 	if m.updated_at != nil {
@@ -7937,9 +8119,6 @@ func (m *RiskLocationMutation) SetField(name string, value ent.Value) error {
 // this mutation.
 func (m *RiskLocationMutation) AddedFields() []string {
 	var fields []string
-	if m.addupdated_by != nil {
-		fields = append(fields, risklocation.FieldUpdatedBy)
-	}
 	return fields
 }
 
@@ -7948,8 +8127,6 @@ func (m *RiskLocationMutation) AddedFields() []string {
 // was not set, or was not defined in the schema.
 func (m *RiskLocationMutation) AddedField(name string) (ent.Value, bool) {
 	switch name {
-	case risklocation.FieldUpdatedBy:
-		return m.AddedUpdatedBy()
 	}
 	return nil, false
 }
@@ -7959,13 +8136,6 @@ func (m *RiskLocationMutation) AddedField(name string) (ent.Value, bool) {
 // type.
 func (m *RiskLocationMutation) AddField(name string, value ent.Value) error {
 	switch name {
-	case risklocation.FieldUpdatedBy:
-		v, ok := value.(int)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.AddUpdatedBy(v)
-		return nil
 	}
 	return fmt.Errorf("unknown RiskLocation numeric field %s", name)
 }
@@ -8026,12 +8196,15 @@ func (m *RiskLocationMutation) ResetField(name string) error {
 
 // AddedEdges returns all edge names that were set/added in this mutation.
 func (m *RiskLocationMutation) AddedEdges() []string {
-	edges := make([]string, 0, 2)
+	edges := make([]string, 0, 3)
 	if m.creator != nil {
 		edges = append(edges, risklocation.EdgeCreator)
 	}
-	if m.risk_location != nil {
-		edges = append(edges, risklocation.EdgeRiskLocation)
+	if m.updator != nil {
+		edges = append(edges, risklocation.EdgeUpdator)
+	}
+	if m.risk_risk_location != nil {
+		edges = append(edges, risklocation.EdgeRiskRiskLocation)
 	}
 	return edges
 }
@@ -8044,9 +8217,13 @@ func (m *RiskLocationMutation) AddedIDs(name string) []ent.Value {
 		if id := m.creator; id != nil {
 			return []ent.Value{*id}
 		}
-	case risklocation.EdgeRiskLocation:
-		ids := make([]ent.Value, 0, len(m.risk_location))
-		for id := range m.risk_location {
+	case risklocation.EdgeUpdator:
+		if id := m.updator; id != nil {
+			return []ent.Value{*id}
+		}
+	case risklocation.EdgeRiskRiskLocation:
+		ids := make([]ent.Value, 0, len(m.risk_risk_location))
+		for id := range m.risk_risk_location {
 			ids = append(ids, id)
 		}
 		return ids
@@ -8056,9 +8233,9 @@ func (m *RiskLocationMutation) AddedIDs(name string) []ent.Value {
 
 // RemovedEdges returns all edge names that were removed in this mutation.
 func (m *RiskLocationMutation) RemovedEdges() []string {
-	edges := make([]string, 0, 2)
-	if m.removedrisk_location != nil {
-		edges = append(edges, risklocation.EdgeRiskLocation)
+	edges := make([]string, 0, 3)
+	if m.removedrisk_risk_location != nil {
+		edges = append(edges, risklocation.EdgeRiskRiskLocation)
 	}
 	return edges
 }
@@ -8067,9 +8244,9 @@ func (m *RiskLocationMutation) RemovedEdges() []string {
 // the given name in this mutation.
 func (m *RiskLocationMutation) RemovedIDs(name string) []ent.Value {
 	switch name {
-	case risklocation.EdgeRiskLocation:
-		ids := make([]ent.Value, 0, len(m.removedrisk_location))
-		for id := range m.removedrisk_location {
+	case risklocation.EdgeRiskRiskLocation:
+		ids := make([]ent.Value, 0, len(m.removedrisk_risk_location))
+		for id := range m.removedrisk_risk_location {
 			ids = append(ids, id)
 		}
 		return ids
@@ -8079,12 +8256,15 @@ func (m *RiskLocationMutation) RemovedIDs(name string) []ent.Value {
 
 // ClearedEdges returns all edge names that were cleared in this mutation.
 func (m *RiskLocationMutation) ClearedEdges() []string {
-	edges := make([]string, 0, 2)
+	edges := make([]string, 0, 3)
 	if m.clearedcreator {
 		edges = append(edges, risklocation.EdgeCreator)
 	}
-	if m.clearedrisk_location {
-		edges = append(edges, risklocation.EdgeRiskLocation)
+	if m.clearedupdator {
+		edges = append(edges, risklocation.EdgeUpdator)
+	}
+	if m.clearedrisk_risk_location {
+		edges = append(edges, risklocation.EdgeRiskRiskLocation)
 	}
 	return edges
 }
@@ -8095,8 +8275,10 @@ func (m *RiskLocationMutation) EdgeCleared(name string) bool {
 	switch name {
 	case risklocation.EdgeCreator:
 		return m.clearedcreator
-	case risklocation.EdgeRiskLocation:
-		return m.clearedrisk_location
+	case risklocation.EdgeUpdator:
+		return m.clearedupdator
+	case risklocation.EdgeRiskRiskLocation:
+		return m.clearedrisk_risk_location
 	}
 	return false
 }
@@ -8107,6 +8289,9 @@ func (m *RiskLocationMutation) ClearEdge(name string) error {
 	switch name {
 	case risklocation.EdgeCreator:
 		m.ClearCreator()
+		return nil
+	case risklocation.EdgeUpdator:
+		m.ClearUpdator()
 		return nil
 	}
 	return fmt.Errorf("unknown RiskLocation unique edge %s", name)
@@ -8119,8 +8304,11 @@ func (m *RiskLocationMutation) ResetEdge(name string) error {
 	case risklocation.EdgeCreator:
 		m.ResetCreator()
 		return nil
-	case risklocation.EdgeRiskLocation:
-		m.ResetRiskLocation()
+	case risklocation.EdgeUpdator:
+		m.ResetUpdator()
+		return nil
+	case risklocation.EdgeRiskRiskLocation:
+		m.ResetRiskRiskLocation()
 		return nil
 	}
 	return fmt.Errorf("unknown RiskLocation edge %s", name)

@@ -112,21 +112,21 @@ const (
 	// It exists in this package in order to avoid circular dependency with the "risk" package.
 	RiskCreatorInverseTable = "risks"
 	// RiskCreatorColumn is the table column denoting the risk_creator relation/edge.
-	RiskCreatorColumn = "created_by"
+	RiskCreatorColumn = "admin_risk_creator"
 	// RiskUpdatorTable is the table that holds the risk_updator relation/edge.
 	RiskUpdatorTable = "risks"
 	// RiskUpdatorInverseTable is the table name for the Risk entity.
 	// It exists in this package in order to avoid circular dependency with the "risk" package.
 	RiskUpdatorInverseTable = "risks"
 	// RiskUpdatorColumn is the table column denoting the risk_updator relation/edge.
-	RiskUpdatorColumn = "admin_risk_updator"
+	RiskUpdatorColumn = "updated_by"
 	// RiskMaintainerTable is the table that holds the risk_maintainer relation/edge.
 	RiskMaintainerTable = "risks"
 	// RiskMaintainerInverseTable is the table name for the Risk entity.
 	// It exists in this package in order to avoid circular dependency with the "risk" package.
 	RiskMaintainerInverseTable = "risks"
 	// RiskMaintainerColumn is the table column denoting the risk_maintainer relation/edge.
-	RiskMaintainerColumn = "maintainer"
+	RiskMaintainerColumn = "admin_risk_maintainer"
 	// RiskLocationCreatorTable is the table that holds the risk_location_creator relation/edge.
 	RiskLocationCreatorTable = "risk_locations"
 	// RiskLocationCreatorInverseTable is the table name for the RiskLocation entity.
@@ -140,7 +140,7 @@ const (
 	// It exists in this package in order to avoid circular dependency with the "risklocation" package.
 	RiskLocationUpdatorInverseTable = "risk_locations"
 	// RiskLocationUpdatorColumn is the table column denoting the risk_location_updator relation/edge.
-	RiskLocationUpdatorColumn = "admin_risk_location_updator"
+	RiskLocationUpdatorColumn = "updated_by"
 	// RiskCategoryCreatorTable is the table that holds the risk_category_creator relation/edge.
 	RiskCategoryCreatorTable = "risk_categories"
 	// RiskCategoryCreatorInverseTable is the table name for the RiskCategory entity.
@@ -154,7 +154,7 @@ const (
 	// It exists in this package in order to avoid circular dependency with the "riskcategory" package.
 	RiskCategoryUpdatorInverseTable = "risk_categories"
 	// RiskCategoryUpdatorColumn is the table column denoting the risk_category_updator relation/edge.
-	RiskCategoryUpdatorColumn = "admin_risk_category_updator"
+	RiskCategoryUpdatorColumn = "updated_by"
 	// DepartmentCreatorTable is the table that holds the department_creator relation/edge.
 	DepartmentCreatorTable = "departments"
 	// DepartmentCreatorInverseTable is the table name for the Department entity.

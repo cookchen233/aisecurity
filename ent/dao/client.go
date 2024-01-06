@@ -1049,7 +1049,8 @@ func (c *DepartmentClient) QueryChildren(d *Department) *DepartmentQuery {
 
 // Hooks returns the client hooks.
 func (c *DepartmentClient) Hooks() []Hook {
-	return c.hooks.Department
+	hooks := c.hooks.Department
+	return append(hooks[:len(hooks):len(hooks)], department.Hooks[:]...)
 }
 
 // Interceptors returns the client interceptors.
@@ -1228,9 +1229,42 @@ func (c *EmployeeClient) QueryDepartment(e *Employee) *DepartmentQuery {
 	return query
 }
 
+// QueryRiskMaintainer queries the risk_maintainer edge of a Employee.
+func (c *EmployeeClient) QueryRiskMaintainer(e *Employee) *RiskQuery {
+	query := (&RiskClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := e.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(employee.Table, employee.FieldID, id),
+			sqlgraph.To(risk.Table, risk.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, employee.RiskMaintainerTable, employee.RiskMaintainerColumn),
+		)
+		fromV = sqlgraph.Neighbors(e.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryRiskCreator queries the risk_creator edge of a Employee.
+func (c *EmployeeClient) QueryRiskCreator(e *Employee) *RiskQuery {
+	query := (&RiskClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := e.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(employee.Table, employee.FieldID, id),
+			sqlgraph.To(risk.Table, risk.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, employee.RiskCreatorTable, employee.RiskCreatorColumn),
+		)
+		fromV = sqlgraph.Neighbors(e.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
 // Hooks returns the client hooks.
 func (c *EmployeeClient) Hooks() []Hook {
-	return c.hooks.Employee
+	hooks := c.hooks.Employee
+	return append(hooks[:len(hooks):len(hooks)], employee.Hooks[:]...)
 }
 
 // Interceptors returns the client interceptors.
@@ -1362,13 +1396,13 @@ func (c *RiskClient) GetX(ctx context.Context, id int) *Risk {
 }
 
 // QueryCreator queries the creator edge of a Risk.
-func (c *RiskClient) QueryCreator(r *Risk) *AdminQuery {
-	query := (&AdminClient{config: c.config}).Query()
+func (c *RiskClient) QueryCreator(r *Risk) *EmployeeQuery {
+	query := (&EmployeeClient{config: c.config}).Query()
 	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
 		id := r.ID
 		step := sqlgraph.NewStep(
 			sqlgraph.From(risk.Table, risk.FieldID, id),
-			sqlgraph.To(admin.Table, admin.FieldID),
+			sqlgraph.To(employee.Table, employee.FieldID),
 			sqlgraph.Edge(sqlgraph.M2O, true, risk.CreatorTable, risk.CreatorColumn),
 		)
 		fromV = sqlgraph.Neighbors(r.driver.Dialect(), step)
@@ -1377,15 +1411,15 @@ func (c *RiskClient) QueryCreator(r *Risk) *AdminQuery {
 	return query
 }
 
-// QueryMaintainerAdmin queries the maintainer_admin edge of a Risk.
-func (c *RiskClient) QueryMaintainerAdmin(r *Risk) *AdminQuery {
+// QueryUpdator queries the updator edge of a Risk.
+func (c *RiskClient) QueryUpdator(r *Risk) *AdminQuery {
 	query := (&AdminClient{config: c.config}).Query()
 	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
 		id := r.ID
 		step := sqlgraph.NewStep(
 			sqlgraph.From(risk.Table, risk.FieldID, id),
 			sqlgraph.To(admin.Table, admin.FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, true, risk.MaintainerAdminTable, risk.MaintainerAdminColumn),
+			sqlgraph.Edge(sqlgraph.M2O, true, risk.UpdatorTable, risk.UpdatorColumn),
 		)
 		fromV = sqlgraph.Neighbors(r.driver.Dialect(), step)
 		return fromV, nil
@@ -1393,15 +1427,31 @@ func (c *RiskClient) QueryMaintainerAdmin(r *Risk) *AdminQuery {
 	return query
 }
 
-// QueryCategory queries the category edge of a Risk.
-func (c *RiskClient) QueryCategory(r *Risk) *RiskCategoryQuery {
+// QueryMaintainer queries the maintainer edge of a Risk.
+func (c *RiskClient) QueryMaintainer(r *Risk) *EmployeeQuery {
+	query := (&EmployeeClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := r.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(risk.Table, risk.FieldID, id),
+			sqlgraph.To(employee.Table, employee.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, risk.MaintainerTable, risk.MaintainerColumn),
+		)
+		fromV = sqlgraph.Neighbors(r.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryRiskCategory queries the risk_category edge of a Risk.
+func (c *RiskClient) QueryRiskCategory(r *Risk) *RiskCategoryQuery {
 	query := (&RiskCategoryClient{config: c.config}).Query()
 	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
 		id := r.ID
 		step := sqlgraph.NewStep(
 			sqlgraph.From(risk.Table, risk.FieldID, id),
 			sqlgraph.To(riskcategory.Table, riskcategory.FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, true, risk.CategoryTable, risk.CategoryColumn),
+			sqlgraph.Edge(sqlgraph.M2O, true, risk.RiskCategoryTable, risk.RiskCategoryColumn),
 		)
 		fromV = sqlgraph.Neighbors(r.driver.Dialect(), step)
 		return fromV, nil
@@ -1409,15 +1459,15 @@ func (c *RiskClient) QueryCategory(r *Risk) *RiskCategoryQuery {
 	return query
 }
 
-// QueryLocation queries the location edge of a Risk.
-func (c *RiskClient) QueryLocation(r *Risk) *RiskLocationQuery {
+// QueryRiskLocation queries the risk_location edge of a Risk.
+func (c *RiskClient) QueryRiskLocation(r *Risk) *RiskLocationQuery {
 	query := (&RiskLocationClient{config: c.config}).Query()
 	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
 		id := r.ID
 		step := sqlgraph.NewStep(
 			sqlgraph.From(risk.Table, risk.FieldID, id),
 			sqlgraph.To(risklocation.Table, risklocation.FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, true, risk.LocationTable, risk.LocationColumn),
+			sqlgraph.Edge(sqlgraph.M2O, true, risk.RiskLocationTable, risk.RiskLocationColumn),
 		)
 		fromV = sqlgraph.Neighbors(r.driver.Dialect(), step)
 		return fromV, nil
@@ -1575,15 +1625,31 @@ func (c *RiskCategoryClient) QueryCreator(rc *RiskCategory) *AdminQuery {
 	return query
 }
 
-// QueryRiskCategory queries the risk_category edge of a RiskCategory.
-func (c *RiskCategoryClient) QueryRiskCategory(rc *RiskCategory) *RiskQuery {
+// QueryUpdator queries the updator edge of a RiskCategory.
+func (c *RiskCategoryClient) QueryUpdator(rc *RiskCategory) *AdminQuery {
+	query := (&AdminClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := rc.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(riskcategory.Table, riskcategory.FieldID, id),
+			sqlgraph.To(admin.Table, admin.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, riskcategory.UpdatorTable, riskcategory.UpdatorColumn),
+		)
+		fromV = sqlgraph.Neighbors(rc.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryRiskRiskCategory queries the risk_risk_category edge of a RiskCategory.
+func (c *RiskCategoryClient) QueryRiskRiskCategory(rc *RiskCategory) *RiskQuery {
 	query := (&RiskClient{config: c.config}).Query()
 	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
 		id := rc.ID
 		step := sqlgraph.NewStep(
 			sqlgraph.From(riskcategory.Table, riskcategory.FieldID, id),
 			sqlgraph.To(risk.Table, risk.FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, false, riskcategory.RiskCategoryTable, riskcategory.RiskCategoryColumn),
+			sqlgraph.Edge(sqlgraph.O2M, false, riskcategory.RiskRiskCategoryTable, riskcategory.RiskRiskCategoryColumn),
 		)
 		fromV = sqlgraph.Neighbors(rc.driver.Dialect(), step)
 		return fromV, nil
@@ -1741,15 +1807,31 @@ func (c *RiskLocationClient) QueryCreator(rl *RiskLocation) *AdminQuery {
 	return query
 }
 
-// QueryRiskLocation queries the risk_location edge of a RiskLocation.
-func (c *RiskLocationClient) QueryRiskLocation(rl *RiskLocation) *RiskQuery {
+// QueryUpdator queries the updator edge of a RiskLocation.
+func (c *RiskLocationClient) QueryUpdator(rl *RiskLocation) *AdminQuery {
+	query := (&AdminClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := rl.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(risklocation.Table, risklocation.FieldID, id),
+			sqlgraph.To(admin.Table, admin.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, risklocation.UpdatorTable, risklocation.UpdatorColumn),
+		)
+		fromV = sqlgraph.Neighbors(rl.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryRiskRiskLocation queries the risk_risk_location edge of a RiskLocation.
+func (c *RiskLocationClient) QueryRiskRiskLocation(rl *RiskLocation) *RiskQuery {
 	query := (&RiskClient{config: c.config}).Query()
 	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
 		id := rl.ID
 		step := sqlgraph.NewStep(
 			sqlgraph.From(risklocation.Table, risklocation.FieldID, id),
 			sqlgraph.To(risk.Table, risk.FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, false, risklocation.RiskLocationTable, risklocation.RiskLocationColumn),
+			sqlgraph.Edge(sqlgraph.O2M, false, risklocation.RiskRiskLocationTable, risklocation.RiskRiskLocationColumn),
 		)
 		fromV = sqlgraph.Neighbors(rl.driver.Dialect(), step)
 		return fromV, nil

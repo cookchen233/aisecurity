@@ -3,6 +3,7 @@
 package dao
 
 import (
+	"aisecurity/ent/dao/admin"
 	"aisecurity/ent/dao/predicate"
 	"aisecurity/ent/dao/risk"
 	"aisecurity/ent/dao/riskcategory"
@@ -51,7 +52,6 @@ func (rcu *RiskCategoryUpdate) ClearDeletedAt() *RiskCategoryUpdate {
 
 // SetUpdatedBy sets the "updated_by" field.
 func (rcu *RiskCategoryUpdate) SetUpdatedBy(i int) *RiskCategoryUpdate {
-	rcu.mutation.ResetUpdatedBy()
 	rcu.mutation.SetUpdatedBy(i)
 	return rcu
 }
@@ -61,12 +61,6 @@ func (rcu *RiskCategoryUpdate) SetNillableUpdatedBy(i *int) *RiskCategoryUpdate 
 	if i != nil {
 		rcu.SetUpdatedBy(*i)
 	}
-	return rcu
-}
-
-// AddUpdatedBy adds i to the "updated_by" field.
-func (rcu *RiskCategoryUpdate) AddUpdatedBy(i int) *RiskCategoryUpdate {
-	rcu.mutation.AddUpdatedBy(i)
 	return rcu
 }
 
@@ -90,19 +84,30 @@ func (rcu *RiskCategoryUpdate) SetNillableTitle(s *string) *RiskCategoryUpdate {
 	return rcu
 }
 
-// AddRiskCategoryIDs adds the "risk_category" edge to the Risk entity by IDs.
-func (rcu *RiskCategoryUpdate) AddRiskCategoryIDs(ids ...int) *RiskCategoryUpdate {
-	rcu.mutation.AddRiskCategoryIDs(ids...)
+// SetUpdatorID sets the "updator" edge to the Admin entity by ID.
+func (rcu *RiskCategoryUpdate) SetUpdatorID(id int) *RiskCategoryUpdate {
+	rcu.mutation.SetUpdatorID(id)
 	return rcu
 }
 
-// AddRiskCategory adds the "risk_category" edges to the Risk entity.
-func (rcu *RiskCategoryUpdate) AddRiskCategory(r ...*Risk) *RiskCategoryUpdate {
+// SetUpdator sets the "updator" edge to the Admin entity.
+func (rcu *RiskCategoryUpdate) SetUpdator(a *Admin) *RiskCategoryUpdate {
+	return rcu.SetUpdatorID(a.ID)
+}
+
+// AddRiskRiskCategoryIDs adds the "risk_risk_category" edge to the Risk entity by IDs.
+func (rcu *RiskCategoryUpdate) AddRiskRiskCategoryIDs(ids ...int) *RiskCategoryUpdate {
+	rcu.mutation.AddRiskRiskCategoryIDs(ids...)
+	return rcu
+}
+
+// AddRiskRiskCategory adds the "risk_risk_category" edges to the Risk entity.
+func (rcu *RiskCategoryUpdate) AddRiskRiskCategory(r ...*Risk) *RiskCategoryUpdate {
 	ids := make([]int, len(r))
 	for i := range r {
 		ids[i] = r[i].ID
 	}
-	return rcu.AddRiskCategoryIDs(ids...)
+	return rcu.AddRiskRiskCategoryIDs(ids...)
 }
 
 // Mutation returns the RiskCategoryMutation object of the builder.
@@ -110,25 +115,31 @@ func (rcu *RiskCategoryUpdate) Mutation() *RiskCategoryMutation {
 	return rcu.mutation
 }
 
-// ClearRiskCategory clears all "risk_category" edges to the Risk entity.
-func (rcu *RiskCategoryUpdate) ClearRiskCategory() *RiskCategoryUpdate {
-	rcu.mutation.ClearRiskCategory()
+// ClearUpdator clears the "updator" edge to the Admin entity.
+func (rcu *RiskCategoryUpdate) ClearUpdator() *RiskCategoryUpdate {
+	rcu.mutation.ClearUpdator()
 	return rcu
 }
 
-// RemoveRiskCategoryIDs removes the "risk_category" edge to Risk entities by IDs.
-func (rcu *RiskCategoryUpdate) RemoveRiskCategoryIDs(ids ...int) *RiskCategoryUpdate {
-	rcu.mutation.RemoveRiskCategoryIDs(ids...)
+// ClearRiskRiskCategory clears all "risk_risk_category" edges to the Risk entity.
+func (rcu *RiskCategoryUpdate) ClearRiskRiskCategory() *RiskCategoryUpdate {
+	rcu.mutation.ClearRiskRiskCategory()
 	return rcu
 }
 
-// RemoveRiskCategory removes "risk_category" edges to Risk entities.
-func (rcu *RiskCategoryUpdate) RemoveRiskCategory(r ...*Risk) *RiskCategoryUpdate {
+// RemoveRiskRiskCategoryIDs removes the "risk_risk_category" edge to Risk entities by IDs.
+func (rcu *RiskCategoryUpdate) RemoveRiskRiskCategoryIDs(ids ...int) *RiskCategoryUpdate {
+	rcu.mutation.RemoveRiskRiskCategoryIDs(ids...)
+	return rcu
+}
+
+// RemoveRiskRiskCategory removes "risk_risk_category" edges to Risk entities.
+func (rcu *RiskCategoryUpdate) RemoveRiskRiskCategory(r ...*Risk) *RiskCategoryUpdate {
 	ids := make([]int, len(r))
 	for i := range r {
 		ids[i] = r[i].ID
 	}
-	return rcu.RemoveRiskCategoryIDs(ids...)
+	return rcu.RemoveRiskRiskCategoryIDs(ids...)
 }
 
 // Save executes the query and returns the number of nodes affected by the update operation.
@@ -188,6 +199,9 @@ func (rcu *RiskCategoryUpdate) check() error {
 	if _, ok := rcu.mutation.CreatorID(); rcu.mutation.CreatorCleared() && !ok {
 		return errors.New(`dao: clearing a required unique edge "RiskCategory.creator"`)
 	}
+	if _, ok := rcu.mutation.UpdatorID(); rcu.mutation.UpdatorCleared() && !ok {
+		return errors.New(`dao: clearing a required unique edge "RiskCategory.updator"`)
+	}
 	return nil
 }
 
@@ -209,24 +223,47 @@ func (rcu *RiskCategoryUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	if rcu.mutation.DeletedAtCleared() {
 		_spec.ClearField(riskcategory.FieldDeletedAt, field.TypeTime)
 	}
-	if value, ok := rcu.mutation.UpdatedBy(); ok {
-		_spec.SetField(riskcategory.FieldUpdatedBy, field.TypeInt, value)
-	}
-	if value, ok := rcu.mutation.AddedUpdatedBy(); ok {
-		_spec.AddField(riskcategory.FieldUpdatedBy, field.TypeInt, value)
-	}
 	if value, ok := rcu.mutation.UpdatedAt(); ok {
 		_spec.SetField(riskcategory.FieldUpdatedAt, field.TypeTime, value)
 	}
 	if value, ok := rcu.mutation.Title(); ok {
 		_spec.SetField(riskcategory.FieldTitle, field.TypeString, value)
 	}
-	if rcu.mutation.RiskCategoryCleared() {
+	if rcu.mutation.UpdatorCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   riskcategory.UpdatorTable,
+			Columns: []string{riskcategory.UpdatorColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(admin.FieldID, field.TypeInt),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := rcu.mutation.UpdatorIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   riskcategory.UpdatorTable,
+			Columns: []string{riskcategory.UpdatorColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(admin.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if rcu.mutation.RiskRiskCategoryCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
-			Table:   riskcategory.RiskCategoryTable,
-			Columns: []string{riskcategory.RiskCategoryColumn},
+			Table:   riskcategory.RiskRiskCategoryTable,
+			Columns: []string{riskcategory.RiskRiskCategoryColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(risk.FieldID, field.TypeInt),
@@ -234,12 +271,12 @@ func (rcu *RiskCategoryUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := rcu.mutation.RemovedRiskCategoryIDs(); len(nodes) > 0 && !rcu.mutation.RiskCategoryCleared() {
+	if nodes := rcu.mutation.RemovedRiskRiskCategoryIDs(); len(nodes) > 0 && !rcu.mutation.RiskRiskCategoryCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
-			Table:   riskcategory.RiskCategoryTable,
-			Columns: []string{riskcategory.RiskCategoryColumn},
+			Table:   riskcategory.RiskRiskCategoryTable,
+			Columns: []string{riskcategory.RiskRiskCategoryColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(risk.FieldID, field.TypeInt),
@@ -250,12 +287,12 @@ func (rcu *RiskCategoryUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := rcu.mutation.RiskCategoryIDs(); len(nodes) > 0 {
+	if nodes := rcu.mutation.RiskRiskCategoryIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
-			Table:   riskcategory.RiskCategoryTable,
-			Columns: []string{riskcategory.RiskCategoryColumn},
+			Table:   riskcategory.RiskRiskCategoryTable,
+			Columns: []string{riskcategory.RiskRiskCategoryColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(risk.FieldID, field.TypeInt),
@@ -308,7 +345,6 @@ func (rcuo *RiskCategoryUpdateOne) ClearDeletedAt() *RiskCategoryUpdateOne {
 
 // SetUpdatedBy sets the "updated_by" field.
 func (rcuo *RiskCategoryUpdateOne) SetUpdatedBy(i int) *RiskCategoryUpdateOne {
-	rcuo.mutation.ResetUpdatedBy()
 	rcuo.mutation.SetUpdatedBy(i)
 	return rcuo
 }
@@ -318,12 +354,6 @@ func (rcuo *RiskCategoryUpdateOne) SetNillableUpdatedBy(i *int) *RiskCategoryUpd
 	if i != nil {
 		rcuo.SetUpdatedBy(*i)
 	}
-	return rcuo
-}
-
-// AddUpdatedBy adds i to the "updated_by" field.
-func (rcuo *RiskCategoryUpdateOne) AddUpdatedBy(i int) *RiskCategoryUpdateOne {
-	rcuo.mutation.AddUpdatedBy(i)
 	return rcuo
 }
 
@@ -347,19 +377,30 @@ func (rcuo *RiskCategoryUpdateOne) SetNillableTitle(s *string) *RiskCategoryUpda
 	return rcuo
 }
 
-// AddRiskCategoryIDs adds the "risk_category" edge to the Risk entity by IDs.
-func (rcuo *RiskCategoryUpdateOne) AddRiskCategoryIDs(ids ...int) *RiskCategoryUpdateOne {
-	rcuo.mutation.AddRiskCategoryIDs(ids...)
+// SetUpdatorID sets the "updator" edge to the Admin entity by ID.
+func (rcuo *RiskCategoryUpdateOne) SetUpdatorID(id int) *RiskCategoryUpdateOne {
+	rcuo.mutation.SetUpdatorID(id)
 	return rcuo
 }
 
-// AddRiskCategory adds the "risk_category" edges to the Risk entity.
-func (rcuo *RiskCategoryUpdateOne) AddRiskCategory(r ...*Risk) *RiskCategoryUpdateOne {
+// SetUpdator sets the "updator" edge to the Admin entity.
+func (rcuo *RiskCategoryUpdateOne) SetUpdator(a *Admin) *RiskCategoryUpdateOne {
+	return rcuo.SetUpdatorID(a.ID)
+}
+
+// AddRiskRiskCategoryIDs adds the "risk_risk_category" edge to the Risk entity by IDs.
+func (rcuo *RiskCategoryUpdateOne) AddRiskRiskCategoryIDs(ids ...int) *RiskCategoryUpdateOne {
+	rcuo.mutation.AddRiskRiskCategoryIDs(ids...)
+	return rcuo
+}
+
+// AddRiskRiskCategory adds the "risk_risk_category" edges to the Risk entity.
+func (rcuo *RiskCategoryUpdateOne) AddRiskRiskCategory(r ...*Risk) *RiskCategoryUpdateOne {
 	ids := make([]int, len(r))
 	for i := range r {
 		ids[i] = r[i].ID
 	}
-	return rcuo.AddRiskCategoryIDs(ids...)
+	return rcuo.AddRiskRiskCategoryIDs(ids...)
 }
 
 // Mutation returns the RiskCategoryMutation object of the builder.
@@ -367,25 +408,31 @@ func (rcuo *RiskCategoryUpdateOne) Mutation() *RiskCategoryMutation {
 	return rcuo.mutation
 }
 
-// ClearRiskCategory clears all "risk_category" edges to the Risk entity.
-func (rcuo *RiskCategoryUpdateOne) ClearRiskCategory() *RiskCategoryUpdateOne {
-	rcuo.mutation.ClearRiskCategory()
+// ClearUpdator clears the "updator" edge to the Admin entity.
+func (rcuo *RiskCategoryUpdateOne) ClearUpdator() *RiskCategoryUpdateOne {
+	rcuo.mutation.ClearUpdator()
 	return rcuo
 }
 
-// RemoveRiskCategoryIDs removes the "risk_category" edge to Risk entities by IDs.
-func (rcuo *RiskCategoryUpdateOne) RemoveRiskCategoryIDs(ids ...int) *RiskCategoryUpdateOne {
-	rcuo.mutation.RemoveRiskCategoryIDs(ids...)
+// ClearRiskRiskCategory clears all "risk_risk_category" edges to the Risk entity.
+func (rcuo *RiskCategoryUpdateOne) ClearRiskRiskCategory() *RiskCategoryUpdateOne {
+	rcuo.mutation.ClearRiskRiskCategory()
 	return rcuo
 }
 
-// RemoveRiskCategory removes "risk_category" edges to Risk entities.
-func (rcuo *RiskCategoryUpdateOne) RemoveRiskCategory(r ...*Risk) *RiskCategoryUpdateOne {
+// RemoveRiskRiskCategoryIDs removes the "risk_risk_category" edge to Risk entities by IDs.
+func (rcuo *RiskCategoryUpdateOne) RemoveRiskRiskCategoryIDs(ids ...int) *RiskCategoryUpdateOne {
+	rcuo.mutation.RemoveRiskRiskCategoryIDs(ids...)
+	return rcuo
+}
+
+// RemoveRiskRiskCategory removes "risk_risk_category" edges to Risk entities.
+func (rcuo *RiskCategoryUpdateOne) RemoveRiskRiskCategory(r ...*Risk) *RiskCategoryUpdateOne {
 	ids := make([]int, len(r))
 	for i := range r {
 		ids[i] = r[i].ID
 	}
-	return rcuo.RemoveRiskCategoryIDs(ids...)
+	return rcuo.RemoveRiskRiskCategoryIDs(ids...)
 }
 
 // Where appends a list predicates to the RiskCategoryUpdate builder.
@@ -458,6 +505,9 @@ func (rcuo *RiskCategoryUpdateOne) check() error {
 	if _, ok := rcuo.mutation.CreatorID(); rcuo.mutation.CreatorCleared() && !ok {
 		return errors.New(`dao: clearing a required unique edge "RiskCategory.creator"`)
 	}
+	if _, ok := rcuo.mutation.UpdatorID(); rcuo.mutation.UpdatorCleared() && !ok {
+		return errors.New(`dao: clearing a required unique edge "RiskCategory.updator"`)
+	}
 	return nil
 }
 
@@ -496,24 +546,47 @@ func (rcuo *RiskCategoryUpdateOne) sqlSave(ctx context.Context) (_node *RiskCate
 	if rcuo.mutation.DeletedAtCleared() {
 		_spec.ClearField(riskcategory.FieldDeletedAt, field.TypeTime)
 	}
-	if value, ok := rcuo.mutation.UpdatedBy(); ok {
-		_spec.SetField(riskcategory.FieldUpdatedBy, field.TypeInt, value)
-	}
-	if value, ok := rcuo.mutation.AddedUpdatedBy(); ok {
-		_spec.AddField(riskcategory.FieldUpdatedBy, field.TypeInt, value)
-	}
 	if value, ok := rcuo.mutation.UpdatedAt(); ok {
 		_spec.SetField(riskcategory.FieldUpdatedAt, field.TypeTime, value)
 	}
 	if value, ok := rcuo.mutation.Title(); ok {
 		_spec.SetField(riskcategory.FieldTitle, field.TypeString, value)
 	}
-	if rcuo.mutation.RiskCategoryCleared() {
+	if rcuo.mutation.UpdatorCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   riskcategory.UpdatorTable,
+			Columns: []string{riskcategory.UpdatorColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(admin.FieldID, field.TypeInt),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := rcuo.mutation.UpdatorIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   riskcategory.UpdatorTable,
+			Columns: []string{riskcategory.UpdatorColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(admin.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if rcuo.mutation.RiskRiskCategoryCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
-			Table:   riskcategory.RiskCategoryTable,
-			Columns: []string{riskcategory.RiskCategoryColumn},
+			Table:   riskcategory.RiskRiskCategoryTable,
+			Columns: []string{riskcategory.RiskRiskCategoryColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(risk.FieldID, field.TypeInt),
@@ -521,12 +594,12 @@ func (rcuo *RiskCategoryUpdateOne) sqlSave(ctx context.Context) (_node *RiskCate
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := rcuo.mutation.RemovedRiskCategoryIDs(); len(nodes) > 0 && !rcuo.mutation.RiskCategoryCleared() {
+	if nodes := rcuo.mutation.RemovedRiskRiskCategoryIDs(); len(nodes) > 0 && !rcuo.mutation.RiskRiskCategoryCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
-			Table:   riskcategory.RiskCategoryTable,
-			Columns: []string{riskcategory.RiskCategoryColumn},
+			Table:   riskcategory.RiskRiskCategoryTable,
+			Columns: []string{riskcategory.RiskRiskCategoryColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(risk.FieldID, field.TypeInt),
@@ -537,12 +610,12 @@ func (rcuo *RiskCategoryUpdateOne) sqlSave(ctx context.Context) (_node *RiskCate
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := rcuo.mutation.RiskCategoryIDs(); len(nodes) > 0 {
+	if nodes := rcuo.mutation.RiskRiskCategoryIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
-			Table:   riskcategory.RiskCategoryTable,
-			Columns: []string{riskcategory.RiskCategoryColumn},
+			Table:   riskcategory.RiskRiskCategoryTable,
+			Columns: []string{riskcategory.RiskRiskCategoryColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(risk.FieldID, field.TypeInt),

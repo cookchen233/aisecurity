@@ -6,6 +6,7 @@ import (
 	"aisecurity/ent/dao/admin"
 	"aisecurity/ent/dao/department"
 	"aisecurity/ent/dao/employee"
+	"aisecurity/ent/dao/risk"
 	"context"
 	"errors"
 	"fmt"
@@ -39,18 +40,6 @@ func (ec *EmployeeCreate) SetNillableCreatedAt(t *time.Time) *EmployeeCreate {
 // SetCreatedBy sets the "created_by" field.
 func (ec *EmployeeCreate) SetCreatedBy(i int) *EmployeeCreate {
 	ec.mutation.SetCreatedBy(i)
-	return ec
-}
-
-// SetAdminID sets the "admin_id" field.
-func (ec *EmployeeCreate) SetAdminID(i int) *EmployeeCreate {
-	ec.mutation.SetAdminID(i)
-	return ec
-}
-
-// SetDepartmentID sets the "department_id" field.
-func (ec *EmployeeCreate) SetDepartmentID(i int) *EmployeeCreate {
-	ec.mutation.SetDepartmentID(i)
 	return ec
 }
 
@@ -88,6 +77,18 @@ func (ec *EmployeeCreate) SetNillableUpdatedAt(t *time.Time) *EmployeeCreate {
 	return ec
 }
 
+// SetAdminID sets the "admin_id" field.
+func (ec *EmployeeCreate) SetAdminID(i int) *EmployeeCreate {
+	ec.mutation.SetAdminID(i)
+	return ec
+}
+
+// SetDepartmentID sets the "department_id" field.
+func (ec *EmployeeCreate) SetDepartmentID(i int) *EmployeeCreate {
+	ec.mutation.SetDepartmentID(i)
+	return ec
+}
+
 // SetCreatorID sets the "creator" edge to the Admin entity by ID.
 func (ec *EmployeeCreate) SetCreatorID(id int) *EmployeeCreate {
 	ec.mutation.SetCreatorID(id)
@@ -109,6 +110,36 @@ func (ec *EmployeeCreate) SetDepartment(d *Department) *EmployeeCreate {
 	return ec.SetDepartmentID(d.ID)
 }
 
+// AddRiskMaintainerIDs adds the "risk_maintainer" edge to the Risk entity by IDs.
+func (ec *EmployeeCreate) AddRiskMaintainerIDs(ids ...int) *EmployeeCreate {
+	ec.mutation.AddRiskMaintainerIDs(ids...)
+	return ec
+}
+
+// AddRiskMaintainer adds the "risk_maintainer" edges to the Risk entity.
+func (ec *EmployeeCreate) AddRiskMaintainer(r ...*Risk) *EmployeeCreate {
+	ids := make([]int, len(r))
+	for i := range r {
+		ids[i] = r[i].ID
+	}
+	return ec.AddRiskMaintainerIDs(ids...)
+}
+
+// AddRiskCreatorIDs adds the "risk_creator" edge to the Risk entity by IDs.
+func (ec *EmployeeCreate) AddRiskCreatorIDs(ids ...int) *EmployeeCreate {
+	ec.mutation.AddRiskCreatorIDs(ids...)
+	return ec
+}
+
+// AddRiskCreator adds the "risk_creator" edges to the Risk entity.
+func (ec *EmployeeCreate) AddRiskCreator(r ...*Risk) *EmployeeCreate {
+	ids := make([]int, len(r))
+	for i := range r {
+		ids[i] = r[i].ID
+	}
+	return ec.AddRiskCreatorIDs(ids...)
+}
+
 // Mutation returns the EmployeeMutation object of the builder.
 func (ec *EmployeeCreate) Mutation() *EmployeeMutation {
 	return ec.mutation
@@ -116,7 +147,9 @@ func (ec *EmployeeCreate) Mutation() *EmployeeMutation {
 
 // Save creates the Employee in the database.
 func (ec *EmployeeCreate) Save(ctx context.Context) (*Employee, error) {
-	ec.defaults()
+	if err := ec.defaults(); err != nil {
+		return nil, err
+	}
 	return withHooks(ctx, ec.sqlSave, ec.mutation, ec.hooks)
 }
 
@@ -143,15 +176,22 @@ func (ec *EmployeeCreate) ExecX(ctx context.Context) {
 }
 
 // defaults sets the default values of the builder before save.
-func (ec *EmployeeCreate) defaults() {
+func (ec *EmployeeCreate) defaults() error {
 	if _, ok := ec.mutation.CreatedAt(); !ok {
+		if employee.DefaultCreatedAt == nil {
+			return fmt.Errorf("dao: uninitialized employee.DefaultCreatedAt (forgotten import dao/runtime?)")
+		}
 		v := employee.DefaultCreatedAt()
 		ec.mutation.SetCreatedAt(v)
 	}
 	if _, ok := ec.mutation.UpdatedAt(); !ok {
+		if employee.DefaultUpdatedAt == nil {
+			return fmt.Errorf("dao: uninitialized employee.DefaultUpdatedAt (forgotten import dao/runtime?)")
+		}
 		v := employee.DefaultUpdatedAt()
 		ec.mutation.SetUpdatedAt(v)
 	}
+	return nil
 }
 
 // check runs all checks and user-defined validators on the builder.
@@ -166,6 +206,17 @@ func (ec *EmployeeCreate) check() error {
 		if err := employee.CreatedByValidator(v); err != nil {
 			return &ValidationError{Name: "created_by", err: fmt.Errorf(`dao: validator failed for field "Employee.created_by": %w`, err)}
 		}
+	}
+	if _, ok := ec.mutation.UpdatedBy(); !ok {
+		return &ValidationError{Name: "updated_by", err: errors.New(`dao: missing required field "Employee.updated_by"`)}
+	}
+	if v, ok := ec.mutation.UpdatedBy(); ok {
+		if err := employee.UpdatedByValidator(v); err != nil {
+			return &ValidationError{Name: "updated_by", err: fmt.Errorf(`dao: validator failed for field "Employee.updated_by": %w`, err)}
+		}
+	}
+	if _, ok := ec.mutation.UpdatedAt(); !ok {
+		return &ValidationError{Name: "updated_at", err: errors.New(`dao: missing required field "Employee.updated_at"`)}
 	}
 	if _, ok := ec.mutation.AdminID(); !ok {
 		return &ValidationError{Name: "admin_id", err: errors.New(`dao: missing required field "Employee.admin_id"`)}
@@ -182,17 +233,6 @@ func (ec *EmployeeCreate) check() error {
 		if err := employee.DepartmentIDValidator(v); err != nil {
 			return &ValidationError{Name: "department_id", err: fmt.Errorf(`dao: validator failed for field "Employee.department_id": %w`, err)}
 		}
-	}
-	if _, ok := ec.mutation.UpdatedBy(); !ok {
-		return &ValidationError{Name: "updated_by", err: errors.New(`dao: missing required field "Employee.updated_by"`)}
-	}
-	if v, ok := ec.mutation.UpdatedBy(); ok {
-		if err := employee.UpdatedByValidator(v); err != nil {
-			return &ValidationError{Name: "updated_by", err: fmt.Errorf(`dao: validator failed for field "Employee.updated_by": %w`, err)}
-		}
-	}
-	if _, ok := ec.mutation.UpdatedAt(); !ok {
-		return &ValidationError{Name: "updated_at", err: errors.New(`dao: missing required field "Employee.updated_at"`)}
 	}
 	if _, ok := ec.mutation.CreatorID(); !ok {
 		return &ValidationError{Name: "creator", err: errors.New(`dao: missing required edge "Employee.creator"`)}
@@ -294,6 +334,38 @@ func (ec *EmployeeCreate) createSpec() (*Employee, *sqlgraph.CreateSpec) {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
 		_node.DepartmentID = nodes[0]
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := ec.mutation.RiskMaintainerIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   employee.RiskMaintainerTable,
+			Columns: []string{employee.RiskMaintainerColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(risk.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := ec.mutation.RiskCreatorIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   employee.RiskCreatorTable,
+			Columns: []string{employee.RiskCreatorColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(risk.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
 		_spec.Edges = append(_spec.Edges, edge)
 	}
 	return _node, _spec

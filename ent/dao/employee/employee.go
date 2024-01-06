@@ -5,6 +5,7 @@ package employee
 import (
 	"time"
 
+	"entgo.io/ent"
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 )
@@ -18,22 +19,26 @@ const (
 	FieldCreatedAt = "created_at"
 	// FieldCreatedBy holds the string denoting the created_by field in the database.
 	FieldCreatedBy = "created_by"
-	// FieldAdminID holds the string denoting the admin_id field in the database.
-	FieldAdminID = "admin_id"
-	// FieldDepartmentID holds the string denoting the department_id field in the database.
-	FieldDepartmentID = "department_id"
 	// FieldDeletedAt holds the string denoting the deleted_at field in the database.
 	FieldDeletedAt = "deleted_at"
 	// FieldUpdatedBy holds the string denoting the updated_by field in the database.
 	FieldUpdatedBy = "updated_by"
 	// FieldUpdatedAt holds the string denoting the updated_at field in the database.
 	FieldUpdatedAt = "updated_at"
+	// FieldAdminID holds the string denoting the admin_id field in the database.
+	FieldAdminID = "admin_id"
+	// FieldDepartmentID holds the string denoting the department_id field in the database.
+	FieldDepartmentID = "department_id"
 	// EdgeCreator holds the string denoting the creator edge name in mutations.
 	EdgeCreator = "creator"
 	// EdgeAdmin holds the string denoting the admin edge name in mutations.
 	EdgeAdmin = "admin"
 	// EdgeDepartment holds the string denoting the department edge name in mutations.
 	EdgeDepartment = "department"
+	// EdgeRiskMaintainer holds the string denoting the risk_maintainer edge name in mutations.
+	EdgeRiskMaintainer = "risk_maintainer"
+	// EdgeRiskCreator holds the string denoting the risk_creator edge name in mutations.
+	EdgeRiskCreator = "risk_creator"
 	// Table holds the table name of the employee in the database.
 	Table = "employees"
 	// CreatorTable is the table that holds the creator relation/edge.
@@ -57,6 +62,20 @@ const (
 	DepartmentInverseTable = "departments"
 	// DepartmentColumn is the table column denoting the department relation/edge.
 	DepartmentColumn = "department_id"
+	// RiskMaintainerTable is the table that holds the risk_maintainer relation/edge.
+	RiskMaintainerTable = "risks"
+	// RiskMaintainerInverseTable is the table name for the Risk entity.
+	// It exists in this package in order to avoid circular dependency with the "risk" package.
+	RiskMaintainerInverseTable = "risks"
+	// RiskMaintainerColumn is the table column denoting the risk_maintainer relation/edge.
+	RiskMaintainerColumn = "maintainer_id"
+	// RiskCreatorTable is the table that holds the risk_creator relation/edge.
+	RiskCreatorTable = "risks"
+	// RiskCreatorInverseTable is the table name for the Risk entity.
+	// It exists in this package in order to avoid circular dependency with the "risk" package.
+	RiskCreatorInverseTable = "risks"
+	// RiskCreatorColumn is the table column denoting the risk_creator relation/edge.
+	RiskCreatorColumn = "created_by"
 )
 
 // Columns holds all SQL columns for employee fields.
@@ -64,11 +83,11 @@ var Columns = []string{
 	FieldID,
 	FieldCreatedAt,
 	FieldCreatedBy,
-	FieldAdminID,
-	FieldDepartmentID,
 	FieldDeletedAt,
 	FieldUpdatedBy,
 	FieldUpdatedAt,
+	FieldAdminID,
+	FieldDepartmentID,
 }
 
 // ForeignKeys holds the SQL foreign-keys that are owned by the "employees"
@@ -92,21 +111,27 @@ func ValidColumn(column string) bool {
 	return false
 }
 
+// Note that the variables below are initialized by the runtime
+// package on the initialization of the application. Therefore,
+// it should be imported in the main as follows:
+//
+//	import _ "aisecurity/ent/dao/runtime"
 var (
+	Hooks [1]ent.Hook
 	// DefaultCreatedAt holds the default value on creation for the "created_at" field.
 	DefaultCreatedAt func() time.Time
 	// CreatedByValidator is a validator for the "created_by" field. It is called by the builders before save.
 	CreatedByValidator func(int) error
-	// AdminIDValidator is a validator for the "admin_id" field. It is called by the builders before save.
-	AdminIDValidator func(int) error
-	// DepartmentIDValidator is a validator for the "department_id" field. It is called by the builders before save.
-	DepartmentIDValidator func(int) error
 	// UpdatedByValidator is a validator for the "updated_by" field. It is called by the builders before save.
 	UpdatedByValidator func(int) error
 	// DefaultUpdatedAt holds the default value on creation for the "updated_at" field.
 	DefaultUpdatedAt func() time.Time
 	// UpdateDefaultUpdatedAt holds the default value on update for the "updated_at" field.
 	UpdateDefaultUpdatedAt func() time.Time
+	// AdminIDValidator is a validator for the "admin_id" field. It is called by the builders before save.
+	AdminIDValidator func(int) error
+	// DepartmentIDValidator is a validator for the "department_id" field. It is called by the builders before save.
+	DepartmentIDValidator func(int) error
 )
 
 // OrderOption defines the ordering options for the Employee queries.
@@ -127,16 +152,6 @@ func ByCreatedBy(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldCreatedBy, opts...).ToFunc()
 }
 
-// ByAdminID orders the results by the admin_id field.
-func ByAdminID(opts ...sql.OrderTermOption) OrderOption {
-	return sql.OrderByField(FieldAdminID, opts...).ToFunc()
-}
-
-// ByDepartmentID orders the results by the department_id field.
-func ByDepartmentID(opts ...sql.OrderTermOption) OrderOption {
-	return sql.OrderByField(FieldDepartmentID, opts...).ToFunc()
-}
-
 // ByDeletedAt orders the results by the deleted_at field.
 func ByDeletedAt(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldDeletedAt, opts...).ToFunc()
@@ -150,6 +165,16 @@ func ByUpdatedBy(opts ...sql.OrderTermOption) OrderOption {
 // ByUpdatedAt orders the results by the updated_at field.
 func ByUpdatedAt(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldUpdatedAt, opts...).ToFunc()
+}
+
+// ByAdminID orders the results by the admin_id field.
+func ByAdminID(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldAdminID, opts...).ToFunc()
+}
+
+// ByDepartmentID orders the results by the department_id field.
+func ByDepartmentID(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldDepartmentID, opts...).ToFunc()
 }
 
 // ByCreatorField orders the results by creator field.
@@ -172,6 +197,34 @@ func ByDepartmentField(field string, opts ...sql.OrderTermOption) OrderOption {
 		sqlgraph.OrderByNeighborTerms(s, newDepartmentStep(), sql.OrderByField(field, opts...))
 	}
 }
+
+// ByRiskMaintainerCount orders the results by risk_maintainer count.
+func ByRiskMaintainerCount(opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborsCount(s, newRiskMaintainerStep(), opts...)
+	}
+}
+
+// ByRiskMaintainer orders the results by risk_maintainer terms.
+func ByRiskMaintainer(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newRiskMaintainerStep(), append([]sql.OrderTerm{term}, terms...)...)
+	}
+}
+
+// ByRiskCreatorCount orders the results by risk_creator count.
+func ByRiskCreatorCount(opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborsCount(s, newRiskCreatorStep(), opts...)
+	}
+}
+
+// ByRiskCreator orders the results by risk_creator terms.
+func ByRiskCreator(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newRiskCreatorStep(), append([]sql.OrderTerm{term}, terms...)...)
+	}
+}
 func newCreatorStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
@@ -191,5 +244,19 @@ func newDepartmentStep() *sqlgraph.Step {
 		sqlgraph.From(Table, FieldID),
 		sqlgraph.To(DepartmentInverseTable, FieldID),
 		sqlgraph.Edge(sqlgraph.M2O, true, DepartmentTable, DepartmentColumn),
+	)
+}
+func newRiskMaintainerStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(RiskMaintainerInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.O2M, false, RiskMaintainerTable, RiskMaintainerColumn),
+	)
+}
+func newRiskCreatorStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(RiskCreatorInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.O2M, false, RiskCreatorTable, RiskCreatorColumn),
 	)
 }

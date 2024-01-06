@@ -101,9 +101,9 @@ func RiskLocationID(v int) predicate.Risk {
 	return predicate.Risk(sql.FieldEQ(FieldRiskLocationID, v))
 }
 
-// Maintainer applies equality check predicate on the "maintainer" field. It's identical to MaintainerEQ.
-func Maintainer(v int) predicate.Risk {
-	return predicate.Risk(sql.FieldEQ(FieldMaintainer, v))
+// MaintainerID applies equality check predicate on the "maintainer_id" field. It's identical to MaintainerIDEQ.
+func MaintainerID(v int) predicate.Risk {
+	return predicate.Risk(sql.FieldEQ(FieldMaintainerID, v))
 }
 
 // Measures applies equality check predicate on the "measures" field. It's identical to MeasuresEQ.
@@ -250,26 +250,6 @@ func UpdatedByIn(vs ...int) predicate.Risk {
 // UpdatedByNotIn applies the NotIn predicate on the "updated_by" field.
 func UpdatedByNotIn(vs ...int) predicate.Risk {
 	return predicate.Risk(sql.FieldNotIn(FieldUpdatedBy, vs...))
-}
-
-// UpdatedByGT applies the GT predicate on the "updated_by" field.
-func UpdatedByGT(v int) predicate.Risk {
-	return predicate.Risk(sql.FieldGT(FieldUpdatedBy, v))
-}
-
-// UpdatedByGTE applies the GTE predicate on the "updated_by" field.
-func UpdatedByGTE(v int) predicate.Risk {
-	return predicate.Risk(sql.FieldGTE(FieldUpdatedBy, v))
-}
-
-// UpdatedByLT applies the LT predicate on the "updated_by" field.
-func UpdatedByLT(v int) predicate.Risk {
-	return predicate.Risk(sql.FieldLT(FieldUpdatedBy, v))
-}
-
-// UpdatedByLTE applies the LTE predicate on the "updated_by" field.
-func UpdatedByLTE(v int) predicate.Risk {
-	return predicate.Risk(sql.FieldLTE(FieldUpdatedBy, v))
 }
 
 // UpdatedAtEQ applies the EQ predicate on the "updated_at" field.
@@ -492,24 +472,24 @@ func RiskLocationIDNotIn(vs ...int) predicate.Risk {
 	return predicate.Risk(sql.FieldNotIn(FieldRiskLocationID, vs...))
 }
 
-// MaintainerEQ applies the EQ predicate on the "maintainer" field.
-func MaintainerEQ(v int) predicate.Risk {
-	return predicate.Risk(sql.FieldEQ(FieldMaintainer, v))
+// MaintainerIDEQ applies the EQ predicate on the "maintainer_id" field.
+func MaintainerIDEQ(v int) predicate.Risk {
+	return predicate.Risk(sql.FieldEQ(FieldMaintainerID, v))
 }
 
-// MaintainerNEQ applies the NEQ predicate on the "maintainer" field.
-func MaintainerNEQ(v int) predicate.Risk {
-	return predicate.Risk(sql.FieldNEQ(FieldMaintainer, v))
+// MaintainerIDNEQ applies the NEQ predicate on the "maintainer_id" field.
+func MaintainerIDNEQ(v int) predicate.Risk {
+	return predicate.Risk(sql.FieldNEQ(FieldMaintainerID, v))
 }
 
-// MaintainerIn applies the In predicate on the "maintainer" field.
-func MaintainerIn(vs ...int) predicate.Risk {
-	return predicate.Risk(sql.FieldIn(FieldMaintainer, vs...))
+// MaintainerIDIn applies the In predicate on the "maintainer_id" field.
+func MaintainerIDIn(vs ...int) predicate.Risk {
+	return predicate.Risk(sql.FieldIn(FieldMaintainerID, vs...))
 }
 
-// MaintainerNotIn applies the NotIn predicate on the "maintainer" field.
-func MaintainerNotIn(vs ...int) predicate.Risk {
-	return predicate.Risk(sql.FieldNotIn(FieldMaintainer, vs...))
+// MaintainerIDNotIn applies the NotIn predicate on the "maintainer_id" field.
+func MaintainerIDNotIn(vs ...int) predicate.Risk {
+	return predicate.Risk(sql.FieldNotIn(FieldMaintainerID, vs...))
 }
 
 // MeasuresEQ applies the EQ predicate on the "measures" field.
@@ -693,7 +673,7 @@ func HasCreator() predicate.Risk {
 }
 
 // HasCreatorWith applies the HasEdge predicate on the "creator" edge with a given conditions (other predicates).
-func HasCreatorWith(preds ...predicate.Admin) predicate.Risk {
+func HasCreatorWith(preds ...predicate.Employee) predicate.Risk {
 	return predicate.Risk(func(s *sql.Selector) {
 		step := newCreatorStep()
 		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
@@ -704,21 +684,21 @@ func HasCreatorWith(preds ...predicate.Admin) predicate.Risk {
 	})
 }
 
-// HasMaintainerAdmin applies the HasEdge predicate on the "maintainer_admin" edge.
-func HasMaintainerAdmin() predicate.Risk {
+// HasUpdator applies the HasEdge predicate on the "updator" edge.
+func HasUpdator() predicate.Risk {
 	return predicate.Risk(func(s *sql.Selector) {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(Table, FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, true, MaintainerAdminTable, MaintainerAdminColumn),
+			sqlgraph.Edge(sqlgraph.M2O, true, UpdatorTable, UpdatorColumn),
 		)
 		sqlgraph.HasNeighbors(s, step)
 	})
 }
 
-// HasMaintainerAdminWith applies the HasEdge predicate on the "maintainer_admin" edge with a given conditions (other predicates).
-func HasMaintainerAdminWith(preds ...predicate.Admin) predicate.Risk {
+// HasUpdatorWith applies the HasEdge predicate on the "updator" edge with a given conditions (other predicates).
+func HasUpdatorWith(preds ...predicate.Admin) predicate.Risk {
 	return predicate.Risk(func(s *sql.Selector) {
-		step := newMaintainerAdminStep()
+		step := newUpdatorStep()
 		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
 			for _, p := range preds {
 				p(s)
@@ -727,21 +707,21 @@ func HasMaintainerAdminWith(preds ...predicate.Admin) predicate.Risk {
 	})
 }
 
-// HasCategory applies the HasEdge predicate on the "category" edge.
-func HasCategory() predicate.Risk {
+// HasMaintainer applies the HasEdge predicate on the "maintainer" edge.
+func HasMaintainer() predicate.Risk {
 	return predicate.Risk(func(s *sql.Selector) {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(Table, FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, true, CategoryTable, CategoryColumn),
+			sqlgraph.Edge(sqlgraph.M2O, true, MaintainerTable, MaintainerColumn),
 		)
 		sqlgraph.HasNeighbors(s, step)
 	})
 }
 
-// HasCategoryWith applies the HasEdge predicate on the "category" edge with a given conditions (other predicates).
-func HasCategoryWith(preds ...predicate.RiskCategory) predicate.Risk {
+// HasMaintainerWith applies the HasEdge predicate on the "maintainer" edge with a given conditions (other predicates).
+func HasMaintainerWith(preds ...predicate.Employee) predicate.Risk {
 	return predicate.Risk(func(s *sql.Selector) {
-		step := newCategoryStep()
+		step := newMaintainerStep()
 		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
 			for _, p := range preds {
 				p(s)
@@ -750,21 +730,44 @@ func HasCategoryWith(preds ...predicate.RiskCategory) predicate.Risk {
 	})
 }
 
-// HasLocation applies the HasEdge predicate on the "location" edge.
-func HasLocation() predicate.Risk {
+// HasRiskCategory applies the HasEdge predicate on the "risk_category" edge.
+func HasRiskCategory() predicate.Risk {
 	return predicate.Risk(func(s *sql.Selector) {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(Table, FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, true, LocationTable, LocationColumn),
+			sqlgraph.Edge(sqlgraph.M2O, true, RiskCategoryTable, RiskCategoryColumn),
 		)
 		sqlgraph.HasNeighbors(s, step)
 	})
 }
 
-// HasLocationWith applies the HasEdge predicate on the "location" edge with a given conditions (other predicates).
-func HasLocationWith(preds ...predicate.RiskLocation) predicate.Risk {
+// HasRiskCategoryWith applies the HasEdge predicate on the "risk_category" edge with a given conditions (other predicates).
+func HasRiskCategoryWith(preds ...predicate.RiskCategory) predicate.Risk {
 	return predicate.Risk(func(s *sql.Selector) {
-		step := newLocationStep()
+		step := newRiskCategoryStep()
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
+}
+
+// HasRiskLocation applies the HasEdge predicate on the "risk_location" edge.
+func HasRiskLocation() predicate.Risk {
+	return predicate.Risk(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, RiskLocationTable, RiskLocationColumn),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasRiskLocationWith applies the HasEdge predicate on the "risk_location" edge with a given conditions (other predicates).
+func HasRiskLocationWith(preds ...predicate.RiskLocation) predicate.Risk {
+	return predicate.Risk(func(s *sql.Selector) {
+		step := newRiskLocationStep()
 		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
 			for _, p := range preds {
 				p(s)

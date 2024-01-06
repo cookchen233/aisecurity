@@ -1,4 +1,4 @@
-package request
+package response
 
 type Admin struct {
 	ID int `json:"id,omitempty"`

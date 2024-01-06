@@ -18,9 +18,13 @@ func NewSecurityRoutes(router *gin.RouterGroup) *SecurityRoutes {
 
 // Setup Register security handlers
 func (routes *SecurityRoutes) Setup() {
-	riskReportingHandler := security.NewRiskHandler()
-	routes.RouterGroup.POST("/risk/create", handlers.Convert(riskReportingHandler, riskReportingHandler.Create))
-	routes.RouterGroup.GET("/risk/get-list", handlers.Convert(riskReportingHandler, riskReportingHandler.GetList))
-	routes.RouterGroup.POST("/risk/create-risk-category", handlers.Convert(riskReportingHandler, riskReportingHandler.CreateRiskCategory))
-	routes.RouterGroup.POST("/risk/create-risk-location", handlers.Convert(riskReportingHandler, riskReportingHandler.CreateRiskLocation))
+	riskHandler := security.NewRiskHandler()
+	{
+		routes.RouterGroup.GET("/get-enums", handlers.Convert(riskHandler, riskHandler.GetEnums))
+		routes.RouterGroup.POST("/risk/create", handlers.Convert(riskHandler, riskHandler.Create))
+		routes.RouterGroup.GET("/risk/get-list", handlers.Convert(riskHandler, riskHandler.GetList))
+		routes.RouterGroup.GET("/risk/details/:id", handlers.Convert(riskHandler, riskHandler.GetByID))
+		routes.RouterGroup.POST("/risk-category/create", handlers.Convert(riskHandler, riskHandler.CreateRiskCategory))
+		routes.RouterGroup.POST("/risk-location/create", handlers.Convert(riskHandler, riskHandler.CreateRiskLocation))
+	}
 }

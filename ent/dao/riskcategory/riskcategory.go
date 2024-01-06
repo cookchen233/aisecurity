@@ -29,8 +29,10 @@ const (
 	FieldTitle = "title"
 	// EdgeCreator holds the string denoting the creator edge name in mutations.
 	EdgeCreator = "creator"
-	// EdgeRiskCategory holds the string denoting the risk_category edge name in mutations.
-	EdgeRiskCategory = "risk_category"
+	// EdgeUpdator holds the string denoting the updator edge name in mutations.
+	EdgeUpdator = "updator"
+	// EdgeRiskRiskCategory holds the string denoting the risk_risk_category edge name in mutations.
+	EdgeRiskRiskCategory = "risk_risk_category"
 	// Table holds the table name of the riskcategory in the database.
 	Table = "risk_categories"
 	// CreatorTable is the table that holds the creator relation/edge.
@@ -40,13 +42,20 @@ const (
 	CreatorInverseTable = "admins"
 	// CreatorColumn is the table column denoting the creator relation/edge.
 	CreatorColumn = "created_by"
-	// RiskCategoryTable is the table that holds the risk_category relation/edge.
-	RiskCategoryTable = "risks"
-	// RiskCategoryInverseTable is the table name for the Risk entity.
+	// UpdatorTable is the table that holds the updator relation/edge.
+	UpdatorTable = "risk_categories"
+	// UpdatorInverseTable is the table name for the Admin entity.
+	// It exists in this package in order to avoid circular dependency with the "admin" package.
+	UpdatorInverseTable = "admins"
+	// UpdatorColumn is the table column denoting the updator relation/edge.
+	UpdatorColumn = "updated_by"
+	// RiskRiskCategoryTable is the table that holds the risk_risk_category relation/edge.
+	RiskRiskCategoryTable = "risks"
+	// RiskRiskCategoryInverseTable is the table name for the Risk entity.
 	// It exists in this package in order to avoid circular dependency with the "risk" package.
-	RiskCategoryInverseTable = "risks"
-	// RiskCategoryColumn is the table column denoting the risk_category relation/edge.
-	RiskCategoryColumn = "risk_category_id"
+	RiskRiskCategoryInverseTable = "risks"
+	// RiskRiskCategoryColumn is the table column denoting the risk_risk_category relation/edge.
+	RiskRiskCategoryColumn = "risk_category_id"
 )
 
 // Columns holds all SQL columns for riskcategory fields.
@@ -60,21 +69,10 @@ var Columns = []string{
 	FieldTitle,
 }
 
-// ForeignKeys holds the SQL foreign-keys that are owned by the "risk_categories"
-// table and are not defined as standalone fields in the schema.
-var ForeignKeys = []string{
-	"admin_risk_category_updator",
-}
-
 // ValidColumn reports if the column name is valid (part of the table columns).
 func ValidColumn(column string) bool {
 	for i := range Columns {
 		if column == Columns[i] {
-			return true
-		}
-	}
-	for i := range ForeignKeys {
-		if column == ForeignKeys[i] {
 			return true
 		}
 	}
@@ -147,17 +145,24 @@ func ByCreatorField(field string, opts ...sql.OrderTermOption) OrderOption {
 	}
 }
 
-// ByRiskCategoryCount orders the results by risk_category count.
-func ByRiskCategoryCount(opts ...sql.OrderTermOption) OrderOption {
+// ByUpdatorField orders the results by updator field.
+func ByUpdatorField(field string, opts ...sql.OrderTermOption) OrderOption {
 	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborsCount(s, newRiskCategoryStep(), opts...)
+		sqlgraph.OrderByNeighborTerms(s, newUpdatorStep(), sql.OrderByField(field, opts...))
 	}
 }
 
-// ByRiskCategory orders the results by risk_category terms.
-func ByRiskCategory(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+// ByRiskRiskCategoryCount orders the results by risk_risk_category count.
+func ByRiskRiskCategoryCount(opts ...sql.OrderTermOption) OrderOption {
 	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborTerms(s, newRiskCategoryStep(), append([]sql.OrderTerm{term}, terms...)...)
+		sqlgraph.OrderByNeighborsCount(s, newRiskRiskCategoryStep(), opts...)
+	}
+}
+
+// ByRiskRiskCategory orders the results by risk_risk_category terms.
+func ByRiskRiskCategory(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newRiskRiskCategoryStep(), append([]sql.OrderTerm{term}, terms...)...)
 	}
 }
 func newCreatorStep() *sqlgraph.Step {
@@ -167,10 +172,17 @@ func newCreatorStep() *sqlgraph.Step {
 		sqlgraph.Edge(sqlgraph.M2O, true, CreatorTable, CreatorColumn),
 	)
 }
-func newRiskCategoryStep() *sqlgraph.Step {
+func newUpdatorStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
-		sqlgraph.To(RiskCategoryInverseTable, FieldID),
-		sqlgraph.Edge(sqlgraph.O2M, false, RiskCategoryTable, RiskCategoryColumn),
+		sqlgraph.To(UpdatorInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.M2O, true, UpdatorTable, UpdatorColumn),
+	)
+}
+func newRiskRiskCategoryStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(RiskRiskCategoryInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.O2M, false, RiskRiskCategoryTable, RiskRiskCategoryColumn),
 	)
 }

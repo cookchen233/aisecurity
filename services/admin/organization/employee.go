@@ -2,14 +2,14 @@ package organization
 
 import (
 	"aisecurity/ent/dao"
-	"aisecurity/ent/dao/admin"
 	"aisecurity/ent/dao/department"
+	"aisecurity/services"
 	"aisecurity/utils/db"
-	"context"
 	"fmt"
 )
 
 type EmployeeService struct {
+	services.Service
 }
 
 func NewEmployeeService() *EmployeeService {
@@ -19,12 +19,10 @@ func NewEmployeeService() *EmployeeService {
 var ()
 
 func (service *EmployeeService) Create(data *dao.Employee) (*dao.Employee, error) {
-	adminData, _ := db.EntClient.Admin.Query().Where(admin.IDEQ(data.AdminID)).Only(context.Background())
-	departmentData, _ := db.EntClient.Department.Query().Where(department.IDEQ(data.DepartmentID)).Only(context.Background())
 	save, err := db.EntClient.Employee.Create().
-		SetAdmin(adminData).
-		SetDepartment(departmentData).
-		Save(context.Background())
+		SetAdminID(data.AdminID).
+		SetDepartmentID(data.DepartmentID).
+		Save(service.Ctx)
 	if err != nil {
 		return nil, fmt.Errorf("failed creating Employee: %w", err)
 	}
@@ -32,17 +30,31 @@ func (service *EmployeeService) Create(data *dao.Employee) (*dao.Employee, error
 }
 
 func (service *EmployeeService) GetList() ([]*dao.Employee, error) {
-	all, err := db.EntClient.Employee.Query().WithAdmin().WithDepartment().All(context.Background())
+	all, err := db.EntClient.Employee.Query().WithAdmin().WithDepartment().All(service.Ctx)
 	if err != nil {
 		return nil, err
 	}
 	return all, nil
 }
 
-func (service *EmployeeService) CreateDepartment(title string) (*dao.Department, error) {
-	saved, err := db.EntClient.Department.Create().SetTitle(title).Save(context.Background())
+func (service *EmployeeService) CreateDepartment(department dao.Department) (*dao.Department, error) {
+	saved, err := db.EntClient.Department.Create().
+		SetTitle(department.Title).
+		SetParentID(department.ParentID).
+		Save(service.Ctx)
 	if err != nil {
 		return nil, fmt.Errorf("failed creating Department: %w", err)
 	}
 	return saved, nil
+}
+
+func (service *EmployeeService) GetDepartmentList() ([]*dao.Department, error) {
+	all, err := db.EntClient.Department.Query().
+		Where(department.ParentIDEQ(1)).
+		Where(department.IDNEQ(1)).
+		WithChildren().All(service.Ctx)
+	if err != nil {
+		return nil, err
+	}
+	return all, nil
 }

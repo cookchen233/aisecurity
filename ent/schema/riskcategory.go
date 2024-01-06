@@ -21,7 +21,7 @@ func (RiskCategory) Mixin() []ent.Mixin {
 // Fields of the RiskCategory.
 func (RiskCategory) Fields() []ent.Field {
 	return []ent.Field{
-		field.String("title").MaxLen(255).Comment("标题"),
+		field.String("title").MaxLen(255).Comment("标题").NotEmpty().StructTag(`validate:"required"`),
 	}
 }
 
@@ -29,7 +29,8 @@ func (RiskCategory) Fields() []ent.Field {
 func (RiskCategory) Edges() []ent.Edge {
 	return []ent.Edge{
 		edge.From("creator", Admin.Type).Ref("risk_category_creator").Field("created_by").Immutable().Unique().Required(),
+		edge.From("updator", Admin.Type).Ref("risk_category_updator").Field("updated_by").Required().Unique(),
 
-		edge.To("risk_category", Risk.Type),
+		edge.To("risk_risk_category", Risk.Type),
 	}
 }

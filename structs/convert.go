@@ -9,6 +9,15 @@ func ConvertTo[T any](from interface{}) T {
 	fromVal := reflect.ValueOf(from)
 	toVal := reflect.ValueOf(&to).Elem()
 
+	// Check if 'fromVal' is a pointer, and if so, get the value it points to
+	if fromVal.Kind() == reflect.Ptr {
+		fromVal = fromVal.Elem()
+	}
+
+	if fromVal.Kind() != reflect.Struct {
+		panic("ConvertTo only accepts structs or pointers to structs")
+	}
+
 	if fromVal.Type().ConvertibleTo(toVal.Type()) {
 		toVal.Set(fromVal.Convert(toVal.Type()))
 	} else {
@@ -25,5 +34,4 @@ func ConvertTo[T any](from interface{}) T {
 		}
 	}
 	return to
-	//return to, fmt.Errorf("cannot convert type %s to %s", fromVal.Type(), toVal.Type())
 }

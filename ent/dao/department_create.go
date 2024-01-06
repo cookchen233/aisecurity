@@ -42,26 +42,6 @@ func (dc *DepartmentCreate) SetCreatedBy(i int) *DepartmentCreate {
 	return dc
 }
 
-// SetTitle sets the "title" field.
-func (dc *DepartmentCreate) SetTitle(s string) *DepartmentCreate {
-	dc.mutation.SetTitle(s)
-	return dc
-}
-
-// SetParentID sets the "parent_id" field.
-func (dc *DepartmentCreate) SetParentID(i int) *DepartmentCreate {
-	dc.mutation.SetParentID(i)
-	return dc
-}
-
-// SetNillableParentID sets the "parent_id" field if the given value is not nil.
-func (dc *DepartmentCreate) SetNillableParentID(i *int) *DepartmentCreate {
-	if i != nil {
-		dc.SetParentID(*i)
-	}
-	return dc
-}
-
 // SetDeletedAt sets the "deleted_at" field.
 func (dc *DepartmentCreate) SetDeletedAt(t time.Time) *DepartmentCreate {
 	dc.mutation.SetDeletedAt(t)
@@ -93,6 +73,18 @@ func (dc *DepartmentCreate) SetNillableUpdatedAt(t *time.Time) *DepartmentCreate
 	if t != nil {
 		dc.SetUpdatedAt(*t)
 	}
+	return dc
+}
+
+// SetTitle sets the "title" field.
+func (dc *DepartmentCreate) SetTitle(s string) *DepartmentCreate {
+	dc.mutation.SetTitle(s)
+	return dc
+}
+
+// SetParentID sets the "parent_id" field.
+func (dc *DepartmentCreate) SetParentID(i int) *DepartmentCreate {
+	dc.mutation.SetParentID(i)
 	return dc
 }
 
@@ -149,7 +141,9 @@ func (dc *DepartmentCreate) Mutation() *DepartmentMutation {
 
 // Save creates the Department in the database.
 func (dc *DepartmentCreate) Save(ctx context.Context) (*Department, error) {
-	dc.defaults()
+	if err := dc.defaults(); err != nil {
+		return nil, err
+	}
 	return withHooks(ctx, dc.sqlSave, dc.mutation, dc.hooks)
 }
 
@@ -176,15 +170,22 @@ func (dc *DepartmentCreate) ExecX(ctx context.Context) {
 }
 
 // defaults sets the default values of the builder before save.
-func (dc *DepartmentCreate) defaults() {
+func (dc *DepartmentCreate) defaults() error {
 	if _, ok := dc.mutation.CreatedAt(); !ok {
+		if department.DefaultCreatedAt == nil {
+			return fmt.Errorf("dao: uninitialized department.DefaultCreatedAt (forgotten import dao/runtime?)")
+		}
 		v := department.DefaultCreatedAt()
 		dc.mutation.SetCreatedAt(v)
 	}
 	if _, ok := dc.mutation.UpdatedAt(); !ok {
+		if department.DefaultUpdatedAt == nil {
+			return fmt.Errorf("dao: uninitialized department.DefaultUpdatedAt (forgotten import dao/runtime?)")
+		}
 		v := department.DefaultUpdatedAt()
 		dc.mutation.SetUpdatedAt(v)
 	}
+	return nil
 }
 
 // check runs all checks and user-defined validators on the builder.
@@ -200,19 +201,6 @@ func (dc *DepartmentCreate) check() error {
 			return &ValidationError{Name: "created_by", err: fmt.Errorf(`dao: validator failed for field "Department.created_by": %w`, err)}
 		}
 	}
-	if _, ok := dc.mutation.Title(); !ok {
-		return &ValidationError{Name: "title", err: errors.New(`dao: missing required field "Department.title"`)}
-	}
-	if v, ok := dc.mutation.Title(); ok {
-		if err := department.TitleValidator(v); err != nil {
-			return &ValidationError{Name: "title", err: fmt.Errorf(`dao: validator failed for field "Department.title": %w`, err)}
-		}
-	}
-	if v, ok := dc.mutation.ParentID(); ok {
-		if err := department.ParentIDValidator(v); err != nil {
-			return &ValidationError{Name: "parent_id", err: fmt.Errorf(`dao: validator failed for field "Department.parent_id": %w`, err)}
-		}
-	}
 	if _, ok := dc.mutation.UpdatedBy(); !ok {
 		return &ValidationError{Name: "updated_by", err: errors.New(`dao: missing required field "Department.updated_by"`)}
 	}
@@ -224,8 +212,27 @@ func (dc *DepartmentCreate) check() error {
 	if _, ok := dc.mutation.UpdatedAt(); !ok {
 		return &ValidationError{Name: "updated_at", err: errors.New(`dao: missing required field "Department.updated_at"`)}
 	}
+	if _, ok := dc.mutation.Title(); !ok {
+		return &ValidationError{Name: "title", err: errors.New(`dao: missing required field "Department.title"`)}
+	}
+	if v, ok := dc.mutation.Title(); ok {
+		if err := department.TitleValidator(v); err != nil {
+			return &ValidationError{Name: "title", err: fmt.Errorf(`dao: validator failed for field "Department.title": %w`, err)}
+		}
+	}
+	if _, ok := dc.mutation.ParentID(); !ok {
+		return &ValidationError{Name: "parent_id", err: errors.New(`dao: missing required field "Department.parent_id"`)}
+	}
+	if v, ok := dc.mutation.ParentID(); ok {
+		if err := department.ParentIDValidator(v); err != nil {
+			return &ValidationError{Name: "parent_id", err: fmt.Errorf(`dao: validator failed for field "Department.parent_id": %w`, err)}
+		}
+	}
 	if _, ok := dc.mutation.CreatorID(); !ok {
 		return &ValidationError{Name: "creator", err: errors.New(`dao: missing required edge "Department.creator"`)}
+	}
+	if _, ok := dc.mutation.ParentID(); !ok {
+		return &ValidationError{Name: "parent", err: errors.New(`dao: missing required edge "Department.parent"`)}
 	}
 	return nil
 }
@@ -257,10 +264,6 @@ func (dc *DepartmentCreate) createSpec() (*Department, *sqlgraph.CreateSpec) {
 		_spec.SetField(department.FieldCreatedAt, field.TypeTime, value)
 		_node.CreatedAt = value
 	}
-	if value, ok := dc.mutation.Title(); ok {
-		_spec.SetField(department.FieldTitle, field.TypeString, value)
-		_node.Title = value
-	}
 	if value, ok := dc.mutation.DeletedAt(); ok {
 		_spec.SetField(department.FieldDeletedAt, field.TypeTime, value)
 		_node.DeletedAt = &value
@@ -272,6 +275,10 @@ func (dc *DepartmentCreate) createSpec() (*Department, *sqlgraph.CreateSpec) {
 	if value, ok := dc.mutation.UpdatedAt(); ok {
 		_spec.SetField(department.FieldUpdatedAt, field.TypeTime, value)
 		_node.UpdatedAt = value
+	}
+	if value, ok := dc.mutation.Title(); ok {
+		_spec.SetField(department.FieldTitle, field.TypeString, value)
+		_node.Title = value
 	}
 	if nodes := dc.mutation.CreatorIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{

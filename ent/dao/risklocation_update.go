@@ -3,6 +3,7 @@
 package dao
 
 import (
+	"aisecurity/ent/dao/admin"
 	"aisecurity/ent/dao/predicate"
 	"aisecurity/ent/dao/risk"
 	"aisecurity/ent/dao/risklocation"
@@ -51,7 +52,6 @@ func (rlu *RiskLocationUpdate) ClearDeletedAt() *RiskLocationUpdate {
 
 // SetUpdatedBy sets the "updated_by" field.
 func (rlu *RiskLocationUpdate) SetUpdatedBy(i int) *RiskLocationUpdate {
-	rlu.mutation.ResetUpdatedBy()
 	rlu.mutation.SetUpdatedBy(i)
 	return rlu
 }
@@ -61,12 +61,6 @@ func (rlu *RiskLocationUpdate) SetNillableUpdatedBy(i *int) *RiskLocationUpdate 
 	if i != nil {
 		rlu.SetUpdatedBy(*i)
 	}
-	return rlu
-}
-
-// AddUpdatedBy adds i to the "updated_by" field.
-func (rlu *RiskLocationUpdate) AddUpdatedBy(i int) *RiskLocationUpdate {
-	rlu.mutation.AddUpdatedBy(i)
 	return rlu
 }
 
@@ -90,19 +84,30 @@ func (rlu *RiskLocationUpdate) SetNillableTitle(s *string) *RiskLocationUpdate {
 	return rlu
 }
 
-// AddRiskLocationIDs adds the "risk_location" edge to the Risk entity by IDs.
-func (rlu *RiskLocationUpdate) AddRiskLocationIDs(ids ...int) *RiskLocationUpdate {
-	rlu.mutation.AddRiskLocationIDs(ids...)
+// SetUpdatorID sets the "updator" edge to the Admin entity by ID.
+func (rlu *RiskLocationUpdate) SetUpdatorID(id int) *RiskLocationUpdate {
+	rlu.mutation.SetUpdatorID(id)
 	return rlu
 }
 
-// AddRiskLocation adds the "risk_location" edges to the Risk entity.
-func (rlu *RiskLocationUpdate) AddRiskLocation(r ...*Risk) *RiskLocationUpdate {
+// SetUpdator sets the "updator" edge to the Admin entity.
+func (rlu *RiskLocationUpdate) SetUpdator(a *Admin) *RiskLocationUpdate {
+	return rlu.SetUpdatorID(a.ID)
+}
+
+// AddRiskRiskLocationIDs adds the "risk_risk_location" edge to the Risk entity by IDs.
+func (rlu *RiskLocationUpdate) AddRiskRiskLocationIDs(ids ...int) *RiskLocationUpdate {
+	rlu.mutation.AddRiskRiskLocationIDs(ids...)
+	return rlu
+}
+
+// AddRiskRiskLocation adds the "risk_risk_location" edges to the Risk entity.
+func (rlu *RiskLocationUpdate) AddRiskRiskLocation(r ...*Risk) *RiskLocationUpdate {
 	ids := make([]int, len(r))
 	for i := range r {
 		ids[i] = r[i].ID
 	}
-	return rlu.AddRiskLocationIDs(ids...)
+	return rlu.AddRiskRiskLocationIDs(ids...)
 }
 
 // Mutation returns the RiskLocationMutation object of the builder.
@@ -110,25 +115,31 @@ func (rlu *RiskLocationUpdate) Mutation() *RiskLocationMutation {
 	return rlu.mutation
 }
 
-// ClearRiskLocation clears all "risk_location" edges to the Risk entity.
-func (rlu *RiskLocationUpdate) ClearRiskLocation() *RiskLocationUpdate {
-	rlu.mutation.ClearRiskLocation()
+// ClearUpdator clears the "updator" edge to the Admin entity.
+func (rlu *RiskLocationUpdate) ClearUpdator() *RiskLocationUpdate {
+	rlu.mutation.ClearUpdator()
 	return rlu
 }
 
-// RemoveRiskLocationIDs removes the "risk_location" edge to Risk entities by IDs.
-func (rlu *RiskLocationUpdate) RemoveRiskLocationIDs(ids ...int) *RiskLocationUpdate {
-	rlu.mutation.RemoveRiskLocationIDs(ids...)
+// ClearRiskRiskLocation clears all "risk_risk_location" edges to the Risk entity.
+func (rlu *RiskLocationUpdate) ClearRiskRiskLocation() *RiskLocationUpdate {
+	rlu.mutation.ClearRiskRiskLocation()
 	return rlu
 }
 
-// RemoveRiskLocation removes "risk_location" edges to Risk entities.
-func (rlu *RiskLocationUpdate) RemoveRiskLocation(r ...*Risk) *RiskLocationUpdate {
+// RemoveRiskRiskLocationIDs removes the "risk_risk_location" edge to Risk entities by IDs.
+func (rlu *RiskLocationUpdate) RemoveRiskRiskLocationIDs(ids ...int) *RiskLocationUpdate {
+	rlu.mutation.RemoveRiskRiskLocationIDs(ids...)
+	return rlu
+}
+
+// RemoveRiskRiskLocation removes "risk_risk_location" edges to Risk entities.
+func (rlu *RiskLocationUpdate) RemoveRiskRiskLocation(r ...*Risk) *RiskLocationUpdate {
 	ids := make([]int, len(r))
 	for i := range r {
 		ids[i] = r[i].ID
 	}
-	return rlu.RemoveRiskLocationIDs(ids...)
+	return rlu.RemoveRiskRiskLocationIDs(ids...)
 }
 
 // Save executes the query and returns the number of nodes affected by the update operation.
@@ -188,6 +199,9 @@ func (rlu *RiskLocationUpdate) check() error {
 	if _, ok := rlu.mutation.CreatorID(); rlu.mutation.CreatorCleared() && !ok {
 		return errors.New(`dao: clearing a required unique edge "RiskLocation.creator"`)
 	}
+	if _, ok := rlu.mutation.UpdatorID(); rlu.mutation.UpdatorCleared() && !ok {
+		return errors.New(`dao: clearing a required unique edge "RiskLocation.updator"`)
+	}
 	return nil
 }
 
@@ -209,24 +223,47 @@ func (rlu *RiskLocationUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	if rlu.mutation.DeletedAtCleared() {
 		_spec.ClearField(risklocation.FieldDeletedAt, field.TypeTime)
 	}
-	if value, ok := rlu.mutation.UpdatedBy(); ok {
-		_spec.SetField(risklocation.FieldUpdatedBy, field.TypeInt, value)
-	}
-	if value, ok := rlu.mutation.AddedUpdatedBy(); ok {
-		_spec.AddField(risklocation.FieldUpdatedBy, field.TypeInt, value)
-	}
 	if value, ok := rlu.mutation.UpdatedAt(); ok {
 		_spec.SetField(risklocation.FieldUpdatedAt, field.TypeTime, value)
 	}
 	if value, ok := rlu.mutation.Title(); ok {
 		_spec.SetField(risklocation.FieldTitle, field.TypeString, value)
 	}
-	if rlu.mutation.RiskLocationCleared() {
+	if rlu.mutation.UpdatorCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   risklocation.UpdatorTable,
+			Columns: []string{risklocation.UpdatorColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(admin.FieldID, field.TypeInt),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := rlu.mutation.UpdatorIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   risklocation.UpdatorTable,
+			Columns: []string{risklocation.UpdatorColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(admin.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if rlu.mutation.RiskRiskLocationCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
-			Table:   risklocation.RiskLocationTable,
-			Columns: []string{risklocation.RiskLocationColumn},
+			Table:   risklocation.RiskRiskLocationTable,
+			Columns: []string{risklocation.RiskRiskLocationColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(risk.FieldID, field.TypeInt),
@@ -234,12 +271,12 @@ func (rlu *RiskLocationUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := rlu.mutation.RemovedRiskLocationIDs(); len(nodes) > 0 && !rlu.mutation.RiskLocationCleared() {
+	if nodes := rlu.mutation.RemovedRiskRiskLocationIDs(); len(nodes) > 0 && !rlu.mutation.RiskRiskLocationCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
-			Table:   risklocation.RiskLocationTable,
-			Columns: []string{risklocation.RiskLocationColumn},
+			Table:   risklocation.RiskRiskLocationTable,
+			Columns: []string{risklocation.RiskRiskLocationColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(risk.FieldID, field.TypeInt),
@@ -250,12 +287,12 @@ func (rlu *RiskLocationUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := rlu.mutation.RiskLocationIDs(); len(nodes) > 0 {
+	if nodes := rlu.mutation.RiskRiskLocationIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
-			Table:   risklocation.RiskLocationTable,
-			Columns: []string{risklocation.RiskLocationColumn},
+			Table:   risklocation.RiskRiskLocationTable,
+			Columns: []string{risklocation.RiskRiskLocationColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(risk.FieldID, field.TypeInt),
@@ -308,7 +345,6 @@ func (rluo *RiskLocationUpdateOne) ClearDeletedAt() *RiskLocationUpdateOne {
 
 // SetUpdatedBy sets the "updated_by" field.
 func (rluo *RiskLocationUpdateOne) SetUpdatedBy(i int) *RiskLocationUpdateOne {
-	rluo.mutation.ResetUpdatedBy()
 	rluo.mutation.SetUpdatedBy(i)
 	return rluo
 }
@@ -318,12 +354,6 @@ func (rluo *RiskLocationUpdateOne) SetNillableUpdatedBy(i *int) *RiskLocationUpd
 	if i != nil {
 		rluo.SetUpdatedBy(*i)
 	}
-	return rluo
-}
-
-// AddUpdatedBy adds i to the "updated_by" field.
-func (rluo *RiskLocationUpdateOne) AddUpdatedBy(i int) *RiskLocationUpdateOne {
-	rluo.mutation.AddUpdatedBy(i)
 	return rluo
 }
 
@@ -347,19 +377,30 @@ func (rluo *RiskLocationUpdateOne) SetNillableTitle(s *string) *RiskLocationUpda
 	return rluo
 }
 
-// AddRiskLocationIDs adds the "risk_location" edge to the Risk entity by IDs.
-func (rluo *RiskLocationUpdateOne) AddRiskLocationIDs(ids ...int) *RiskLocationUpdateOne {
-	rluo.mutation.AddRiskLocationIDs(ids...)
+// SetUpdatorID sets the "updator" edge to the Admin entity by ID.
+func (rluo *RiskLocationUpdateOne) SetUpdatorID(id int) *RiskLocationUpdateOne {
+	rluo.mutation.SetUpdatorID(id)
 	return rluo
 }
 
-// AddRiskLocation adds the "risk_location" edges to the Risk entity.
-func (rluo *RiskLocationUpdateOne) AddRiskLocation(r ...*Risk) *RiskLocationUpdateOne {
+// SetUpdator sets the "updator" edge to the Admin entity.
+func (rluo *RiskLocationUpdateOne) SetUpdator(a *Admin) *RiskLocationUpdateOne {
+	return rluo.SetUpdatorID(a.ID)
+}
+
+// AddRiskRiskLocationIDs adds the "risk_risk_location" edge to the Risk entity by IDs.
+func (rluo *RiskLocationUpdateOne) AddRiskRiskLocationIDs(ids ...int) *RiskLocationUpdateOne {
+	rluo.mutation.AddRiskRiskLocationIDs(ids...)
+	return rluo
+}
+
+// AddRiskRiskLocation adds the "risk_risk_location" edges to the Risk entity.
+func (rluo *RiskLocationUpdateOne) AddRiskRiskLocation(r ...*Risk) *RiskLocationUpdateOne {
 	ids := make([]int, len(r))
 	for i := range r {
 		ids[i] = r[i].ID
 	}
-	return rluo.AddRiskLocationIDs(ids...)
+	return rluo.AddRiskRiskLocationIDs(ids...)
 }
 
 // Mutation returns the RiskLocationMutation object of the builder.
@@ -367,25 +408,31 @@ func (rluo *RiskLocationUpdateOne) Mutation() *RiskLocationMutation {
 	return rluo.mutation
 }
 
-// ClearRiskLocation clears all "risk_location" edges to the Risk entity.
-func (rluo *RiskLocationUpdateOne) ClearRiskLocation() *RiskLocationUpdateOne {
-	rluo.mutation.ClearRiskLocation()
+// ClearUpdator clears the "updator" edge to the Admin entity.
+func (rluo *RiskLocationUpdateOne) ClearUpdator() *RiskLocationUpdateOne {
+	rluo.mutation.ClearUpdator()
 	return rluo
 }
 
-// RemoveRiskLocationIDs removes the "risk_location" edge to Risk entities by IDs.
-func (rluo *RiskLocationUpdateOne) RemoveRiskLocationIDs(ids ...int) *RiskLocationUpdateOne {
-	rluo.mutation.RemoveRiskLocationIDs(ids...)
+// ClearRiskRiskLocation clears all "risk_risk_location" edges to the Risk entity.
+func (rluo *RiskLocationUpdateOne) ClearRiskRiskLocation() *RiskLocationUpdateOne {
+	rluo.mutation.ClearRiskRiskLocation()
 	return rluo
 }
 
-// RemoveRiskLocation removes "risk_location" edges to Risk entities.
-func (rluo *RiskLocationUpdateOne) RemoveRiskLocation(r ...*Risk) *RiskLocationUpdateOne {
+// RemoveRiskRiskLocationIDs removes the "risk_risk_location" edge to Risk entities by IDs.
+func (rluo *RiskLocationUpdateOne) RemoveRiskRiskLocationIDs(ids ...int) *RiskLocationUpdateOne {
+	rluo.mutation.RemoveRiskRiskLocationIDs(ids...)
+	return rluo
+}
+
+// RemoveRiskRiskLocation removes "risk_risk_location" edges to Risk entities.
+func (rluo *RiskLocationUpdateOne) RemoveRiskRiskLocation(r ...*Risk) *RiskLocationUpdateOne {
 	ids := make([]int, len(r))
 	for i := range r {
 		ids[i] = r[i].ID
 	}
-	return rluo.RemoveRiskLocationIDs(ids...)
+	return rluo.RemoveRiskRiskLocationIDs(ids...)
 }
 
 // Where appends a list predicates to the RiskLocationUpdate builder.
@@ -458,6 +505,9 @@ func (rluo *RiskLocationUpdateOne) check() error {
 	if _, ok := rluo.mutation.CreatorID(); rluo.mutation.CreatorCleared() && !ok {
 		return errors.New(`dao: clearing a required unique edge "RiskLocation.creator"`)
 	}
+	if _, ok := rluo.mutation.UpdatorID(); rluo.mutation.UpdatorCleared() && !ok {
+		return errors.New(`dao: clearing a required unique edge "RiskLocation.updator"`)
+	}
 	return nil
 }
 
@@ -496,24 +546,47 @@ func (rluo *RiskLocationUpdateOne) sqlSave(ctx context.Context) (_node *RiskLoca
 	if rluo.mutation.DeletedAtCleared() {
 		_spec.ClearField(risklocation.FieldDeletedAt, field.TypeTime)
 	}
-	if value, ok := rluo.mutation.UpdatedBy(); ok {
-		_spec.SetField(risklocation.FieldUpdatedBy, field.TypeInt, value)
-	}
-	if value, ok := rluo.mutation.AddedUpdatedBy(); ok {
-		_spec.AddField(risklocation.FieldUpdatedBy, field.TypeInt, value)
-	}
 	if value, ok := rluo.mutation.UpdatedAt(); ok {
 		_spec.SetField(risklocation.FieldUpdatedAt, field.TypeTime, value)
 	}
 	if value, ok := rluo.mutation.Title(); ok {
 		_spec.SetField(risklocation.FieldTitle, field.TypeString, value)
 	}
-	if rluo.mutation.RiskLocationCleared() {
+	if rluo.mutation.UpdatorCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   risklocation.UpdatorTable,
+			Columns: []string{risklocation.UpdatorColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(admin.FieldID, field.TypeInt),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := rluo.mutation.UpdatorIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   risklocation.UpdatorTable,
+			Columns: []string{risklocation.UpdatorColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(admin.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if rluo.mutation.RiskRiskLocationCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
-			Table:   risklocation.RiskLocationTable,
-			Columns: []string{risklocation.RiskLocationColumn},
+			Table:   risklocation.RiskRiskLocationTable,
+			Columns: []string{risklocation.RiskRiskLocationColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(risk.FieldID, field.TypeInt),
@@ -521,12 +594,12 @@ func (rluo *RiskLocationUpdateOne) sqlSave(ctx context.Context) (_node *RiskLoca
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := rluo.mutation.RemovedRiskLocationIDs(); len(nodes) > 0 && !rluo.mutation.RiskLocationCleared() {
+	if nodes := rluo.mutation.RemovedRiskRiskLocationIDs(); len(nodes) > 0 && !rluo.mutation.RiskRiskLocationCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
-			Table:   risklocation.RiskLocationTable,
-			Columns: []string{risklocation.RiskLocationColumn},
+			Table:   risklocation.RiskRiskLocationTable,
+			Columns: []string{risklocation.RiskRiskLocationColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(risk.FieldID, field.TypeInt),
@@ -537,12 +610,12 @@ func (rluo *RiskLocationUpdateOne) sqlSave(ctx context.Context) (_node *RiskLoca
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := rluo.mutation.RiskLocationIDs(); len(nodes) > 0 {
+	if nodes := rluo.mutation.RiskRiskLocationIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
-			Table:   risklocation.RiskLocationTable,
-			Columns: []string{risklocation.RiskLocationColumn},
+			Table:   risklocation.RiskRiskLocationTable,
+			Columns: []string{risklocation.RiskRiskLocationColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(risk.FieldID, field.TypeInt),

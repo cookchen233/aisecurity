@@ -1429,9 +1429,6 @@ func (aq *AdminQuery) loadRiskCreator(ctx context.Context, query *RiskQuery, nod
 		}
 	}
 	query.withFKs = true
-	if len(query.ctx.Fields) > 0 {
-		query.ctx.AppendFieldOnce(risk.FieldCreatedBy)
-	}
 	query.Where(predicate.Risk(func(s *sql.Selector) {
 		s.Where(sql.InValues(s.C(admin.RiskCreatorColumn), fks...))
 	}))
@@ -1440,10 +1437,13 @@ func (aq *AdminQuery) loadRiskCreator(ctx context.Context, query *RiskQuery, nod
 		return err
 	}
 	for _, n := range neighbors {
-		fk := n.CreatedBy
-		node, ok := nodeids[fk]
+		fk := n.admin_risk_creator
+		if fk == nil {
+			return fmt.Errorf(`foreign-key "admin_risk_creator" is nil for node %v`, n.ID)
+		}
+		node, ok := nodeids[*fk]
 		if !ok {
-			return fmt.Errorf(`unexpected referenced foreign-key "created_by" returned %v for node %v`, fk, n.ID)
+			return fmt.Errorf(`unexpected referenced foreign-key "admin_risk_creator" returned %v for node %v`, *fk, n.ID)
 		}
 		assign(node, n)
 	}
@@ -1460,6 +1460,9 @@ func (aq *AdminQuery) loadRiskUpdator(ctx context.Context, query *RiskQuery, nod
 		}
 	}
 	query.withFKs = true
+	if len(query.ctx.Fields) > 0 {
+		query.ctx.AppendFieldOnce(risk.FieldUpdatedBy)
+	}
 	query.Where(predicate.Risk(func(s *sql.Selector) {
 		s.Where(sql.InValues(s.C(admin.RiskUpdatorColumn), fks...))
 	}))
@@ -1468,13 +1471,10 @@ func (aq *AdminQuery) loadRiskUpdator(ctx context.Context, query *RiskQuery, nod
 		return err
 	}
 	for _, n := range neighbors {
-		fk := n.admin_risk_updator
-		if fk == nil {
-			return fmt.Errorf(`foreign-key "admin_risk_updator" is nil for node %v`, n.ID)
-		}
-		node, ok := nodeids[*fk]
+		fk := n.UpdatedBy
+		node, ok := nodeids[fk]
 		if !ok {
-			return fmt.Errorf(`unexpected referenced foreign-key "admin_risk_updator" returned %v for node %v`, *fk, n.ID)
+			return fmt.Errorf(`unexpected referenced foreign-key "updated_by" returned %v for node %v`, fk, n.ID)
 		}
 		assign(node, n)
 	}
@@ -1491,9 +1491,6 @@ func (aq *AdminQuery) loadRiskMaintainer(ctx context.Context, query *RiskQuery, 
 		}
 	}
 	query.withFKs = true
-	if len(query.ctx.Fields) > 0 {
-		query.ctx.AppendFieldOnce(risk.FieldMaintainer)
-	}
 	query.Where(predicate.Risk(func(s *sql.Selector) {
 		s.Where(sql.InValues(s.C(admin.RiskMaintainerColumn), fks...))
 	}))
@@ -1502,10 +1499,13 @@ func (aq *AdminQuery) loadRiskMaintainer(ctx context.Context, query *RiskQuery, 
 		return err
 	}
 	for _, n := range neighbors {
-		fk := n.Maintainer
-		node, ok := nodeids[fk]
+		fk := n.admin_risk_maintainer
+		if fk == nil {
+			return fmt.Errorf(`foreign-key "admin_risk_maintainer" is nil for node %v`, n.ID)
+		}
+		node, ok := nodeids[*fk]
 		if !ok {
-			return fmt.Errorf(`unexpected referenced foreign-key "maintainer" returned %v for node %v`, fk, n.ID)
+			return fmt.Errorf(`unexpected referenced foreign-key "admin_risk_maintainer" returned %v for node %v`, *fk, n.ID)
 		}
 		assign(node, n)
 	}
@@ -1521,7 +1521,6 @@ func (aq *AdminQuery) loadRiskLocationCreator(ctx context.Context, query *RiskLo
 			init(nodes[i])
 		}
 	}
-	query.withFKs = true
 	if len(query.ctx.Fields) > 0 {
 		query.ctx.AppendFieldOnce(risklocation.FieldCreatedBy)
 	}
@@ -1552,7 +1551,9 @@ func (aq *AdminQuery) loadRiskLocationUpdator(ctx context.Context, query *RiskLo
 			init(nodes[i])
 		}
 	}
-	query.withFKs = true
+	if len(query.ctx.Fields) > 0 {
+		query.ctx.AppendFieldOnce(risklocation.FieldUpdatedBy)
+	}
 	query.Where(predicate.RiskLocation(func(s *sql.Selector) {
 		s.Where(sql.InValues(s.C(admin.RiskLocationUpdatorColumn), fks...))
 	}))
@@ -1561,13 +1562,10 @@ func (aq *AdminQuery) loadRiskLocationUpdator(ctx context.Context, query *RiskLo
 		return err
 	}
 	for _, n := range neighbors {
-		fk := n.admin_risk_location_updator
-		if fk == nil {
-			return fmt.Errorf(`foreign-key "admin_risk_location_updator" is nil for node %v`, n.ID)
-		}
-		node, ok := nodeids[*fk]
+		fk := n.UpdatedBy
+		node, ok := nodeids[fk]
 		if !ok {
-			return fmt.Errorf(`unexpected referenced foreign-key "admin_risk_location_updator" returned %v for node %v`, *fk, n.ID)
+			return fmt.Errorf(`unexpected referenced foreign-key "updated_by" returned %v for node %v`, fk, n.ID)
 		}
 		assign(node, n)
 	}
@@ -1583,7 +1581,6 @@ func (aq *AdminQuery) loadRiskCategoryCreator(ctx context.Context, query *RiskCa
 			init(nodes[i])
 		}
 	}
-	query.withFKs = true
 	if len(query.ctx.Fields) > 0 {
 		query.ctx.AppendFieldOnce(riskcategory.FieldCreatedBy)
 	}
@@ -1614,7 +1611,9 @@ func (aq *AdminQuery) loadRiskCategoryUpdator(ctx context.Context, query *RiskCa
 			init(nodes[i])
 		}
 	}
-	query.withFKs = true
+	if len(query.ctx.Fields) > 0 {
+		query.ctx.AppendFieldOnce(riskcategory.FieldUpdatedBy)
+	}
 	query.Where(predicate.RiskCategory(func(s *sql.Selector) {
 		s.Where(sql.InValues(s.C(admin.RiskCategoryUpdatorColumn), fks...))
 	}))
@@ -1623,13 +1622,10 @@ func (aq *AdminQuery) loadRiskCategoryUpdator(ctx context.Context, query *RiskCa
 		return err
 	}
 	for _, n := range neighbors {
-		fk := n.admin_risk_category_updator
-		if fk == nil {
-			return fmt.Errorf(`foreign-key "admin_risk_category_updator" is nil for node %v`, n.ID)
-		}
-		node, ok := nodeids[*fk]
+		fk := n.UpdatedBy
+		node, ok := nodeids[fk]
 		if !ok {
-			return fmt.Errorf(`unexpected referenced foreign-key "admin_risk_category_updator" returned %v for node %v`, *fk, n.ID)
+			return fmt.Errorf(`unexpected referenced foreign-key "updated_by" returned %v for node %v`, fk, n.ID)
 		}
 		assign(node, n)
 	}

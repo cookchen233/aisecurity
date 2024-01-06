@@ -74,10 +74,10 @@ var (
 	DepartmentsColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt, Increment: true},
 		{Name: "created_at", Type: field.TypeTime},
-		{Name: "title", Type: field.TypeString, Size: 255},
 		{Name: "deleted_at", Type: field.TypeTime, Nullable: true},
 		{Name: "updated_by", Type: field.TypeInt},
 		{Name: "updated_at", Type: field.TypeTime},
+		{Name: "title", Type: field.TypeString, Size: 255},
 		{Name: "created_by", Type: field.TypeInt},
 		{Name: "admin_department_updator", Type: field.TypeInt, Nullable: true},
 		{Name: "parent_id", Type: field.TypeInt, Nullable: true},
@@ -157,7 +157,6 @@ var (
 		{Name: "id", Type: field.TypeInt, Increment: true},
 		{Name: "created_at", Type: field.TypeTime},
 		{Name: "deleted_at", Type: field.TypeTime, Nullable: true},
-		{Name: "updated_by", Type: field.TypeInt},
 		{Name: "updated_at", Type: field.TypeTime},
 		{Name: "title", Type: field.TypeString, Size: 255},
 		{Name: "content", Type: field.TypeString},
@@ -165,9 +164,11 @@ var (
 		{Name: "measures", Type: field.TypeString, Nullable: true},
 		{Name: "maintain_status", Type: field.TypeInt, Default: 0},
 		{Name: "due_time", Type: field.TypeTime},
+		{Name: "admin_risk_creator", Type: field.TypeInt, Nullable: true},
+		{Name: "updated_by", Type: field.TypeInt},
+		{Name: "admin_risk_maintainer", Type: field.TypeInt, Nullable: true},
+		{Name: "maintainer_id", Type: field.TypeInt},
 		{Name: "created_by", Type: field.TypeInt},
-		{Name: "admin_risk_updator", Type: field.TypeInt, Nullable: true},
-		{Name: "maintainer", Type: field.TypeInt},
 		{Name: "risk_category_id", Type: field.TypeInt},
 		{Name: "risk_location_id", Type: field.TypeInt},
 	}
@@ -179,31 +180,43 @@ var (
 		ForeignKeys: []*schema.ForeignKey{
 			{
 				Symbol:     "risks_admins_risk_creator",
+				Columns:    []*schema.Column{RisksColumns[10]},
+				RefColumns: []*schema.Column{AdminsColumns[0]},
+				OnDelete:   schema.SetNull,
+			},
+			{
+				Symbol:     "risks_admins_risk_updator",
 				Columns:    []*schema.Column{RisksColumns[11]},
 				RefColumns: []*schema.Column{AdminsColumns[0]},
 				OnDelete:   schema.NoAction,
 			},
 			{
-				Symbol:     "risks_admins_risk_updator",
+				Symbol:     "risks_admins_risk_maintainer",
 				Columns:    []*schema.Column{RisksColumns[12]},
 				RefColumns: []*schema.Column{AdminsColumns[0]},
 				OnDelete:   schema.SetNull,
 			},
 			{
-				Symbol:     "risks_admins_risk_maintainer",
+				Symbol:     "risks_employees_risk_maintainer",
 				Columns:    []*schema.Column{RisksColumns[13]},
-				RefColumns: []*schema.Column{AdminsColumns[0]},
+				RefColumns: []*schema.Column{EmployeesColumns[0]},
 				OnDelete:   schema.NoAction,
 			},
 			{
-				Symbol:     "risks_risk_categories_risk_category",
+				Symbol:     "risks_employees_risk_creator",
 				Columns:    []*schema.Column{RisksColumns[14]},
+				RefColumns: []*schema.Column{EmployeesColumns[0]},
+				OnDelete:   schema.NoAction,
+			},
+			{
+				Symbol:     "risks_risk_categories_risk_risk_category",
+				Columns:    []*schema.Column{RisksColumns[15]},
 				RefColumns: []*schema.Column{RiskCategoriesColumns[0]},
 				OnDelete:   schema.NoAction,
 			},
 			{
-				Symbol:     "risks_risk_locations_risk_location",
-				Columns:    []*schema.Column{RisksColumns[15]},
+				Symbol:     "risks_risk_locations_risk_risk_location",
+				Columns:    []*schema.Column{RisksColumns[16]},
 				RefColumns: []*schema.Column{RiskLocationsColumns[0]},
 				OnDelete:   schema.NoAction,
 			},
@@ -214,11 +227,10 @@ var (
 		{Name: "id", Type: field.TypeInt, Increment: true},
 		{Name: "created_at", Type: field.TypeTime},
 		{Name: "deleted_at", Type: field.TypeTime, Nullable: true},
-		{Name: "updated_by", Type: field.TypeInt},
 		{Name: "updated_at", Type: field.TypeTime},
 		{Name: "title", Type: field.TypeString, Size: 255},
 		{Name: "created_by", Type: field.TypeInt},
-		{Name: "admin_risk_category_updator", Type: field.TypeInt, Nullable: true},
+		{Name: "updated_by", Type: field.TypeInt},
 	}
 	// RiskCategoriesTable holds the schema information for the "risk_categories" table.
 	RiskCategoriesTable = &schema.Table{
@@ -228,15 +240,15 @@ var (
 		ForeignKeys: []*schema.ForeignKey{
 			{
 				Symbol:     "risk_categories_admins_risk_category_creator",
-				Columns:    []*schema.Column{RiskCategoriesColumns[6]},
+				Columns:    []*schema.Column{RiskCategoriesColumns[5]},
 				RefColumns: []*schema.Column{AdminsColumns[0]},
 				OnDelete:   schema.NoAction,
 			},
 			{
 				Symbol:     "risk_categories_admins_risk_category_updator",
-				Columns:    []*schema.Column{RiskCategoriesColumns[7]},
+				Columns:    []*schema.Column{RiskCategoriesColumns[6]},
 				RefColumns: []*schema.Column{AdminsColumns[0]},
-				OnDelete:   schema.SetNull,
+				OnDelete:   schema.NoAction,
 			},
 		},
 	}
@@ -245,11 +257,10 @@ var (
 		{Name: "id", Type: field.TypeInt, Increment: true},
 		{Name: "created_at", Type: field.TypeTime},
 		{Name: "deleted_at", Type: field.TypeTime, Nullable: true},
-		{Name: "updated_by", Type: field.TypeInt},
 		{Name: "updated_at", Type: field.TypeTime},
 		{Name: "title", Type: field.TypeString, Size: 255},
 		{Name: "created_by", Type: field.TypeInt},
-		{Name: "admin_risk_location_updator", Type: field.TypeInt, Nullable: true},
+		{Name: "updated_by", Type: field.TypeInt},
 	}
 	// RiskLocationsTable holds the schema information for the "risk_locations" table.
 	RiskLocationsTable = &schema.Table{
@@ -259,15 +270,15 @@ var (
 		ForeignKeys: []*schema.ForeignKey{
 			{
 				Symbol:     "risk_locations_admins_risk_location_creator",
-				Columns:    []*schema.Column{RiskLocationsColumns[6]},
+				Columns:    []*schema.Column{RiskLocationsColumns[5]},
 				RefColumns: []*schema.Column{AdminsColumns[0]},
 				OnDelete:   schema.NoAction,
 			},
 			{
 				Symbol:     "risk_locations_admins_risk_location_updator",
-				Columns:    []*schema.Column{RiskLocationsColumns[7]},
+				Columns:    []*schema.Column{RiskLocationsColumns[6]},
 				RefColumns: []*schema.Column{AdminsColumns[0]},
-				OnDelete:   schema.SetNull,
+				OnDelete:   schema.NoAction,
 			},
 		},
 	}
@@ -324,8 +335,10 @@ func init() {
 	RisksTable.ForeignKeys[0].RefTable = AdminsTable
 	RisksTable.ForeignKeys[1].RefTable = AdminsTable
 	RisksTable.ForeignKeys[2].RefTable = AdminsTable
-	RisksTable.ForeignKeys[3].RefTable = RiskCategoriesTable
-	RisksTable.ForeignKeys[4].RefTable = RiskLocationsTable
+	RisksTable.ForeignKeys[3].RefTable = EmployeesTable
+	RisksTable.ForeignKeys[4].RefTable = EmployeesTable
+	RisksTable.ForeignKeys[5].RefTable = RiskCategoriesTable
+	RisksTable.ForeignKeys[6].RefTable = RiskLocationsTable
 	RiskCategoriesTable.ForeignKeys[0].RefTable = AdminsTable
 	RiskCategoriesTable.ForeignKeys[1].RefTable = AdminsTable
 	RiskLocationsTable.ForeignKeys[0].RefTable = AdminsTable

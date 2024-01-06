@@ -215,26 +215,6 @@ func UpdatedByNotIn(vs ...int) predicate.RiskLocation {
 	return predicate.RiskLocation(sql.FieldNotIn(FieldUpdatedBy, vs...))
 }
 
-// UpdatedByGT applies the GT predicate on the "updated_by" field.
-func UpdatedByGT(v int) predicate.RiskLocation {
-	return predicate.RiskLocation(sql.FieldGT(FieldUpdatedBy, v))
-}
-
-// UpdatedByGTE applies the GTE predicate on the "updated_by" field.
-func UpdatedByGTE(v int) predicate.RiskLocation {
-	return predicate.RiskLocation(sql.FieldGTE(FieldUpdatedBy, v))
-}
-
-// UpdatedByLT applies the LT predicate on the "updated_by" field.
-func UpdatedByLT(v int) predicate.RiskLocation {
-	return predicate.RiskLocation(sql.FieldLT(FieldUpdatedBy, v))
-}
-
-// UpdatedByLTE applies the LTE predicate on the "updated_by" field.
-func UpdatedByLTE(v int) predicate.RiskLocation {
-	return predicate.RiskLocation(sql.FieldLTE(FieldUpdatedBy, v))
-}
-
 // UpdatedAtEQ applies the EQ predicate on the "updated_at" field.
 func UpdatedAtEQ(v time.Time) predicate.RiskLocation {
 	return predicate.RiskLocation(sql.FieldEQ(FieldUpdatedAt, v))
@@ -363,21 +343,44 @@ func HasCreatorWith(preds ...predicate.Admin) predicate.RiskLocation {
 	})
 }
 
-// HasRiskLocation applies the HasEdge predicate on the "risk_location" edge.
-func HasRiskLocation() predicate.RiskLocation {
+// HasUpdator applies the HasEdge predicate on the "updator" edge.
+func HasUpdator() predicate.RiskLocation {
 	return predicate.RiskLocation(func(s *sql.Selector) {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(Table, FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, false, RiskLocationTable, RiskLocationColumn),
+			sqlgraph.Edge(sqlgraph.M2O, true, UpdatorTable, UpdatorColumn),
 		)
 		sqlgraph.HasNeighbors(s, step)
 	})
 }
 
-// HasRiskLocationWith applies the HasEdge predicate on the "risk_location" edge with a given conditions (other predicates).
-func HasRiskLocationWith(preds ...predicate.Risk) predicate.RiskLocation {
+// HasUpdatorWith applies the HasEdge predicate on the "updator" edge with a given conditions (other predicates).
+func HasUpdatorWith(preds ...predicate.Admin) predicate.RiskLocation {
 	return predicate.RiskLocation(func(s *sql.Selector) {
-		step := newRiskLocationStep()
+		step := newUpdatorStep()
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
+}
+
+// HasRiskRiskLocation applies the HasEdge predicate on the "risk_risk_location" edge.
+func HasRiskRiskLocation() predicate.RiskLocation {
+	return predicate.RiskLocation(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, RiskRiskLocationTable, RiskRiskLocationColumn),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasRiskRiskLocationWith applies the HasEdge predicate on the "risk_risk_location" edge with a given conditions (other predicates).
+func HasRiskRiskLocationWith(preds ...predicate.Risk) predicate.RiskLocation {
+	return predicate.RiskLocation(func(s *sql.Selector) {
+		step := newRiskRiskLocationStep()
 		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
 			for _, p := range preds {
 				p(s)

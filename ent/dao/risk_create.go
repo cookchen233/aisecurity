@@ -4,6 +4,7 @@ package dao
 
 import (
 	"aisecurity/ent/dao/admin"
+	"aisecurity/ent/dao/employee"
 	"aisecurity/ent/dao/risk"
 	"aisecurity/ent/dao/riskcategory"
 	"aisecurity/ent/dao/risklocation"
@@ -111,9 +112,9 @@ func (rc *RiskCreate) SetRiskLocationID(i int) *RiskCreate {
 	return rc
 }
 
-// SetMaintainer sets the "maintainer" field.
-func (rc *RiskCreate) SetMaintainer(i int) *RiskCreate {
-	rc.mutation.SetMaintainer(i)
+// SetMaintainerID sets the "maintainer_id" field.
+func (rc *RiskCreate) SetMaintainerID(i int) *RiskCreate {
+	rc.mutation.SetMaintainerID(i)
 	return rc
 }
 
@@ -151,48 +152,41 @@ func (rc *RiskCreate) SetDueTime(t time.Time) *RiskCreate {
 	return rc
 }
 
-// SetCreatorID sets the "creator" edge to the Admin entity by ID.
+// SetCreatorID sets the "creator" edge to the Employee entity by ID.
 func (rc *RiskCreate) SetCreatorID(id int) *RiskCreate {
 	rc.mutation.SetCreatorID(id)
 	return rc
 }
 
-// SetCreator sets the "creator" edge to the Admin entity.
-func (rc *RiskCreate) SetCreator(a *Admin) *RiskCreate {
-	return rc.SetCreatorID(a.ID)
+// SetCreator sets the "creator" edge to the Employee entity.
+func (rc *RiskCreate) SetCreator(e *Employee) *RiskCreate {
+	return rc.SetCreatorID(e.ID)
 }
 
-// SetMaintainerAdminID sets the "maintainer_admin" edge to the Admin entity by ID.
-func (rc *RiskCreate) SetMaintainerAdminID(id int) *RiskCreate {
-	rc.mutation.SetMaintainerAdminID(id)
+// SetUpdatorID sets the "updator" edge to the Admin entity by ID.
+func (rc *RiskCreate) SetUpdatorID(id int) *RiskCreate {
+	rc.mutation.SetUpdatorID(id)
 	return rc
 }
 
-// SetMaintainerAdmin sets the "maintainer_admin" edge to the Admin entity.
-func (rc *RiskCreate) SetMaintainerAdmin(a *Admin) *RiskCreate {
-	return rc.SetMaintainerAdminID(a.ID)
+// SetUpdator sets the "updator" edge to the Admin entity.
+func (rc *RiskCreate) SetUpdator(a *Admin) *RiskCreate {
+	return rc.SetUpdatorID(a.ID)
 }
 
-// SetCategoryID sets the "category" edge to the RiskCategory entity by ID.
-func (rc *RiskCreate) SetCategoryID(id int) *RiskCreate {
-	rc.mutation.SetCategoryID(id)
-	return rc
+// SetMaintainer sets the "maintainer" edge to the Employee entity.
+func (rc *RiskCreate) SetMaintainer(e *Employee) *RiskCreate {
+	return rc.SetMaintainerID(e.ID)
 }
 
-// SetCategory sets the "category" edge to the RiskCategory entity.
-func (rc *RiskCreate) SetCategory(r *RiskCategory) *RiskCreate {
-	return rc.SetCategoryID(r.ID)
+// SetRiskCategory sets the "risk_category" edge to the RiskCategory entity.
+func (rc *RiskCreate) SetRiskCategory(r *RiskCategory) *RiskCreate {
+	return rc.SetRiskCategoryID(r.ID)
 }
 
-// SetLocationID sets the "location" edge to the RiskLocation entity by ID.
-func (rc *RiskCreate) SetLocationID(id int) *RiskCreate {
-	rc.mutation.SetLocationID(id)
-	return rc
-}
-
-// SetLocation sets the "location" edge to the RiskLocation entity.
-func (rc *RiskCreate) SetLocation(r *RiskLocation) *RiskCreate {
-	return rc.SetLocationID(r.ID)
+// SetRiskLocation sets the "risk_location" edge to the RiskLocation entity.
+func (rc *RiskCreate) SetRiskLocation(r *RiskLocation) *RiskCreate {
+	return rc.SetRiskLocationID(r.ID)
 }
 
 // Mutation returns the RiskMutation object of the builder.
@@ -304,12 +298,12 @@ func (rc *RiskCreate) check() error {
 			return &ValidationError{Name: "risk_location_id", err: fmt.Errorf(`dao: validator failed for field "Risk.risk_location_id": %w`, err)}
 		}
 	}
-	if _, ok := rc.mutation.Maintainer(); !ok {
-		return &ValidationError{Name: "maintainer", err: errors.New(`dao: missing required field "Risk.maintainer"`)}
+	if _, ok := rc.mutation.MaintainerID(); !ok {
+		return &ValidationError{Name: "maintainer_id", err: errors.New(`dao: missing required field "Risk.maintainer_id"`)}
 	}
-	if v, ok := rc.mutation.Maintainer(); ok {
-		if err := risk.MaintainerValidator(v); err != nil {
-			return &ValidationError{Name: "maintainer", err: fmt.Errorf(`dao: validator failed for field "Risk.maintainer": %w`, err)}
+	if v, ok := rc.mutation.MaintainerID(); ok {
+		if err := risk.MaintainerIDValidator(v); err != nil {
+			return &ValidationError{Name: "maintainer_id", err: fmt.Errorf(`dao: validator failed for field "Risk.maintainer_id": %w`, err)}
 		}
 	}
 	if _, ok := rc.mutation.MaintainStatus(); !ok {
@@ -326,14 +320,17 @@ func (rc *RiskCreate) check() error {
 	if _, ok := rc.mutation.CreatorID(); !ok {
 		return &ValidationError{Name: "creator", err: errors.New(`dao: missing required edge "Risk.creator"`)}
 	}
-	if _, ok := rc.mutation.MaintainerAdminID(); !ok {
-		return &ValidationError{Name: "maintainer_admin", err: errors.New(`dao: missing required edge "Risk.maintainer_admin"`)}
+	if _, ok := rc.mutation.UpdatorID(); !ok {
+		return &ValidationError{Name: "updator", err: errors.New(`dao: missing required edge "Risk.updator"`)}
 	}
-	if _, ok := rc.mutation.CategoryID(); !ok {
-		return &ValidationError{Name: "category", err: errors.New(`dao: missing required edge "Risk.category"`)}
+	if _, ok := rc.mutation.MaintainerID(); !ok {
+		return &ValidationError{Name: "maintainer", err: errors.New(`dao: missing required edge "Risk.maintainer"`)}
 	}
-	if _, ok := rc.mutation.LocationID(); !ok {
-		return &ValidationError{Name: "location", err: errors.New(`dao: missing required edge "Risk.location"`)}
+	if _, ok := rc.mutation.RiskCategoryID(); !ok {
+		return &ValidationError{Name: "risk_category", err: errors.New(`dao: missing required edge "Risk.risk_category"`)}
+	}
+	if _, ok := rc.mutation.RiskLocationID(); !ok {
+		return &ValidationError{Name: "risk_location", err: errors.New(`dao: missing required edge "Risk.risk_location"`)}
 	}
 	return nil
 }
@@ -368,10 +365,6 @@ func (rc *RiskCreate) createSpec() (*Risk, *sqlgraph.CreateSpec) {
 	if value, ok := rc.mutation.DeletedAt(); ok {
 		_spec.SetField(risk.FieldDeletedAt, field.TypeTime, value)
 		_node.DeletedAt = &value
-	}
-	if value, ok := rc.mutation.UpdatedBy(); ok {
-		_spec.SetField(risk.FieldUpdatedBy, field.TypeInt, value)
-		_node.UpdatedBy = value
 	}
 	if value, ok := rc.mutation.UpdatedAt(); ok {
 		_spec.SetField(risk.FieldUpdatedAt, field.TypeTime, value)
@@ -409,7 +402,7 @@ func (rc *RiskCreate) createSpec() (*Risk, *sqlgraph.CreateSpec) {
 			Columns: []string{risk.CreatorColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(admin.FieldID, field.TypeInt),
+				IDSpec: sqlgraph.NewFieldSpec(employee.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {
@@ -418,12 +411,12 @@ func (rc *RiskCreate) createSpec() (*Risk, *sqlgraph.CreateSpec) {
 		_node.CreatedBy = nodes[0]
 		_spec.Edges = append(_spec.Edges, edge)
 	}
-	if nodes := rc.mutation.MaintainerAdminIDs(); len(nodes) > 0 {
+	if nodes := rc.mutation.UpdatorIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: true,
-			Table:   risk.MaintainerAdminTable,
-			Columns: []string{risk.MaintainerAdminColumn},
+			Table:   risk.UpdatorTable,
+			Columns: []string{risk.UpdatorColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(admin.FieldID, field.TypeInt),
@@ -432,15 +425,32 @@ func (rc *RiskCreate) createSpec() (*Risk, *sqlgraph.CreateSpec) {
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
-		_node.Maintainer = nodes[0]
+		_node.UpdatedBy = nodes[0]
 		_spec.Edges = append(_spec.Edges, edge)
 	}
-	if nodes := rc.mutation.CategoryIDs(); len(nodes) > 0 {
+	if nodes := rc.mutation.MaintainerIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: true,
-			Table:   risk.CategoryTable,
-			Columns: []string{risk.CategoryColumn},
+			Table:   risk.MaintainerTable,
+			Columns: []string{risk.MaintainerColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(employee.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_node.MaintainerID = nodes[0]
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := rc.mutation.RiskCategoryIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   risk.RiskCategoryTable,
+			Columns: []string{risk.RiskCategoryColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(riskcategory.FieldID, field.TypeInt),
@@ -452,12 +462,12 @@ func (rc *RiskCreate) createSpec() (*Risk, *sqlgraph.CreateSpec) {
 		_node.RiskCategoryID = nodes[0]
 		_spec.Edges = append(_spec.Edges, edge)
 	}
-	if nodes := rc.mutation.LocationIDs(); len(nodes) > 0 {
+	if nodes := rc.mutation.RiskLocationIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: true,
-			Table:   risk.LocationTable,
-			Columns: []string{risk.LocationColumn},
+			Table:   risk.RiskLocationTable,
+			Columns: []string{risk.RiskLocationColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(risklocation.FieldID, field.TypeInt),

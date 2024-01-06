@@ -1,8 +1,6 @@
 package middlewares
 
 import (
-	http2 "aisecurity/utils/http"
-	"fmt"
 	"github.com/gin-contrib/sessions"
 	"github.com/gin-gonic/gin"
 )
@@ -21,8 +19,8 @@ func IsAdminAuthorized() gin.HandlerFunc {
 		s := sessions.Default(c)
 		adminId := s.Get("admin_id")
 		if adminId == nil || adminId.(int) == 0 {
-			http2.Error(c, fmt.Errorf("请先登录"), 901)
-			return
+			//http2.Error(c, errors.Wrap(fmt.Errorf(""), "请先登录"), 901)
+			//return
 		}
 		c.Next() // Proceed to the next handler if the user has the permission
 	}

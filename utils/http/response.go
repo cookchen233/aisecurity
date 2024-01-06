@@ -1,6 +1,7 @@
 package http
 
 import (
+	"aisecurity/properties"
 	"github.com/gin-gonic/gin"
 	"github.com/pkg/errors"
 	"net/http"
@@ -9,42 +10,52 @@ import (
 )
 
 type Payload struct {
-	Code    int         `json:"code"`
-	Message string      `json:"message"`
-	Data    interface{} `json:"data"`
-	Ref     string      `json:"ref"`
-	Traceid string      `json:"traceid"`
+	Code    properties.ResponseCode `json:"code"`
+	Message string                  `json:"message"`
+	Data    interface{}             `json:"data"`
+	Ref     string                  `json:"ref"`
+	Traceid string                  `json:"traceid"`
 }
 
 func Success(c *gin.Context, data interface{}) {
 	varType := reflect.TypeOf(data).Kind()
 	// Checking if the variable is a scalar type
-	var respData interface{}
 	switch varType {
 	case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64,
 		reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64, reflect.Uintptr,
 		reflect.Float32, reflect.Float64,
 		reflect.Bool,
 		reflect.String:
-		respData = struct {
+		data = struct {
 			Value interface{} `json:"value"`
 		}{data}
 	case reflect.Array, reflect.Slice:
-		respData = struct {
+		data = struct {
 			List interface{} `json:"list"`
 		}{data}
 	default:
 		varValue := reflect.ValueOf(data)
 		if varValue.Kind() == reflect.Struct {
 			if _, ok := varValue.Type().FieldByName("Item"); !ok {
-				respData = struct {
+				data = struct {
 					Item interface{} `json:"item"`
 				}{data}
-			} else {
-				respData = data
 			}
-		} else {
-			respData = data
+		} else if varValue.Kind() == reflect.Pointer {
+			// Dereference the pointer to get the value it points to.
+			dereferencedValue := varValue.Elem()
+			// Check the kind of the dereferenced value.
+			if dereferencedValue.Kind() == reflect.Struct {
+				// Now check if the struct has a field named "Item".
+				if _, ok := dereferencedValue.Type().FieldByName("Item"); !ok {
+					data = struct {
+						Item interface{} `json:"item"`
+					}{data}
+				}
+			} else {
+				// Handle other kinds (like pointer to a basic type) appropriately.
+				data = dereferencedValue.Interface()
+			}
 		}
 	}
 	traceid, ex := c.Get("traceid")
@@ -54,13 +65,16 @@ func Success(c *gin.Context, data interface{}) {
 	c.JSON(http.StatusOK, Payload{
 		http.StatusOK,
 		"成功",
-		respData,
+		data,
 		"",
 		traceid.(string),
 	})
+	if len(c.Errors) > 0 {
+		Error(c, c.Errors[0], 1000)
+	}
 }
 
-func SuccessWithCode(c *gin.Context, data interface{}, code int) {
+func SuccessWithCode(c *gin.Context, data interface{}, code properties.ResponseCode) {
 	traceid, _ := c.Get("traceid")
 	if traceid == nil {
 		traceid = ""
@@ -74,23 +88,24 @@ func SuccessWithCode(c *gin.Context, data interface{}, code int) {
 	})
 }
 
-func Error(c *gin.Context, err error, code int) {
+func Error(c *gin.Context, err error, code properties.ResponseCode) {
 	var statusCode = c.Writer.Status()
-	var errMessage string
 	if !c.Writer.Written() {
-		statusCode = 400
-		errMessage = "请求数据错误, 请检查"
+		statusCode = http.StatusBadRequest
 		if code >= 1000 {
-			statusCode = 500
-			errMessage = "服务器发生错误, 请稍后再试"
+			statusCode = http.StatusInternalServerError
 		}
 		c.Status(statusCode)
 	}
-	c.Error(errors.WithStack(err))
+	if len(c.Errors) == 0 || err != c.Errors[len(c.Errors)-1] {
+		c.Error(errors.WithStack(err))
+	}
 	traceid, ex := c.Get("traceid")
 	if !ex {
 		traceid = ""
 	}
+
+	var errMessage = properties.ResponseCode(code).Message()
 	if err, ok := err.(interface{ Cause() error }); ok {
 		errMessage = err.Cause().Error()
 	}
@@ -105,7 +120,6 @@ func Error(c *gin.Context, err error, code int) {
 		// Trim any leading colon or space
 		errMessage = strings.TrimRight(errMessage, ": ")
 	}
-
 	c.AbortWithStatusJSON(statusCode, Payload{
 		code,
 		errMessage,

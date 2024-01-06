@@ -3,7 +3,6 @@
 package dao
 
 import (
-	"aisecurity/ent/dao/admin"
 	"aisecurity/ent/dao/department"
 	"aisecurity/ent/dao/employee"
 	"aisecurity/ent/dao/predicate"
@@ -27,54 +26,6 @@ type DepartmentUpdate struct {
 // Where appends a list predicates to the DepartmentUpdate builder.
 func (du *DepartmentUpdate) Where(ps ...predicate.Department) *DepartmentUpdate {
 	du.mutation.Where(ps...)
-	return du
-}
-
-// SetCreatedBy sets the "created_by" field.
-func (du *DepartmentUpdate) SetCreatedBy(i int) *DepartmentUpdate {
-	du.mutation.SetCreatedBy(i)
-	return du
-}
-
-// SetNillableCreatedBy sets the "created_by" field if the given value is not nil.
-func (du *DepartmentUpdate) SetNillableCreatedBy(i *int) *DepartmentUpdate {
-	if i != nil {
-		du.SetCreatedBy(*i)
-	}
-	return du
-}
-
-// SetTitle sets the "title" field.
-func (du *DepartmentUpdate) SetTitle(s string) *DepartmentUpdate {
-	du.mutation.SetTitle(s)
-	return du
-}
-
-// SetNillableTitle sets the "title" field if the given value is not nil.
-func (du *DepartmentUpdate) SetNillableTitle(s *string) *DepartmentUpdate {
-	if s != nil {
-		du.SetTitle(*s)
-	}
-	return du
-}
-
-// SetParentID sets the "parent_id" field.
-func (du *DepartmentUpdate) SetParentID(i int) *DepartmentUpdate {
-	du.mutation.SetParentID(i)
-	return du
-}
-
-// SetNillableParentID sets the "parent_id" field if the given value is not nil.
-func (du *DepartmentUpdate) SetNillableParentID(i *int) *DepartmentUpdate {
-	if i != nil {
-		du.SetParentID(*i)
-	}
-	return du
-}
-
-// ClearParentID clears the value of the "parent_id" field.
-func (du *DepartmentUpdate) ClearParentID() *DepartmentUpdate {
-	du.mutation.ClearParentID()
 	return du
 }
 
@@ -125,15 +76,32 @@ func (du *DepartmentUpdate) SetUpdatedAt(t time.Time) *DepartmentUpdate {
 	return du
 }
 
-// SetCreatorID sets the "creator" edge to the Admin entity by ID.
-func (du *DepartmentUpdate) SetCreatorID(id int) *DepartmentUpdate {
-	du.mutation.SetCreatorID(id)
+// SetTitle sets the "title" field.
+func (du *DepartmentUpdate) SetTitle(s string) *DepartmentUpdate {
+	du.mutation.SetTitle(s)
 	return du
 }
 
-// SetCreator sets the "creator" edge to the Admin entity.
-func (du *DepartmentUpdate) SetCreator(a *Admin) *DepartmentUpdate {
-	return du.SetCreatorID(a.ID)
+// SetNillableTitle sets the "title" field if the given value is not nil.
+func (du *DepartmentUpdate) SetNillableTitle(s *string) *DepartmentUpdate {
+	if s != nil {
+		du.SetTitle(*s)
+	}
+	return du
+}
+
+// SetParentID sets the "parent_id" field.
+func (du *DepartmentUpdate) SetParentID(i int) *DepartmentUpdate {
+	du.mutation.SetParentID(i)
+	return du
+}
+
+// SetNillableParentID sets the "parent_id" field if the given value is not nil.
+func (du *DepartmentUpdate) SetNillableParentID(i *int) *DepartmentUpdate {
+	if i != nil {
+		du.SetParentID(*i)
+	}
+	return du
 }
 
 // SetParent sets the "parent" edge to the Department entity.
@@ -174,12 +142,6 @@ func (du *DepartmentUpdate) AddChildren(d ...*Department) *DepartmentUpdate {
 // Mutation returns the DepartmentMutation object of the builder.
 func (du *DepartmentUpdate) Mutation() *DepartmentMutation {
 	return du.mutation
-}
-
-// ClearCreator clears the "creator" edge to the Admin entity.
-func (du *DepartmentUpdate) ClearCreator() *DepartmentUpdate {
-	du.mutation.ClearCreator()
-	return du
 }
 
 // ClearParent clears the "parent" edge to the Department entity.
@@ -232,7 +194,9 @@ func (du *DepartmentUpdate) RemoveChildren(d ...*Department) *DepartmentUpdate {
 
 // Save executes the query and returns the number of nodes affected by the update operation.
 func (du *DepartmentUpdate) Save(ctx context.Context) (int, error) {
-	du.defaults()
+	if err := du.defaults(); err != nil {
+		return 0, err
+	}
 	return withHooks(ctx, du.sqlSave, du.mutation, du.hooks)
 }
 
@@ -259,18 +223,22 @@ func (du *DepartmentUpdate) ExecX(ctx context.Context) {
 }
 
 // defaults sets the default values of the builder before save.
-func (du *DepartmentUpdate) defaults() {
+func (du *DepartmentUpdate) defaults() error {
 	if _, ok := du.mutation.UpdatedAt(); !ok {
+		if department.UpdateDefaultUpdatedAt == nil {
+			return fmt.Errorf("dao: uninitialized department.UpdateDefaultUpdatedAt (forgotten import dao/runtime?)")
+		}
 		v := department.UpdateDefaultUpdatedAt()
 		du.mutation.SetUpdatedAt(v)
 	}
+	return nil
 }
 
 // check runs all checks and user-defined validators on the builder.
 func (du *DepartmentUpdate) check() error {
-	if v, ok := du.mutation.CreatedBy(); ok {
-		if err := department.CreatedByValidator(v); err != nil {
-			return &ValidationError{Name: "created_by", err: fmt.Errorf(`dao: validator failed for field "Department.created_by": %w`, err)}
+	if v, ok := du.mutation.UpdatedBy(); ok {
+		if err := department.UpdatedByValidator(v); err != nil {
+			return &ValidationError{Name: "updated_by", err: fmt.Errorf(`dao: validator failed for field "Department.updated_by": %w`, err)}
 		}
 	}
 	if v, ok := du.mutation.Title(); ok {
@@ -283,13 +251,11 @@ func (du *DepartmentUpdate) check() error {
 			return &ValidationError{Name: "parent_id", err: fmt.Errorf(`dao: validator failed for field "Department.parent_id": %w`, err)}
 		}
 	}
-	if v, ok := du.mutation.UpdatedBy(); ok {
-		if err := department.UpdatedByValidator(v); err != nil {
-			return &ValidationError{Name: "updated_by", err: fmt.Errorf(`dao: validator failed for field "Department.updated_by": %w`, err)}
-		}
-	}
 	if _, ok := du.mutation.CreatorID(); du.mutation.CreatorCleared() && !ok {
 		return errors.New(`dao: clearing a required unique edge "Department.creator"`)
+	}
+	if _, ok := du.mutation.ParentID(); du.mutation.ParentCleared() && !ok {
+		return errors.New(`dao: clearing a required unique edge "Department.parent"`)
 	}
 	return nil
 }
@@ -306,9 +272,6 @@ func (du *DepartmentUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			}
 		}
 	}
-	if value, ok := du.mutation.Title(); ok {
-		_spec.SetField(department.FieldTitle, field.TypeString, value)
-	}
 	if value, ok := du.mutation.DeletedAt(); ok {
 		_spec.SetField(department.FieldDeletedAt, field.TypeTime, value)
 	}
@@ -324,34 +287,8 @@ func (du *DepartmentUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	if value, ok := du.mutation.UpdatedAt(); ok {
 		_spec.SetField(department.FieldUpdatedAt, field.TypeTime, value)
 	}
-	if du.mutation.CreatorCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2O,
-			Inverse: true,
-			Table:   department.CreatorTable,
-			Columns: []string{department.CreatorColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(admin.FieldID, field.TypeInt),
-			},
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := du.mutation.CreatorIDs(); len(nodes) > 0 {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2O,
-			Inverse: true,
-			Table:   department.CreatorTable,
-			Columns: []string{department.CreatorColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(admin.FieldID, field.TypeInt),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	if value, ok := du.mutation.Title(); ok {
+		_spec.SetField(department.FieldTitle, field.TypeString, value)
 	}
 	if du.mutation.ParentCleared() {
 		edge := &sqlgraph.EdgeSpec{
@@ -492,54 +429,6 @@ type DepartmentUpdateOne struct {
 	mutation *DepartmentMutation
 }
 
-// SetCreatedBy sets the "created_by" field.
-func (duo *DepartmentUpdateOne) SetCreatedBy(i int) *DepartmentUpdateOne {
-	duo.mutation.SetCreatedBy(i)
-	return duo
-}
-
-// SetNillableCreatedBy sets the "created_by" field if the given value is not nil.
-func (duo *DepartmentUpdateOne) SetNillableCreatedBy(i *int) *DepartmentUpdateOne {
-	if i != nil {
-		duo.SetCreatedBy(*i)
-	}
-	return duo
-}
-
-// SetTitle sets the "title" field.
-func (duo *DepartmentUpdateOne) SetTitle(s string) *DepartmentUpdateOne {
-	duo.mutation.SetTitle(s)
-	return duo
-}
-
-// SetNillableTitle sets the "title" field if the given value is not nil.
-func (duo *DepartmentUpdateOne) SetNillableTitle(s *string) *DepartmentUpdateOne {
-	if s != nil {
-		duo.SetTitle(*s)
-	}
-	return duo
-}
-
-// SetParentID sets the "parent_id" field.
-func (duo *DepartmentUpdateOne) SetParentID(i int) *DepartmentUpdateOne {
-	duo.mutation.SetParentID(i)
-	return duo
-}
-
-// SetNillableParentID sets the "parent_id" field if the given value is not nil.
-func (duo *DepartmentUpdateOne) SetNillableParentID(i *int) *DepartmentUpdateOne {
-	if i != nil {
-		duo.SetParentID(*i)
-	}
-	return duo
-}
-
-// ClearParentID clears the value of the "parent_id" field.
-func (duo *DepartmentUpdateOne) ClearParentID() *DepartmentUpdateOne {
-	duo.mutation.ClearParentID()
-	return duo
-}
-
 // SetDeletedAt sets the "deleted_at" field.
 func (duo *DepartmentUpdateOne) SetDeletedAt(t time.Time) *DepartmentUpdateOne {
 	duo.mutation.SetDeletedAt(t)
@@ -587,15 +476,32 @@ func (duo *DepartmentUpdateOne) SetUpdatedAt(t time.Time) *DepartmentUpdateOne {
 	return duo
 }
 
-// SetCreatorID sets the "creator" edge to the Admin entity by ID.
-func (duo *DepartmentUpdateOne) SetCreatorID(id int) *DepartmentUpdateOne {
-	duo.mutation.SetCreatorID(id)
+// SetTitle sets the "title" field.
+func (duo *DepartmentUpdateOne) SetTitle(s string) *DepartmentUpdateOne {
+	duo.mutation.SetTitle(s)
 	return duo
 }
 
-// SetCreator sets the "creator" edge to the Admin entity.
-func (duo *DepartmentUpdateOne) SetCreator(a *Admin) *DepartmentUpdateOne {
-	return duo.SetCreatorID(a.ID)
+// SetNillableTitle sets the "title" field if the given value is not nil.
+func (duo *DepartmentUpdateOne) SetNillableTitle(s *string) *DepartmentUpdateOne {
+	if s != nil {
+		duo.SetTitle(*s)
+	}
+	return duo
+}
+
+// SetParentID sets the "parent_id" field.
+func (duo *DepartmentUpdateOne) SetParentID(i int) *DepartmentUpdateOne {
+	duo.mutation.SetParentID(i)
+	return duo
+}
+
+// SetNillableParentID sets the "parent_id" field if the given value is not nil.
+func (duo *DepartmentUpdateOne) SetNillableParentID(i *int) *DepartmentUpdateOne {
+	if i != nil {
+		duo.SetParentID(*i)
+	}
+	return duo
 }
 
 // SetParent sets the "parent" edge to the Department entity.
@@ -636,12 +542,6 @@ func (duo *DepartmentUpdateOne) AddChildren(d ...*Department) *DepartmentUpdateO
 // Mutation returns the DepartmentMutation object of the builder.
 func (duo *DepartmentUpdateOne) Mutation() *DepartmentMutation {
 	return duo.mutation
-}
-
-// ClearCreator clears the "creator" edge to the Admin entity.
-func (duo *DepartmentUpdateOne) ClearCreator() *DepartmentUpdateOne {
-	duo.mutation.ClearCreator()
-	return duo
 }
 
 // ClearParent clears the "parent" edge to the Department entity.
@@ -707,7 +607,9 @@ func (duo *DepartmentUpdateOne) Select(field string, fields ...string) *Departme
 
 // Save executes the query and returns the updated Department entity.
 func (duo *DepartmentUpdateOne) Save(ctx context.Context) (*Department, error) {
-	duo.defaults()
+	if err := duo.defaults(); err != nil {
+		return nil, err
+	}
 	return withHooks(ctx, duo.sqlSave, duo.mutation, duo.hooks)
 }
 
@@ -734,18 +636,22 @@ func (duo *DepartmentUpdateOne) ExecX(ctx context.Context) {
 }
 
 // defaults sets the default values of the builder before save.
-func (duo *DepartmentUpdateOne) defaults() {
+func (duo *DepartmentUpdateOne) defaults() error {
 	if _, ok := duo.mutation.UpdatedAt(); !ok {
+		if department.UpdateDefaultUpdatedAt == nil {
+			return fmt.Errorf("dao: uninitialized department.UpdateDefaultUpdatedAt (forgotten import dao/runtime?)")
+		}
 		v := department.UpdateDefaultUpdatedAt()
 		duo.mutation.SetUpdatedAt(v)
 	}
+	return nil
 }
 
 // check runs all checks and user-defined validators on the builder.
 func (duo *DepartmentUpdateOne) check() error {
-	if v, ok := duo.mutation.CreatedBy(); ok {
-		if err := department.CreatedByValidator(v); err != nil {
-			return &ValidationError{Name: "created_by", err: fmt.Errorf(`dao: validator failed for field "Department.created_by": %w`, err)}
+	if v, ok := duo.mutation.UpdatedBy(); ok {
+		if err := department.UpdatedByValidator(v); err != nil {
+			return &ValidationError{Name: "updated_by", err: fmt.Errorf(`dao: validator failed for field "Department.updated_by": %w`, err)}
 		}
 	}
 	if v, ok := duo.mutation.Title(); ok {
@@ -758,13 +664,11 @@ func (duo *DepartmentUpdateOne) check() error {
 			return &ValidationError{Name: "parent_id", err: fmt.Errorf(`dao: validator failed for field "Department.parent_id": %w`, err)}
 		}
 	}
-	if v, ok := duo.mutation.UpdatedBy(); ok {
-		if err := department.UpdatedByValidator(v); err != nil {
-			return &ValidationError{Name: "updated_by", err: fmt.Errorf(`dao: validator failed for field "Department.updated_by": %w`, err)}
-		}
-	}
 	if _, ok := duo.mutation.CreatorID(); duo.mutation.CreatorCleared() && !ok {
 		return errors.New(`dao: clearing a required unique edge "Department.creator"`)
+	}
+	if _, ok := duo.mutation.ParentID(); duo.mutation.ParentCleared() && !ok {
+		return errors.New(`dao: clearing a required unique edge "Department.parent"`)
 	}
 	return nil
 }
@@ -798,9 +702,6 @@ func (duo *DepartmentUpdateOne) sqlSave(ctx context.Context) (_node *Department,
 			}
 		}
 	}
-	if value, ok := duo.mutation.Title(); ok {
-		_spec.SetField(department.FieldTitle, field.TypeString, value)
-	}
 	if value, ok := duo.mutation.DeletedAt(); ok {
 		_spec.SetField(department.FieldDeletedAt, field.TypeTime, value)
 	}
@@ -816,34 +717,8 @@ func (duo *DepartmentUpdateOne) sqlSave(ctx context.Context) (_node *Department,
 	if value, ok := duo.mutation.UpdatedAt(); ok {
 		_spec.SetField(department.FieldUpdatedAt, field.TypeTime, value)
 	}
-	if duo.mutation.CreatorCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2O,
-			Inverse: true,
-			Table:   department.CreatorTable,
-			Columns: []string{department.CreatorColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(admin.FieldID, field.TypeInt),
-			},
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := duo.mutation.CreatorIDs(); len(nodes) > 0 {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2O,
-			Inverse: true,
-			Table:   department.CreatorTable,
-			Columns: []string{department.CreatorColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(admin.FieldID, field.TypeInt),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	if value, ok := duo.mutation.Title(); ok {
+		_spec.SetField(department.FieldTitle, field.TypeString, value)
 	}
 	if duo.mutation.ParentCleared() {
 		edge := &sqlgraph.EdgeSpec{

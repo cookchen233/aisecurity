@@ -1,7 +1,7 @@
 package handlers
 
 import (
-	"aisecurity/types"
+	"aisecurity/services"
 	"context"
 	"errors"
 	"fmt"
@@ -13,11 +13,15 @@ import (
 	"log"
 )
 
-type Handler struct {
-	HandlerService types.IService
+type IHandler interface {
+	SetContext(c context.Context)
 }
 
-func Convert(handler types.IHandler, handerFunc gin.HandlerFunc) gin.HandlerFunc {
+type Handler struct {
+	HandlerService services.IService
+}
+
+func Convert(handler IHandler, handerFunc gin.HandlerFunc) gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		handler.SetContext(ctx)
 		handerFunc(ctx)

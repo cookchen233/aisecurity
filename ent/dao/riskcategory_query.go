@@ -20,13 +20,13 @@ import (
 // RiskCategoryQuery is the builder for querying RiskCategory entities.
 type RiskCategoryQuery struct {
 	config
-	ctx              *QueryContext
-	order            []riskcategory.OrderOption
-	inters           []Interceptor
-	predicates       []predicate.RiskCategory
-	withCreator      *AdminQuery
-	withRiskCategory *RiskQuery
-	withFKs          bool
+	ctx                  *QueryContext
+	order                []riskcategory.OrderOption
+	inters               []Interceptor
+	predicates           []predicate.RiskCategory
+	withCreator          *AdminQuery
+	withUpdator          *AdminQuery
+	withRiskRiskCategory *RiskQuery
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
 	path func(context.Context) (*sql.Selector, error)
@@ -85,8 +85,30 @@ func (rcq *RiskCategoryQuery) QueryCreator() *AdminQuery {
 	return query
 }
 
-// QueryRiskCategory chains the current query on the "risk_category" edge.
-func (rcq *RiskCategoryQuery) QueryRiskCategory() *RiskQuery {
+// QueryUpdator chains the current query on the "updator" edge.
+func (rcq *RiskCategoryQuery) QueryUpdator() *AdminQuery {
+	query := (&AdminClient{config: rcq.config}).Query()
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := rcq.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := rcq.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(riskcategory.Table, riskcategory.FieldID, selector),
+			sqlgraph.To(admin.Table, admin.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, riskcategory.UpdatorTable, riskcategory.UpdatorColumn),
+		)
+		fromU = sqlgraph.SetNeighbors(rcq.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
+}
+
+// QueryRiskRiskCategory chains the current query on the "risk_risk_category" edge.
+func (rcq *RiskCategoryQuery) QueryRiskRiskCategory() *RiskQuery {
 	query := (&RiskClient{config: rcq.config}).Query()
 	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
 		if err := rcq.prepareQuery(ctx); err != nil {
@@ -99,7 +121,7 @@ func (rcq *RiskCategoryQuery) QueryRiskCategory() *RiskQuery {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(riskcategory.Table, riskcategory.FieldID, selector),
 			sqlgraph.To(risk.Table, risk.FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, false, riskcategory.RiskCategoryTable, riskcategory.RiskCategoryColumn),
+			sqlgraph.Edge(sqlgraph.O2M, false, riskcategory.RiskRiskCategoryTable, riskcategory.RiskRiskCategoryColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(rcq.driver.Dialect(), step)
 		return fromU, nil
@@ -294,13 +316,14 @@ func (rcq *RiskCategoryQuery) Clone() *RiskCategoryQuery {
 		return nil
 	}
 	return &RiskCategoryQuery{
-		config:           rcq.config,
-		ctx:              rcq.ctx.Clone(),
-		order:            append([]riskcategory.OrderOption{}, rcq.order...),
-		inters:           append([]Interceptor{}, rcq.inters...),
-		predicates:       append([]predicate.RiskCategory{}, rcq.predicates...),
-		withCreator:      rcq.withCreator.Clone(),
-		withRiskCategory: rcq.withRiskCategory.Clone(),
+		config:               rcq.config,
+		ctx:                  rcq.ctx.Clone(),
+		order:                append([]riskcategory.OrderOption{}, rcq.order...),
+		inters:               append([]Interceptor{}, rcq.inters...),
+		predicates:           append([]predicate.RiskCategory{}, rcq.predicates...),
+		withCreator:          rcq.withCreator.Clone(),
+		withUpdator:          rcq.withUpdator.Clone(),
+		withRiskRiskCategory: rcq.withRiskRiskCategory.Clone(),
 		// clone intermediate query.
 		sql:  rcq.sql.Clone(),
 		path: rcq.path,
@@ -318,14 +341,25 @@ func (rcq *RiskCategoryQuery) WithCreator(opts ...func(*AdminQuery)) *RiskCatego
 	return rcq
 }
 
-// WithRiskCategory tells the query-builder to eager-load the nodes that are connected to
-// the "risk_category" edge. The optional arguments are used to configure the query builder of the edge.
-func (rcq *RiskCategoryQuery) WithRiskCategory(opts ...func(*RiskQuery)) *RiskCategoryQuery {
+// WithUpdator tells the query-builder to eager-load the nodes that are connected to
+// the "updator" edge. The optional arguments are used to configure the query builder of the edge.
+func (rcq *RiskCategoryQuery) WithUpdator(opts ...func(*AdminQuery)) *RiskCategoryQuery {
+	query := (&AdminClient{config: rcq.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	rcq.withUpdator = query
+	return rcq
+}
+
+// WithRiskRiskCategory tells the query-builder to eager-load the nodes that are connected to
+// the "risk_risk_category" edge. The optional arguments are used to configure the query builder of the edge.
+func (rcq *RiskCategoryQuery) WithRiskRiskCategory(opts ...func(*RiskQuery)) *RiskCategoryQuery {
 	query := (&RiskClient{config: rcq.config}).Query()
 	for _, opt := range opts {
 		opt(query)
 	}
-	rcq.withRiskCategory = query
+	rcq.withRiskRiskCategory = query
 	return rcq
 }
 
@@ -406,16 +440,13 @@ func (rcq *RiskCategoryQuery) prepareQuery(ctx context.Context) error {
 func (rcq *RiskCategoryQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*RiskCategory, error) {
 	var (
 		nodes       = []*RiskCategory{}
-		withFKs     = rcq.withFKs
 		_spec       = rcq.querySpec()
-		loadedTypes = [2]bool{
+		loadedTypes = [3]bool{
 			rcq.withCreator != nil,
-			rcq.withRiskCategory != nil,
+			rcq.withUpdator != nil,
+			rcq.withRiskRiskCategory != nil,
 		}
 	)
-	if withFKs {
-		_spec.Node.Columns = append(_spec.Node.Columns, riskcategory.ForeignKeys...)
-	}
 	_spec.ScanValues = func(columns []string) ([]any, error) {
 		return (*RiskCategory).scanValues(nil, columns)
 	}
@@ -440,10 +471,16 @@ func (rcq *RiskCategoryQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([
 			return nil, err
 		}
 	}
-	if query := rcq.withRiskCategory; query != nil {
-		if err := rcq.loadRiskCategory(ctx, query, nodes,
-			func(n *RiskCategory) { n.Edges.RiskCategory = []*Risk{} },
-			func(n *RiskCategory, e *Risk) { n.Edges.RiskCategory = append(n.Edges.RiskCategory, e) }); err != nil {
+	if query := rcq.withUpdator; query != nil {
+		if err := rcq.loadUpdator(ctx, query, nodes, nil,
+			func(n *RiskCategory, e *Admin) { n.Edges.Updator = e }); err != nil {
+			return nil, err
+		}
+	}
+	if query := rcq.withRiskRiskCategory; query != nil {
+		if err := rcq.loadRiskRiskCategory(ctx, query, nodes,
+			func(n *RiskCategory) { n.Edges.RiskRiskCategory = []*Risk{} },
+			func(n *RiskCategory, e *Risk) { n.Edges.RiskRiskCategory = append(n.Edges.RiskRiskCategory, e) }); err != nil {
 			return nil, err
 		}
 	}
@@ -479,7 +516,36 @@ func (rcq *RiskCategoryQuery) loadCreator(ctx context.Context, query *AdminQuery
 	}
 	return nil
 }
-func (rcq *RiskCategoryQuery) loadRiskCategory(ctx context.Context, query *RiskQuery, nodes []*RiskCategory, init func(*RiskCategory), assign func(*RiskCategory, *Risk)) error {
+func (rcq *RiskCategoryQuery) loadUpdator(ctx context.Context, query *AdminQuery, nodes []*RiskCategory, init func(*RiskCategory), assign func(*RiskCategory, *Admin)) error {
+	ids := make([]int, 0, len(nodes))
+	nodeids := make(map[int][]*RiskCategory)
+	for i := range nodes {
+		fk := nodes[i].UpdatedBy
+		if _, ok := nodeids[fk]; !ok {
+			ids = append(ids, fk)
+		}
+		nodeids[fk] = append(nodeids[fk], nodes[i])
+	}
+	if len(ids) == 0 {
+		return nil
+	}
+	query.Where(admin.IDIn(ids...))
+	neighbors, err := query.All(ctx)
+	if err != nil {
+		return err
+	}
+	for _, n := range neighbors {
+		nodes, ok := nodeids[n.ID]
+		if !ok {
+			return fmt.Errorf(`unexpected foreign-key "updated_by" returned %v`, n.ID)
+		}
+		for i := range nodes {
+			assign(nodes[i], n)
+		}
+	}
+	return nil
+}
+func (rcq *RiskCategoryQuery) loadRiskRiskCategory(ctx context.Context, query *RiskQuery, nodes []*RiskCategory, init func(*RiskCategory), assign func(*RiskCategory, *Risk)) error {
 	fks := make([]driver.Value, 0, len(nodes))
 	nodeids := make(map[int]*RiskCategory)
 	for i := range nodes {
@@ -494,7 +560,7 @@ func (rcq *RiskCategoryQuery) loadRiskCategory(ctx context.Context, query *RiskQ
 		query.ctx.AppendFieldOnce(risk.FieldRiskCategoryID)
 	}
 	query.Where(predicate.Risk(func(s *sql.Selector) {
-		s.Where(sql.InValues(s.C(riskcategory.RiskCategoryColumn), fks...))
+		s.Where(sql.InValues(s.C(riskcategory.RiskRiskCategoryColumn), fks...))
 	}))
 	neighbors, err := query.All(ctx)
 	if err != nil {
@@ -538,6 +604,9 @@ func (rcq *RiskCategoryQuery) querySpec() *sqlgraph.QuerySpec {
 		}
 		if rcq.withCreator != nil {
 			_spec.Node.AddColumnOnce(riskcategory.FieldCreatedBy)
+		}
+		if rcq.withUpdator != nil {
+			_spec.Node.AddColumnOnce(riskcategory.FieldUpdatedBy)
 		}
 	}
 	if ps := rcq.predicates; len(ps) > 0 {

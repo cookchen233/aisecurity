@@ -1,6 +1,7 @@
 package middlewares
 
 import (
+	"aisecurity/properties"
 	"aisecurity/utils"
 	http2 "aisecurity/utils/http"
 	"bytes"
@@ -48,7 +49,6 @@ func LogMiddleware() gin.HandlerFunc {
 
 		zfs := []zap.Field{
 			zap.String("start", start.Format(time.StampMicro)),
-			zap.Int("status", c.Writer.Status()),
 			zap.String("method", c.Request.Method),
 			zap.String("content_type", c.ContentType()),
 			zap.String("path", c.Request.URL.Path),
@@ -94,6 +94,7 @@ func LogMiddleware() gin.HandlerFunc {
 			stackTraces = append(stackTraces, strings.Split(fmt.Sprintf("%+v", e.Err), "\n\t"))
 		}
 		zfs = append(zfs, zap.String("latency", fmt.Sprintf("%s", latency)))
+		zfs = append(zfs, zap.Int("status", c.Writer.Status()))
 		if len(c.Errors) > 0 {
 			resp, err := io.ReadAll(blw.body)
 			if err != nil {
@@ -145,25 +146,28 @@ func RecoveryMiddleware() gin.HandlerFunc {
 					}
 				}
 				headersToStr := strings.Join(headers, "\r\n")
-				c.Error(err.(error))
+				var panicErr error
+				panicErr, ok := err.(error)
+				if !ok {
+					// If r is indeed an error, use it.
+					panicErr = fmt.Errorf("panic: %v", err)
+				}
+				c.Error(panicErr)
 				if brokenPipe {
 					utils.Logger.Error(c.Request.URL.String(),
 						zap.Any("err", err),
 						zap.String("headers", headersToStr),
 						zap.Stack("stack"),
 					)
-					// If the connection is dead, we can't write a status to it.
-
-					c.Abort()
 				} else {
-					utils.Logger.Panic(c.Request.URL.String(),
+					utils.Logger.Error(c.Request.URL.String(),
 						zap.Any("err", err),
 						zap.String("headers", headersToStr),
 						zap.Stack("stack"),
 						zap.String("panicRecoveredTime", time.Now().Format(time.RFC3339)),
 					)
-					http2.Error(c, err.(error), http.StatusInternalServerError)
 				}
+				http2.Error(c, panicErr, properties.ServerError)
 			}
 		}()
 		c.Next()

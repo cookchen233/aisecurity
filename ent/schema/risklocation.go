@@ -21,7 +21,7 @@ func (RiskLocation) Mixin() []ent.Mixin {
 // Fields of the RiskLocation.
 func (RiskLocation) Fields() []ent.Field {
 	return []ent.Field{
-		field.String("title").MaxLen(255).Comment("标题"),
+		field.String("title").MaxLen(255).Comment("标题").NotEmpty().StructTag(`validate:"required"`),
 	}
 }
 
@@ -29,7 +29,8 @@ func (RiskLocation) Fields() []ent.Field {
 func (RiskLocation) Edges() []ent.Edge {
 	return []ent.Edge{
 		edge.From("creator", Admin.Type).Ref("risk_location_creator").Field("created_by").Immutable().Unique().Required(),
+		edge.From("updator", Admin.Type).Ref("risk_location_updator").Field("updated_by").Required().Unique(),
 
-		edge.To("risk_location", Risk.Type),
+		edge.To("risk_risk_location", Risk.Type),
 	}
 }

@@ -11,6 +11,7 @@ import (
 	"fmt"
 	"github.com/gin-contrib/sessions"
 	"github.com/gin-gonic/gin"
+	"github.com/pkg/errors"
 	"golang.org/x/crypto/bcrypt"
 	"log"
 )
@@ -111,7 +112,7 @@ func (handler *AdminHandler) Login(c *gin.Context) {
 	admin, err := handler.service.GetByUserName(req.Username)
 	if err != nil {
 		if dao.IsNotFound(err) {
-			http.Error(c, fmt.Errorf("用户名或密码错误"), 900)
+			http.Error(c, errors.Wrap(fmt.Errorf(""), "用户名或密码错误"), 901)
 			return
 		}
 		http.Error(c, err, 900)
@@ -120,7 +121,7 @@ func (handler *AdminHandler) Login(c *gin.Context) {
 
 	// Compare the provided password with the stored hash
 	if err := bcrypt.CompareHashAndPassword([]byte(admin.Password), []byte(req.Password)); err != nil {
-		http.Error(c, fmt.Errorf("用户名或密码错误"), 900)
+		http.Error(c, errors.Wrap(fmt.Errorf(""), "用户名或密码错误"), 901)
 		return
 	}
 

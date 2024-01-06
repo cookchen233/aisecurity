@@ -15,7 +15,7 @@ import (
 
 // RiskLocation is the model entity for the RiskLocation schema.
 type RiskLocation struct {
-	config `json:"-"`
+	config `json:"-" validate:"-"`
 	// ID of the ent.
 	ID int `json:"id,omitempty"`
 	// 创建时间
@@ -29,23 +29,24 @@ type RiskLocation struct {
 	// 最后更新时间
 	UpdatedAt time.Time `json:"updated_at"`
 	// 标题
-	Title string `json:"title"`
+	Title string `json:"title" validate:"required"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the RiskLocationQuery when eager-loading is set.
-	Edges                       RiskLocationEdges `json:"edges"`
-	admin_risk_location_updator *int
-	selectValues                sql.SelectValues
+	Edges        RiskLocationEdges `json:"edges"`
+	selectValues sql.SelectValues
 }
 
 // RiskLocationEdges holds the relations/edges for other nodes in the graph.
 type RiskLocationEdges struct {
 	// Creator holds the value of the creator edge.
 	Creator *Admin `json:"creator,omitempty"`
-	// RiskLocation holds the value of the risk_location edge.
-	RiskLocation []*Risk `json:"risk_location,omitempty"`
+	// Updator holds the value of the updator edge.
+	Updator *Admin `json:"updator,omitempty"`
+	// RiskRiskLocation holds the value of the risk_risk_location edge.
+	RiskRiskLocation []*Risk `json:"risk_risk_location,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
-	loadedTypes [2]bool
+	loadedTypes [3]bool
 }
 
 // CreatorOrErr returns the Creator value or an error if the edge
@@ -61,13 +62,26 @@ func (e RiskLocationEdges) CreatorOrErr() (*Admin, error) {
 	return nil, &NotLoadedError{edge: "creator"}
 }
 
-// RiskLocationOrErr returns the RiskLocation value or an error if the edge
-// was not loaded in eager-loading.
-func (e RiskLocationEdges) RiskLocationOrErr() ([]*Risk, error) {
+// UpdatorOrErr returns the Updator value or an error if the edge
+// was not loaded in eager-loading, or loaded but was not found.
+func (e RiskLocationEdges) UpdatorOrErr() (*Admin, error) {
 	if e.loadedTypes[1] {
-		return e.RiskLocation, nil
+		if e.Updator == nil {
+			// Edge was loaded but was not found.
+			return nil, &NotFoundError{label: admin.Label}
+		}
+		return e.Updator, nil
 	}
-	return nil, &NotLoadedError{edge: "risk_location"}
+	return nil, &NotLoadedError{edge: "updator"}
+}
+
+// RiskRiskLocationOrErr returns the RiskRiskLocation value or an error if the edge
+// was not loaded in eager-loading.
+func (e RiskLocationEdges) RiskRiskLocationOrErr() ([]*Risk, error) {
+	if e.loadedTypes[2] {
+		return e.RiskRiskLocation, nil
+	}
+	return nil, &NotLoadedError{edge: "risk_risk_location"}
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
@@ -81,8 +95,6 @@ func (*RiskLocation) scanValues(columns []string) ([]any, error) {
 			values[i] = new(sql.NullString)
 		case risklocation.FieldCreatedAt, risklocation.FieldDeletedAt, risklocation.FieldUpdatedAt:
 			values[i] = new(sql.NullTime)
-		case risklocation.ForeignKeys[0]: // admin_risk_location_updator
-			values[i] = new(sql.NullInt64)
 		default:
 			values[i] = new(sql.UnknownType)
 		}
@@ -141,13 +153,6 @@ func (rl *RiskLocation) assignValues(columns []string, values []any) error {
 			} else if value.Valid {
 				rl.Title = value.String
 			}
-		case risklocation.ForeignKeys[0]:
-			if value, ok := values[i].(*sql.NullInt64); !ok {
-				return fmt.Errorf("unexpected type %T for edge-field admin_risk_location_updator", value)
-			} else if value.Valid {
-				rl.admin_risk_location_updator = new(int)
-				*rl.admin_risk_location_updator = int(value.Int64)
-			}
 		default:
 			rl.selectValues.Set(columns[i], values[i])
 		}
@@ -166,9 +171,14 @@ func (rl *RiskLocation) QueryCreator() *AdminQuery {
 	return NewRiskLocationClient(rl.config).QueryCreator(rl)
 }
 
-// QueryRiskLocation queries the "risk_location" edge of the RiskLocation entity.
-func (rl *RiskLocation) QueryRiskLocation() *RiskQuery {
-	return NewRiskLocationClient(rl.config).QueryRiskLocation(rl)
+// QueryUpdator queries the "updator" edge of the RiskLocation entity.
+func (rl *RiskLocation) QueryUpdator() *AdminQuery {
+	return NewRiskLocationClient(rl.config).QueryUpdator(rl)
+}
+
+// QueryRiskRiskLocation queries the "risk_risk_location" edge of the RiskLocation entity.
+func (rl *RiskLocation) QueryRiskRiskLocation() *RiskQuery {
+	return NewRiskLocationClient(rl.config).QueryRiskRiskLocation(rl)
 }
 
 // Update returns a builder for updating this RiskLocation.

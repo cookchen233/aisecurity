@@ -22,16 +22,16 @@ type Department struct {
 	CreatedAt time.Time `json:"created_at"`
 	// 创建者
 	CreatedBy int `json:"created_by"`
-	// 标题
-	Title string `json:"title"`
-	// 上级部门id
-	ParentID int `json:"parent_id"`
 	// 删除时间
 	DeletedAt *time.Time `json:"deleted_at"`
 	// 最后更新者
 	UpdatedBy int `json:"updated_by"`
 	// 最后更新时间
 	UpdatedAt time.Time `json:"updated_at"`
+	// 标题
+	Title string `json:"title"`
+	// 上级部门id
+	ParentID int `json:"parent_id"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the DepartmentQuery when eager-loading is set.
 	Edges                    DepartmentEdges `json:"edges"`
@@ -103,7 +103,7 @@ func (*Department) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
 	for i := range columns {
 		switch columns[i] {
-		case department.FieldID, department.FieldCreatedBy, department.FieldParentID, department.FieldUpdatedBy:
+		case department.FieldID, department.FieldCreatedBy, department.FieldUpdatedBy, department.FieldParentID:
 			values[i] = new(sql.NullInt64)
 		case department.FieldTitle:
 			values[i] = new(sql.NullString)
@@ -144,18 +144,6 @@ func (d *Department) assignValues(columns []string, values []any) error {
 			} else if value.Valid {
 				d.CreatedBy = int(value.Int64)
 			}
-		case department.FieldTitle:
-			if value, ok := values[i].(*sql.NullString); !ok {
-				return fmt.Errorf("unexpected type %T for field title", values[i])
-			} else if value.Valid {
-				d.Title = value.String
-			}
-		case department.FieldParentID:
-			if value, ok := values[i].(*sql.NullInt64); !ok {
-				return fmt.Errorf("unexpected type %T for field parent_id", values[i])
-			} else if value.Valid {
-				d.ParentID = int(value.Int64)
-			}
 		case department.FieldDeletedAt:
 			if value, ok := values[i].(*sql.NullTime); !ok {
 				return fmt.Errorf("unexpected type %T for field deleted_at", values[i])
@@ -174,6 +162,18 @@ func (d *Department) assignValues(columns []string, values []any) error {
 				return fmt.Errorf("unexpected type %T for field updated_at", values[i])
 			} else if value.Valid {
 				d.UpdatedAt = value.Time
+			}
+		case department.FieldTitle:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field title", values[i])
+			} else if value.Valid {
+				d.Title = value.String
+			}
+		case department.FieldParentID:
+			if value, ok := values[i].(*sql.NullInt64); !ok {
+				return fmt.Errorf("unexpected type %T for field parent_id", values[i])
+			} else if value.Valid {
+				d.ParentID = int(value.Int64)
 			}
 		case department.ForeignKeys[0]:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
@@ -244,12 +244,6 @@ func (d *Department) String() string {
 	builder.WriteString("created_by=")
 	builder.WriteString(fmt.Sprintf("%v", d.CreatedBy))
 	builder.WriteString(", ")
-	builder.WriteString("title=")
-	builder.WriteString(d.Title)
-	builder.WriteString(", ")
-	builder.WriteString("parent_id=")
-	builder.WriteString(fmt.Sprintf("%v", d.ParentID))
-	builder.WriteString(", ")
 	if v := d.DeletedAt; v != nil {
 		builder.WriteString("deleted_at=")
 		builder.WriteString(v.Format(time.ANSIC))
@@ -260,6 +254,12 @@ func (d *Department) String() string {
 	builder.WriteString(", ")
 	builder.WriteString("updated_at=")
 	builder.WriteString(d.UpdatedAt.Format(time.ANSIC))
+	builder.WriteString(", ")
+	builder.WriteString("title=")
+	builder.WriteString(d.Title)
+	builder.WriteString(", ")
+	builder.WriteString("parent_id=")
+	builder.WriteString(fmt.Sprintf("%v", d.ParentID))
 	builder.WriteByte(')')
 	return builder.String()
 }

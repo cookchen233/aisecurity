@@ -23,16 +23,16 @@ type Employee struct {
 	CreatedAt time.Time `json:"created_at"`
 	// 创建者
 	CreatedBy int `json:"created_by"`
-	// 管理员id
-	AdminID int `json:"admin_id"`
-	// 部门id
-	DepartmentID int `json:"department_id"`
 	// 删除时间
 	DeletedAt *time.Time `json:"deleted_at"`
 	// 最后更新者
 	UpdatedBy int `json:"updated_by"`
 	// 最后更新时间
 	UpdatedAt time.Time `json:"updated_at"`
+	// 管理员id
+	AdminID int `json:"admin_id"`
+	// 部门id
+	DepartmentID int `json:"department_id"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the EmployeeQuery when eager-loading is set.
 	Edges                  EmployeeEdges `json:"edges"`
@@ -48,9 +48,13 @@ type EmployeeEdges struct {
 	Admin *Admin `json:"admin,omitempty"`
 	// Department holds the value of the department edge.
 	Department *Department `json:"department,omitempty"`
+	// RiskMaintainer holds the value of the risk_maintainer edge.
+	RiskMaintainer []*Risk `json:"risk_maintainer,omitempty"`
+	// RiskCreator holds the value of the risk_creator edge.
+	RiskCreator []*Risk `json:"risk_creator,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
-	loadedTypes [3]bool
+	loadedTypes [5]bool
 }
 
 // CreatorOrErr returns the Creator value or an error if the edge
@@ -92,12 +96,30 @@ func (e EmployeeEdges) DepartmentOrErr() (*Department, error) {
 	return nil, &NotLoadedError{edge: "department"}
 }
 
+// RiskMaintainerOrErr returns the RiskMaintainer value or an error if the edge
+// was not loaded in eager-loading.
+func (e EmployeeEdges) RiskMaintainerOrErr() ([]*Risk, error) {
+	if e.loadedTypes[3] {
+		return e.RiskMaintainer, nil
+	}
+	return nil, &NotLoadedError{edge: "risk_maintainer"}
+}
+
+// RiskCreatorOrErr returns the RiskCreator value or an error if the edge
+// was not loaded in eager-loading.
+func (e EmployeeEdges) RiskCreatorOrErr() ([]*Risk, error) {
+	if e.loadedTypes[4] {
+		return e.RiskCreator, nil
+	}
+	return nil, &NotLoadedError{edge: "risk_creator"}
+}
+
 // scanValues returns the types for scanning values from sql.Rows.
 func (*Employee) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
 	for i := range columns {
 		switch columns[i] {
-		case employee.FieldID, employee.FieldCreatedBy, employee.FieldAdminID, employee.FieldDepartmentID, employee.FieldUpdatedBy:
+		case employee.FieldID, employee.FieldCreatedBy, employee.FieldUpdatedBy, employee.FieldAdminID, employee.FieldDepartmentID:
 			values[i] = new(sql.NullInt64)
 		case employee.FieldCreatedAt, employee.FieldDeletedAt, employee.FieldUpdatedAt:
 			values[i] = new(sql.NullTime)
@@ -136,18 +158,6 @@ func (e *Employee) assignValues(columns []string, values []any) error {
 			} else if value.Valid {
 				e.CreatedBy = int(value.Int64)
 			}
-		case employee.FieldAdminID:
-			if value, ok := values[i].(*sql.NullInt64); !ok {
-				return fmt.Errorf("unexpected type %T for field admin_id", values[i])
-			} else if value.Valid {
-				e.AdminID = int(value.Int64)
-			}
-		case employee.FieldDepartmentID:
-			if value, ok := values[i].(*sql.NullInt64); !ok {
-				return fmt.Errorf("unexpected type %T for field department_id", values[i])
-			} else if value.Valid {
-				e.DepartmentID = int(value.Int64)
-			}
 		case employee.FieldDeletedAt:
 			if value, ok := values[i].(*sql.NullTime); !ok {
 				return fmt.Errorf("unexpected type %T for field deleted_at", values[i])
@@ -166,6 +176,18 @@ func (e *Employee) assignValues(columns []string, values []any) error {
 				return fmt.Errorf("unexpected type %T for field updated_at", values[i])
 			} else if value.Valid {
 				e.UpdatedAt = value.Time
+			}
+		case employee.FieldAdminID:
+			if value, ok := values[i].(*sql.NullInt64); !ok {
+				return fmt.Errorf("unexpected type %T for field admin_id", values[i])
+			} else if value.Valid {
+				e.AdminID = int(value.Int64)
+			}
+		case employee.FieldDepartmentID:
+			if value, ok := values[i].(*sql.NullInt64); !ok {
+				return fmt.Errorf("unexpected type %T for field department_id", values[i])
+			} else if value.Valid {
+				e.DepartmentID = int(value.Int64)
 			}
 		case employee.ForeignKeys[0]:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
@@ -202,6 +224,16 @@ func (e *Employee) QueryDepartment() *DepartmentQuery {
 	return NewEmployeeClient(e.config).QueryDepartment(e)
 }
 
+// QueryRiskMaintainer queries the "risk_maintainer" edge of the Employee entity.
+func (e *Employee) QueryRiskMaintainer() *RiskQuery {
+	return NewEmployeeClient(e.config).QueryRiskMaintainer(e)
+}
+
+// QueryRiskCreator queries the "risk_creator" edge of the Employee entity.
+func (e *Employee) QueryRiskCreator() *RiskQuery {
+	return NewEmployeeClient(e.config).QueryRiskCreator(e)
+}
+
 // Update returns a builder for updating this Employee.
 // Note that you need to call Employee.Unwrap() before calling this method if this Employee
 // was returned from a transaction, and the transaction was committed or rolled back.
@@ -231,12 +263,6 @@ func (e *Employee) String() string {
 	builder.WriteString("created_by=")
 	builder.WriteString(fmt.Sprintf("%v", e.CreatedBy))
 	builder.WriteString(", ")
-	builder.WriteString("admin_id=")
-	builder.WriteString(fmt.Sprintf("%v", e.AdminID))
-	builder.WriteString(", ")
-	builder.WriteString("department_id=")
-	builder.WriteString(fmt.Sprintf("%v", e.DepartmentID))
-	builder.WriteString(", ")
 	if v := e.DeletedAt; v != nil {
 		builder.WriteString("deleted_at=")
 		builder.WriteString(v.Format(time.ANSIC))
@@ -247,6 +273,12 @@ func (e *Employee) String() string {
 	builder.WriteString(", ")
 	builder.WriteString("updated_at=")
 	builder.WriteString(e.UpdatedAt.Format(time.ANSIC))
+	builder.WriteString(", ")
+	builder.WriteString("admin_id=")
+	builder.WriteString(fmt.Sprintf("%v", e.AdminID))
+	builder.WriteString(", ")
+	builder.WriteString("department_id=")
+	builder.WriteString(fmt.Sprintf("%v", e.DepartmentID))
 	builder.WriteByte(')')
 	return builder.String()
 }

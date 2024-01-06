@@ -19,9 +19,11 @@ func NewAuthRoutes(router *gin.RouterGroup) *AuthRoutes {
 // Setup Register auth handlers
 func (routes *AuthRoutes) Setup() {
 	adminRoleHandler := auth.NewAdminRoleHandler()
-	routes.RouterGroup.POST("/admin-role/create", adminRoleHandler.Create)
-	routes.RouterGroup.GET("/admin-role/get-list", adminRoleHandler.GetList)
-	routes.RouterGroup.GET("/admin-role/get-modules", adminRoleHandler.GetModules)
+	{
+		routes.RouterGroup.POST("/admin-role/create", adminRoleHandler.Create)
+		routes.RouterGroup.GET("/admin-role/get-list", adminRoleHandler.GetList)
+		routes.RouterGroup.GET("/admin-role/get-modules", adminRoleHandler.GetModules)
+	}
 
 	adminHandler := auth.NewAdminHandler()
 	{
