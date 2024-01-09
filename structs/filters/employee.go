@@ -6,5 +6,4 @@ import (
 
 type Employee struct {
 	structs.StandardFilter
-	Name string `form:"name"`
 }

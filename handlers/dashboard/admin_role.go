@@ -6,6 +6,7 @@ import (
 	"aisecurity/structs/entities"
 	"aisecurity/structs/filters"
 	"aisecurity/utils/http"
+	"context"
 	"github.com/gin-gonic/gin"
 )
 
@@ -16,19 +17,20 @@ type AdminRoleHandler struct {
 }
 
 func NewAdminRoleHandler() *AdminRoleHandler {
-	h := &AdminRoleHandler{
-		Service: services.NewAdminRoleService(),
-	}
+	h := &AdminRoleHandler{}
+	h.Service = services.NewAdminRoleService()
 	h.Handler.Service = h.Service
+	return h
+}
+
+func (h *AdminRoleHandler) ResetRequest(ctx context.Context) {
 	h.Filter = &filters.AdminRole{}
 	h.Handler.Filter = h.Filter
 	h.Entity = &entities.AdminRole{}
 	h.Handler.Entity = h.Entity
-	return h
 }
-
-func (handler *AdminRoleHandler) GetModules(c *gin.Context) {
-	modules, err := handler.Service.GetModules()
+func (h *AdminRoleHandler) GetModules(c *gin.Context) {
+	modules, err := h.Service.GetModules()
 	if err != nil {
 		http.Error(c, err, 1000)
 		return

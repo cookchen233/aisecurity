@@ -21,18 +21,18 @@ func NewRiskLocationService() *RiskLocationService {
 	}
 }
 
-func (service *RiskLocationService) Create(ent structs.IEntity) (structs.IEntity, error) {
+func (s *RiskLocationService) Create(ent structs.IEntity) (structs.IEntity, error) {
 	e := ent.(*entities.RiskLocation)
 	save, err := db.EntClient.RiskLocation.Create().
 		SetName(e.Name).
-		Save(service.Ctx)
+		Save(s.Ctx)
 	if err != nil {
 		return nil, utils.ErrorWrap(err, "failed creating RiskLocation")
 	}
 	return save, nil
 }
 
-func (service *RiskLocationService) query(fit structs.IFilter) *dao.RiskLocationQuery {
+func (s *RiskLocationService) query(fit structs.IFilter) *dao.RiskLocationQuery {
 	f := fit.(*filters.RiskLocation)
 	q := db.EntClient.RiskLocation.Query()
 	if f.ID != 0 {
@@ -44,26 +44,26 @@ func (service *RiskLocationService) query(fit structs.IFilter) *dao.RiskLocation
 	return q.Clone()
 }
 
-func (service *RiskLocationService) GetToal(fit structs.IFilter) (int, error) {
+func (s *RiskLocationService) GetTotal(fit structs.IFilter) (int, error) {
 	// total
-	total, err := service.query(fit).Count(service.Ctx)
+	total, err := s.query(fit).Count(s.Ctx)
 	if err != nil {
 		return 0, utils.ErrorWithStack(err)
 	}
 	return total, nil
 }
 
-func (service *RiskLocationService) GetList(filter structs.IFilter) ([]structs.IEntity, error) {
+func (s *RiskLocationService) GetList(filter structs.IFilter) ([]structs.IEntity, error) {
 	// list
 	page := min(1000, max(1, filter.GetOffset()))
 	limit := min(10000, max(1, filter.GetOffset()))
 	offset := (page - 1) * limit
-	list, err := service.query(filter).
+	list, err := s.query(filter).
 		WithCreator().
 		WithUpdater().
 		Limit(limit). // Set the number of items to return
 		Offset(offset).
-		All(service.Ctx)
+		All(s.Ctx)
 	if err != nil {
 		return nil, utils.ErrorWithStack(err)
 	}

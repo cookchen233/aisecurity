@@ -8,6 +8,7 @@ import (
 	"aisecurity/structs/filters"
 	"aisecurity/structs/posts"
 	"aisecurity/utils/http"
+	"context"
 	"fmt"
 	"github.com/gin-contrib/sessions"
 	"github.com/gin-gonic/gin"
@@ -22,29 +23,30 @@ type IndexHandler struct {
 }
 
 func NewIndexHandler() *IndexHandler {
-	h := &IndexHandler{
-		Service: services.NewAdminService(),
-	}
+	h := &IndexHandler{}
+	h.Service = services.NewAdminService()
 	h.Handler.Service = h.Service
+	return h
+}
+func (h *IndexHandler) ResetRequest(ctx context.Context) {
 	h.Filter = &filters.Admin{}
 	h.Handler.Filter = h.Filter
 	h.Entity = &entities.Admin{}
 	h.Handler.Entity = h.Entity
-	return h
 }
 
-func (handler *IndexHandler) Login(c *gin.Context) {
+func (h *IndexHandler) Login(c *gin.Context) {
 	var p posts.DashboardLogin
 	if err := c.BindJSON(&p); err != nil {
 		http.Error(c, err, 900)
 		return
 	}
-	if err := handler.Validate(p); err != nil {
+	if err := h.Validate(p); err != nil {
 		http.Error(c, err, 900)
 		return
 	}
 
-	admin, err := handler.Service.GetByUserName(p.Username)
+	admin, err := h.Service.GetByUserName(p.Username)
 	if err != nil {
 		if dao.IsNotFound(err) {
 			http.Error(c, errors.Wrap(fmt.Errorf(""), "用户名或密码错误"), 901)

@@ -6,5 +6,4 @@ import (
 
 type Occupation struct {
 	structs.StandardFilter
-	Name string `form:"name"`
 }

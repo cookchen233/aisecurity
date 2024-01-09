@@ -5,6 +5,7 @@ import (
 	"aisecurity/services"
 	"aisecurity/structs/entities"
 	"aisecurity/structs/filters"
+	"context"
 )
 
 type EmployeeHandler struct {
@@ -13,13 +14,14 @@ type EmployeeHandler struct {
 }
 
 func NewEmployeeHandler() *EmployeeHandler {
-	h := &EmployeeHandler{
-		Service: services.NewEmployeeService(),
-	}
+	h := &EmployeeHandler{}
+	h.Service = services.NewEmployeeService()
 	h.Handler.Service = h.Service
+	return h
+}
+func (h *EmployeeHandler) ResetRequest(ctx context.Context) {
 	h.Filter = &filters.Employee{}
 	h.Handler.Filter = h.Filter
 	h.Entity = &entities.Employee{}
 	h.Handler.Entity = h.Entity
-	return h
 }

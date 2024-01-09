@@ -6,9 +6,13 @@ import (
 	"aisecurity/structs"
 	"aisecurity/structs/entities"
 	"aisecurity/structs/filters"
+	"aisecurity/structs/types"
 	"aisecurity/utils"
 	"aisecurity/utils/db"
+	"fmt"
 	"github.com/gin-gonic/gin"
+	"github.com/gogf/gf/v2/util/gconv"
+	"go.uber.org/zap"
 )
 
 type RiskService struct {
@@ -22,10 +26,10 @@ func NewRiskService() *RiskService {
 	}
 }
 
-func (service *RiskService) Create(ent structs.IEntity) (structs.IEntity, error) {
+func (s *RiskService) Create(ent structs.IEntity) (structs.IEntity, error) {
 	e := ent.(*entities.Risk)
 	save, err := db.EntClient.Risk.Create().
-		SetReporterID(max(1, service.Ctx.(*gin.Context).GetInt("admin_id"))).
+		SetReporterID(max(1, s.Ctx.(*gin.Context).GetInt("admin_id"))).
 		SetTitle(e.Title).
 		SetContent(e.Content).
 		SetImages(e.Images).
@@ -35,22 +39,23 @@ func (service *RiskService) Create(ent structs.IEntity) (structs.IEntity, error)
 		SetMeasures(e.Measures).
 		SetMaintainStatus(e.MaintainStatus).
 		SetDueTime(e.DueTime).
-		Save(service.Ctx)
+		Save(s.Ctx)
 	if err != nil {
 		return nil, utils.ErrorWrap(err, "failed creating RiskLocation")
 	}
 	return save, nil
 }
 
-func (service *RiskService) Get(id int) (*dao.Risk, error) {
-	one, err := service.entClient.Query().Where(risk.IDEQ(id)).WithCreator().Only(service.Ctx)
+func (s *RiskService) Get(id int) (*dao.Risk, error) {
+	one, err := s.entClient.Query().Where(risk.IDEQ(id)).WithCreator().Only(s.Ctx)
 	if err != nil {
 		return nil, err
 	}
 	return one, nil
 }
 
-func (service *RiskService) query(fit structs.IFilter) *dao.RiskQuery {
+func (s *RiskService) query(fit structs.IFilter) *dao.RiskQuery {
+	utils.Logger.Info("risk query", zap.Any("fit", fit))
 	f := fit.(*filters.Risk)
 	q := db.EntClient.Risk.Query()
 	if f.ID != 0 {
@@ -84,21 +89,31 @@ func (service *RiskService) query(fit structs.IFilter) *dao.RiskQuery {
 	return q.Clone()
 }
 
-func (service *RiskService) GetToal(fit structs.IFilter) (int, error) {
+func (s *RiskService) GetTotal(fit structs.IFilter) (int, error) {
 	// total
-	total, err := service.query(fit).Count(service.Ctx)
+	fmt.Println("risk get total", fit)
+	total, err := s.query(fit).Count(s.Ctx)
 	if err != nil {
 		return 0, utils.ErrorWithStack(err)
 	}
 	return total, nil
 }
 
-func (service *RiskService) GetList(filter structs.IFilter) ([]structs.IEntity, error) {
+func (s *RiskService) GetMaintainStatusCounts(fit structs.IFilter) ([]types.MaintainStatusCounts, error) {
+	// status counts
+	var counts []types.MaintainStatusCounts
+	err := s.query(fit).GroupBy(risk.FieldMaintainStatus).
+		Aggregate(dao.Count()).
+		Scan(s.Ctx, &counts)
+	if err != nil {
+		return counts, utils.ErrorWithStack(err)
+	}
+	return counts, nil
+}
+
+func (s *RiskService) GetList(fit structs.IFilter) ([]structs.IEntity, error) {
 	// list
-	page := min(1000, max(1, filter.GetOffset()))
-	limit := min(10000, max(1, filter.GetOffset()))
-	offset := (page - 1) * limit
-	list, err := service.query(filter).
+	list, err := s.query(fit).
 		WithRiskLocation().
 		WithRiskCategory().
 		WithMaintainer(func(q *dao.EmployeeQuery) {
@@ -111,15 +126,23 @@ func (service *RiskService) GetList(filter structs.IFilter) ([]structs.IEntity, 
 				q.WithAdminRoles()
 			})
 		}).
-		Limit(limit). // Set the number of items to return
-		Offset(offset).
-		All(service.Ctx)
+		Limit(fit.GetLimit()). // Set the number of items to return
+		Offset(fit.GetOffset()).
+		All(s.Ctx)
 	if err != nil {
 		return nil, utils.ErrorWithStack(err)
 	}
 	ents := make([]structs.IEntity, len(list))
 	for i, v := range list {
+		v2 := new(entities.Risk)
 		ents[i] = v
+		err := gconv.Struct(v, v2)
+		if err != nil {
+			utils.Logger.Warn("convert error", zap.Error(err))
+		} else {
+			v2.MaintainStatusLabel = v2.MaintainStatus.Label()
+			ents[i] = v2
+		}
 	}
 	return ents, nil
 }

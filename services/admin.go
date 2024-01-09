@@ -3,8 +3,11 @@ package services
 import (
 	"aisecurity/ent/dao"
 	"aisecurity/ent/dao/admin"
+	"aisecurity/ent/dao/risklocation"
 	"aisecurity/structs"
 	"aisecurity/structs/entities"
+	"aisecurity/structs/filters"
+	"aisecurity/utils"
 	"aisecurity/utils/db"
 	"fmt"
 	"github.com/pkg/errors"
@@ -22,29 +25,29 @@ func NewAdminService() *AdminService {
 	}
 }
 
-func (service *AdminService) Create(ent structs.IEntity) (structs.IEntity, error) {
+func (s *AdminService) Create(ent structs.IEntity) (structs.IEntity, error) {
 	e := ent.(*entities.Admin)
 	// Hash the password
 	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(e.Password), bcrypt.DefaultCost)
 	if err != nil {
 		return nil, fmt.Errorf("failed to hash password: %w", err)
 	}
-	saved, err := service.entClient.Create().
+	saved, err := s.entClient.Create().
 		SetUsername(e.Username).
 		SetNickname(e.Nickname).
 		SetRealName(e.RealName).
 		SetPassword(string(hashedPassword)).
 		AddAdminRoleIDs(e.AdminRoleIDs...).
-		Save(service.Ctx)
+		Save(s.Ctx)
 	if err != nil {
 		return nil, fmt.Errorf("failed creating Admin: %w", err)
 	}
 	return saved, nil
 }
 
-func (service *AdminService) Update(ent structs.IEntity) (structs.IEntity, error) {
+func (s *AdminService) Update(ent structs.IEntity) (structs.IEntity, error) {
 	e := ent.(*entities.Admin)
-	q := service.entClient.UpdateOneID(e.ID)
+	q := s.entClient.UpdateOneID(e.ID)
 	if e.Password != "" {
 		// Hash the password
 		hashedPassword, err := bcrypt.GenerateFromPassword([]byte(e.Password), bcrypt.DefaultCost)
@@ -57,15 +60,39 @@ func (service *AdminService) Update(ent structs.IEntity) (structs.IEntity, error
 		SetUsername(e.Username).
 		SetNickname(e.Nickname).
 		SetRealName(e.RealName).
-		Save(service.Ctx)
+		Save(s.Ctx)
 	if err != nil {
 		return nil, errors.Wrap(err, "failed updating Admin")
 	}
 	return saved, nil
 }
 
-func (service *AdminService) GetList(fit structs.IFilter) ([]structs.IEntity, error) {
-	list, err := service.entClient.Query().WithCreator().All(service.Ctx)
+func (s *AdminService) query(fit structs.IFilter) *dao.RiskLocationQuery {
+	f := fit.(*filters.Admin)
+	q := db.EntClient.RiskLocation.Query()
+	if f.ID != 0 {
+		q = q.Where(risklocation.IDEQ(f.ID))
+	}
+	if f.Nickname != "" {
+		q = q.Where(risklocation.NameContainsFold(f.Nickname))
+	}
+	return q.Clone()
+}
+
+func (s *AdminService) GetTotal(fit structs.IFilter) (int, error) {
+	// total
+	total, err := s.query(fit).Count(s.Ctx)
+	if err != nil {
+		return 0, utils.ErrorWithStack(err)
+	}
+	return total, nil
+}
+
+func (s *AdminService) GetList(fit structs.IFilter) ([]structs.IEntity, error) {
+	list, err := s.query(fit).WithCreator().
+		Offset(fit.GetOffset()).
+		Limit(fit.GetLimit()).
+		All(s.Ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -76,8 +103,8 @@ func (service *AdminService) GetList(fit structs.IFilter) ([]structs.IEntity, er
 	return ents, nil
 }
 
-func (service *AdminService) GetByUserName(username string) (*dao.Admin, error) {
-	one, err := service.entClient.Query().Where(admin.UsernameEQ(username)).Only(service.Ctx)
+func (s *AdminService) GetByUserName(username string) (*dao.Admin, error) {
+	one, err := s.entClient.Query().Where(admin.UsernameEQ(username)).Only(s.Ctx)
 	if err != nil {
 		return nil, err
 	}

@@ -2,7 +2,9 @@ package services
 
 import (
 	"aisecurity/structs"
+	"aisecurity/utils"
 	"context"
+	"go.uber.org/zap"
 )
 
 type IService interface {
@@ -10,6 +12,7 @@ type IService interface {
 	Create(structs.IEntity) (structs.IEntity, error)
 	Update(structs.IEntity) (structs.IEntity, error)
 	GetList(structs.IFilter) ([]structs.IEntity, error)
+	GetTotal(structs.IFilter) (int, error)
 	GetDetails(structs.IFilter) (structs.IEntity, error)
 	Delete(structs.IEntity) error
 }
@@ -18,12 +21,31 @@ type Service struct {
 	Ctx context.Context
 }
 
-func (service *Service) SetContext(ctx context.Context) {
-	service.Ctx = ctx
+func (s *Service) SetContext(ctx context.Context) {
+	s.Ctx = ctx
 }
 
-func (service *Service) Create(structs.IEntity) (structs.IEntity, error)     { return nil, nil }
-func (service *Service) Update(structs.IEntity) (structs.IEntity, error)     { return nil, nil }
-func (service *Service) GetList(structs.IFilter) ([]structs.IEntity, error)  { return nil, nil }
-func (service *Service) GetDetails(structs.IFilter) (structs.IEntity, error) { return nil, nil }
-func (service *Service) Delete(structs.IEntity) error                        { return nil }
+func (s *Service) Create(structs.IEntity) (structs.IEntity, error) {
+	utils.Logger.Error("called empty service method", zap.String("method", utils.GetMethodName()))
+	return nil, nil
+}
+func (s *Service) Update(structs.IEntity) (structs.IEntity, error) {
+	utils.Logger.Error("called empty service method", zap.String("method", utils.GetMethodName()))
+	return nil, nil
+}
+func (s *Service) GetList(structs.IFilter) ([]structs.IEntity, error) {
+	utils.Logger.Error("called empty service method", zap.String("method", utils.GetMethodName()))
+	return nil, nil
+}
+func (s *Service) GetTotal(structs.IFilter) (int, error) {
+	utils.Logger.Error("called empty service method", zap.String("method", utils.GetMethodName()))
+	return 0, nil
+}
+func (s *Service) GetDetails(structs.IFilter) (structs.IEntity, error) {
+	utils.Logger.Error("called empty service method", zap.String("method", utils.GetMethodName()))
+	return nil, nil
+}
+func (s *Service) Delete(structs.IEntity) error {
+	utils.Logger.Error("called empty service method", zap.String("method", utils.GetMethodName()))
+	return nil
+}

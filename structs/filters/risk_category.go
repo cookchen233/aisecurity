@@ -6,5 +6,4 @@ import (
 
 type RiskCategory struct {
 	structs.StandardFilter
-	Name string `form:"name"`
 }

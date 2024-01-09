@@ -62,20 +62,21 @@ type IFilter interface {
 }
 
 type StandardFilter struct {
+	// for generic filter
 	Page  int `form:"page"`
 	Limit int `form:"limit"`
 	ID    int `form:"id"`
+
+	// for specific filter, some filters may not need.
+	Name  string `form:"name"`
+	Title string `form:"title"`
 }
 
-func (f *StandardFilter) GetPage() int { return f.Page }
+func (f *StandardFilter) GetPage() int { return min(1000, max(1, f.Page)) }
 
-func (f *StandardFilter) GetLimit() int { return f.Limit }
+func (f *StandardFilter) GetLimit() int { return min(10000, max(1, f.Limit)) }
 
-func (f *StandardFilter) GetOffset() int {
-	page := min(1000, max(1, f.Page))
-	limit := min(10000, max(1, f.Limit))
-	return (page - 1) * limit
-}
+func (f *StandardFilter) GetOffset() int { return (f.GetPage() - 1) * f.GetLimit() }
 
 func (f *StandardFilter) GetID() int { return f.ID }
 

@@ -58,7 +58,7 @@ type SubMenu struct {
 	Enabled     int    `toml:"IsEnabled"`
 }
 
-func (service *AdminRoleService) GetModules() ([]Module, error) {
+func (s *AdminRoleService) GetModules() ([]Module, error) {
 	onceLoadModule.Do(func() {
 		var cfg config
 		_, err := toml.DecodeFile("config/dashboard_permissions.toml", &cfg)
@@ -73,12 +73,12 @@ func (service *AdminRoleService) GetModules() ([]Module, error) {
 	return modules, nil
 }
 
-func (service *AdminRoleService) GetSuperRole() (*dao.AdminRole, error) {
-	data, err := service.entClient.Query().Order(adminrole.ByID(sql.OrderAsc())).First(context.Background())
+func (s *AdminRoleService) GetSuperRole() (*dao.AdminRole, error) {
+	data, err := s.entClient.Query().Order(adminrole.ByID(sql.OrderAsc())).First(context.Background())
 	if err != nil {
 		if dao.IsNotFound(err) {
 			fmt.Printf("there is no one role yet, create a new one")
-			saved, err := service.entClient.Create().
+			saved, err := s.entClient.Create().
 				SetName("超级管理员").
 				Save(context.Background())
 			if err != nil {
@@ -95,9 +95,9 @@ func (service *AdminRoleService) GetSuperRole() (*dao.AdminRole, error) {
 	return data, nil
 }
 
-func (service *AdminRoleService) Create(ent structs.IEntity) (structs.IEntity, error) {
+func (s *AdminRoleService) Create(ent structs.IEntity) (structs.IEntity, error) {
 	e := ent.(*dao.AdminRole)
-	saved, err := service.entClient.Create().
+	saved, err := s.entClient.Create().
 		SetName(e.Name).
 		Save(context.Background())
 	if err != nil {
@@ -106,8 +106,8 @@ func (service *AdminRoleService) Create(ent structs.IEntity) (structs.IEntity, e
 	return saved, nil
 }
 
-func (service *AdminRoleService) GetList(fit structs.IFilter) ([]structs.IEntity, error) {
-	list, err := service.entClient.Query().WithCreator().All(context.Background())
+func (s *AdminRoleService) GetList(fit structs.IFilter) ([]structs.IEntity, error) {
+	list, err := s.entClient.Query().WithCreator().All(context.Background())
 	if err != nil {
 		return nil, err
 	}

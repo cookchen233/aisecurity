@@ -3,6 +3,7 @@ package utils
 import (
 	"fmt"
 	"github.com/pkg/errors"
+	"runtime"
 )
 
 func FilterZerosFromArray(input []int) []int {
@@ -43,4 +44,9 @@ func ErrorWithStack(err error) error {
 
 	// Error does not have a stack trace, add it
 	return errors.WithStack(err)
+}
+
+func GetMethodName() string {
+	pc, _, _, _ := runtime.Caller(1)
+	return runtime.FuncForPC(pc).Name()
 }

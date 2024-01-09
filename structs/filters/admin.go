@@ -6,4 +6,5 @@ import (
 
 type Admin struct {
 	structs.StandardFilter
+	Nickname string `form:"nickname"`
 }

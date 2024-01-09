@@ -5,6 +5,7 @@ import (
 	"aisecurity/services"
 	"aisecurity/structs/entities"
 	"aisecurity/structs/filters"
+	"context"
 )
 
 type DepartmentHandler struct {
@@ -13,13 +14,14 @@ type DepartmentHandler struct {
 }
 
 func NewDepartmentHandler() *DepartmentHandler {
-	h := &DepartmentHandler{
-		Service: services.NewDepartmentService(),
-	}
+	h := &DepartmentHandler{}
+	h.Service = services.NewDepartmentService()
 	h.Handler.Service = h.Service
+	return h
+}
+func (h *DepartmentHandler) ResetRequest(ctx context.Context) {
 	h.Filter = &filters.Department{}
 	h.Handler.Filter = h.Filter
 	h.Entity = &entities.Department{}
 	h.Handler.Entity = h.Entity
-	return h
 }

@@ -7,7 +7,6 @@ import (
 
 type Risk struct {
 	structs.StandardFilter
-	Title           string                    `form:"title"`
 	RiskCategoryIDs []int                     `form:"risk_category_ids[]"`
 	RiskLocationIDs []int                     `form:"risk_location_ids[]"`
 	MaintainerIDs   []int                     `form:"maintainer_ids[]"`

@@ -21,14 +21,14 @@ func NewDepartmentService() *DepartmentService {
 
 var ()
 
-func (service *DepartmentService) Create(ent structs.IEntity) (structs.IEntity, error) {
+func (s *DepartmentService) Create(ent structs.IEntity) (structs.IEntity, error) {
 	e := ent.(*entities.Department)
 	c := db.EntClient.Department.Create().
 		SetName(e.Name)
 	if e.ParentID > 0 {
 		c.SetParentID(e.ParentID)
 	}
-	saved, err := c.Save(service.Ctx)
+	saved, err := c.Save(s.Ctx)
 	if err != nil {
 		return nil, fmt.Errorf("failed creating Department: %w", err)
 	}
@@ -36,16 +36,16 @@ func (service *DepartmentService) Create(ent structs.IEntity) (structs.IEntity, 
 }
 
 // List returns a list of departments with all employees
-func (service *DepartmentService) List() ([]*dao.Department, error) {
+func (s *DepartmentService) List() ([]*dao.Department, error) {
 	topLevelDepartments, err := db.EntClient.Department.Query().
 		WithChildren().
 		WithParent().
-		All(service.Ctx)
+		All(s.Ctx)
 	if err != nil {
 		return nil, err
 	}
 	for _, d := range topLevelDepartments {
-		employeeIDs, err := service.getAllEmployeeIDs(d)
+		employeeIDs, err := s.getAllEmployeeIDs(d)
 		if err != nil {
 			log.Fatalf("failed to get employees for department %v: %v", d.ID, err)
 		}
@@ -54,7 +54,7 @@ func (service *DepartmentService) List() ([]*dao.Department, error) {
 			Where(employee.IDIn(employeeIDs...)).
 			WithAdmin().
 			WithOccupations().
-			All(service.Ctx)
+			All(s.Ctx)
 		if err != nil {
 			log.Fatalf("failed querying employees: %v", err)
 		}
@@ -63,18 +63,18 @@ func (service *DepartmentService) List() ([]*dao.Department, error) {
 	return topLevelDepartments, nil
 }
 
-func (service *DepartmentService) Tree() ([]*dao.Department, error) {
+func (s *DepartmentService) Tree() ([]*dao.Department, error) {
 	list, err := db.EntClient.Department.Query().
 		Where(department.Not(department.HasParent())).
 		WithEmployees(func(query *dao.EmployeeQuery) {
 			query.WithOccupations()
 		}).
-		All(service.Ctx)
+		All(s.Ctx)
 	if err != nil {
 		return nil, err
 	}
 	for _, d := range list {
-		err := service.getNestedChildren(d)
+		err := s.getNestedChildren(d)
 		if err != nil {
 			return nil, err
 		}
@@ -82,17 +82,17 @@ func (service *DepartmentService) Tree() ([]*dao.Department, error) {
 	return list, nil
 }
 
-func (service *DepartmentService) getNestedChildren(dept *dao.Department) error {
+func (s *DepartmentService) getNestedChildren(dept *dao.Department) error {
 	children, err := dept.QueryChildren().
 		WithEmployees(func(query *dao.EmployeeQuery) {
 			query.WithOccupations()
 		}).
-		All(service.Ctx)
+		All(s.Ctx)
 	if err != nil {
 		return err
 	}
 	for _, ch := range children {
-		err := service.getNestedChildren(ch)
+		err := s.getNestedChildren(ch)
 		if err != nil {
 			return err
 		}
@@ -101,21 +101,21 @@ func (service *DepartmentService) getNestedChildren(dept *dao.Department) error 
 	return nil
 }
 
-func (service *DepartmentService) getAllEmployeeIDs(d *dao.Department) ([]int, error) {
+func (s *DepartmentService) getAllEmployeeIDs(d *dao.Department) ([]int, error) {
 	// Base case: if the department has no children, return its direct employees
-	if !d.QueryChildren().ExistX(service.Ctx) {
-		return d.QueryEmployees().IDs(service.Ctx)
+	if !d.QueryChildren().ExistX(s.Ctx) {
+		return d.QueryEmployees().IDs(s.Ctx)
 	}
 
 	// Recursive case: accumulate employee IDs from all child departments
 	var employeeIDs []int
-	children, err := d.QueryChildren().All(service.Ctx)
+	children, err := d.QueryChildren().All(s.Ctx)
 	if err != nil {
 		return nil, err
 	}
 
 	for _, child := range children {
-		childEmployeeIDs, err := service.getAllEmployeeIDs(child)
+		childEmployeeIDs, err := s.getAllEmployeeIDs(child)
 		if err != nil {
 			return nil, err
 		}
@@ -123,7 +123,7 @@ func (service *DepartmentService) getAllEmployeeIDs(d *dao.Department) ([]int, e
 	}
 
 	// Append the direct employees of the current department
-	directEmployeeIDs, err := d.QueryEmployees().IDs(service.Ctx)
+	directEmployeeIDs, err := d.QueryEmployees().IDs(s.Ctx)
 	if err != nil {
 		return nil, err
 	}

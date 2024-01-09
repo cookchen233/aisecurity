@@ -21,18 +21,18 @@ func NewOccupationService() *OccupationService {
 	}
 }
 
-func (service *OccupationService) Create(ent structs.IEntity) (structs.IEntity, error) {
+func (s *OccupationService) Create(ent structs.IEntity) (structs.IEntity, error) {
 	e := ent.(*entities.Occupation)
 	save, err := db.EntClient.Occupation.Create().
 		SetName(e.Name).
-		Save(service.Ctx)
+		Save(s.Ctx)
 	if err != nil {
 		return nil, utils.ErrorWrap(err, "failed creating Occupation")
 	}
 	return save, nil
 }
 
-func (service *OccupationService) query(fit structs.IFilter) *dao.OccupationQuery {
+func (s *OccupationService) query(fit structs.IFilter) *dao.OccupationQuery {
 	f := fit.(*filters.Occupation)
 	q := db.EntClient.Occupation.Query()
 	if f.ID != 0 {
@@ -44,26 +44,26 @@ func (service *OccupationService) query(fit structs.IFilter) *dao.OccupationQuer
 	return q.Clone()
 }
 
-func (service *OccupationService) GetToal(fit structs.IFilter) (int, error) {
+func (s *OccupationService) GetTotal(fit structs.IFilter) (int, error) {
 	// total
-	total, err := service.query(fit).Count(service.Ctx)
+	total, err := s.query(fit).Count(s.Ctx)
 	if err != nil {
 		return 0, utils.ErrorWithStack(err)
 	}
 	return total, nil
 }
 
-func (service *OccupationService) GetList(filter structs.IFilter) ([]structs.IEntity, error) {
+func (s *OccupationService) GetList(filter structs.IFilter) ([]structs.IEntity, error) {
 	// list
 	page := min(1000, max(1, filter.GetOffset()))
 	limit := min(10000, max(1, filter.GetOffset()))
 	offset := (page - 1) * limit
-	list, err := service.query(filter).
+	list, err := s.query(filter).
 		WithCreator().
 		WithUpdater().
 		Limit(limit). // Set the number of items to return
 		Offset(offset).
-		All(service.Ctx)
+		All(s.Ctx)
 	if err != nil {
 		return nil, utils.ErrorWithStack(err)
 	}

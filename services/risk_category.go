@@ -21,18 +21,18 @@ func NewRiskCategoryService() *RiskCategoryService {
 	}
 }
 
-func (service *RiskCategoryService) Create(ent structs.IEntity) (structs.IEntity, error) {
+func (s *RiskCategoryService) Create(ent structs.IEntity) (structs.IEntity, error) {
 	e := ent.(*entities.RiskCategory)
 	save, err := db.EntClient.RiskCategory.Create().
 		SetName(e.Name).
-		Save(service.Ctx)
+		Save(s.Ctx)
 	if err != nil {
 		return nil, utils.ErrorWrap(err, "failed creating RiskCategory")
 	}
 	return save, nil
 }
 
-func (service *RiskCategoryService) query(fit structs.IFilter) *dao.RiskCategoryQuery {
+func (s *RiskCategoryService) query(fit structs.IFilter) *dao.RiskCategoryQuery {
 	f := fit.(*filters.RiskCategory)
 	q := db.EntClient.RiskCategory.Query()
 	if f.ID != 0 {
@@ -44,26 +44,26 @@ func (service *RiskCategoryService) query(fit structs.IFilter) *dao.RiskCategory
 	return q.Clone()
 }
 
-func (service *RiskCategoryService) GetToal(fit structs.IFilter) (int, error) {
+func (s *RiskCategoryService) GetTotal(fit structs.IFilter) (int, error) {
 	// total
-	total, err := service.query(fit).Count(service.Ctx)
+	total, err := s.query(fit).Count(s.Ctx)
 	if err != nil {
 		return 0, utils.ErrorWithStack(err)
 	}
 	return total, nil
 }
 
-func (service *RiskCategoryService) GetList(filter structs.IFilter) ([]structs.IEntity, error) {
+func (s *RiskCategoryService) GetList(filter structs.IFilter) ([]structs.IEntity, error) {
 	// list
 	page := min(1000, max(1, filter.GetOffset()))
 	limit := min(10000, max(1, filter.GetOffset()))
 	offset := (page - 1) * limit
-	list, err := service.query(filter).
+	list, err := s.query(filter).
 		WithCreator().
 		WithUpdater().
 		Limit(limit). // Set the number of items to return
 		Offset(offset).
-		All(service.Ctx)
+		All(s.Ctx)
 	if err != nil {
 		return nil, utils.ErrorWithStack(err)
 	}
