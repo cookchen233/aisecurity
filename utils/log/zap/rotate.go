@@ -41,8 +41,8 @@ func NewProductionRotateConfig(filename string) *RotateConfig {
 
 		RotationTime: time.Hour * 24, // 24 小时轮转一次
 
-		MaxSize:    100, // 100M
-		MaxBackups: 100,
+		MaxSize:    2, // 100M
+		MaxBackups: 2,
 		Compress:   true,
 		LocalTime:  false,
 	}

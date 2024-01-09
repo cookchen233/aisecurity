@@ -2,6 +2,7 @@ package http
 
 import (
 	"aisecurity/properties"
+	"aisecurity/utils"
 	"github.com/gin-gonic/gin"
 	"github.com/pkg/errors"
 	"net/http"
@@ -18,74 +19,107 @@ type Payload struct {
 }
 
 func Success(c *gin.Context, data interface{}) {
-	varType := reflect.TypeOf(data).Kind()
-	// Checking if the variable is a scalar type
-	switch varType {
-	case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64,
-		reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64, reflect.Uintptr,
-		reflect.Float32, reflect.Float64,
-		reflect.Bool,
-		reflect.String:
-		data = struct {
-			Value interface{} `json:"value"`
-		}{data}
-	case reflect.Array, reflect.Slice:
-		data = struct {
-			List interface{} `json:"list"`
-		}{data}
-	default:
-		varValue := reflect.ValueOf(data)
-		if varValue.Kind() == reflect.Struct {
-			if _, ok := varValue.Type().FieldByName("Item"); !ok {
-				data = struct {
-					Item interface{} `json:"item"`
-				}{data}
-			}
-		} else if varValue.Kind() == reflect.Pointer {
-			// Dereference the pointer to get the value it points to.
-			dereferencedValue := varValue.Elem()
-			// Check the kind of the dereferenced value.
-			if dereferencedValue.Kind() == reflect.Struct {
-				// Now check if the struct has a field named "Item".
-				if _, ok := dereferencedValue.Type().FieldByName("Item"); !ok {
-					data = struct {
-						Item interface{} `json:"item"`
-					}{data}
-				}
-			} else {
-				// Handle other kinds (like pointer to a basic type) appropriately.
-				data = dereferencedValue.Interface()
-			}
-		}
-	}
+	data = prepareData(data)
 	traceid, ex := c.Get("traceid")
 	if !ex {
 		traceid = ""
 	}
 	c.JSON(http.StatusOK, Payload{
-		http.StatusOK,
-		"成功",
-		data,
-		"",
-		traceid.(string),
+		Code:    http.StatusOK,
+		Message: "成功",
+		Data:    data,
+		Traceid: traceid.(string),
 	})
 	if len(c.Errors) > 0 {
 		Error(c, c.Errors[0], 1000)
 	}
 }
 
+func prepareData(data interface{}) interface{} {
+	varValue := reflect.ValueOf(data)
+	varType := reflect.TypeOf(data)
+
+	if varType == nil {
+		return struct {
+			List []interface{} `json:"list"`
+		}{[]interface{}{}}
+	}
+
+	switch varType.Kind() {
+	case reflect.Slice, reflect.Array:
+		if varValue.Len() == 0 {
+			return struct {
+				List interface{} `json:"list"`
+			}{[]interface{}{}}
+		}
+		return struct {
+			List interface{} `json:"list"`
+		}{data}
+	case reflect.Struct:
+		return prepareStructData(varValue, varType, data)
+	case reflect.Pointer:
+		return preparePointerData(varValue, data)
+	default:
+		return struct {
+			Value interface{} `json:"value"`
+		}{data}
+	}
+}
+
+func prepareStructData(varValue reflect.Value, varType reflect.Type, data interface{}) interface{} {
+	// Ensure varValue is addressable, necessary for setting field values
+	if !varValue.CanAddr() {
+		// Create a copy that is addressable
+		copy := reflect.New(varType).Elem()
+		copy.Set(varValue)
+		varValue = copy
+	}
+
+	if listField := varValue.FieldByName("List"); listField.IsValid() && listField.Kind() == reflect.Slice {
+		if listField.IsNil() || listField.Len() == 0 {
+			// Set the List field to an empty slice
+			listField.Set(reflect.MakeSlice(listField.Type(), 0, 0))
+		}
+		return varValue.Interface()
+	}
+
+	if _, ok := varType.FieldByName("Item"); ok {
+		return data
+	}
+
+	return struct {
+		Item interface{} `json:"item"`
+	}{data}
+}
+
+func preparePointerData(varValue reflect.Value, data interface{}) interface{} {
+	if varValue.IsNil() {
+		return struct {
+			Item interface{} `json:"item"`
+		}{nil}
+	}
+	dereferencedValue := varValue.Elem()
+	if dereferencedValue.Kind() == reflect.Struct {
+		return prepareStructData(dereferencedValue, dereferencedValue.Type(), dereferencedValue.Interface())
+	}
+	return dereferencedValue.Interface()
+}
+
 func SuccessWithCode(c *gin.Context, data interface{}, code properties.ResponseCode) {
-	traceid, _ := c.Get("traceid")
-	if traceid == nil {
+	data = prepareData(data)
+	traceid, ex := c.Get("traceid")
+	if !ex {
 		traceid = ""
 	}
 	c.JSON(http.StatusOK, Payload{
-		code,
-		"成功",
-		data,
-		"",
-		traceid.(string),
+		Code:    code,
+		Message: "成功",
+		Data:    data,
+		Traceid: traceid.(string),
 	})
+	if len(c.Errors) > 0 {
+		Error(c, c.Errors[0], 1000)
+	}
 }
 
 func Error(c *gin.Context, err error, code properties.ResponseCode) {
@@ -98,18 +132,18 @@ func Error(c *gin.Context, err error, code properties.ResponseCode) {
 		c.Status(statusCode)
 	}
 	if len(c.Errors) == 0 || err != c.Errors[len(c.Errors)-1] {
-		c.Error(errors.WithStack(err))
+		c.Error(utils.ErrorWithStack(err))
+		//c.Error(err)
 	}
 	traceid, ex := c.Get("traceid")
 	if !ex {
 		traceid = ""
 	}
 
-	var errMessage = properties.ResponseCode(code).Message()
-	if err, ok := err.(interface{ Cause() error }); ok {
-		errMessage = err.Cause().Error()
-	}
-
+	var errMessage = code.Message()
+	//if err, ok := err.(interface{ Cause() error }); ok {
+	//	errMessage = err.Cause().Error()
+	//}
 	cause := errors.Cause(err)
 	// Convert the full error message and the cause into strings
 	fullErrMsg := err.Error()

@@ -25,14 +25,14 @@ const (
 	FieldUpdatedBy = "updated_by"
 	// FieldUpdatedAt holds the string denoting the updated_at field in the database.
 	FieldUpdatedAt = "updated_at"
-	// FieldTitle holds the string denoting the title field in the database.
-	FieldTitle = "title"
+	// FieldName holds the string denoting the name field in the database.
+	FieldName = "name"
 	// EdgeCreator holds the string denoting the creator edge name in mutations.
 	EdgeCreator = "creator"
-	// EdgeUpdator holds the string denoting the updator edge name in mutations.
-	EdgeUpdator = "updator"
-	// EdgeRiskRiskLocation holds the string denoting the risk_risk_location edge name in mutations.
-	EdgeRiskRiskLocation = "risk_risk_location"
+	// EdgeUpdater holds the string denoting the updater edge name in mutations.
+	EdgeUpdater = "updater"
+	// EdgeRisk holds the string denoting the risk edge name in mutations.
+	EdgeRisk = "risk"
 	// Table holds the table name of the risklocation in the database.
 	Table = "risk_locations"
 	// CreatorTable is the table that holds the creator relation/edge.
@@ -42,20 +42,20 @@ const (
 	CreatorInverseTable = "admins"
 	// CreatorColumn is the table column denoting the creator relation/edge.
 	CreatorColumn = "created_by"
-	// UpdatorTable is the table that holds the updator relation/edge.
-	UpdatorTable = "risk_locations"
-	// UpdatorInverseTable is the table name for the Admin entity.
+	// UpdaterTable is the table that holds the updater relation/edge.
+	UpdaterTable = "risk_locations"
+	// UpdaterInverseTable is the table name for the Admin entity.
 	// It exists in this package in order to avoid circular dependency with the "admin" package.
-	UpdatorInverseTable = "admins"
-	// UpdatorColumn is the table column denoting the updator relation/edge.
-	UpdatorColumn = "updated_by"
-	// RiskRiskLocationTable is the table that holds the risk_risk_location relation/edge.
-	RiskRiskLocationTable = "risks"
-	// RiskRiskLocationInverseTable is the table name for the Risk entity.
+	UpdaterInverseTable = "admins"
+	// UpdaterColumn is the table column denoting the updater relation/edge.
+	UpdaterColumn = "updated_by"
+	// RiskTable is the table that holds the risk relation/edge.
+	RiskTable = "risks"
+	// RiskInverseTable is the table name for the Risk entity.
 	// It exists in this package in order to avoid circular dependency with the "risk" package.
-	RiskRiskLocationInverseTable = "risks"
-	// RiskRiskLocationColumn is the table column denoting the risk_risk_location relation/edge.
-	RiskRiskLocationColumn = "risk_location_id"
+	RiskInverseTable = "risks"
+	// RiskColumn is the table column denoting the risk relation/edge.
+	RiskColumn = "risk_location_id"
 )
 
 // Columns holds all SQL columns for risklocation fields.
@@ -66,7 +66,7 @@ var Columns = []string{
 	FieldDeletedAt,
 	FieldUpdatedBy,
 	FieldUpdatedAt,
-	FieldTitle,
+	FieldName,
 }
 
 // ValidColumn reports if the column name is valid (part of the table columns).
@@ -96,8 +96,8 @@ var (
 	DefaultUpdatedAt func() time.Time
 	// UpdateDefaultUpdatedAt holds the default value on update for the "updated_at" field.
 	UpdateDefaultUpdatedAt func() time.Time
-	// TitleValidator is a validator for the "title" field. It is called by the builders before save.
-	TitleValidator func(string) error
+	// NameValidator is a validator for the "name" field. It is called by the builders before save.
+	NameValidator func(string) error
 )
 
 // OrderOption defines the ordering options for the RiskLocation queries.
@@ -133,9 +133,9 @@ func ByUpdatedAt(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldUpdatedAt, opts...).ToFunc()
 }
 
-// ByTitle orders the results by the title field.
-func ByTitle(opts ...sql.OrderTermOption) OrderOption {
-	return sql.OrderByField(FieldTitle, opts...).ToFunc()
+// ByName orders the results by the name field.
+func ByName(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldName, opts...).ToFunc()
 }
 
 // ByCreatorField orders the results by creator field.
@@ -145,24 +145,24 @@ func ByCreatorField(field string, opts ...sql.OrderTermOption) OrderOption {
 	}
 }
 
-// ByUpdatorField orders the results by updator field.
-func ByUpdatorField(field string, opts ...sql.OrderTermOption) OrderOption {
+// ByUpdaterField orders the results by updater field.
+func ByUpdaterField(field string, opts ...sql.OrderTermOption) OrderOption {
 	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborTerms(s, newUpdatorStep(), sql.OrderByField(field, opts...))
+		sqlgraph.OrderByNeighborTerms(s, newUpdaterStep(), sql.OrderByField(field, opts...))
 	}
 }
 
-// ByRiskRiskLocationCount orders the results by risk_risk_location count.
-func ByRiskRiskLocationCount(opts ...sql.OrderTermOption) OrderOption {
+// ByRiskCount orders the results by risk count.
+func ByRiskCount(opts ...sql.OrderTermOption) OrderOption {
 	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborsCount(s, newRiskRiskLocationStep(), opts...)
+		sqlgraph.OrderByNeighborsCount(s, newRiskStep(), opts...)
 	}
 }
 
-// ByRiskRiskLocation orders the results by risk_risk_location terms.
-func ByRiskRiskLocation(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+// ByRisk orders the results by risk terms.
+func ByRisk(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
 	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborTerms(s, newRiskRiskLocationStep(), append([]sql.OrderTerm{term}, terms...)...)
+		sqlgraph.OrderByNeighborTerms(s, newRiskStep(), append([]sql.OrderTerm{term}, terms...)...)
 	}
 }
 func newCreatorStep() *sqlgraph.Step {
@@ -172,17 +172,17 @@ func newCreatorStep() *sqlgraph.Step {
 		sqlgraph.Edge(sqlgraph.M2O, true, CreatorTable, CreatorColumn),
 	)
 }
-func newUpdatorStep() *sqlgraph.Step {
+func newUpdaterStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
-		sqlgraph.To(UpdatorInverseTable, FieldID),
-		sqlgraph.Edge(sqlgraph.M2O, true, UpdatorTable, UpdatorColumn),
+		sqlgraph.To(UpdaterInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.M2O, true, UpdaterTable, UpdaterColumn),
 	)
 }
-func newRiskRiskLocationStep() *sqlgraph.Step {
+func newRiskStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
-		sqlgraph.To(RiskRiskLocationInverseTable, FieldID),
-		sqlgraph.Edge(sqlgraph.O2M, false, RiskRiskLocationTable, RiskRiskLocationColumn),
+		sqlgraph.To(RiskInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.O2M, false, RiskTable, RiskColumn),
 	)
 }

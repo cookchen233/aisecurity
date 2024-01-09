@@ -31,14 +31,18 @@ const (
 	FieldDepartmentID = "department_id"
 	// EdgeCreator holds the string denoting the creator edge name in mutations.
 	EdgeCreator = "creator"
+	// EdgeUpdater holds the string denoting the updater edge name in mutations.
+	EdgeUpdater = "updater"
 	// EdgeAdmin holds the string denoting the admin edge name in mutations.
 	EdgeAdmin = "admin"
 	// EdgeDepartment holds the string denoting the department edge name in mutations.
 	EdgeDepartment = "department"
+	// EdgeOccupations holds the string denoting the occupations edge name in mutations.
+	EdgeOccupations = "occupations"
+	// EdgeRiskReporter holds the string denoting the risk_reporter edge name in mutations.
+	EdgeRiskReporter = "risk_reporter"
 	// EdgeRiskMaintainer holds the string denoting the risk_maintainer edge name in mutations.
 	EdgeRiskMaintainer = "risk_maintainer"
-	// EdgeRiskCreator holds the string denoting the risk_creator edge name in mutations.
-	EdgeRiskCreator = "risk_creator"
 	// Table holds the table name of the employee in the database.
 	Table = "employees"
 	// CreatorTable is the table that holds the creator relation/edge.
@@ -48,6 +52,13 @@ const (
 	CreatorInverseTable = "admins"
 	// CreatorColumn is the table column denoting the creator relation/edge.
 	CreatorColumn = "created_by"
+	// UpdaterTable is the table that holds the updater relation/edge.
+	UpdaterTable = "employees"
+	// UpdaterInverseTable is the table name for the Admin entity.
+	// It exists in this package in order to avoid circular dependency with the "admin" package.
+	UpdaterInverseTable = "admins"
+	// UpdaterColumn is the table column denoting the updater relation/edge.
+	UpdaterColumn = "updated_by"
 	// AdminTable is the table that holds the admin relation/edge.
 	AdminTable = "employees"
 	// AdminInverseTable is the table name for the Admin entity.
@@ -62,6 +73,18 @@ const (
 	DepartmentInverseTable = "departments"
 	// DepartmentColumn is the table column denoting the department relation/edge.
 	DepartmentColumn = "department_id"
+	// OccupationsTable is the table that holds the occupations relation/edge. The primary key declared below.
+	OccupationsTable = "occupation_employees"
+	// OccupationsInverseTable is the table name for the Occupation entity.
+	// It exists in this package in order to avoid circular dependency with the "occupation" package.
+	OccupationsInverseTable = "occupations"
+	// RiskReporterTable is the table that holds the risk_reporter relation/edge.
+	RiskReporterTable = "risks"
+	// RiskReporterInverseTable is the table name for the Risk entity.
+	// It exists in this package in order to avoid circular dependency with the "risk" package.
+	RiskReporterInverseTable = "risks"
+	// RiskReporterColumn is the table column denoting the risk_reporter relation/edge.
+	RiskReporterColumn = "reporter_id"
 	// RiskMaintainerTable is the table that holds the risk_maintainer relation/edge.
 	RiskMaintainerTable = "risks"
 	// RiskMaintainerInverseTable is the table name for the Risk entity.
@@ -69,13 +92,6 @@ const (
 	RiskMaintainerInverseTable = "risks"
 	// RiskMaintainerColumn is the table column denoting the risk_maintainer relation/edge.
 	RiskMaintainerColumn = "maintainer_id"
-	// RiskCreatorTable is the table that holds the risk_creator relation/edge.
-	RiskCreatorTable = "risks"
-	// RiskCreatorInverseTable is the table name for the Risk entity.
-	// It exists in this package in order to avoid circular dependency with the "risk" package.
-	RiskCreatorInverseTable = "risks"
-	// RiskCreatorColumn is the table column denoting the risk_creator relation/edge.
-	RiskCreatorColumn = "created_by"
 )
 
 // Columns holds all SQL columns for employee fields.
@@ -90,21 +106,16 @@ var Columns = []string{
 	FieldDepartmentID,
 }
 
-// ForeignKeys holds the SQL foreign-keys that are owned by the "employees"
-// table and are not defined as standalone fields in the schema.
-var ForeignKeys = []string{
-	"admin_employee_updator",
-}
+var (
+	// OccupationsPrimaryKey and OccupationsColumn2 are the table columns denoting the
+	// primary key for the occupations relation (M2M).
+	OccupationsPrimaryKey = []string{"occupation_id", "employee_id"}
+)
 
 // ValidColumn reports if the column name is valid (part of the table columns).
 func ValidColumn(column string) bool {
 	for i := range Columns {
 		if column == Columns[i] {
-			return true
-		}
-	}
-	for i := range ForeignKeys {
-		if column == ForeignKeys[i] {
 			return true
 		}
 	}
@@ -184,6 +195,13 @@ func ByCreatorField(field string, opts ...sql.OrderTermOption) OrderOption {
 	}
 }
 
+// ByUpdaterField orders the results by updater field.
+func ByUpdaterField(field string, opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newUpdaterStep(), sql.OrderByField(field, opts...))
+	}
+}
+
 // ByAdminField orders the results by admin field.
 func ByAdminField(field string, opts ...sql.OrderTermOption) OrderOption {
 	return func(s *sql.Selector) {
@@ -195,6 +213,34 @@ func ByAdminField(field string, opts ...sql.OrderTermOption) OrderOption {
 func ByDepartmentField(field string, opts ...sql.OrderTermOption) OrderOption {
 	return func(s *sql.Selector) {
 		sqlgraph.OrderByNeighborTerms(s, newDepartmentStep(), sql.OrderByField(field, opts...))
+	}
+}
+
+// ByOccupationsCount orders the results by occupations count.
+func ByOccupationsCount(opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborsCount(s, newOccupationsStep(), opts...)
+	}
+}
+
+// ByOccupations orders the results by occupations terms.
+func ByOccupations(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newOccupationsStep(), append([]sql.OrderTerm{term}, terms...)...)
+	}
+}
+
+// ByRiskReporterCount orders the results by risk_reporter count.
+func ByRiskReporterCount(opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborsCount(s, newRiskReporterStep(), opts...)
+	}
+}
+
+// ByRiskReporter orders the results by risk_reporter terms.
+func ByRiskReporter(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newRiskReporterStep(), append([]sql.OrderTerm{term}, terms...)...)
 	}
 }
 
@@ -211,25 +257,18 @@ func ByRiskMaintainer(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
 		sqlgraph.OrderByNeighborTerms(s, newRiskMaintainerStep(), append([]sql.OrderTerm{term}, terms...)...)
 	}
 }
-
-// ByRiskCreatorCount orders the results by risk_creator count.
-func ByRiskCreatorCount(opts ...sql.OrderTermOption) OrderOption {
-	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborsCount(s, newRiskCreatorStep(), opts...)
-	}
-}
-
-// ByRiskCreator orders the results by risk_creator terms.
-func ByRiskCreator(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
-	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborTerms(s, newRiskCreatorStep(), append([]sql.OrderTerm{term}, terms...)...)
-	}
-}
 func newCreatorStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
 		sqlgraph.To(CreatorInverseTable, FieldID),
 		sqlgraph.Edge(sqlgraph.M2O, true, CreatorTable, CreatorColumn),
+	)
+}
+func newUpdaterStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(UpdaterInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.M2O, true, UpdaterTable, UpdaterColumn),
 	)
 }
 func newAdminStep() *sqlgraph.Step {
@@ -246,17 +285,24 @@ func newDepartmentStep() *sqlgraph.Step {
 		sqlgraph.Edge(sqlgraph.M2O, true, DepartmentTable, DepartmentColumn),
 	)
 }
+func newOccupationsStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(OccupationsInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.M2M, true, OccupationsTable, OccupationsPrimaryKey...),
+	)
+}
+func newRiskReporterStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(RiskReporterInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.O2M, false, RiskReporterTable, RiskReporterColumn),
+	)
+}
 func newRiskMaintainerStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
 		sqlgraph.To(RiskMaintainerInverseTable, FieldID),
 		sqlgraph.Edge(sqlgraph.O2M, false, RiskMaintainerTable, RiskMaintainerColumn),
-	)
-}
-func newRiskCreatorStep() *sqlgraph.Step {
-	return sqlgraph.NewStep(
-		sqlgraph.From(Table, FieldID),
-		sqlgraph.To(RiskCreatorInverseTable, FieldID),
-		sqlgraph.Edge(sqlgraph.O2M, false, RiskCreatorTable, RiskCreatorColumn),
 	)
 }

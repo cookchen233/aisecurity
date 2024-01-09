@@ -3,7 +3,7 @@
 ###
 # group: admin
 # @name auth/role/index
-GET {{aisecurity_base_url}}admin/auth/role/index
+GET {{aisecurity_base_url}}dashboard/auth/role/index
 Referer-Policy: strict-origin-when-cross-origin
 Content-Type: multipart/form-data; boundary=WebAppBoundary
 
@@ -21,19 +21,19 @@ demo1234
 # group: admin
 # @name security/admin/create
 # @no-redirect
-GET {{aisecurity_base_url}}admin/auth/admin/create
+GET {{aisecurity_base_url}}dashboard/auth/admin/create
 
 ###
 # group: admin
 # @name security/risk-reporting/index
 # @no-redirect
-GET {{aisecurity_base_url}}admin/security/risk-reporting/get-list
+GET {{aisecurity_base_url}}dashboard/security/risk-reporting/get-list
 
 ###
 # group: admin
 # @name security/risk-reporting/create
 # @no-redirect
-POST {{aisecurity_base_url}}admin/security/risk-reporting/create-risk-location
+POST {{aisecurity_base_url}}dashboard/security/risk-reporting/create-risk-location
 Content-Type: application/json
 
 {

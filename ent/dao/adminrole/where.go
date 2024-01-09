@@ -363,21 +363,21 @@ func HasCreatorWith(preds ...predicate.Admin) predicate.AdminRole {
 	})
 }
 
-// HasUpdator applies the HasEdge predicate on the "updator" edge.
-func HasUpdator() predicate.AdminRole {
+// HasUpdater applies the HasEdge predicate on the "updater" edge.
+func HasUpdater() predicate.AdminRole {
 	return predicate.AdminRole(func(s *sql.Selector) {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(Table, FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, true, UpdatorTable, UpdatorColumn),
+			sqlgraph.Edge(sqlgraph.M2O, true, UpdaterTable, UpdaterColumn),
 		)
 		sqlgraph.HasNeighbors(s, step)
 	})
 }
 
-// HasUpdatorWith applies the HasEdge predicate on the "updator" edge with a given conditions (other predicates).
-func HasUpdatorWith(preds ...predicate.Admin) predicate.AdminRole {
+// HasUpdaterWith applies the HasEdge predicate on the "updater" edge with a given conditions (other predicates).
+func HasUpdaterWith(preds ...predicate.Admin) predicate.AdminRole {
 	return predicate.AdminRole(func(s *sql.Selector) {
-		step := newUpdatorStep()
+		step := newUpdaterStep()
 		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
 			for _, p := range preds {
 				p(s)

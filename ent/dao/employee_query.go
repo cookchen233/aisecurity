@@ -6,6 +6,7 @@ import (
 	"aisecurity/ent/dao/admin"
 	"aisecurity/ent/dao/department"
 	"aisecurity/ent/dao/employee"
+	"aisecurity/ent/dao/occupation"
 	"aisecurity/ent/dao/predicate"
 	"aisecurity/ent/dao/risk"
 	"context"
@@ -26,11 +27,12 @@ type EmployeeQuery struct {
 	inters             []Interceptor
 	predicates         []predicate.Employee
 	withCreator        *AdminQuery
+	withUpdater        *AdminQuery
 	withAdmin          *AdminQuery
 	withDepartment     *DepartmentQuery
+	withOccupations    *OccupationQuery
+	withRiskReporter   *RiskQuery
 	withRiskMaintainer *RiskQuery
-	withRiskCreator    *RiskQuery
-	withFKs            bool
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
 	path func(context.Context) (*sql.Selector, error)
@@ -89,6 +91,28 @@ func (eq *EmployeeQuery) QueryCreator() *AdminQuery {
 	return query
 }
 
+// QueryUpdater chains the current query on the "updater" edge.
+func (eq *EmployeeQuery) QueryUpdater() *AdminQuery {
+	query := (&AdminClient{config: eq.config}).Query()
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := eq.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := eq.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(employee.Table, employee.FieldID, selector),
+			sqlgraph.To(admin.Table, admin.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, employee.UpdaterTable, employee.UpdaterColumn),
+		)
+		fromU = sqlgraph.SetNeighbors(eq.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
+}
+
 // QueryAdmin chains the current query on the "admin" edge.
 func (eq *EmployeeQuery) QueryAdmin() *AdminQuery {
 	query := (&AdminClient{config: eq.config}).Query()
@@ -133,6 +157,50 @@ func (eq *EmployeeQuery) QueryDepartment() *DepartmentQuery {
 	return query
 }
 
+// QueryOccupations chains the current query on the "occupations" edge.
+func (eq *EmployeeQuery) QueryOccupations() *OccupationQuery {
+	query := (&OccupationClient{config: eq.config}).Query()
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := eq.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := eq.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(employee.Table, employee.FieldID, selector),
+			sqlgraph.To(occupation.Table, occupation.FieldID),
+			sqlgraph.Edge(sqlgraph.M2M, true, employee.OccupationsTable, employee.OccupationsPrimaryKey...),
+		)
+		fromU = sqlgraph.SetNeighbors(eq.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
+}
+
+// QueryRiskReporter chains the current query on the "risk_reporter" edge.
+func (eq *EmployeeQuery) QueryRiskReporter() *RiskQuery {
+	query := (&RiskClient{config: eq.config}).Query()
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := eq.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := eq.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(employee.Table, employee.FieldID, selector),
+			sqlgraph.To(risk.Table, risk.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, employee.RiskReporterTable, employee.RiskReporterColumn),
+		)
+		fromU = sqlgraph.SetNeighbors(eq.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
+}
+
 // QueryRiskMaintainer chains the current query on the "risk_maintainer" edge.
 func (eq *EmployeeQuery) QueryRiskMaintainer() *RiskQuery {
 	query := (&RiskClient{config: eq.config}).Query()
@@ -148,28 +216,6 @@ func (eq *EmployeeQuery) QueryRiskMaintainer() *RiskQuery {
 			sqlgraph.From(employee.Table, employee.FieldID, selector),
 			sqlgraph.To(risk.Table, risk.FieldID),
 			sqlgraph.Edge(sqlgraph.O2M, false, employee.RiskMaintainerTable, employee.RiskMaintainerColumn),
-		)
-		fromU = sqlgraph.SetNeighbors(eq.driver.Dialect(), step)
-		return fromU, nil
-	}
-	return query
-}
-
-// QueryRiskCreator chains the current query on the "risk_creator" edge.
-func (eq *EmployeeQuery) QueryRiskCreator() *RiskQuery {
-	query := (&RiskClient{config: eq.config}).Query()
-	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
-		if err := eq.prepareQuery(ctx); err != nil {
-			return nil, err
-		}
-		selector := eq.sqlQuery(ctx)
-		if err := selector.Err(); err != nil {
-			return nil, err
-		}
-		step := sqlgraph.NewStep(
-			sqlgraph.From(employee.Table, employee.FieldID, selector),
-			sqlgraph.To(risk.Table, risk.FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, false, employee.RiskCreatorTable, employee.RiskCreatorColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(eq.driver.Dialect(), step)
 		return fromU, nil
@@ -370,10 +416,12 @@ func (eq *EmployeeQuery) Clone() *EmployeeQuery {
 		inters:             append([]Interceptor{}, eq.inters...),
 		predicates:         append([]predicate.Employee{}, eq.predicates...),
 		withCreator:        eq.withCreator.Clone(),
+		withUpdater:        eq.withUpdater.Clone(),
 		withAdmin:          eq.withAdmin.Clone(),
 		withDepartment:     eq.withDepartment.Clone(),
+		withOccupations:    eq.withOccupations.Clone(),
+		withRiskReporter:   eq.withRiskReporter.Clone(),
 		withRiskMaintainer: eq.withRiskMaintainer.Clone(),
-		withRiskCreator:    eq.withRiskCreator.Clone(),
 		// clone intermediate query.
 		sql:  eq.sql.Clone(),
 		path: eq.path,
@@ -388,6 +436,17 @@ func (eq *EmployeeQuery) WithCreator(opts ...func(*AdminQuery)) *EmployeeQuery {
 		opt(query)
 	}
 	eq.withCreator = query
+	return eq
+}
+
+// WithUpdater tells the query-builder to eager-load the nodes that are connected to
+// the "updater" edge. The optional arguments are used to configure the query builder of the edge.
+func (eq *EmployeeQuery) WithUpdater(opts ...func(*AdminQuery)) *EmployeeQuery {
+	query := (&AdminClient{config: eq.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	eq.withUpdater = query
 	return eq
 }
 
@@ -413,6 +472,28 @@ func (eq *EmployeeQuery) WithDepartment(opts ...func(*DepartmentQuery)) *Employe
 	return eq
 }
 
+// WithOccupations tells the query-builder to eager-load the nodes that are connected to
+// the "occupations" edge. The optional arguments are used to configure the query builder of the edge.
+func (eq *EmployeeQuery) WithOccupations(opts ...func(*OccupationQuery)) *EmployeeQuery {
+	query := (&OccupationClient{config: eq.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	eq.withOccupations = query
+	return eq
+}
+
+// WithRiskReporter tells the query-builder to eager-load the nodes that are connected to
+// the "risk_reporter" edge. The optional arguments are used to configure the query builder of the edge.
+func (eq *EmployeeQuery) WithRiskReporter(opts ...func(*RiskQuery)) *EmployeeQuery {
+	query := (&RiskClient{config: eq.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	eq.withRiskReporter = query
+	return eq
+}
+
 // WithRiskMaintainer tells the query-builder to eager-load the nodes that are connected to
 // the "risk_maintainer" edge. The optional arguments are used to configure the query builder of the edge.
 func (eq *EmployeeQuery) WithRiskMaintainer(opts ...func(*RiskQuery)) *EmployeeQuery {
@@ -421,17 +502,6 @@ func (eq *EmployeeQuery) WithRiskMaintainer(opts ...func(*RiskQuery)) *EmployeeQ
 		opt(query)
 	}
 	eq.withRiskMaintainer = query
-	return eq
-}
-
-// WithRiskCreator tells the query-builder to eager-load the nodes that are connected to
-// the "risk_creator" edge. The optional arguments are used to configure the query builder of the edge.
-func (eq *EmployeeQuery) WithRiskCreator(opts ...func(*RiskQuery)) *EmployeeQuery {
-	query := (&RiskClient{config: eq.config}).Query()
-	for _, opt := range opts {
-		opt(query)
-	}
-	eq.withRiskCreator = query
 	return eq
 }
 
@@ -512,19 +582,17 @@ func (eq *EmployeeQuery) prepareQuery(ctx context.Context) error {
 func (eq *EmployeeQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Employee, error) {
 	var (
 		nodes       = []*Employee{}
-		withFKs     = eq.withFKs
 		_spec       = eq.querySpec()
-		loadedTypes = [5]bool{
+		loadedTypes = [7]bool{
 			eq.withCreator != nil,
+			eq.withUpdater != nil,
 			eq.withAdmin != nil,
 			eq.withDepartment != nil,
+			eq.withOccupations != nil,
+			eq.withRiskReporter != nil,
 			eq.withRiskMaintainer != nil,
-			eq.withRiskCreator != nil,
 		}
 	)
-	if withFKs {
-		_spec.Node.Columns = append(_spec.Node.Columns, employee.ForeignKeys...)
-	}
 	_spec.ScanValues = func(columns []string) ([]any, error) {
 		return (*Employee).scanValues(nil, columns)
 	}
@@ -549,6 +617,12 @@ func (eq *EmployeeQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Emp
 			return nil, err
 		}
 	}
+	if query := eq.withUpdater; query != nil {
+		if err := eq.loadUpdater(ctx, query, nodes, nil,
+			func(n *Employee, e *Admin) { n.Edges.Updater = e }); err != nil {
+			return nil, err
+		}
+	}
 	if query := eq.withAdmin; query != nil {
 		if err := eq.loadAdmin(ctx, query, nodes, nil,
 			func(n *Employee, e *Admin) { n.Edges.Admin = e }); err != nil {
@@ -561,17 +635,24 @@ func (eq *EmployeeQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Emp
 			return nil, err
 		}
 	}
+	if query := eq.withOccupations; query != nil {
+		if err := eq.loadOccupations(ctx, query, nodes,
+			func(n *Employee) { n.Edges.Occupations = []*Occupation{} },
+			func(n *Employee, e *Occupation) { n.Edges.Occupations = append(n.Edges.Occupations, e) }); err != nil {
+			return nil, err
+		}
+	}
+	if query := eq.withRiskReporter; query != nil {
+		if err := eq.loadRiskReporter(ctx, query, nodes,
+			func(n *Employee) { n.Edges.RiskReporter = []*Risk{} },
+			func(n *Employee, e *Risk) { n.Edges.RiskReporter = append(n.Edges.RiskReporter, e) }); err != nil {
+			return nil, err
+		}
+	}
 	if query := eq.withRiskMaintainer; query != nil {
 		if err := eq.loadRiskMaintainer(ctx, query, nodes,
 			func(n *Employee) { n.Edges.RiskMaintainer = []*Risk{} },
 			func(n *Employee, e *Risk) { n.Edges.RiskMaintainer = append(n.Edges.RiskMaintainer, e) }); err != nil {
-			return nil, err
-		}
-	}
-	if query := eq.withRiskCreator; query != nil {
-		if err := eq.loadRiskCreator(ctx, query, nodes,
-			func(n *Employee) { n.Edges.RiskCreator = []*Risk{} },
-			func(n *Employee, e *Risk) { n.Edges.RiskCreator = append(n.Edges.RiskCreator, e) }); err != nil {
 			return nil, err
 		}
 	}
@@ -600,6 +681,35 @@ func (eq *EmployeeQuery) loadCreator(ctx context.Context, query *AdminQuery, nod
 		nodes, ok := nodeids[n.ID]
 		if !ok {
 			return fmt.Errorf(`unexpected foreign-key "created_by" returned %v`, n.ID)
+		}
+		for i := range nodes {
+			assign(nodes[i], n)
+		}
+	}
+	return nil
+}
+func (eq *EmployeeQuery) loadUpdater(ctx context.Context, query *AdminQuery, nodes []*Employee, init func(*Employee), assign func(*Employee, *Admin)) error {
+	ids := make([]int, 0, len(nodes))
+	nodeids := make(map[int][]*Employee)
+	for i := range nodes {
+		fk := nodes[i].UpdatedBy
+		if _, ok := nodeids[fk]; !ok {
+			ids = append(ids, fk)
+		}
+		nodeids[fk] = append(nodeids[fk], nodes[i])
+	}
+	if len(ids) == 0 {
+		return nil
+	}
+	query.Where(admin.IDIn(ids...))
+	neighbors, err := query.All(ctx)
+	if err != nil {
+		return err
+	}
+	for _, n := range neighbors {
+		nodes, ok := nodeids[n.ID]
+		if !ok {
+			return fmt.Errorf(`unexpected foreign-key "updated_by" returned %v`, n.ID)
 		}
 		for i := range nodes {
 			assign(nodes[i], n)
@@ -665,6 +775,97 @@ func (eq *EmployeeQuery) loadDepartment(ctx context.Context, query *DepartmentQu
 	}
 	return nil
 }
+func (eq *EmployeeQuery) loadOccupations(ctx context.Context, query *OccupationQuery, nodes []*Employee, init func(*Employee), assign func(*Employee, *Occupation)) error {
+	edgeIDs := make([]driver.Value, len(nodes))
+	byID := make(map[int]*Employee)
+	nids := make(map[int]map[*Employee]struct{})
+	for i, node := range nodes {
+		edgeIDs[i] = node.ID
+		byID[node.ID] = node
+		if init != nil {
+			init(node)
+		}
+	}
+	query.Where(func(s *sql.Selector) {
+		joinT := sql.Table(employee.OccupationsTable)
+		s.Join(joinT).On(s.C(occupation.FieldID), joinT.C(employee.OccupationsPrimaryKey[0]))
+		s.Where(sql.InValues(joinT.C(employee.OccupationsPrimaryKey[1]), edgeIDs...))
+		columns := s.SelectedColumns()
+		s.Select(joinT.C(employee.OccupationsPrimaryKey[1]))
+		s.AppendSelect(columns...)
+		s.SetDistinct(false)
+	})
+	if err := query.prepareQuery(ctx); err != nil {
+		return err
+	}
+	qr := QuerierFunc(func(ctx context.Context, q Query) (Value, error) {
+		return query.sqlAll(ctx, func(_ context.Context, spec *sqlgraph.QuerySpec) {
+			assign := spec.Assign
+			values := spec.ScanValues
+			spec.ScanValues = func(columns []string) ([]any, error) {
+				values, err := values(columns[1:])
+				if err != nil {
+					return nil, err
+				}
+				return append([]any{new(sql.NullInt64)}, values...), nil
+			}
+			spec.Assign = func(columns []string, values []any) error {
+				outValue := int(values[0].(*sql.NullInt64).Int64)
+				inValue := int(values[1].(*sql.NullInt64).Int64)
+				if nids[inValue] == nil {
+					nids[inValue] = map[*Employee]struct{}{byID[outValue]: {}}
+					return assign(columns[1:], values[1:])
+				}
+				nids[inValue][byID[outValue]] = struct{}{}
+				return nil
+			}
+		})
+	})
+	neighbors, err := withInterceptors[[]*Occupation](ctx, query, qr, query.inters)
+	if err != nil {
+		return err
+	}
+	for _, n := range neighbors {
+		nodes, ok := nids[n.ID]
+		if !ok {
+			return fmt.Errorf(`unexpected "occupations" node returned %v`, n.ID)
+		}
+		for kn := range nodes {
+			assign(kn, n)
+		}
+	}
+	return nil
+}
+func (eq *EmployeeQuery) loadRiskReporter(ctx context.Context, query *RiskQuery, nodes []*Employee, init func(*Employee), assign func(*Employee, *Risk)) error {
+	fks := make([]driver.Value, 0, len(nodes))
+	nodeids := make(map[int]*Employee)
+	for i := range nodes {
+		fks = append(fks, nodes[i].ID)
+		nodeids[nodes[i].ID] = nodes[i]
+		if init != nil {
+			init(nodes[i])
+		}
+	}
+	if len(query.ctx.Fields) > 0 {
+		query.ctx.AppendFieldOnce(risk.FieldReporterID)
+	}
+	query.Where(predicate.Risk(func(s *sql.Selector) {
+		s.Where(sql.InValues(s.C(employee.RiskReporterColumn), fks...))
+	}))
+	neighbors, err := query.All(ctx)
+	if err != nil {
+		return err
+	}
+	for _, n := range neighbors {
+		fk := n.ReporterID
+		node, ok := nodeids[fk]
+		if !ok {
+			return fmt.Errorf(`unexpected referenced foreign-key "reporter_id" returned %v for node %v`, fk, n.ID)
+		}
+		assign(node, n)
+	}
+	return nil
+}
 func (eq *EmployeeQuery) loadRiskMaintainer(ctx context.Context, query *RiskQuery, nodes []*Employee, init func(*Employee), assign func(*Employee, *Risk)) error {
 	fks := make([]driver.Value, 0, len(nodes))
 	nodeids := make(map[int]*Employee)
@@ -675,7 +876,6 @@ func (eq *EmployeeQuery) loadRiskMaintainer(ctx context.Context, query *RiskQuer
 			init(nodes[i])
 		}
 	}
-	query.withFKs = true
 	if len(query.ctx.Fields) > 0 {
 		query.ctx.AppendFieldOnce(risk.FieldMaintainerID)
 	}
@@ -691,37 +891,6 @@ func (eq *EmployeeQuery) loadRiskMaintainer(ctx context.Context, query *RiskQuer
 		node, ok := nodeids[fk]
 		if !ok {
 			return fmt.Errorf(`unexpected referenced foreign-key "maintainer_id" returned %v for node %v`, fk, n.ID)
-		}
-		assign(node, n)
-	}
-	return nil
-}
-func (eq *EmployeeQuery) loadRiskCreator(ctx context.Context, query *RiskQuery, nodes []*Employee, init func(*Employee), assign func(*Employee, *Risk)) error {
-	fks := make([]driver.Value, 0, len(nodes))
-	nodeids := make(map[int]*Employee)
-	for i := range nodes {
-		fks = append(fks, nodes[i].ID)
-		nodeids[nodes[i].ID] = nodes[i]
-		if init != nil {
-			init(nodes[i])
-		}
-	}
-	query.withFKs = true
-	if len(query.ctx.Fields) > 0 {
-		query.ctx.AppendFieldOnce(risk.FieldCreatedBy)
-	}
-	query.Where(predicate.Risk(func(s *sql.Selector) {
-		s.Where(sql.InValues(s.C(employee.RiskCreatorColumn), fks...))
-	}))
-	neighbors, err := query.All(ctx)
-	if err != nil {
-		return err
-	}
-	for _, n := range neighbors {
-		fk := n.CreatedBy
-		node, ok := nodeids[fk]
-		if !ok {
-			return fmt.Errorf(`unexpected referenced foreign-key "created_by" returned %v for node %v`, fk, n.ID)
 		}
 		assign(node, n)
 	}
@@ -755,6 +924,9 @@ func (eq *EmployeeQuery) querySpec() *sqlgraph.QuerySpec {
 		}
 		if eq.withCreator != nil {
 			_spec.Node.AddColumnOnce(employee.FieldCreatedBy)
+		}
+		if eq.withUpdater != nil {
+			_spec.Node.AddColumnOnce(employee.FieldUpdatedBy)
 		}
 		if eq.withAdmin != nil {
 			_spec.Node.AddColumnOnce(employee.FieldAdminID)

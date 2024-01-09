@@ -116,23 +116,23 @@ func (arc *AdminRoleCreate) SetCreator(a *Admin) *AdminRoleCreate {
 	return arc.SetCreatorID(a.ID)
 }
 
-// SetUpdatorID sets the "updator" edge to the Admin entity by ID.
-func (arc *AdminRoleCreate) SetUpdatorID(id int) *AdminRoleCreate {
-	arc.mutation.SetUpdatorID(id)
+// SetUpdaterID sets the "updater" edge to the Admin entity by ID.
+func (arc *AdminRoleCreate) SetUpdaterID(id int) *AdminRoleCreate {
+	arc.mutation.SetUpdaterID(id)
 	return arc
 }
 
-// SetNillableUpdatorID sets the "updator" edge to the Admin entity by ID if the given value is not nil.
-func (arc *AdminRoleCreate) SetNillableUpdatorID(id *int) *AdminRoleCreate {
+// SetNillableUpdaterID sets the "updater" edge to the Admin entity by ID if the given value is not nil.
+func (arc *AdminRoleCreate) SetNillableUpdaterID(id *int) *AdminRoleCreate {
 	if id != nil {
-		arc = arc.SetUpdatorID(*id)
+		arc = arc.SetUpdaterID(*id)
 	}
 	return arc
 }
 
-// SetUpdator sets the "updator" edge to the Admin entity.
-func (arc *AdminRoleCreate) SetUpdator(a *Admin) *AdminRoleCreate {
-	return arc.SetUpdatorID(a.ID)
+// SetUpdater sets the "updater" edge to the Admin entity.
+func (arc *AdminRoleCreate) SetUpdater(a *Admin) *AdminRoleCreate {
+	return arc.SetUpdaterID(a.ID)
 }
 
 // AddAdminIDs adds the "admins" edge to the Admin entity by IDs.
@@ -280,12 +280,12 @@ func (arc *AdminRoleCreate) createSpec() (*AdminRole, *sqlgraph.CreateSpec) {
 		_node.CreatedBy = nodes[0]
 		_spec.Edges = append(_spec.Edges, edge)
 	}
-	if nodes := arc.mutation.UpdatorIDs(); len(nodes) > 0 {
+	if nodes := arc.mutation.UpdaterIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: true,
-			Table:   adminrole.UpdatorTable,
-			Columns: []string{adminrole.UpdatorColumn},
+			Table:   adminrole.UpdaterTable,
+			Columns: []string{adminrole.UpdaterColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(admin.FieldID, field.TypeInt),

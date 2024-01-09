@@ -16,7 +16,9 @@ var (
 		{Name: "updated_at", Type: field.TypeTime},
 		{Name: "username", Type: field.TypeString, Size: 64},
 		{Name: "password", Type: field.TypeString, Size: 255},
-		{Name: "name", Type: field.TypeString, Nullable: true, Size: 64},
+		{Name: "nickname", Type: field.TypeString, Size: 255},
+		{Name: "real_name", Type: field.TypeString, Size: 255},
+		{Name: "avatar", Type: field.TypeString, Nullable: true, Size: 255},
 		{Name: "created_by", Type: field.TypeInt, Nullable: true},
 		{Name: "updated_by", Type: field.TypeInt, Nullable: true},
 	}
@@ -28,13 +30,13 @@ var (
 		ForeignKeys: []*schema.ForeignKey{
 			{
 				Symbol:     "admins_admins_admin_creator",
-				Columns:    []*schema.Column{AdminsColumns[7]},
+				Columns:    []*schema.Column{AdminsColumns[9]},
 				RefColumns: []*schema.Column{AdminsColumns[0]},
 				OnDelete:   schema.SetNull,
 			},
 			{
-				Symbol:     "admins_admins_admin_updator",
-				Columns:    []*schema.Column{AdminsColumns[8]},
+				Symbol:     "admins_admins_admin_updater",
+				Columns:    []*schema.Column{AdminsColumns[10]},
 				RefColumns: []*schema.Column{AdminsColumns[0]},
 				OnDelete:   schema.SetNull,
 			},
@@ -63,7 +65,7 @@ var (
 				OnDelete:   schema.SetNull,
 			},
 			{
-				Symbol:     "admin_roles_admins_admin_role_updator",
+				Symbol:     "admin_roles_admins_admin_role_updater",
 				Columns:    []*schema.Column{AdminRolesColumns[6]},
 				RefColumns: []*schema.Column{AdminsColumns[0]},
 				OnDelete:   schema.SetNull,
@@ -75,11 +77,10 @@ var (
 		{Name: "id", Type: field.TypeInt, Increment: true},
 		{Name: "created_at", Type: field.TypeTime},
 		{Name: "deleted_at", Type: field.TypeTime, Nullable: true},
-		{Name: "updated_by", Type: field.TypeInt},
 		{Name: "updated_at", Type: field.TypeTime},
-		{Name: "title", Type: field.TypeString, Size: 255},
+		{Name: "name", Type: field.TypeString, Size: 255},
 		{Name: "created_by", Type: field.TypeInt},
-		{Name: "admin_department_updator", Type: field.TypeInt, Nullable: true},
+		{Name: "updated_by", Type: field.TypeInt},
 		{Name: "parent_id", Type: field.TypeInt, Nullable: true},
 	}
 	// DepartmentsTable holds the schema information for the "departments" table.
@@ -90,19 +91,19 @@ var (
 		ForeignKeys: []*schema.ForeignKey{
 			{
 				Symbol:     "departments_admins_department_creator",
+				Columns:    []*schema.Column{DepartmentsColumns[5]},
+				RefColumns: []*schema.Column{AdminsColumns[0]},
+				OnDelete:   schema.NoAction,
+			},
+			{
+				Symbol:     "departments_admins_department_updater",
 				Columns:    []*schema.Column{DepartmentsColumns[6]},
 				RefColumns: []*schema.Column{AdminsColumns[0]},
 				OnDelete:   schema.NoAction,
 			},
 			{
-				Symbol:     "departments_admins_department_updator",
-				Columns:    []*schema.Column{DepartmentsColumns[7]},
-				RefColumns: []*schema.Column{AdminsColumns[0]},
-				OnDelete:   schema.SetNull,
-			},
-			{
 				Symbol:     "departments_departments_children",
-				Columns:    []*schema.Column{DepartmentsColumns[8]},
+				Columns:    []*schema.Column{DepartmentsColumns[7]},
 				RefColumns: []*schema.Column{DepartmentsColumns[0]},
 				OnDelete:   schema.SetNull,
 			},
@@ -113,10 +114,9 @@ var (
 		{Name: "id", Type: field.TypeInt, Increment: true},
 		{Name: "created_at", Type: field.TypeTime},
 		{Name: "deleted_at", Type: field.TypeTime, Nullable: true},
-		{Name: "updated_by", Type: field.TypeInt},
 		{Name: "updated_at", Type: field.TypeTime},
 		{Name: "created_by", Type: field.TypeInt},
-		{Name: "admin_employee_updator", Type: field.TypeInt, Nullable: true},
+		{Name: "updated_by", Type: field.TypeInt},
 		{Name: "admin_id", Type: field.TypeInt},
 		{Name: "department_id", Type: field.TypeInt},
 	}
@@ -128,26 +128,57 @@ var (
 		ForeignKeys: []*schema.ForeignKey{
 			{
 				Symbol:     "employees_admins_employee_creator",
+				Columns:    []*schema.Column{EmployeesColumns[4]},
+				RefColumns: []*schema.Column{AdminsColumns[0]},
+				OnDelete:   schema.NoAction,
+			},
+			{
+				Symbol:     "employees_admins_employee_updater",
 				Columns:    []*schema.Column{EmployeesColumns[5]},
 				RefColumns: []*schema.Column{AdminsColumns[0]},
 				OnDelete:   schema.NoAction,
 			},
 			{
-				Symbol:     "employees_admins_employee_updator",
+				Symbol:     "employees_admins_employee",
 				Columns:    []*schema.Column{EmployeesColumns[6]},
-				RefColumns: []*schema.Column{AdminsColumns[0]},
-				OnDelete:   schema.SetNull,
-			},
-			{
-				Symbol:     "employees_admins_employee_admin",
-				Columns:    []*schema.Column{EmployeesColumns[7]},
 				RefColumns: []*schema.Column{AdminsColumns[0]},
 				OnDelete:   schema.NoAction,
 			},
 			{
-				Symbol:     "employees_departments_employee_department",
-				Columns:    []*schema.Column{EmployeesColumns[8]},
+				Symbol:     "employees_departments_employees",
+				Columns:    []*schema.Column{EmployeesColumns[7]},
 				RefColumns: []*schema.Column{DepartmentsColumns[0]},
+				OnDelete:   schema.NoAction,
+			},
+		},
+	}
+	// OccupationsColumns holds the columns for the "occupations" table.
+	OccupationsColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeInt, Increment: true},
+		{Name: "created_at", Type: field.TypeTime},
+		{Name: "deleted_at", Type: field.TypeTime, Nullable: true},
+		{Name: "updated_at", Type: field.TypeTime},
+		{Name: "name", Type: field.TypeString, Size: 255},
+		{Name: "description", Type: field.TypeString, Nullable: true},
+		{Name: "created_by", Type: field.TypeInt},
+		{Name: "updated_by", Type: field.TypeInt},
+	}
+	// OccupationsTable holds the schema information for the "occupations" table.
+	OccupationsTable = &schema.Table{
+		Name:       "occupations",
+		Columns:    OccupationsColumns,
+		PrimaryKey: []*schema.Column{OccupationsColumns[0]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:     "occupations_admins_occupation_creator",
+				Columns:    []*schema.Column{OccupationsColumns[6]},
+				RefColumns: []*schema.Column{AdminsColumns[0]},
+				OnDelete:   schema.NoAction,
+			},
+			{
+				Symbol:     "occupations_admins_occupation_updater",
+				Columns:    []*schema.Column{OccupationsColumns[7]},
+				RefColumns: []*schema.Column{AdminsColumns[0]},
 				OnDelete:   schema.NoAction,
 			},
 		},
@@ -159,16 +190,15 @@ var (
 		{Name: "deleted_at", Type: field.TypeTime, Nullable: true},
 		{Name: "updated_at", Type: field.TypeTime},
 		{Name: "title", Type: field.TypeString, Size: 255},
-		{Name: "content", Type: field.TypeString},
+		{Name: "content", Type: field.TypeString, Nullable: true},
 		{Name: "images", Type: field.TypeJSON, Nullable: true},
 		{Name: "measures", Type: field.TypeString, Nullable: true},
 		{Name: "maintain_status", Type: field.TypeInt, Default: 0},
 		{Name: "due_time", Type: field.TypeTime},
-		{Name: "admin_risk_creator", Type: field.TypeInt, Nullable: true},
-		{Name: "updated_by", Type: field.TypeInt},
-		{Name: "admin_risk_maintainer", Type: field.TypeInt, Nullable: true},
-		{Name: "maintainer_id", Type: field.TypeInt},
 		{Name: "created_by", Type: field.TypeInt},
+		{Name: "updated_by", Type: field.TypeInt},
+		{Name: "reporter_id", Type: field.TypeInt},
+		{Name: "maintainer_id", Type: field.TypeInt},
 		{Name: "risk_category_id", Type: field.TypeInt},
 		{Name: "risk_location_id", Type: field.TypeInt},
 	}
@@ -182,19 +212,19 @@ var (
 				Symbol:     "risks_admins_risk_creator",
 				Columns:    []*schema.Column{RisksColumns[10]},
 				RefColumns: []*schema.Column{AdminsColumns[0]},
-				OnDelete:   schema.SetNull,
+				OnDelete:   schema.NoAction,
 			},
 			{
-				Symbol:     "risks_admins_risk_updator",
+				Symbol:     "risks_admins_risk_updater",
 				Columns:    []*schema.Column{RisksColumns[11]},
 				RefColumns: []*schema.Column{AdminsColumns[0]},
 				OnDelete:   schema.NoAction,
 			},
 			{
-				Symbol:     "risks_admins_risk_maintainer",
+				Symbol:     "risks_employees_risk_reporter",
 				Columns:    []*schema.Column{RisksColumns[12]},
-				RefColumns: []*schema.Column{AdminsColumns[0]},
-				OnDelete:   schema.SetNull,
+				RefColumns: []*schema.Column{EmployeesColumns[0]},
+				OnDelete:   schema.NoAction,
 			},
 			{
 				Symbol:     "risks_employees_risk_maintainer",
@@ -203,20 +233,14 @@ var (
 				OnDelete:   schema.NoAction,
 			},
 			{
-				Symbol:     "risks_employees_risk_creator",
+				Symbol:     "risks_risk_categories_risk",
 				Columns:    []*schema.Column{RisksColumns[14]},
-				RefColumns: []*schema.Column{EmployeesColumns[0]},
-				OnDelete:   schema.NoAction,
-			},
-			{
-				Symbol:     "risks_risk_categories_risk_risk_category",
-				Columns:    []*schema.Column{RisksColumns[15]},
 				RefColumns: []*schema.Column{RiskCategoriesColumns[0]},
 				OnDelete:   schema.NoAction,
 			},
 			{
-				Symbol:     "risks_risk_locations_risk_risk_location",
-				Columns:    []*schema.Column{RisksColumns[16]},
+				Symbol:     "risks_risk_locations_risk",
+				Columns:    []*schema.Column{RisksColumns[15]},
 				RefColumns: []*schema.Column{RiskLocationsColumns[0]},
 				OnDelete:   schema.NoAction,
 			},
@@ -228,7 +252,7 @@ var (
 		{Name: "created_at", Type: field.TypeTime},
 		{Name: "deleted_at", Type: field.TypeTime, Nullable: true},
 		{Name: "updated_at", Type: field.TypeTime},
-		{Name: "title", Type: field.TypeString, Size: 255},
+		{Name: "name", Type: field.TypeString, Size: 255},
 		{Name: "created_by", Type: field.TypeInt},
 		{Name: "updated_by", Type: field.TypeInt},
 	}
@@ -245,7 +269,7 @@ var (
 				OnDelete:   schema.NoAction,
 			},
 			{
-				Symbol:     "risk_categories_admins_risk_category_updator",
+				Symbol:     "risk_categories_admins_risk_category_updater",
 				Columns:    []*schema.Column{RiskCategoriesColumns[6]},
 				RefColumns: []*schema.Column{AdminsColumns[0]},
 				OnDelete:   schema.NoAction,
@@ -258,7 +282,7 @@ var (
 		{Name: "created_at", Type: field.TypeTime},
 		{Name: "deleted_at", Type: field.TypeTime, Nullable: true},
 		{Name: "updated_at", Type: field.TypeTime},
-		{Name: "title", Type: field.TypeString, Size: 255},
+		{Name: "name", Type: field.TypeString, Size: 255},
 		{Name: "created_by", Type: field.TypeInt},
 		{Name: "updated_by", Type: field.TypeInt},
 	}
@@ -275,7 +299,7 @@ var (
 				OnDelete:   schema.NoAction,
 			},
 			{
-				Symbol:     "risk_locations_admins_risk_location_updator",
+				Symbol:     "risk_locations_admins_risk_location_updater",
 				Columns:    []*schema.Column{RiskLocationsColumns[6]},
 				RefColumns: []*schema.Column{AdminsColumns[0]},
 				OnDelete:   schema.NoAction,
@@ -307,16 +331,43 @@ var (
 			},
 		},
 	}
+	// OccupationEmployeesColumns holds the columns for the "occupation_employees" table.
+	OccupationEmployeesColumns = []*schema.Column{
+		{Name: "occupation_id", Type: field.TypeInt},
+		{Name: "employee_id", Type: field.TypeInt},
+	}
+	// OccupationEmployeesTable holds the schema information for the "occupation_employees" table.
+	OccupationEmployeesTable = &schema.Table{
+		Name:       "occupation_employees",
+		Columns:    OccupationEmployeesColumns,
+		PrimaryKey: []*schema.Column{OccupationEmployeesColumns[0], OccupationEmployeesColumns[1]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:     "occupation_employees_occupation_id",
+				Columns:    []*schema.Column{OccupationEmployeesColumns[0]},
+				RefColumns: []*schema.Column{OccupationsColumns[0]},
+				OnDelete:   schema.Cascade,
+			},
+			{
+				Symbol:     "occupation_employees_employee_id",
+				Columns:    []*schema.Column{OccupationEmployeesColumns[1]},
+				RefColumns: []*schema.Column{EmployeesColumns[0]},
+				OnDelete:   schema.Cascade,
+			},
+		},
+	}
 	// Tables holds all the tables in the schema.
 	Tables = []*schema.Table{
 		AdminsTable,
 		AdminRolesTable,
 		DepartmentsTable,
 		EmployeesTable,
+		OccupationsTable,
 		RisksTable,
 		RiskCategoriesTable,
 		RiskLocationsTable,
 		AdminRoleAdminsTable,
+		OccupationEmployeesTable,
 	}
 )
 
@@ -332,17 +383,20 @@ func init() {
 	EmployeesTable.ForeignKeys[1].RefTable = AdminsTable
 	EmployeesTable.ForeignKeys[2].RefTable = AdminsTable
 	EmployeesTable.ForeignKeys[3].RefTable = DepartmentsTable
+	OccupationsTable.ForeignKeys[0].RefTable = AdminsTable
+	OccupationsTable.ForeignKeys[1].RefTable = AdminsTable
 	RisksTable.ForeignKeys[0].RefTable = AdminsTable
 	RisksTable.ForeignKeys[1].RefTable = AdminsTable
-	RisksTable.ForeignKeys[2].RefTable = AdminsTable
+	RisksTable.ForeignKeys[2].RefTable = EmployeesTable
 	RisksTable.ForeignKeys[3].RefTable = EmployeesTable
-	RisksTable.ForeignKeys[4].RefTable = EmployeesTable
-	RisksTable.ForeignKeys[5].RefTable = RiskCategoriesTable
-	RisksTable.ForeignKeys[6].RefTable = RiskLocationsTable
+	RisksTable.ForeignKeys[4].RefTable = RiskCategoriesTable
+	RisksTable.ForeignKeys[5].RefTable = RiskLocationsTable
 	RiskCategoriesTable.ForeignKeys[0].RefTable = AdminsTable
 	RiskCategoriesTable.ForeignKeys[1].RefTable = AdminsTable
 	RiskLocationsTable.ForeignKeys[0].RefTable = AdminsTable
 	RiskLocationsTable.ForeignKeys[1].RefTable = AdminsTable
 	AdminRoleAdminsTable.ForeignKeys[0].RefTable = AdminRolesTable
 	AdminRoleAdminsTable.ForeignKeys[1].RefTable = AdminsTable
+	OccupationEmployeesTable.ForeignKeys[0].RefTable = OccupationsTable
+	OccupationEmployeesTable.ForeignKeys[1].RefTable = EmployeesTable
 }

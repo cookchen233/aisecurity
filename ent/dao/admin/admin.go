@@ -29,56 +29,62 @@ const (
 	FieldUsername = "username"
 	// FieldPassword holds the string denoting the password field in the database.
 	FieldPassword = "password"
-	// FieldName holds the string denoting the name field in the database.
-	FieldName = "name"
+	// FieldNickname holds the string denoting the nickname field in the database.
+	FieldNickname = "nickname"
+	// FieldRealName holds the string denoting the real_name field in the database.
+	FieldRealName = "real_name"
+	// FieldAvatar holds the string denoting the avatar field in the database.
+	FieldAvatar = "avatar"
 	// EdgeCreator holds the string denoting the creator edge name in mutations.
 	EdgeCreator = "creator"
-	// EdgeUpdator holds the string denoting the updator edge name in mutations.
-	EdgeUpdator = "updator"
+	// EdgeUpdater holds the string denoting the updater edge name in mutations.
+	EdgeUpdater = "updater"
 	// EdgeAdminRoles holds the string denoting the admin_roles edge name in mutations.
 	EdgeAdminRoles = "admin_roles"
 	// EdgeAdminCreator holds the string denoting the admin_creator edge name in mutations.
 	EdgeAdminCreator = "admin_creator"
-	// EdgeAdminUpdator holds the string denoting the admin_updator edge name in mutations.
-	EdgeAdminUpdator = "admin_updator"
+	// EdgeAdminUpdater holds the string denoting the admin_updater edge name in mutations.
+	EdgeAdminUpdater = "admin_updater"
 	// EdgeAdminRoleCreator holds the string denoting the admin_role_creator edge name in mutations.
 	EdgeAdminRoleCreator = "admin_role_creator"
-	// EdgeAdminRoleUpdator holds the string denoting the admin_role_updator edge name in mutations.
-	EdgeAdminRoleUpdator = "admin_role_updator"
+	// EdgeAdminRoleUpdater holds the string denoting the admin_role_updater edge name in mutations.
+	EdgeAdminRoleUpdater = "admin_role_updater"
 	// EdgeRiskCreator holds the string denoting the risk_creator edge name in mutations.
 	EdgeRiskCreator = "risk_creator"
-	// EdgeRiskUpdator holds the string denoting the risk_updator edge name in mutations.
-	EdgeRiskUpdator = "risk_updator"
-	// EdgeRiskMaintainer holds the string denoting the risk_maintainer edge name in mutations.
-	EdgeRiskMaintainer = "risk_maintainer"
+	// EdgeRiskUpdater holds the string denoting the risk_updater edge name in mutations.
+	EdgeRiskUpdater = "risk_updater"
 	// EdgeRiskLocationCreator holds the string denoting the risk_location_creator edge name in mutations.
 	EdgeRiskLocationCreator = "risk_location_creator"
-	// EdgeRiskLocationUpdator holds the string denoting the risk_location_updator edge name in mutations.
-	EdgeRiskLocationUpdator = "risk_location_updator"
+	// EdgeRiskLocationUpdater holds the string denoting the risk_location_updater edge name in mutations.
+	EdgeRiskLocationUpdater = "risk_location_updater"
 	// EdgeRiskCategoryCreator holds the string denoting the risk_category_creator edge name in mutations.
 	EdgeRiskCategoryCreator = "risk_category_creator"
-	// EdgeRiskCategoryUpdator holds the string denoting the risk_category_updator edge name in mutations.
-	EdgeRiskCategoryUpdator = "risk_category_updator"
+	// EdgeRiskCategoryUpdater holds the string denoting the risk_category_updater edge name in mutations.
+	EdgeRiskCategoryUpdater = "risk_category_updater"
 	// EdgeDepartmentCreator holds the string denoting the department_creator edge name in mutations.
 	EdgeDepartmentCreator = "department_creator"
-	// EdgeDepartmentUpdator holds the string denoting the department_updator edge name in mutations.
-	EdgeDepartmentUpdator = "department_updator"
+	// EdgeDepartmentUpdater holds the string denoting the department_updater edge name in mutations.
+	EdgeDepartmentUpdater = "department_updater"
 	// EdgeEmployeeCreator holds the string denoting the employee_creator edge name in mutations.
 	EdgeEmployeeCreator = "employee_creator"
-	// EdgeEmployeeUpdator holds the string denoting the employee_updator edge name in mutations.
-	EdgeEmployeeUpdator = "employee_updator"
-	// EdgeEmployeeAdmin holds the string denoting the employee_admin edge name in mutations.
-	EdgeEmployeeAdmin = "employee_admin"
+	// EdgeEmployeeUpdater holds the string denoting the employee_updater edge name in mutations.
+	EdgeEmployeeUpdater = "employee_updater"
+	// EdgeEmployee holds the string denoting the employee edge name in mutations.
+	EdgeEmployee = "employee"
+	// EdgeOccupationCreator holds the string denoting the occupation_creator edge name in mutations.
+	EdgeOccupationCreator = "occupation_creator"
+	// EdgeOccupationUpdater holds the string denoting the occupation_updater edge name in mutations.
+	EdgeOccupationUpdater = "occupation_updater"
 	// Table holds the table name of the admin in the database.
 	Table = "admins"
 	// CreatorTable is the table that holds the creator relation/edge.
 	CreatorTable = "admins"
 	// CreatorColumn is the table column denoting the creator relation/edge.
 	CreatorColumn = "created_by"
-	// UpdatorTable is the table that holds the updator relation/edge.
-	UpdatorTable = "admins"
-	// UpdatorColumn is the table column denoting the updator relation/edge.
-	UpdatorColumn = "updated_by"
+	// UpdaterTable is the table that holds the updater relation/edge.
+	UpdaterTable = "admins"
+	// UpdaterColumn is the table column denoting the updater relation/edge.
+	UpdaterColumn = "updated_by"
 	// AdminRolesTable is the table that holds the admin_roles relation/edge. The primary key declared below.
 	AdminRolesTable = "admin_role_admins"
 	// AdminRolesInverseTable is the table name for the AdminRole entity.
@@ -88,10 +94,10 @@ const (
 	AdminCreatorTable = "admins"
 	// AdminCreatorColumn is the table column denoting the admin_creator relation/edge.
 	AdminCreatorColumn = "created_by"
-	// AdminUpdatorTable is the table that holds the admin_updator relation/edge.
-	AdminUpdatorTable = "admins"
-	// AdminUpdatorColumn is the table column denoting the admin_updator relation/edge.
-	AdminUpdatorColumn = "updated_by"
+	// AdminUpdaterTable is the table that holds the admin_updater relation/edge.
+	AdminUpdaterTable = "admins"
+	// AdminUpdaterColumn is the table column denoting the admin_updater relation/edge.
+	AdminUpdaterColumn = "updated_by"
 	// AdminRoleCreatorTable is the table that holds the admin_role_creator relation/edge.
 	AdminRoleCreatorTable = "admin_roles"
 	// AdminRoleCreatorInverseTable is the table name for the AdminRole entity.
@@ -99,34 +105,27 @@ const (
 	AdminRoleCreatorInverseTable = "admin_roles"
 	// AdminRoleCreatorColumn is the table column denoting the admin_role_creator relation/edge.
 	AdminRoleCreatorColumn = "created_by"
-	// AdminRoleUpdatorTable is the table that holds the admin_role_updator relation/edge.
-	AdminRoleUpdatorTable = "admin_roles"
-	// AdminRoleUpdatorInverseTable is the table name for the AdminRole entity.
+	// AdminRoleUpdaterTable is the table that holds the admin_role_updater relation/edge.
+	AdminRoleUpdaterTable = "admin_roles"
+	// AdminRoleUpdaterInverseTable is the table name for the AdminRole entity.
 	// It exists in this package in order to avoid circular dependency with the "adminrole" package.
-	AdminRoleUpdatorInverseTable = "admin_roles"
-	// AdminRoleUpdatorColumn is the table column denoting the admin_role_updator relation/edge.
-	AdminRoleUpdatorColumn = "updated_by"
+	AdminRoleUpdaterInverseTable = "admin_roles"
+	// AdminRoleUpdaterColumn is the table column denoting the admin_role_updater relation/edge.
+	AdminRoleUpdaterColumn = "updated_by"
 	// RiskCreatorTable is the table that holds the risk_creator relation/edge.
 	RiskCreatorTable = "risks"
 	// RiskCreatorInverseTable is the table name for the Risk entity.
 	// It exists in this package in order to avoid circular dependency with the "risk" package.
 	RiskCreatorInverseTable = "risks"
 	// RiskCreatorColumn is the table column denoting the risk_creator relation/edge.
-	RiskCreatorColumn = "admin_risk_creator"
-	// RiskUpdatorTable is the table that holds the risk_updator relation/edge.
-	RiskUpdatorTable = "risks"
-	// RiskUpdatorInverseTable is the table name for the Risk entity.
+	RiskCreatorColumn = "created_by"
+	// RiskUpdaterTable is the table that holds the risk_updater relation/edge.
+	RiskUpdaterTable = "risks"
+	// RiskUpdaterInverseTable is the table name for the Risk entity.
 	// It exists in this package in order to avoid circular dependency with the "risk" package.
-	RiskUpdatorInverseTable = "risks"
-	// RiskUpdatorColumn is the table column denoting the risk_updator relation/edge.
-	RiskUpdatorColumn = "updated_by"
-	// RiskMaintainerTable is the table that holds the risk_maintainer relation/edge.
-	RiskMaintainerTable = "risks"
-	// RiskMaintainerInverseTable is the table name for the Risk entity.
-	// It exists in this package in order to avoid circular dependency with the "risk" package.
-	RiskMaintainerInverseTable = "risks"
-	// RiskMaintainerColumn is the table column denoting the risk_maintainer relation/edge.
-	RiskMaintainerColumn = "admin_risk_maintainer"
+	RiskUpdaterInverseTable = "risks"
+	// RiskUpdaterColumn is the table column denoting the risk_updater relation/edge.
+	RiskUpdaterColumn = "updated_by"
 	// RiskLocationCreatorTable is the table that holds the risk_location_creator relation/edge.
 	RiskLocationCreatorTable = "risk_locations"
 	// RiskLocationCreatorInverseTable is the table name for the RiskLocation entity.
@@ -134,13 +133,13 @@ const (
 	RiskLocationCreatorInverseTable = "risk_locations"
 	// RiskLocationCreatorColumn is the table column denoting the risk_location_creator relation/edge.
 	RiskLocationCreatorColumn = "created_by"
-	// RiskLocationUpdatorTable is the table that holds the risk_location_updator relation/edge.
-	RiskLocationUpdatorTable = "risk_locations"
-	// RiskLocationUpdatorInverseTable is the table name for the RiskLocation entity.
+	// RiskLocationUpdaterTable is the table that holds the risk_location_updater relation/edge.
+	RiskLocationUpdaterTable = "risk_locations"
+	// RiskLocationUpdaterInverseTable is the table name for the RiskLocation entity.
 	// It exists in this package in order to avoid circular dependency with the "risklocation" package.
-	RiskLocationUpdatorInverseTable = "risk_locations"
-	// RiskLocationUpdatorColumn is the table column denoting the risk_location_updator relation/edge.
-	RiskLocationUpdatorColumn = "updated_by"
+	RiskLocationUpdaterInverseTable = "risk_locations"
+	// RiskLocationUpdaterColumn is the table column denoting the risk_location_updater relation/edge.
+	RiskLocationUpdaterColumn = "updated_by"
 	// RiskCategoryCreatorTable is the table that holds the risk_category_creator relation/edge.
 	RiskCategoryCreatorTable = "risk_categories"
 	// RiskCategoryCreatorInverseTable is the table name for the RiskCategory entity.
@@ -148,13 +147,13 @@ const (
 	RiskCategoryCreatorInverseTable = "risk_categories"
 	// RiskCategoryCreatorColumn is the table column denoting the risk_category_creator relation/edge.
 	RiskCategoryCreatorColumn = "created_by"
-	// RiskCategoryUpdatorTable is the table that holds the risk_category_updator relation/edge.
-	RiskCategoryUpdatorTable = "risk_categories"
-	// RiskCategoryUpdatorInverseTable is the table name for the RiskCategory entity.
+	// RiskCategoryUpdaterTable is the table that holds the risk_category_updater relation/edge.
+	RiskCategoryUpdaterTable = "risk_categories"
+	// RiskCategoryUpdaterInverseTable is the table name for the RiskCategory entity.
 	// It exists in this package in order to avoid circular dependency with the "riskcategory" package.
-	RiskCategoryUpdatorInverseTable = "risk_categories"
-	// RiskCategoryUpdatorColumn is the table column denoting the risk_category_updator relation/edge.
-	RiskCategoryUpdatorColumn = "updated_by"
+	RiskCategoryUpdaterInverseTable = "risk_categories"
+	// RiskCategoryUpdaterColumn is the table column denoting the risk_category_updater relation/edge.
+	RiskCategoryUpdaterColumn = "updated_by"
 	// DepartmentCreatorTable is the table that holds the department_creator relation/edge.
 	DepartmentCreatorTable = "departments"
 	// DepartmentCreatorInverseTable is the table name for the Department entity.
@@ -162,13 +161,13 @@ const (
 	DepartmentCreatorInverseTable = "departments"
 	// DepartmentCreatorColumn is the table column denoting the department_creator relation/edge.
 	DepartmentCreatorColumn = "created_by"
-	// DepartmentUpdatorTable is the table that holds the department_updator relation/edge.
-	DepartmentUpdatorTable = "departments"
-	// DepartmentUpdatorInverseTable is the table name for the Department entity.
+	// DepartmentUpdaterTable is the table that holds the department_updater relation/edge.
+	DepartmentUpdaterTable = "departments"
+	// DepartmentUpdaterInverseTable is the table name for the Department entity.
 	// It exists in this package in order to avoid circular dependency with the "department" package.
-	DepartmentUpdatorInverseTable = "departments"
-	// DepartmentUpdatorColumn is the table column denoting the department_updator relation/edge.
-	DepartmentUpdatorColumn = "admin_department_updator"
+	DepartmentUpdaterInverseTable = "departments"
+	// DepartmentUpdaterColumn is the table column denoting the department_updater relation/edge.
+	DepartmentUpdaterColumn = "updated_by"
 	// EmployeeCreatorTable is the table that holds the employee_creator relation/edge.
 	EmployeeCreatorTable = "employees"
 	// EmployeeCreatorInverseTable is the table name for the Employee entity.
@@ -176,20 +175,34 @@ const (
 	EmployeeCreatorInverseTable = "employees"
 	// EmployeeCreatorColumn is the table column denoting the employee_creator relation/edge.
 	EmployeeCreatorColumn = "created_by"
-	// EmployeeUpdatorTable is the table that holds the employee_updator relation/edge.
-	EmployeeUpdatorTable = "employees"
-	// EmployeeUpdatorInverseTable is the table name for the Employee entity.
+	// EmployeeUpdaterTable is the table that holds the employee_updater relation/edge.
+	EmployeeUpdaterTable = "employees"
+	// EmployeeUpdaterInverseTable is the table name for the Employee entity.
 	// It exists in this package in order to avoid circular dependency with the "employee" package.
-	EmployeeUpdatorInverseTable = "employees"
-	// EmployeeUpdatorColumn is the table column denoting the employee_updator relation/edge.
-	EmployeeUpdatorColumn = "admin_employee_updator"
-	// EmployeeAdminTable is the table that holds the employee_admin relation/edge.
-	EmployeeAdminTable = "employees"
-	// EmployeeAdminInverseTable is the table name for the Employee entity.
+	EmployeeUpdaterInverseTable = "employees"
+	// EmployeeUpdaterColumn is the table column denoting the employee_updater relation/edge.
+	EmployeeUpdaterColumn = "updated_by"
+	// EmployeeTable is the table that holds the employee relation/edge.
+	EmployeeTable = "employees"
+	// EmployeeInverseTable is the table name for the Employee entity.
 	// It exists in this package in order to avoid circular dependency with the "employee" package.
-	EmployeeAdminInverseTable = "employees"
-	// EmployeeAdminColumn is the table column denoting the employee_admin relation/edge.
-	EmployeeAdminColumn = "admin_id"
+	EmployeeInverseTable = "employees"
+	// EmployeeColumn is the table column denoting the employee relation/edge.
+	EmployeeColumn = "admin_id"
+	// OccupationCreatorTable is the table that holds the occupation_creator relation/edge.
+	OccupationCreatorTable = "occupations"
+	// OccupationCreatorInverseTable is the table name for the Occupation entity.
+	// It exists in this package in order to avoid circular dependency with the "occupation" package.
+	OccupationCreatorInverseTable = "occupations"
+	// OccupationCreatorColumn is the table column denoting the occupation_creator relation/edge.
+	OccupationCreatorColumn = "created_by"
+	// OccupationUpdaterTable is the table that holds the occupation_updater relation/edge.
+	OccupationUpdaterTable = "occupations"
+	// OccupationUpdaterInverseTable is the table name for the Occupation entity.
+	// It exists in this package in order to avoid circular dependency with the "occupation" package.
+	OccupationUpdaterInverseTable = "occupations"
+	// OccupationUpdaterColumn is the table column denoting the occupation_updater relation/edge.
+	OccupationUpdaterColumn = "updated_by"
 )
 
 // Columns holds all SQL columns for admin fields.
@@ -202,7 +215,9 @@ var Columns = []string{
 	FieldUpdatedAt,
 	FieldUsername,
 	FieldPassword,
-	FieldName,
+	FieldNickname,
+	FieldRealName,
+	FieldAvatar,
 }
 
 var (
@@ -242,8 +257,12 @@ var (
 	UsernameValidator func(string) error
 	// PasswordValidator is a validator for the "password" field. It is called by the builders before save.
 	PasswordValidator func(string) error
-	// NameValidator is a validator for the "name" field. It is called by the builders before save.
-	NameValidator func(string) error
+	// NicknameValidator is a validator for the "nickname" field. It is called by the builders before save.
+	NicknameValidator func(string) error
+	// RealNameValidator is a validator for the "real_name" field. It is called by the builders before save.
+	RealNameValidator func(string) error
+	// AvatarValidator is a validator for the "avatar" field. It is called by the builders before save.
+	AvatarValidator func(string) error
 )
 
 // OrderOption defines the ordering options for the Admin queries.
@@ -289,9 +308,19 @@ func ByPassword(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldPassword, opts...).ToFunc()
 }
 
-// ByName orders the results by the name field.
-func ByName(opts ...sql.OrderTermOption) OrderOption {
-	return sql.OrderByField(FieldName, opts...).ToFunc()
+// ByNickname orders the results by the nickname field.
+func ByNickname(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldNickname, opts...).ToFunc()
+}
+
+// ByRealName orders the results by the real_name field.
+func ByRealName(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldRealName, opts...).ToFunc()
+}
+
+// ByAvatar orders the results by the avatar field.
+func ByAvatar(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldAvatar, opts...).ToFunc()
 }
 
 // ByCreatorField orders the results by creator field.
@@ -301,10 +330,10 @@ func ByCreatorField(field string, opts ...sql.OrderTermOption) OrderOption {
 	}
 }
 
-// ByUpdatorField orders the results by updator field.
-func ByUpdatorField(field string, opts ...sql.OrderTermOption) OrderOption {
+// ByUpdaterField orders the results by updater field.
+func ByUpdaterField(field string, opts ...sql.OrderTermOption) OrderOption {
 	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborTerms(s, newUpdatorStep(), sql.OrderByField(field, opts...))
+		sqlgraph.OrderByNeighborTerms(s, newUpdaterStep(), sql.OrderByField(field, opts...))
 	}
 }
 
@@ -336,17 +365,17 @@ func ByAdminCreator(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
 	}
 }
 
-// ByAdminUpdatorCount orders the results by admin_updator count.
-func ByAdminUpdatorCount(opts ...sql.OrderTermOption) OrderOption {
+// ByAdminUpdaterCount orders the results by admin_updater count.
+func ByAdminUpdaterCount(opts ...sql.OrderTermOption) OrderOption {
 	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborsCount(s, newAdminUpdatorStep(), opts...)
+		sqlgraph.OrderByNeighborsCount(s, newAdminUpdaterStep(), opts...)
 	}
 }
 
-// ByAdminUpdator orders the results by admin_updator terms.
-func ByAdminUpdator(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+// ByAdminUpdater orders the results by admin_updater terms.
+func ByAdminUpdater(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
 	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborTerms(s, newAdminUpdatorStep(), append([]sql.OrderTerm{term}, terms...)...)
+		sqlgraph.OrderByNeighborTerms(s, newAdminUpdaterStep(), append([]sql.OrderTerm{term}, terms...)...)
 	}
 }
 
@@ -364,17 +393,17 @@ func ByAdminRoleCreator(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption 
 	}
 }
 
-// ByAdminRoleUpdatorCount orders the results by admin_role_updator count.
-func ByAdminRoleUpdatorCount(opts ...sql.OrderTermOption) OrderOption {
+// ByAdminRoleUpdaterCount orders the results by admin_role_updater count.
+func ByAdminRoleUpdaterCount(opts ...sql.OrderTermOption) OrderOption {
 	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborsCount(s, newAdminRoleUpdatorStep(), opts...)
+		sqlgraph.OrderByNeighborsCount(s, newAdminRoleUpdaterStep(), opts...)
 	}
 }
 
-// ByAdminRoleUpdator orders the results by admin_role_updator terms.
-func ByAdminRoleUpdator(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+// ByAdminRoleUpdater orders the results by admin_role_updater terms.
+func ByAdminRoleUpdater(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
 	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborTerms(s, newAdminRoleUpdatorStep(), append([]sql.OrderTerm{term}, terms...)...)
+		sqlgraph.OrderByNeighborTerms(s, newAdminRoleUpdaterStep(), append([]sql.OrderTerm{term}, terms...)...)
 	}
 }
 
@@ -392,31 +421,17 @@ func ByRiskCreator(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
 	}
 }
 
-// ByRiskUpdatorCount orders the results by risk_updator count.
-func ByRiskUpdatorCount(opts ...sql.OrderTermOption) OrderOption {
+// ByRiskUpdaterCount orders the results by risk_updater count.
+func ByRiskUpdaterCount(opts ...sql.OrderTermOption) OrderOption {
 	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborsCount(s, newRiskUpdatorStep(), opts...)
+		sqlgraph.OrderByNeighborsCount(s, newRiskUpdaterStep(), opts...)
 	}
 }
 
-// ByRiskUpdator orders the results by risk_updator terms.
-func ByRiskUpdator(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+// ByRiskUpdater orders the results by risk_updater terms.
+func ByRiskUpdater(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
 	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborTerms(s, newRiskUpdatorStep(), append([]sql.OrderTerm{term}, terms...)...)
-	}
-}
-
-// ByRiskMaintainerCount orders the results by risk_maintainer count.
-func ByRiskMaintainerCount(opts ...sql.OrderTermOption) OrderOption {
-	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborsCount(s, newRiskMaintainerStep(), opts...)
-	}
-}
-
-// ByRiskMaintainer orders the results by risk_maintainer terms.
-func ByRiskMaintainer(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
-	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborTerms(s, newRiskMaintainerStep(), append([]sql.OrderTerm{term}, terms...)...)
+		sqlgraph.OrderByNeighborTerms(s, newRiskUpdaterStep(), append([]sql.OrderTerm{term}, terms...)...)
 	}
 }
 
@@ -434,17 +449,17 @@ func ByRiskLocationCreator(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOpti
 	}
 }
 
-// ByRiskLocationUpdatorCount orders the results by risk_location_updator count.
-func ByRiskLocationUpdatorCount(opts ...sql.OrderTermOption) OrderOption {
+// ByRiskLocationUpdaterCount orders the results by risk_location_updater count.
+func ByRiskLocationUpdaterCount(opts ...sql.OrderTermOption) OrderOption {
 	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborsCount(s, newRiskLocationUpdatorStep(), opts...)
+		sqlgraph.OrderByNeighborsCount(s, newRiskLocationUpdaterStep(), opts...)
 	}
 }
 
-// ByRiskLocationUpdator orders the results by risk_location_updator terms.
-func ByRiskLocationUpdator(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+// ByRiskLocationUpdater orders the results by risk_location_updater terms.
+func ByRiskLocationUpdater(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
 	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborTerms(s, newRiskLocationUpdatorStep(), append([]sql.OrderTerm{term}, terms...)...)
+		sqlgraph.OrderByNeighborTerms(s, newRiskLocationUpdaterStep(), append([]sql.OrderTerm{term}, terms...)...)
 	}
 }
 
@@ -462,17 +477,17 @@ func ByRiskCategoryCreator(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOpti
 	}
 }
 
-// ByRiskCategoryUpdatorCount orders the results by risk_category_updator count.
-func ByRiskCategoryUpdatorCount(opts ...sql.OrderTermOption) OrderOption {
+// ByRiskCategoryUpdaterCount orders the results by risk_category_updater count.
+func ByRiskCategoryUpdaterCount(opts ...sql.OrderTermOption) OrderOption {
 	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborsCount(s, newRiskCategoryUpdatorStep(), opts...)
+		sqlgraph.OrderByNeighborsCount(s, newRiskCategoryUpdaterStep(), opts...)
 	}
 }
 
-// ByRiskCategoryUpdator orders the results by risk_category_updator terms.
-func ByRiskCategoryUpdator(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+// ByRiskCategoryUpdater orders the results by risk_category_updater terms.
+func ByRiskCategoryUpdater(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
 	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborTerms(s, newRiskCategoryUpdatorStep(), append([]sql.OrderTerm{term}, terms...)...)
+		sqlgraph.OrderByNeighborTerms(s, newRiskCategoryUpdaterStep(), append([]sql.OrderTerm{term}, terms...)...)
 	}
 }
 
@@ -490,17 +505,17 @@ func ByDepartmentCreator(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption
 	}
 }
 
-// ByDepartmentUpdatorCount orders the results by department_updator count.
-func ByDepartmentUpdatorCount(opts ...sql.OrderTermOption) OrderOption {
+// ByDepartmentUpdaterCount orders the results by department_updater count.
+func ByDepartmentUpdaterCount(opts ...sql.OrderTermOption) OrderOption {
 	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborsCount(s, newDepartmentUpdatorStep(), opts...)
+		sqlgraph.OrderByNeighborsCount(s, newDepartmentUpdaterStep(), opts...)
 	}
 }
 
-// ByDepartmentUpdator orders the results by department_updator terms.
-func ByDepartmentUpdator(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+// ByDepartmentUpdater orders the results by department_updater terms.
+func ByDepartmentUpdater(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
 	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborTerms(s, newDepartmentUpdatorStep(), append([]sql.OrderTerm{term}, terms...)...)
+		sqlgraph.OrderByNeighborTerms(s, newDepartmentUpdaterStep(), append([]sql.OrderTerm{term}, terms...)...)
 	}
 }
 
@@ -518,31 +533,59 @@ func ByEmployeeCreator(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
 	}
 }
 
-// ByEmployeeUpdatorCount orders the results by employee_updator count.
-func ByEmployeeUpdatorCount(opts ...sql.OrderTermOption) OrderOption {
+// ByEmployeeUpdaterCount orders the results by employee_updater count.
+func ByEmployeeUpdaterCount(opts ...sql.OrderTermOption) OrderOption {
 	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborsCount(s, newEmployeeUpdatorStep(), opts...)
+		sqlgraph.OrderByNeighborsCount(s, newEmployeeUpdaterStep(), opts...)
 	}
 }
 
-// ByEmployeeUpdator orders the results by employee_updator terms.
-func ByEmployeeUpdator(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+// ByEmployeeUpdater orders the results by employee_updater terms.
+func ByEmployeeUpdater(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
 	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborTerms(s, newEmployeeUpdatorStep(), append([]sql.OrderTerm{term}, terms...)...)
+		sqlgraph.OrderByNeighborTerms(s, newEmployeeUpdaterStep(), append([]sql.OrderTerm{term}, terms...)...)
 	}
 }
 
-// ByEmployeeAdminCount orders the results by employee_admin count.
-func ByEmployeeAdminCount(opts ...sql.OrderTermOption) OrderOption {
+// ByEmployeeCount orders the results by employee count.
+func ByEmployeeCount(opts ...sql.OrderTermOption) OrderOption {
 	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborsCount(s, newEmployeeAdminStep(), opts...)
+		sqlgraph.OrderByNeighborsCount(s, newEmployeeStep(), opts...)
 	}
 }
 
-// ByEmployeeAdmin orders the results by employee_admin terms.
-func ByEmployeeAdmin(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+// ByEmployee orders the results by employee terms.
+func ByEmployee(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
 	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborTerms(s, newEmployeeAdminStep(), append([]sql.OrderTerm{term}, terms...)...)
+		sqlgraph.OrderByNeighborTerms(s, newEmployeeStep(), append([]sql.OrderTerm{term}, terms...)...)
+	}
+}
+
+// ByOccupationCreatorCount orders the results by occupation_creator count.
+func ByOccupationCreatorCount(opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborsCount(s, newOccupationCreatorStep(), opts...)
+	}
+}
+
+// ByOccupationCreator orders the results by occupation_creator terms.
+func ByOccupationCreator(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newOccupationCreatorStep(), append([]sql.OrderTerm{term}, terms...)...)
+	}
+}
+
+// ByOccupationUpdaterCount orders the results by occupation_updater count.
+func ByOccupationUpdaterCount(opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborsCount(s, newOccupationUpdaterStep(), opts...)
+	}
+}
+
+// ByOccupationUpdater orders the results by occupation_updater terms.
+func ByOccupationUpdater(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newOccupationUpdaterStep(), append([]sql.OrderTerm{term}, terms...)...)
 	}
 }
 func newCreatorStep() *sqlgraph.Step {
@@ -552,11 +595,11 @@ func newCreatorStep() *sqlgraph.Step {
 		sqlgraph.Edge(sqlgraph.M2O, true, CreatorTable, CreatorColumn),
 	)
 }
-func newUpdatorStep() *sqlgraph.Step {
+func newUpdaterStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
 		sqlgraph.To(Table, FieldID),
-		sqlgraph.Edge(sqlgraph.M2O, true, UpdatorTable, UpdatorColumn),
+		sqlgraph.Edge(sqlgraph.M2O, true, UpdaterTable, UpdaterColumn),
 	)
 }
 func newAdminRolesStep() *sqlgraph.Step {
@@ -573,11 +616,11 @@ func newAdminCreatorStep() *sqlgraph.Step {
 		sqlgraph.Edge(sqlgraph.O2M, false, AdminCreatorTable, AdminCreatorColumn),
 	)
 }
-func newAdminUpdatorStep() *sqlgraph.Step {
+func newAdminUpdaterStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
 		sqlgraph.To(Table, FieldID),
-		sqlgraph.Edge(sqlgraph.O2M, false, AdminUpdatorTable, AdminUpdatorColumn),
+		sqlgraph.Edge(sqlgraph.O2M, false, AdminUpdaterTable, AdminUpdaterColumn),
 	)
 }
 func newAdminRoleCreatorStep() *sqlgraph.Step {
@@ -587,11 +630,11 @@ func newAdminRoleCreatorStep() *sqlgraph.Step {
 		sqlgraph.Edge(sqlgraph.O2M, false, AdminRoleCreatorTable, AdminRoleCreatorColumn),
 	)
 }
-func newAdminRoleUpdatorStep() *sqlgraph.Step {
+func newAdminRoleUpdaterStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
-		sqlgraph.To(AdminRoleUpdatorInverseTable, FieldID),
-		sqlgraph.Edge(sqlgraph.O2M, false, AdminRoleUpdatorTable, AdminRoleUpdatorColumn),
+		sqlgraph.To(AdminRoleUpdaterInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.O2M, false, AdminRoleUpdaterTable, AdminRoleUpdaterColumn),
 	)
 }
 func newRiskCreatorStep() *sqlgraph.Step {
@@ -601,18 +644,11 @@ func newRiskCreatorStep() *sqlgraph.Step {
 		sqlgraph.Edge(sqlgraph.O2M, false, RiskCreatorTable, RiskCreatorColumn),
 	)
 }
-func newRiskUpdatorStep() *sqlgraph.Step {
+func newRiskUpdaterStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
-		sqlgraph.To(RiskUpdatorInverseTable, FieldID),
-		sqlgraph.Edge(sqlgraph.O2M, false, RiskUpdatorTable, RiskUpdatorColumn),
-	)
-}
-func newRiskMaintainerStep() *sqlgraph.Step {
-	return sqlgraph.NewStep(
-		sqlgraph.From(Table, FieldID),
-		sqlgraph.To(RiskMaintainerInverseTable, FieldID),
-		sqlgraph.Edge(sqlgraph.O2M, false, RiskMaintainerTable, RiskMaintainerColumn),
+		sqlgraph.To(RiskUpdaterInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.O2M, false, RiskUpdaterTable, RiskUpdaterColumn),
 	)
 }
 func newRiskLocationCreatorStep() *sqlgraph.Step {
@@ -622,11 +658,11 @@ func newRiskLocationCreatorStep() *sqlgraph.Step {
 		sqlgraph.Edge(sqlgraph.O2M, false, RiskLocationCreatorTable, RiskLocationCreatorColumn),
 	)
 }
-func newRiskLocationUpdatorStep() *sqlgraph.Step {
+func newRiskLocationUpdaterStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
-		sqlgraph.To(RiskLocationUpdatorInverseTable, FieldID),
-		sqlgraph.Edge(sqlgraph.O2M, false, RiskLocationUpdatorTable, RiskLocationUpdatorColumn),
+		sqlgraph.To(RiskLocationUpdaterInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.O2M, false, RiskLocationUpdaterTable, RiskLocationUpdaterColumn),
 	)
 }
 func newRiskCategoryCreatorStep() *sqlgraph.Step {
@@ -636,11 +672,11 @@ func newRiskCategoryCreatorStep() *sqlgraph.Step {
 		sqlgraph.Edge(sqlgraph.O2M, false, RiskCategoryCreatorTable, RiskCategoryCreatorColumn),
 	)
 }
-func newRiskCategoryUpdatorStep() *sqlgraph.Step {
+func newRiskCategoryUpdaterStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
-		sqlgraph.To(RiskCategoryUpdatorInverseTable, FieldID),
-		sqlgraph.Edge(sqlgraph.O2M, false, RiskCategoryUpdatorTable, RiskCategoryUpdatorColumn),
+		sqlgraph.To(RiskCategoryUpdaterInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.O2M, false, RiskCategoryUpdaterTable, RiskCategoryUpdaterColumn),
 	)
 }
 func newDepartmentCreatorStep() *sqlgraph.Step {
@@ -650,11 +686,11 @@ func newDepartmentCreatorStep() *sqlgraph.Step {
 		sqlgraph.Edge(sqlgraph.O2M, false, DepartmentCreatorTable, DepartmentCreatorColumn),
 	)
 }
-func newDepartmentUpdatorStep() *sqlgraph.Step {
+func newDepartmentUpdaterStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
-		sqlgraph.To(DepartmentUpdatorInverseTable, FieldID),
-		sqlgraph.Edge(sqlgraph.O2M, false, DepartmentUpdatorTable, DepartmentUpdatorColumn),
+		sqlgraph.To(DepartmentUpdaterInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.O2M, false, DepartmentUpdaterTable, DepartmentUpdaterColumn),
 	)
 }
 func newEmployeeCreatorStep() *sqlgraph.Step {
@@ -664,17 +700,31 @@ func newEmployeeCreatorStep() *sqlgraph.Step {
 		sqlgraph.Edge(sqlgraph.O2M, false, EmployeeCreatorTable, EmployeeCreatorColumn),
 	)
 }
-func newEmployeeUpdatorStep() *sqlgraph.Step {
+func newEmployeeUpdaterStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
-		sqlgraph.To(EmployeeUpdatorInverseTable, FieldID),
-		sqlgraph.Edge(sqlgraph.O2M, false, EmployeeUpdatorTable, EmployeeUpdatorColumn),
+		sqlgraph.To(EmployeeUpdaterInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.O2M, false, EmployeeUpdaterTable, EmployeeUpdaterColumn),
 	)
 }
-func newEmployeeAdminStep() *sqlgraph.Step {
+func newEmployeeStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
-		sqlgraph.To(EmployeeAdminInverseTable, FieldID),
-		sqlgraph.Edge(sqlgraph.O2M, false, EmployeeAdminTable, EmployeeAdminColumn),
+		sqlgraph.To(EmployeeInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.O2M, false, EmployeeTable, EmployeeColumn),
+	)
+}
+func newOccupationCreatorStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(OccupationCreatorInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.O2M, false, OccupationCreatorTable, OccupationCreatorColumn),
+	)
+}
+func newOccupationUpdaterStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(OccupationUpdaterInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.O2M, false, OccupationUpdaterTable, OccupationUpdaterColumn),
 	)
 }

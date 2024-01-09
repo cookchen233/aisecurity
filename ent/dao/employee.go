@@ -35,26 +35,29 @@ type Employee struct {
 	DepartmentID int `json:"department_id"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the EmployeeQuery when eager-loading is set.
-	Edges                  EmployeeEdges `json:"edges"`
-	admin_employee_updator *int
-	selectValues           sql.SelectValues
+	Edges        EmployeeEdges `json:"edges"`
+	selectValues sql.SelectValues
 }
 
 // EmployeeEdges holds the relations/edges for other nodes in the graph.
 type EmployeeEdges struct {
 	// Creator holds the value of the creator edge.
 	Creator *Admin `json:"creator,omitempty"`
+	// Updater holds the value of the updater edge.
+	Updater *Admin `json:"updater,omitempty"`
 	// Admin holds the value of the admin edge.
 	Admin *Admin `json:"admin,omitempty"`
 	// Department holds the value of the department edge.
 	Department *Department `json:"department,omitempty"`
+	// Occupations holds the value of the occupations edge.
+	Occupations []*Occupation `json:"occupations,omitempty"`
+	// RiskReporter holds the value of the risk_reporter edge.
+	RiskReporter []*Risk `json:"risk_reporter,omitempty"`
 	// RiskMaintainer holds the value of the risk_maintainer edge.
 	RiskMaintainer []*Risk `json:"risk_maintainer,omitempty"`
-	// RiskCreator holds the value of the risk_creator edge.
-	RiskCreator []*Risk `json:"risk_creator,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
-	loadedTypes [5]bool
+	loadedTypes [7]bool
 }
 
 // CreatorOrErr returns the Creator value or an error if the edge
@@ -70,10 +73,23 @@ func (e EmployeeEdges) CreatorOrErr() (*Admin, error) {
 	return nil, &NotLoadedError{edge: "creator"}
 }
 
+// UpdaterOrErr returns the Updater value or an error if the edge
+// was not loaded in eager-loading, or loaded but was not found.
+func (e EmployeeEdges) UpdaterOrErr() (*Admin, error) {
+	if e.loadedTypes[1] {
+		if e.Updater == nil {
+			// Edge was loaded but was not found.
+			return nil, &NotFoundError{label: admin.Label}
+		}
+		return e.Updater, nil
+	}
+	return nil, &NotLoadedError{edge: "updater"}
+}
+
 // AdminOrErr returns the Admin value or an error if the edge
 // was not loaded in eager-loading, or loaded but was not found.
 func (e EmployeeEdges) AdminOrErr() (*Admin, error) {
-	if e.loadedTypes[1] {
+	if e.loadedTypes[2] {
 		if e.Admin == nil {
 			// Edge was loaded but was not found.
 			return nil, &NotFoundError{label: admin.Label}
@@ -86,7 +102,7 @@ func (e EmployeeEdges) AdminOrErr() (*Admin, error) {
 // DepartmentOrErr returns the Department value or an error if the edge
 // was not loaded in eager-loading, or loaded but was not found.
 func (e EmployeeEdges) DepartmentOrErr() (*Department, error) {
-	if e.loadedTypes[2] {
+	if e.loadedTypes[3] {
 		if e.Department == nil {
 			// Edge was loaded but was not found.
 			return nil, &NotFoundError{label: department.Label}
@@ -96,22 +112,31 @@ func (e EmployeeEdges) DepartmentOrErr() (*Department, error) {
 	return nil, &NotLoadedError{edge: "department"}
 }
 
+// OccupationsOrErr returns the Occupations value or an error if the edge
+// was not loaded in eager-loading.
+func (e EmployeeEdges) OccupationsOrErr() ([]*Occupation, error) {
+	if e.loadedTypes[4] {
+		return e.Occupations, nil
+	}
+	return nil, &NotLoadedError{edge: "occupations"}
+}
+
+// RiskReporterOrErr returns the RiskReporter value or an error if the edge
+// was not loaded in eager-loading.
+func (e EmployeeEdges) RiskReporterOrErr() ([]*Risk, error) {
+	if e.loadedTypes[5] {
+		return e.RiskReporter, nil
+	}
+	return nil, &NotLoadedError{edge: "risk_reporter"}
+}
+
 // RiskMaintainerOrErr returns the RiskMaintainer value or an error if the edge
 // was not loaded in eager-loading.
 func (e EmployeeEdges) RiskMaintainerOrErr() ([]*Risk, error) {
-	if e.loadedTypes[3] {
+	if e.loadedTypes[6] {
 		return e.RiskMaintainer, nil
 	}
 	return nil, &NotLoadedError{edge: "risk_maintainer"}
-}
-
-// RiskCreatorOrErr returns the RiskCreator value or an error if the edge
-// was not loaded in eager-loading.
-func (e EmployeeEdges) RiskCreatorOrErr() ([]*Risk, error) {
-	if e.loadedTypes[4] {
-		return e.RiskCreator, nil
-	}
-	return nil, &NotLoadedError{edge: "risk_creator"}
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
@@ -123,8 +148,6 @@ func (*Employee) scanValues(columns []string) ([]any, error) {
 			values[i] = new(sql.NullInt64)
 		case employee.FieldCreatedAt, employee.FieldDeletedAt, employee.FieldUpdatedAt:
 			values[i] = new(sql.NullTime)
-		case employee.ForeignKeys[0]: // admin_employee_updator
-			values[i] = new(sql.NullInt64)
 		default:
 			values[i] = new(sql.UnknownType)
 		}
@@ -189,13 +212,6 @@ func (e *Employee) assignValues(columns []string, values []any) error {
 			} else if value.Valid {
 				e.DepartmentID = int(value.Int64)
 			}
-		case employee.ForeignKeys[0]:
-			if value, ok := values[i].(*sql.NullInt64); !ok {
-				return fmt.Errorf("unexpected type %T for edge-field admin_employee_updator", value)
-			} else if value.Valid {
-				e.admin_employee_updator = new(int)
-				*e.admin_employee_updator = int(value.Int64)
-			}
 		default:
 			e.selectValues.Set(columns[i], values[i])
 		}
@@ -214,6 +230,11 @@ func (e *Employee) QueryCreator() *AdminQuery {
 	return NewEmployeeClient(e.config).QueryCreator(e)
 }
 
+// QueryUpdater queries the "updater" edge of the Employee entity.
+func (e *Employee) QueryUpdater() *AdminQuery {
+	return NewEmployeeClient(e.config).QueryUpdater(e)
+}
+
 // QueryAdmin queries the "admin" edge of the Employee entity.
 func (e *Employee) QueryAdmin() *AdminQuery {
 	return NewEmployeeClient(e.config).QueryAdmin(e)
@@ -224,14 +245,19 @@ func (e *Employee) QueryDepartment() *DepartmentQuery {
 	return NewEmployeeClient(e.config).QueryDepartment(e)
 }
 
+// QueryOccupations queries the "occupations" edge of the Employee entity.
+func (e *Employee) QueryOccupations() *OccupationQuery {
+	return NewEmployeeClient(e.config).QueryOccupations(e)
+}
+
+// QueryRiskReporter queries the "risk_reporter" edge of the Employee entity.
+func (e *Employee) QueryRiskReporter() *RiskQuery {
+	return NewEmployeeClient(e.config).QueryRiskReporter(e)
+}
+
 // QueryRiskMaintainer queries the "risk_maintainer" edge of the Employee entity.
 func (e *Employee) QueryRiskMaintainer() *RiskQuery {
 	return NewEmployeeClient(e.config).QueryRiskMaintainer(e)
-}
-
-// QueryRiskCreator queries the "risk_creator" edge of the Employee entity.
-func (e *Employee) QueryRiskCreator() *RiskQuery {
-	return NewEmployeeClient(e.config).QueryRiskCreator(e)
 }
 
 // Update returns a builder for updating this Employee.

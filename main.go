@@ -50,10 +50,10 @@ func main() {
 
 	// Register middlewares
 	r.Use(
-		middlewares.RecoveryMiddleware(),
-		middlewares.LogMiddleware(),
-		middlewares.RequestLogMiddleware(),
-		middlewares.AuditMiddleware(),
+		middlewares.Recovery(),
+		middlewares.RequestLog(),
+		middlewares.JoyRequestLog(),
+		middlewares.DatabaseAudit(),
 	)
 
 	// Open the database connection

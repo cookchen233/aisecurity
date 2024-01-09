@@ -128,23 +128,23 @@ func (aru *AdminRoleUpdate) SetCreator(a *Admin) *AdminRoleUpdate {
 	return aru.SetCreatorID(a.ID)
 }
 
-// SetUpdatorID sets the "updator" edge to the Admin entity by ID.
-func (aru *AdminRoleUpdate) SetUpdatorID(id int) *AdminRoleUpdate {
-	aru.mutation.SetUpdatorID(id)
+// SetUpdaterID sets the "updater" edge to the Admin entity by ID.
+func (aru *AdminRoleUpdate) SetUpdaterID(id int) *AdminRoleUpdate {
+	aru.mutation.SetUpdaterID(id)
 	return aru
 }
 
-// SetNillableUpdatorID sets the "updator" edge to the Admin entity by ID if the given value is not nil.
-func (aru *AdminRoleUpdate) SetNillableUpdatorID(id *int) *AdminRoleUpdate {
+// SetNillableUpdaterID sets the "updater" edge to the Admin entity by ID if the given value is not nil.
+func (aru *AdminRoleUpdate) SetNillableUpdaterID(id *int) *AdminRoleUpdate {
 	if id != nil {
-		aru = aru.SetUpdatorID(*id)
+		aru = aru.SetUpdaterID(*id)
 	}
 	return aru
 }
 
-// SetUpdator sets the "updator" edge to the Admin entity.
-func (aru *AdminRoleUpdate) SetUpdator(a *Admin) *AdminRoleUpdate {
-	return aru.SetUpdatorID(a.ID)
+// SetUpdater sets the "updater" edge to the Admin entity.
+func (aru *AdminRoleUpdate) SetUpdater(a *Admin) *AdminRoleUpdate {
+	return aru.SetUpdaterID(a.ID)
 }
 
 // AddAdminIDs adds the "admins" edge to the Admin entity by IDs.
@@ -173,9 +173,9 @@ func (aru *AdminRoleUpdate) ClearCreator() *AdminRoleUpdate {
 	return aru
 }
 
-// ClearUpdator clears the "updator" edge to the Admin entity.
-func (aru *AdminRoleUpdate) ClearUpdator() *AdminRoleUpdate {
-	aru.mutation.ClearUpdator()
+// ClearUpdater clears the "updater" edge to the Admin entity.
+func (aru *AdminRoleUpdate) ClearUpdater() *AdminRoleUpdate {
+	aru.mutation.ClearUpdater()
 	return aru
 }
 
@@ -309,12 +309,12 @@ func (aru *AdminRoleUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if aru.mutation.UpdatorCleared() {
+	if aru.mutation.UpdaterCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: true,
-			Table:   adminrole.UpdatorTable,
-			Columns: []string{adminrole.UpdatorColumn},
+			Table:   adminrole.UpdaterTable,
+			Columns: []string{adminrole.UpdaterColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(admin.FieldID, field.TypeInt),
@@ -322,12 +322,12 @@ func (aru *AdminRoleUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := aru.mutation.UpdatorIDs(); len(nodes) > 0 {
+	if nodes := aru.mutation.UpdaterIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: true,
-			Table:   adminrole.UpdatorTable,
-			Columns: []string{adminrole.UpdatorColumn},
+			Table:   adminrole.UpdaterTable,
+			Columns: []string{adminrole.UpdaterColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(admin.FieldID, field.TypeInt),
@@ -502,23 +502,23 @@ func (aruo *AdminRoleUpdateOne) SetCreator(a *Admin) *AdminRoleUpdateOne {
 	return aruo.SetCreatorID(a.ID)
 }
 
-// SetUpdatorID sets the "updator" edge to the Admin entity by ID.
-func (aruo *AdminRoleUpdateOne) SetUpdatorID(id int) *AdminRoleUpdateOne {
-	aruo.mutation.SetUpdatorID(id)
+// SetUpdaterID sets the "updater" edge to the Admin entity by ID.
+func (aruo *AdminRoleUpdateOne) SetUpdaterID(id int) *AdminRoleUpdateOne {
+	aruo.mutation.SetUpdaterID(id)
 	return aruo
 }
 
-// SetNillableUpdatorID sets the "updator" edge to the Admin entity by ID if the given value is not nil.
-func (aruo *AdminRoleUpdateOne) SetNillableUpdatorID(id *int) *AdminRoleUpdateOne {
+// SetNillableUpdaterID sets the "updater" edge to the Admin entity by ID if the given value is not nil.
+func (aruo *AdminRoleUpdateOne) SetNillableUpdaterID(id *int) *AdminRoleUpdateOne {
 	if id != nil {
-		aruo = aruo.SetUpdatorID(*id)
+		aruo = aruo.SetUpdaterID(*id)
 	}
 	return aruo
 }
 
-// SetUpdator sets the "updator" edge to the Admin entity.
-func (aruo *AdminRoleUpdateOne) SetUpdator(a *Admin) *AdminRoleUpdateOne {
-	return aruo.SetUpdatorID(a.ID)
+// SetUpdater sets the "updater" edge to the Admin entity.
+func (aruo *AdminRoleUpdateOne) SetUpdater(a *Admin) *AdminRoleUpdateOne {
+	return aruo.SetUpdaterID(a.ID)
 }
 
 // AddAdminIDs adds the "admins" edge to the Admin entity by IDs.
@@ -547,9 +547,9 @@ func (aruo *AdminRoleUpdateOne) ClearCreator() *AdminRoleUpdateOne {
 	return aruo
 }
 
-// ClearUpdator clears the "updator" edge to the Admin entity.
-func (aruo *AdminRoleUpdateOne) ClearUpdator() *AdminRoleUpdateOne {
-	aruo.mutation.ClearUpdator()
+// ClearUpdater clears the "updater" edge to the Admin entity.
+func (aruo *AdminRoleUpdateOne) ClearUpdater() *AdminRoleUpdateOne {
+	aruo.mutation.ClearUpdater()
 	return aruo
 }
 
@@ -713,12 +713,12 @@ func (aruo *AdminRoleUpdateOne) sqlSave(ctx context.Context) (_node *AdminRole, 
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if aruo.mutation.UpdatorCleared() {
+	if aruo.mutation.UpdaterCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: true,
-			Table:   adminrole.UpdatorTable,
-			Columns: []string{adminrole.UpdatorColumn},
+			Table:   adminrole.UpdaterTable,
+			Columns: []string{adminrole.UpdaterColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(admin.FieldID, field.TypeInt),
@@ -726,12 +726,12 @@ func (aruo *AdminRoleUpdateOne) sqlSave(ctx context.Context) (_node *AdminRole, 
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := aruo.mutation.UpdatorIDs(); len(nodes) > 0 {
+	if nodes := aruo.mutation.UpdaterIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: true,
-			Table:   adminrole.UpdatorTable,
-			Columns: []string{adminrole.UpdatorColumn},
+			Table:   adminrole.UpdaterTable,
+			Columns: []string{adminrole.UpdaterColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(admin.FieldID, field.TypeInt),

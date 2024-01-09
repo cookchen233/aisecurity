@@ -28,8 +28,8 @@ const (
 	FieldUpdatedAt = "updated_at"
 	// EdgeCreator holds the string denoting the creator edge name in mutations.
 	EdgeCreator = "creator"
-	// EdgeUpdator holds the string denoting the updator edge name in mutations.
-	EdgeUpdator = "updator"
+	// EdgeUpdater holds the string denoting the updater edge name in mutations.
+	EdgeUpdater = "updater"
 	// EdgeAdmins holds the string denoting the admins edge name in mutations.
 	EdgeAdmins = "admins"
 	// Table holds the table name of the adminrole in the database.
@@ -41,13 +41,13 @@ const (
 	CreatorInverseTable = "admins"
 	// CreatorColumn is the table column denoting the creator relation/edge.
 	CreatorColumn = "created_by"
-	// UpdatorTable is the table that holds the updator relation/edge.
-	UpdatorTable = "admin_roles"
-	// UpdatorInverseTable is the table name for the Admin entity.
+	// UpdaterTable is the table that holds the updater relation/edge.
+	UpdaterTable = "admin_roles"
+	// UpdaterInverseTable is the table name for the Admin entity.
 	// It exists in this package in order to avoid circular dependency with the "admin" package.
-	UpdatorInverseTable = "admins"
-	// UpdatorColumn is the table column denoting the updator relation/edge.
-	UpdatorColumn = "updated_by"
+	UpdaterInverseTable = "admins"
+	// UpdaterColumn is the table column denoting the updater relation/edge.
+	UpdaterColumn = "updated_by"
 	// AdminsTable is the table that holds the admins relation/edge. The primary key declared below.
 	AdminsTable = "admin_role_admins"
 	// AdminsInverseTable is the table name for the Admin entity.
@@ -142,10 +142,10 @@ func ByCreatorField(field string, opts ...sql.OrderTermOption) OrderOption {
 	}
 }
 
-// ByUpdatorField orders the results by updator field.
-func ByUpdatorField(field string, opts ...sql.OrderTermOption) OrderOption {
+// ByUpdaterField orders the results by updater field.
+func ByUpdaterField(field string, opts ...sql.OrderTermOption) OrderOption {
 	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborTerms(s, newUpdatorStep(), sql.OrderByField(field, opts...))
+		sqlgraph.OrderByNeighborTerms(s, newUpdaterStep(), sql.OrderByField(field, opts...))
 	}
 }
 
@@ -169,11 +169,11 @@ func newCreatorStep() *sqlgraph.Step {
 		sqlgraph.Edge(sqlgraph.M2O, true, CreatorTable, CreatorColumn),
 	)
 }
-func newUpdatorStep() *sqlgraph.Step {
+func newUpdaterStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
-		sqlgraph.To(UpdatorInverseTable, FieldID),
-		sqlgraph.Edge(sqlgraph.M2O, true, UpdatorTable, UpdatorColumn),
+		sqlgraph.To(UpdaterInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.M2O, true, UpdaterTable, UpdaterColumn),
 	)
 }
 func newAdminsStep() *sqlgraph.Step {

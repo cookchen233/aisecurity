@@ -24,7 +24,7 @@ type AdminRoleQuery struct {
 	inters      []Interceptor
 	predicates  []predicate.AdminRole
 	withCreator *AdminQuery
-	withUpdator *AdminQuery
+	withUpdater *AdminQuery
 	withAdmins  *AdminQuery
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
@@ -84,8 +84,8 @@ func (arq *AdminRoleQuery) QueryCreator() *AdminQuery {
 	return query
 }
 
-// QueryUpdator chains the current query on the "updator" edge.
-func (arq *AdminRoleQuery) QueryUpdator() *AdminQuery {
+// QueryUpdater chains the current query on the "updater" edge.
+func (arq *AdminRoleQuery) QueryUpdater() *AdminQuery {
 	query := (&AdminClient{config: arq.config}).Query()
 	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
 		if err := arq.prepareQuery(ctx); err != nil {
@@ -98,7 +98,7 @@ func (arq *AdminRoleQuery) QueryUpdator() *AdminQuery {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(adminrole.Table, adminrole.FieldID, selector),
 			sqlgraph.To(admin.Table, admin.FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, true, adminrole.UpdatorTable, adminrole.UpdatorColumn),
+			sqlgraph.Edge(sqlgraph.M2O, true, adminrole.UpdaterTable, adminrole.UpdaterColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(arq.driver.Dialect(), step)
 		return fromU, nil
@@ -321,7 +321,7 @@ func (arq *AdminRoleQuery) Clone() *AdminRoleQuery {
 		inters:      append([]Interceptor{}, arq.inters...),
 		predicates:  append([]predicate.AdminRole{}, arq.predicates...),
 		withCreator: arq.withCreator.Clone(),
-		withUpdator: arq.withUpdator.Clone(),
+		withUpdater: arq.withUpdater.Clone(),
 		withAdmins:  arq.withAdmins.Clone(),
 		// clone intermediate query.
 		sql:  arq.sql.Clone(),
@@ -340,14 +340,14 @@ func (arq *AdminRoleQuery) WithCreator(opts ...func(*AdminQuery)) *AdminRoleQuer
 	return arq
 }
 
-// WithUpdator tells the query-builder to eager-load the nodes that are connected to
-// the "updator" edge. The optional arguments are used to configure the query builder of the edge.
-func (arq *AdminRoleQuery) WithUpdator(opts ...func(*AdminQuery)) *AdminRoleQuery {
+// WithUpdater tells the query-builder to eager-load the nodes that are connected to
+// the "updater" edge. The optional arguments are used to configure the query builder of the edge.
+func (arq *AdminRoleQuery) WithUpdater(opts ...func(*AdminQuery)) *AdminRoleQuery {
 	query := (&AdminClient{config: arq.config}).Query()
 	for _, opt := range opts {
 		opt(query)
 	}
-	arq.withUpdator = query
+	arq.withUpdater = query
 	return arq
 }
 
@@ -442,7 +442,7 @@ func (arq *AdminRoleQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*A
 		_spec       = arq.querySpec()
 		loadedTypes = [3]bool{
 			arq.withCreator != nil,
-			arq.withUpdator != nil,
+			arq.withUpdater != nil,
 			arq.withAdmins != nil,
 		}
 	)
@@ -470,9 +470,9 @@ func (arq *AdminRoleQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*A
 			return nil, err
 		}
 	}
-	if query := arq.withUpdator; query != nil {
-		if err := arq.loadUpdator(ctx, query, nodes, nil,
-			func(n *AdminRole, e *Admin) { n.Edges.Updator = e }); err != nil {
+	if query := arq.withUpdater; query != nil {
+		if err := arq.loadUpdater(ctx, query, nodes, nil,
+			func(n *AdminRole, e *Admin) { n.Edges.Updater = e }); err != nil {
 			return nil, err
 		}
 	}
@@ -515,7 +515,7 @@ func (arq *AdminRoleQuery) loadCreator(ctx context.Context, query *AdminQuery, n
 	}
 	return nil
 }
-func (arq *AdminRoleQuery) loadUpdator(ctx context.Context, query *AdminQuery, nodes []*AdminRole, init func(*AdminRole), assign func(*AdminRole, *Admin)) error {
+func (arq *AdminRoleQuery) loadUpdater(ctx context.Context, query *AdminQuery, nodes []*AdminRole, init func(*AdminRole), assign func(*AdminRole, *Admin)) error {
 	ids := make([]int, 0, len(nodes))
 	nodeids := make(map[int][]*AdminRole)
 	for i := range nodes {
@@ -634,7 +634,7 @@ func (arq *AdminRoleQuery) querySpec() *sqlgraph.QuerySpec {
 		if arq.withCreator != nil {
 			_spec.Node.AddColumnOnce(adminrole.FieldCreatedBy)
 		}
-		if arq.withUpdator != nil {
+		if arq.withUpdater != nil {
 			_spec.Node.AddColumnOnce(adminrole.FieldUpdatedBy)
 		}
 	}

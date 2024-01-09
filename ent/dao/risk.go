@@ -20,7 +20,7 @@ import (
 
 // Risk is the model entity for the Risk schema.
 type Risk struct {
-	config `json:"-"`
+	config `json:"-" validate:"-"`
 	// ID of the ent.
 	ID int `json:"id,omitempty"`
 	// 创建时间
@@ -34,7 +34,7 @@ type Risk struct {
 	// 最后更新时间
 	UpdatedAt time.Time `json:"updated_at"`
 	// 标题
-	Title string `json:"title"`
+	Title string `json:"title" validate:"required"`
 	// 内容
 	Content string `json:"content"`
 	// 图片
@@ -46,6 +46,8 @@ type Risk struct {
 	RiskCategoryID int `json:"risk_category_id"`
 	// 地点
 	RiskLocationID int `json:"risk_location_id"`
+	// 汇报人
+	ReporterID int `json:"reporter_id"`
 	// 整改人
 	MaintainerID int `json:"maintainer_id"`
 	// 整改措施
@@ -56,72 +58,59 @@ type Risk struct {
 	DueTime time.Time `json:"due_time"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the RiskQuery when eager-loading is set.
-	Edges                 RiskEdges `json:"edges"`
-	admin_risk_creator    *int
-	admin_risk_maintainer *int
-	selectValues          sql.SelectValues
+	Edges        RiskEdges `json:"edges"`
+	selectValues sql.SelectValues
 }
 
 // RiskEdges holds the relations/edges for other nodes in the graph.
 type RiskEdges struct {
 	// Creator holds the value of the creator edge.
-	Creator *Employee `json:"creator,omitempty"`
-	// Updator holds the value of the updator edge.
-	Updator *Admin `json:"updator,omitempty"`
-	// Maintainer holds the value of the maintainer edge.
-	Maintainer *Employee `json:"maintainer,omitempty"`
+	Creator *Admin `json:"creator,omitempty"`
+	// Updater holds the value of the updater edge.
+	Updater *Admin `json:"updater,omitempty"`
 	// RiskCategory holds the value of the risk_category edge.
 	RiskCategory *RiskCategory `json:"risk_category,omitempty"`
 	// RiskLocation holds the value of the risk_location edge.
 	RiskLocation *RiskLocation `json:"risk_location,omitempty"`
+	// Reporter holds the value of the reporter edge.
+	Reporter *Employee `json:"reporter,omitempty"`
+	// Maintainer holds the value of the maintainer edge.
+	Maintainer *Employee `json:"maintainer,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
-	loadedTypes [5]bool
+	loadedTypes [6]bool
 }
 
 // CreatorOrErr returns the Creator value or an error if the edge
 // was not loaded in eager-loading, or loaded but was not found.
-func (e RiskEdges) CreatorOrErr() (*Employee, error) {
+func (e RiskEdges) CreatorOrErr() (*Admin, error) {
 	if e.loadedTypes[0] {
 		if e.Creator == nil {
 			// Edge was loaded but was not found.
-			return nil, &NotFoundError{label: employee.Label}
+			return nil, &NotFoundError{label: admin.Label}
 		}
 		return e.Creator, nil
 	}
 	return nil, &NotLoadedError{edge: "creator"}
 }
 
-// UpdatorOrErr returns the Updator value or an error if the edge
+// UpdaterOrErr returns the Updater value or an error if the edge
 // was not loaded in eager-loading, or loaded but was not found.
-func (e RiskEdges) UpdatorOrErr() (*Admin, error) {
+func (e RiskEdges) UpdaterOrErr() (*Admin, error) {
 	if e.loadedTypes[1] {
-		if e.Updator == nil {
+		if e.Updater == nil {
 			// Edge was loaded but was not found.
 			return nil, &NotFoundError{label: admin.Label}
 		}
-		return e.Updator, nil
+		return e.Updater, nil
 	}
-	return nil, &NotLoadedError{edge: "updator"}
-}
-
-// MaintainerOrErr returns the Maintainer value or an error if the edge
-// was not loaded in eager-loading, or loaded but was not found.
-func (e RiskEdges) MaintainerOrErr() (*Employee, error) {
-	if e.loadedTypes[2] {
-		if e.Maintainer == nil {
-			// Edge was loaded but was not found.
-			return nil, &NotFoundError{label: employee.Label}
-		}
-		return e.Maintainer, nil
-	}
-	return nil, &NotLoadedError{edge: "maintainer"}
+	return nil, &NotLoadedError{edge: "updater"}
 }
 
 // RiskCategoryOrErr returns the RiskCategory value or an error if the edge
 // was not loaded in eager-loading, or loaded but was not found.
 func (e RiskEdges) RiskCategoryOrErr() (*RiskCategory, error) {
-	if e.loadedTypes[3] {
+	if e.loadedTypes[2] {
 		if e.RiskCategory == nil {
 			// Edge was loaded but was not found.
 			return nil, &NotFoundError{label: riskcategory.Label}
@@ -134,7 +123,7 @@ func (e RiskEdges) RiskCategoryOrErr() (*RiskCategory, error) {
 // RiskLocationOrErr returns the RiskLocation value or an error if the edge
 // was not loaded in eager-loading, or loaded but was not found.
 func (e RiskEdges) RiskLocationOrErr() (*RiskLocation, error) {
-	if e.loadedTypes[4] {
+	if e.loadedTypes[3] {
 		if e.RiskLocation == nil {
 			// Edge was loaded but was not found.
 			return nil, &NotFoundError{label: risklocation.Label}
@@ -144,6 +133,32 @@ func (e RiskEdges) RiskLocationOrErr() (*RiskLocation, error) {
 	return nil, &NotLoadedError{edge: "risk_location"}
 }
 
+// ReporterOrErr returns the Reporter value or an error if the edge
+// was not loaded in eager-loading, or loaded but was not found.
+func (e RiskEdges) ReporterOrErr() (*Employee, error) {
+	if e.loadedTypes[4] {
+		if e.Reporter == nil {
+			// Edge was loaded but was not found.
+			return nil, &NotFoundError{label: employee.Label}
+		}
+		return e.Reporter, nil
+	}
+	return nil, &NotLoadedError{edge: "reporter"}
+}
+
+// MaintainerOrErr returns the Maintainer value or an error if the edge
+// was not loaded in eager-loading, or loaded but was not found.
+func (e RiskEdges) MaintainerOrErr() (*Employee, error) {
+	if e.loadedTypes[5] {
+		if e.Maintainer == nil {
+			// Edge was loaded but was not found.
+			return nil, &NotFoundError{label: employee.Label}
+		}
+		return e.Maintainer, nil
+	}
+	return nil, &NotLoadedError{edge: "maintainer"}
+}
+
 // scanValues returns the types for scanning values from sql.Rows.
 func (*Risk) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
@@ -151,16 +166,12 @@ func (*Risk) scanValues(columns []string) ([]any, error) {
 		switch columns[i] {
 		case risk.FieldImages:
 			values[i] = new([]byte)
-		case risk.FieldID, risk.FieldCreatedBy, risk.FieldUpdatedBy, risk.FieldRiskCategoryID, risk.FieldRiskLocationID, risk.FieldMaintainerID, risk.FieldMaintainStatus:
+		case risk.FieldID, risk.FieldCreatedBy, risk.FieldUpdatedBy, risk.FieldRiskCategoryID, risk.FieldRiskLocationID, risk.FieldReporterID, risk.FieldMaintainerID, risk.FieldMaintainStatus:
 			values[i] = new(sql.NullInt64)
 		case risk.FieldTitle, risk.FieldContent, risk.FieldMeasures:
 			values[i] = new(sql.NullString)
 		case risk.FieldCreatedAt, risk.FieldDeletedAt, risk.FieldUpdatedAt, risk.FieldDueTime:
 			values[i] = new(sql.NullTime)
-		case risk.ForeignKeys[0]: // admin_risk_creator
-			values[i] = new(sql.NullInt64)
-		case risk.ForeignKeys[1]: // admin_risk_maintainer
-			values[i] = new(sql.NullInt64)
 		default:
 			values[i] = new(sql.UnknownType)
 		}
@@ -245,6 +256,12 @@ func (r *Risk) assignValues(columns []string, values []any) error {
 			} else if value.Valid {
 				r.RiskLocationID = int(value.Int64)
 			}
+		case risk.FieldReporterID:
+			if value, ok := values[i].(*sql.NullInt64); !ok {
+				return fmt.Errorf("unexpected type %T for field reporter_id", values[i])
+			} else if value.Valid {
+				r.ReporterID = int(value.Int64)
+			}
 		case risk.FieldMaintainerID:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
 				return fmt.Errorf("unexpected type %T for field maintainer_id", values[i])
@@ -269,20 +286,6 @@ func (r *Risk) assignValues(columns []string, values []any) error {
 			} else if value.Valid {
 				r.DueTime = value.Time
 			}
-		case risk.ForeignKeys[0]:
-			if value, ok := values[i].(*sql.NullInt64); !ok {
-				return fmt.Errorf("unexpected type %T for edge-field admin_risk_creator", value)
-			} else if value.Valid {
-				r.admin_risk_creator = new(int)
-				*r.admin_risk_creator = int(value.Int64)
-			}
-		case risk.ForeignKeys[1]:
-			if value, ok := values[i].(*sql.NullInt64); !ok {
-				return fmt.Errorf("unexpected type %T for edge-field admin_risk_maintainer", value)
-			} else if value.Valid {
-				r.admin_risk_maintainer = new(int)
-				*r.admin_risk_maintainer = int(value.Int64)
-			}
 		default:
 			r.selectValues.Set(columns[i], values[i])
 		}
@@ -297,18 +300,13 @@ func (r *Risk) Value(name string) (ent.Value, error) {
 }
 
 // QueryCreator queries the "creator" edge of the Risk entity.
-func (r *Risk) QueryCreator() *EmployeeQuery {
+func (r *Risk) QueryCreator() *AdminQuery {
 	return NewRiskClient(r.config).QueryCreator(r)
 }
 
-// QueryUpdator queries the "updator" edge of the Risk entity.
-func (r *Risk) QueryUpdator() *AdminQuery {
-	return NewRiskClient(r.config).QueryUpdator(r)
-}
-
-// QueryMaintainer queries the "maintainer" edge of the Risk entity.
-func (r *Risk) QueryMaintainer() *EmployeeQuery {
-	return NewRiskClient(r.config).QueryMaintainer(r)
+// QueryUpdater queries the "updater" edge of the Risk entity.
+func (r *Risk) QueryUpdater() *AdminQuery {
+	return NewRiskClient(r.config).QueryUpdater(r)
 }
 
 // QueryRiskCategory queries the "risk_category" edge of the Risk entity.
@@ -319,6 +317,16 @@ func (r *Risk) QueryRiskCategory() *RiskCategoryQuery {
 // QueryRiskLocation queries the "risk_location" edge of the Risk entity.
 func (r *Risk) QueryRiskLocation() *RiskLocationQuery {
 	return NewRiskClient(r.config).QueryRiskLocation(r)
+}
+
+// QueryReporter queries the "reporter" edge of the Risk entity.
+func (r *Risk) QueryReporter() *EmployeeQuery {
+	return NewRiskClient(r.config).QueryReporter(r)
+}
+
+// QueryMaintainer queries the "maintainer" edge of the Risk entity.
+func (r *Risk) QueryMaintainer() *EmployeeQuery {
+	return NewRiskClient(r.config).QueryMaintainer(r)
 }
 
 // Update returns a builder for updating this Risk.
@@ -375,6 +383,9 @@ func (r *Risk) String() string {
 	builder.WriteString(", ")
 	builder.WriteString("risk_location_id=")
 	builder.WriteString(fmt.Sprintf("%v", r.RiskLocationID))
+	builder.WriteString(", ")
+	builder.WriteString("reporter_id=")
+	builder.WriteString(fmt.Sprintf("%v", r.ReporterID))
 	builder.WriteString(", ")
 	builder.WriteString("maintainer_id=")
 	builder.WriteString(fmt.Sprintf("%v", r.MaintainerID))

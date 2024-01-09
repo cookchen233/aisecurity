@@ -15,7 +15,7 @@ import (
 
 // AdminRole is the model entity for the AdminRole schema.
 type AdminRole struct {
-	config `json:"-"`
+	config `json:"-" validate:"-"`
 	// ID of the ent.
 	ID int `json:"id,omitempty"`
 	// 创建时间
@@ -23,7 +23,7 @@ type AdminRole struct {
 	// 创建者
 	CreatedBy int `json:"created_by"`
 	// 名称
-	Name string `json:"name"`
+	Name string `json:"name" validate:"required"`
 	// 删除时间
 	DeletedAt *time.Time `json:"deleted_at"`
 	// 最后更新者
@@ -40,8 +40,8 @@ type AdminRole struct {
 type AdminRoleEdges struct {
 	// Creator holds the value of the creator edge.
 	Creator *Admin `json:"creator,omitempty"`
-	// Updator holds the value of the updator edge.
-	Updator *Admin `json:"updator,omitempty"`
+	// Updater holds the value of the updater edge.
+	Updater *Admin `json:"updater,omitempty"`
 	// Admins holds the value of the admins edge.
 	Admins []*Admin `json:"admins,omitempty"`
 	// loadedTypes holds the information for reporting if a
@@ -62,17 +62,17 @@ func (e AdminRoleEdges) CreatorOrErr() (*Admin, error) {
 	return nil, &NotLoadedError{edge: "creator"}
 }
 
-// UpdatorOrErr returns the Updator value or an error if the edge
+// UpdaterOrErr returns the Updater value or an error if the edge
 // was not loaded in eager-loading, or loaded but was not found.
-func (e AdminRoleEdges) UpdatorOrErr() (*Admin, error) {
+func (e AdminRoleEdges) UpdaterOrErr() (*Admin, error) {
 	if e.loadedTypes[1] {
-		if e.Updator == nil {
+		if e.Updater == nil {
 			// Edge was loaded but was not found.
 			return nil, &NotFoundError{label: admin.Label}
 		}
-		return e.Updator, nil
+		return e.Updater, nil
 	}
-	return nil, &NotLoadedError{edge: "updator"}
+	return nil, &NotLoadedError{edge: "updater"}
 }
 
 // AdminsOrErr returns the Admins value or an error if the edge
@@ -171,9 +171,9 @@ func (ar *AdminRole) QueryCreator() *AdminQuery {
 	return NewAdminRoleClient(ar.config).QueryCreator(ar)
 }
 
-// QueryUpdator queries the "updator" edge of the AdminRole entity.
-func (ar *AdminRole) QueryUpdator() *AdminQuery {
-	return NewAdminRoleClient(ar.config).QueryUpdator(ar)
+// QueryUpdater queries the "updater" edge of the AdminRole entity.
+func (ar *AdminRole) QueryUpdater() *AdminQuery {
+	return NewAdminRoleClient(ar.config).QueryUpdater(ar)
 }
 
 // QueryAdmins queries the "admins" edge of the AdminRole entity.

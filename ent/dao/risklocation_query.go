@@ -20,13 +20,13 @@ import (
 // RiskLocationQuery is the builder for querying RiskLocation entities.
 type RiskLocationQuery struct {
 	config
-	ctx                  *QueryContext
-	order                []risklocation.OrderOption
-	inters               []Interceptor
-	predicates           []predicate.RiskLocation
-	withCreator          *AdminQuery
-	withUpdator          *AdminQuery
-	withRiskRiskLocation *RiskQuery
+	ctx         *QueryContext
+	order       []risklocation.OrderOption
+	inters      []Interceptor
+	predicates  []predicate.RiskLocation
+	withCreator *AdminQuery
+	withUpdater *AdminQuery
+	withRisk    *RiskQuery
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
 	path func(context.Context) (*sql.Selector, error)
@@ -85,8 +85,8 @@ func (rlq *RiskLocationQuery) QueryCreator() *AdminQuery {
 	return query
 }
 
-// QueryUpdator chains the current query on the "updator" edge.
-func (rlq *RiskLocationQuery) QueryUpdator() *AdminQuery {
+// QueryUpdater chains the current query on the "updater" edge.
+func (rlq *RiskLocationQuery) QueryUpdater() *AdminQuery {
 	query := (&AdminClient{config: rlq.config}).Query()
 	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
 		if err := rlq.prepareQuery(ctx); err != nil {
@@ -99,7 +99,7 @@ func (rlq *RiskLocationQuery) QueryUpdator() *AdminQuery {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(risklocation.Table, risklocation.FieldID, selector),
 			sqlgraph.To(admin.Table, admin.FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, true, risklocation.UpdatorTable, risklocation.UpdatorColumn),
+			sqlgraph.Edge(sqlgraph.M2O, true, risklocation.UpdaterTable, risklocation.UpdaterColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(rlq.driver.Dialect(), step)
 		return fromU, nil
@@ -107,8 +107,8 @@ func (rlq *RiskLocationQuery) QueryUpdator() *AdminQuery {
 	return query
 }
 
-// QueryRiskRiskLocation chains the current query on the "risk_risk_location" edge.
-func (rlq *RiskLocationQuery) QueryRiskRiskLocation() *RiskQuery {
+// QueryRisk chains the current query on the "risk" edge.
+func (rlq *RiskLocationQuery) QueryRisk() *RiskQuery {
 	query := (&RiskClient{config: rlq.config}).Query()
 	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
 		if err := rlq.prepareQuery(ctx); err != nil {
@@ -121,7 +121,7 @@ func (rlq *RiskLocationQuery) QueryRiskRiskLocation() *RiskQuery {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(risklocation.Table, risklocation.FieldID, selector),
 			sqlgraph.To(risk.Table, risk.FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, false, risklocation.RiskRiskLocationTable, risklocation.RiskRiskLocationColumn),
+			sqlgraph.Edge(sqlgraph.O2M, false, risklocation.RiskTable, risklocation.RiskColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(rlq.driver.Dialect(), step)
 		return fromU, nil
@@ -316,14 +316,14 @@ func (rlq *RiskLocationQuery) Clone() *RiskLocationQuery {
 		return nil
 	}
 	return &RiskLocationQuery{
-		config:               rlq.config,
-		ctx:                  rlq.ctx.Clone(),
-		order:                append([]risklocation.OrderOption{}, rlq.order...),
-		inters:               append([]Interceptor{}, rlq.inters...),
-		predicates:           append([]predicate.RiskLocation{}, rlq.predicates...),
-		withCreator:          rlq.withCreator.Clone(),
-		withUpdator:          rlq.withUpdator.Clone(),
-		withRiskRiskLocation: rlq.withRiskRiskLocation.Clone(),
+		config:      rlq.config,
+		ctx:         rlq.ctx.Clone(),
+		order:       append([]risklocation.OrderOption{}, rlq.order...),
+		inters:      append([]Interceptor{}, rlq.inters...),
+		predicates:  append([]predicate.RiskLocation{}, rlq.predicates...),
+		withCreator: rlq.withCreator.Clone(),
+		withUpdater: rlq.withUpdater.Clone(),
+		withRisk:    rlq.withRisk.Clone(),
 		// clone intermediate query.
 		sql:  rlq.sql.Clone(),
 		path: rlq.path,
@@ -341,25 +341,25 @@ func (rlq *RiskLocationQuery) WithCreator(opts ...func(*AdminQuery)) *RiskLocati
 	return rlq
 }
 
-// WithUpdator tells the query-builder to eager-load the nodes that are connected to
-// the "updator" edge. The optional arguments are used to configure the query builder of the edge.
-func (rlq *RiskLocationQuery) WithUpdator(opts ...func(*AdminQuery)) *RiskLocationQuery {
+// WithUpdater tells the query-builder to eager-load the nodes that are connected to
+// the "updater" edge. The optional arguments are used to configure the query builder of the edge.
+func (rlq *RiskLocationQuery) WithUpdater(opts ...func(*AdminQuery)) *RiskLocationQuery {
 	query := (&AdminClient{config: rlq.config}).Query()
 	for _, opt := range opts {
 		opt(query)
 	}
-	rlq.withUpdator = query
+	rlq.withUpdater = query
 	return rlq
 }
 
-// WithRiskRiskLocation tells the query-builder to eager-load the nodes that are connected to
-// the "risk_risk_location" edge. The optional arguments are used to configure the query builder of the edge.
-func (rlq *RiskLocationQuery) WithRiskRiskLocation(opts ...func(*RiskQuery)) *RiskLocationQuery {
+// WithRisk tells the query-builder to eager-load the nodes that are connected to
+// the "risk" edge. The optional arguments are used to configure the query builder of the edge.
+func (rlq *RiskLocationQuery) WithRisk(opts ...func(*RiskQuery)) *RiskLocationQuery {
 	query := (&RiskClient{config: rlq.config}).Query()
 	for _, opt := range opts {
 		opt(query)
 	}
-	rlq.withRiskRiskLocation = query
+	rlq.withRisk = query
 	return rlq
 }
 
@@ -443,8 +443,8 @@ func (rlq *RiskLocationQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([
 		_spec       = rlq.querySpec()
 		loadedTypes = [3]bool{
 			rlq.withCreator != nil,
-			rlq.withUpdator != nil,
-			rlq.withRiskRiskLocation != nil,
+			rlq.withUpdater != nil,
+			rlq.withRisk != nil,
 		}
 	)
 	_spec.ScanValues = func(columns []string) ([]any, error) {
@@ -471,16 +471,16 @@ func (rlq *RiskLocationQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([
 			return nil, err
 		}
 	}
-	if query := rlq.withUpdator; query != nil {
-		if err := rlq.loadUpdator(ctx, query, nodes, nil,
-			func(n *RiskLocation, e *Admin) { n.Edges.Updator = e }); err != nil {
+	if query := rlq.withUpdater; query != nil {
+		if err := rlq.loadUpdater(ctx, query, nodes, nil,
+			func(n *RiskLocation, e *Admin) { n.Edges.Updater = e }); err != nil {
 			return nil, err
 		}
 	}
-	if query := rlq.withRiskRiskLocation; query != nil {
-		if err := rlq.loadRiskRiskLocation(ctx, query, nodes,
-			func(n *RiskLocation) { n.Edges.RiskRiskLocation = []*Risk{} },
-			func(n *RiskLocation, e *Risk) { n.Edges.RiskRiskLocation = append(n.Edges.RiskRiskLocation, e) }); err != nil {
+	if query := rlq.withRisk; query != nil {
+		if err := rlq.loadRisk(ctx, query, nodes,
+			func(n *RiskLocation) { n.Edges.Risk = []*Risk{} },
+			func(n *RiskLocation, e *Risk) { n.Edges.Risk = append(n.Edges.Risk, e) }); err != nil {
 			return nil, err
 		}
 	}
@@ -516,7 +516,7 @@ func (rlq *RiskLocationQuery) loadCreator(ctx context.Context, query *AdminQuery
 	}
 	return nil
 }
-func (rlq *RiskLocationQuery) loadUpdator(ctx context.Context, query *AdminQuery, nodes []*RiskLocation, init func(*RiskLocation), assign func(*RiskLocation, *Admin)) error {
+func (rlq *RiskLocationQuery) loadUpdater(ctx context.Context, query *AdminQuery, nodes []*RiskLocation, init func(*RiskLocation), assign func(*RiskLocation, *Admin)) error {
 	ids := make([]int, 0, len(nodes))
 	nodeids := make(map[int][]*RiskLocation)
 	for i := range nodes {
@@ -545,7 +545,7 @@ func (rlq *RiskLocationQuery) loadUpdator(ctx context.Context, query *AdminQuery
 	}
 	return nil
 }
-func (rlq *RiskLocationQuery) loadRiskRiskLocation(ctx context.Context, query *RiskQuery, nodes []*RiskLocation, init func(*RiskLocation), assign func(*RiskLocation, *Risk)) error {
+func (rlq *RiskLocationQuery) loadRisk(ctx context.Context, query *RiskQuery, nodes []*RiskLocation, init func(*RiskLocation), assign func(*RiskLocation, *Risk)) error {
 	fks := make([]driver.Value, 0, len(nodes))
 	nodeids := make(map[int]*RiskLocation)
 	for i := range nodes {
@@ -555,12 +555,11 @@ func (rlq *RiskLocationQuery) loadRiskRiskLocation(ctx context.Context, query *R
 			init(nodes[i])
 		}
 	}
-	query.withFKs = true
 	if len(query.ctx.Fields) > 0 {
 		query.ctx.AppendFieldOnce(risk.FieldRiskLocationID)
 	}
 	query.Where(predicate.Risk(func(s *sql.Selector) {
-		s.Where(sql.InValues(s.C(risklocation.RiskRiskLocationColumn), fks...))
+		s.Where(sql.InValues(s.C(risklocation.RiskColumn), fks...))
 	}))
 	neighbors, err := query.All(ctx)
 	if err != nil {
@@ -605,7 +604,7 @@ func (rlq *RiskLocationQuery) querySpec() *sqlgraph.QuerySpec {
 		if rlq.withCreator != nil {
 			_spec.Node.AddColumnOnce(risklocation.FieldCreatedBy)
 		}
-		if rlq.withUpdator != nil {
+		if rlq.withUpdater != nil {
 			_spec.Node.AddColumnOnce(risklocation.FieldUpdatedBy)
 		}
 	}

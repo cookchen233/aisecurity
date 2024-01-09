@@ -20,6 +20,8 @@ type Tx struct {
 	Department *DepartmentClient
 	// Employee is the client for interacting with the Employee builders.
 	Employee *EmployeeClient
+	// Occupation is the client for interacting with the Occupation builders.
+	Occupation *OccupationClient
 	// Risk is the client for interacting with the Risk builders.
 	Risk *RiskClient
 	// RiskCategory is the client for interacting with the RiskCategory builders.
@@ -161,6 +163,7 @@ func (tx *Tx) init() {
 	tx.AdminRole = NewAdminRoleClient(tx.config)
 	tx.Department = NewDepartmentClient(tx.config)
 	tx.Employee = NewEmployeeClient(tx.config)
+	tx.Occupation = NewOccupationClient(tx.config)
 	tx.Risk = NewRiskClient(tx.config)
 	tx.RiskCategory = NewRiskCategoryClient(tx.config)
 	tx.RiskLocation = NewRiskLocationClient(tx.config)

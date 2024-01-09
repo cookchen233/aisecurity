@@ -36,6 +36,8 @@ const (
 	FieldRiskCategoryID = "risk_category_id"
 	// FieldRiskLocationID holds the string denoting the risk_location_id field in the database.
 	FieldRiskLocationID = "risk_location_id"
+	// FieldReporterID holds the string denoting the reporter_id field in the database.
+	FieldReporterID = "reporter_id"
 	// FieldMaintainerID holds the string denoting the maintainer_id field in the database.
 	FieldMaintainerID = "maintainer_id"
 	// FieldMeasures holds the string denoting the measures field in the database.
@@ -46,37 +48,32 @@ const (
 	FieldDueTime = "due_time"
 	// EdgeCreator holds the string denoting the creator edge name in mutations.
 	EdgeCreator = "creator"
-	// EdgeUpdator holds the string denoting the updator edge name in mutations.
-	EdgeUpdator = "updator"
-	// EdgeMaintainer holds the string denoting the maintainer edge name in mutations.
-	EdgeMaintainer = "maintainer"
+	// EdgeUpdater holds the string denoting the updater edge name in mutations.
+	EdgeUpdater = "updater"
 	// EdgeRiskCategory holds the string denoting the risk_category edge name in mutations.
 	EdgeRiskCategory = "risk_category"
 	// EdgeRiskLocation holds the string denoting the risk_location edge name in mutations.
 	EdgeRiskLocation = "risk_location"
+	// EdgeReporter holds the string denoting the reporter edge name in mutations.
+	EdgeReporter = "reporter"
+	// EdgeMaintainer holds the string denoting the maintainer edge name in mutations.
+	EdgeMaintainer = "maintainer"
 	// Table holds the table name of the risk in the database.
 	Table = "risks"
 	// CreatorTable is the table that holds the creator relation/edge.
 	CreatorTable = "risks"
-	// CreatorInverseTable is the table name for the Employee entity.
-	// It exists in this package in order to avoid circular dependency with the "employee" package.
-	CreatorInverseTable = "employees"
+	// CreatorInverseTable is the table name for the Admin entity.
+	// It exists in this package in order to avoid circular dependency with the "admin" package.
+	CreatorInverseTable = "admins"
 	// CreatorColumn is the table column denoting the creator relation/edge.
 	CreatorColumn = "created_by"
-	// UpdatorTable is the table that holds the updator relation/edge.
-	UpdatorTable = "risks"
-	// UpdatorInverseTable is the table name for the Admin entity.
+	// UpdaterTable is the table that holds the updater relation/edge.
+	UpdaterTable = "risks"
+	// UpdaterInverseTable is the table name for the Admin entity.
 	// It exists in this package in order to avoid circular dependency with the "admin" package.
-	UpdatorInverseTable = "admins"
-	// UpdatorColumn is the table column denoting the updator relation/edge.
-	UpdatorColumn = "updated_by"
-	// MaintainerTable is the table that holds the maintainer relation/edge.
-	MaintainerTable = "risks"
-	// MaintainerInverseTable is the table name for the Employee entity.
-	// It exists in this package in order to avoid circular dependency with the "employee" package.
-	MaintainerInverseTable = "employees"
-	// MaintainerColumn is the table column denoting the maintainer relation/edge.
-	MaintainerColumn = "maintainer_id"
+	UpdaterInverseTable = "admins"
+	// UpdaterColumn is the table column denoting the updater relation/edge.
+	UpdaterColumn = "updated_by"
 	// RiskCategoryTable is the table that holds the risk_category relation/edge.
 	RiskCategoryTable = "risks"
 	// RiskCategoryInverseTable is the table name for the RiskCategory entity.
@@ -91,6 +88,20 @@ const (
 	RiskLocationInverseTable = "risk_locations"
 	// RiskLocationColumn is the table column denoting the risk_location relation/edge.
 	RiskLocationColumn = "risk_location_id"
+	// ReporterTable is the table that holds the reporter relation/edge.
+	ReporterTable = "risks"
+	// ReporterInverseTable is the table name for the Employee entity.
+	// It exists in this package in order to avoid circular dependency with the "employee" package.
+	ReporterInverseTable = "employees"
+	// ReporterColumn is the table column denoting the reporter relation/edge.
+	ReporterColumn = "reporter_id"
+	// MaintainerTable is the table that holds the maintainer relation/edge.
+	MaintainerTable = "risks"
+	// MaintainerInverseTable is the table name for the Employee entity.
+	// It exists in this package in order to avoid circular dependency with the "employee" package.
+	MaintainerInverseTable = "employees"
+	// MaintainerColumn is the table column denoting the maintainer relation/edge.
+	MaintainerColumn = "maintainer_id"
 )
 
 // Columns holds all SQL columns for risk fields.
@@ -106,28 +117,17 @@ var Columns = []string{
 	FieldImages,
 	FieldRiskCategoryID,
 	FieldRiskLocationID,
+	FieldReporterID,
 	FieldMaintainerID,
 	FieldMeasures,
 	FieldMaintainStatus,
 	FieldDueTime,
 }
 
-// ForeignKeys holds the SQL foreign-keys that are owned by the "risks"
-// table and are not defined as standalone fields in the schema.
-var ForeignKeys = []string{
-	"admin_risk_creator",
-	"admin_risk_maintainer",
-}
-
 // ValidColumn reports if the column name is valid (part of the table columns).
 func ValidColumn(column string) bool {
 	for i := range Columns {
 		if column == Columns[i] {
-			return true
-		}
-	}
-	for i := range ForeignKeys {
-		if column == ForeignKeys[i] {
 			return true
 		}
 	}
@@ -157,6 +157,8 @@ var (
 	RiskCategoryIDValidator func(int) error
 	// RiskLocationIDValidator is a validator for the "risk_location_id" field. It is called by the builders before save.
 	RiskLocationIDValidator func(int) error
+	// ReporterIDValidator is a validator for the "reporter_id" field. It is called by the builders before save.
+	ReporterIDValidator func(int) error
 	// MaintainerIDValidator is a validator for the "maintainer_id" field. It is called by the builders before save.
 	MaintainerIDValidator func(int) error
 	// DefaultMaintainStatus holds the default value on creation for the "maintain_status" field.
@@ -218,6 +220,11 @@ func ByRiskLocationID(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldRiskLocationID, opts...).ToFunc()
 }
 
+// ByReporterID orders the results by the reporter_id field.
+func ByReporterID(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldReporterID, opts...).ToFunc()
+}
+
 // ByMaintainerID orders the results by the maintainer_id field.
 func ByMaintainerID(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldMaintainerID, opts...).ToFunc()
@@ -245,17 +252,10 @@ func ByCreatorField(field string, opts ...sql.OrderTermOption) OrderOption {
 	}
 }
 
-// ByUpdatorField orders the results by updator field.
-func ByUpdatorField(field string, opts ...sql.OrderTermOption) OrderOption {
+// ByUpdaterField orders the results by updater field.
+func ByUpdaterField(field string, opts ...sql.OrderTermOption) OrderOption {
 	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborTerms(s, newUpdatorStep(), sql.OrderByField(field, opts...))
-	}
-}
-
-// ByMaintainerField orders the results by maintainer field.
-func ByMaintainerField(field string, opts ...sql.OrderTermOption) OrderOption {
-	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborTerms(s, newMaintainerStep(), sql.OrderByField(field, opts...))
+		sqlgraph.OrderByNeighborTerms(s, newUpdaterStep(), sql.OrderByField(field, opts...))
 	}
 }
 
@@ -272,6 +272,20 @@ func ByRiskLocationField(field string, opts ...sql.OrderTermOption) OrderOption 
 		sqlgraph.OrderByNeighborTerms(s, newRiskLocationStep(), sql.OrderByField(field, opts...))
 	}
 }
+
+// ByReporterField orders the results by reporter field.
+func ByReporterField(field string, opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newReporterStep(), sql.OrderByField(field, opts...))
+	}
+}
+
+// ByMaintainerField orders the results by maintainer field.
+func ByMaintainerField(field string, opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newMaintainerStep(), sql.OrderByField(field, opts...))
+	}
+}
 func newCreatorStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
@@ -279,18 +293,11 @@ func newCreatorStep() *sqlgraph.Step {
 		sqlgraph.Edge(sqlgraph.M2O, true, CreatorTable, CreatorColumn),
 	)
 }
-func newUpdatorStep() *sqlgraph.Step {
+func newUpdaterStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
-		sqlgraph.To(UpdatorInverseTable, FieldID),
-		sqlgraph.Edge(sqlgraph.M2O, true, UpdatorTable, UpdatorColumn),
-	)
-}
-func newMaintainerStep() *sqlgraph.Step {
-	return sqlgraph.NewStep(
-		sqlgraph.From(Table, FieldID),
-		sqlgraph.To(MaintainerInverseTable, FieldID),
-		sqlgraph.Edge(sqlgraph.M2O, true, MaintainerTable, MaintainerColumn),
+		sqlgraph.To(UpdaterInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.M2O, true, UpdaterTable, UpdaterColumn),
 	)
 }
 func newRiskCategoryStep() *sqlgraph.Step {
@@ -305,5 +312,19 @@ func newRiskLocationStep() *sqlgraph.Step {
 		sqlgraph.From(Table, FieldID),
 		sqlgraph.To(RiskLocationInverseTable, FieldID),
 		sqlgraph.Edge(sqlgraph.M2O, true, RiskLocationTable, RiskLocationColumn),
+	)
+}
+func newReporterStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(ReporterInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.M2O, true, ReporterTable, ReporterColumn),
+	)
+}
+func newMaintainerStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(MaintainerInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.M2O, true, MaintainerTable, MaintainerColumn),
 	)
 }

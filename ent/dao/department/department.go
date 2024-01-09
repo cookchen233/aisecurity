@@ -25,16 +25,18 @@ const (
 	FieldUpdatedBy = "updated_by"
 	// FieldUpdatedAt holds the string denoting the updated_at field in the database.
 	FieldUpdatedAt = "updated_at"
-	// FieldTitle holds the string denoting the title field in the database.
-	FieldTitle = "title"
+	// FieldName holds the string denoting the name field in the database.
+	FieldName = "name"
 	// FieldParentID holds the string denoting the parent_id field in the database.
 	FieldParentID = "parent_id"
 	// EdgeCreator holds the string denoting the creator edge name in mutations.
 	EdgeCreator = "creator"
+	// EdgeUpdater holds the string denoting the updater edge name in mutations.
+	EdgeUpdater = "updater"
 	// EdgeParent holds the string denoting the parent edge name in mutations.
 	EdgeParent = "parent"
-	// EdgeEmployeeDepartment holds the string denoting the employee_department edge name in mutations.
-	EdgeEmployeeDepartment = "employee_department"
+	// EdgeEmployees holds the string denoting the employees edge name in mutations.
+	EdgeEmployees = "employees"
 	// EdgeChildren holds the string denoting the children edge name in mutations.
 	EdgeChildren = "children"
 	// Table holds the table name of the department in the database.
@@ -46,17 +48,24 @@ const (
 	CreatorInverseTable = "admins"
 	// CreatorColumn is the table column denoting the creator relation/edge.
 	CreatorColumn = "created_by"
+	// UpdaterTable is the table that holds the updater relation/edge.
+	UpdaterTable = "departments"
+	// UpdaterInverseTable is the table name for the Admin entity.
+	// It exists in this package in order to avoid circular dependency with the "admin" package.
+	UpdaterInverseTable = "admins"
+	// UpdaterColumn is the table column denoting the updater relation/edge.
+	UpdaterColumn = "updated_by"
 	// ParentTable is the table that holds the parent relation/edge.
 	ParentTable = "departments"
 	// ParentColumn is the table column denoting the parent relation/edge.
 	ParentColumn = "parent_id"
-	// EmployeeDepartmentTable is the table that holds the employee_department relation/edge.
-	EmployeeDepartmentTable = "employees"
-	// EmployeeDepartmentInverseTable is the table name for the Employee entity.
+	// EmployeesTable is the table that holds the employees relation/edge.
+	EmployeesTable = "employees"
+	// EmployeesInverseTable is the table name for the Employee entity.
 	// It exists in this package in order to avoid circular dependency with the "employee" package.
-	EmployeeDepartmentInverseTable = "employees"
-	// EmployeeDepartmentColumn is the table column denoting the employee_department relation/edge.
-	EmployeeDepartmentColumn = "department_id"
+	EmployeesInverseTable = "employees"
+	// EmployeesColumn is the table column denoting the employees relation/edge.
+	EmployeesColumn = "department_id"
 	// ChildrenTable is the table that holds the children relation/edge.
 	ChildrenTable = "departments"
 	// ChildrenColumn is the table column denoting the children relation/edge.
@@ -71,25 +80,14 @@ var Columns = []string{
 	FieldDeletedAt,
 	FieldUpdatedBy,
 	FieldUpdatedAt,
-	FieldTitle,
+	FieldName,
 	FieldParentID,
-}
-
-// ForeignKeys holds the SQL foreign-keys that are owned by the "departments"
-// table and are not defined as standalone fields in the schema.
-var ForeignKeys = []string{
-	"admin_department_updator",
 }
 
 // ValidColumn reports if the column name is valid (part of the table columns).
 func ValidColumn(column string) bool {
 	for i := range Columns {
 		if column == Columns[i] {
-			return true
-		}
-	}
-	for i := range ForeignKeys {
-		if column == ForeignKeys[i] {
 			return true
 		}
 	}
@@ -113,8 +111,8 @@ var (
 	DefaultUpdatedAt func() time.Time
 	// UpdateDefaultUpdatedAt holds the default value on update for the "updated_at" field.
 	UpdateDefaultUpdatedAt func() time.Time
-	// TitleValidator is a validator for the "title" field. It is called by the builders before save.
-	TitleValidator func(string) error
+	// NameValidator is a validator for the "name" field. It is called by the builders before save.
+	NameValidator func(string) error
 	// ParentIDValidator is a validator for the "parent_id" field. It is called by the builders before save.
 	ParentIDValidator func(int) error
 )
@@ -152,9 +150,9 @@ func ByUpdatedAt(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldUpdatedAt, opts...).ToFunc()
 }
 
-// ByTitle orders the results by the title field.
-func ByTitle(opts ...sql.OrderTermOption) OrderOption {
-	return sql.OrderByField(FieldTitle, opts...).ToFunc()
+// ByName orders the results by the name field.
+func ByName(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldName, opts...).ToFunc()
 }
 
 // ByParentID orders the results by the parent_id field.
@@ -169,6 +167,13 @@ func ByCreatorField(field string, opts ...sql.OrderTermOption) OrderOption {
 	}
 }
 
+// ByUpdaterField orders the results by updater field.
+func ByUpdaterField(field string, opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newUpdaterStep(), sql.OrderByField(field, opts...))
+	}
+}
+
 // ByParentField orders the results by parent field.
 func ByParentField(field string, opts ...sql.OrderTermOption) OrderOption {
 	return func(s *sql.Selector) {
@@ -176,17 +181,17 @@ func ByParentField(field string, opts ...sql.OrderTermOption) OrderOption {
 	}
 }
 
-// ByEmployeeDepartmentCount orders the results by employee_department count.
-func ByEmployeeDepartmentCount(opts ...sql.OrderTermOption) OrderOption {
+// ByEmployeesCount orders the results by employees count.
+func ByEmployeesCount(opts ...sql.OrderTermOption) OrderOption {
 	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborsCount(s, newEmployeeDepartmentStep(), opts...)
+		sqlgraph.OrderByNeighborsCount(s, newEmployeesStep(), opts...)
 	}
 }
 
-// ByEmployeeDepartment orders the results by employee_department terms.
-func ByEmployeeDepartment(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+// ByEmployees orders the results by employees terms.
+func ByEmployees(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
 	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborTerms(s, newEmployeeDepartmentStep(), append([]sql.OrderTerm{term}, terms...)...)
+		sqlgraph.OrderByNeighborTerms(s, newEmployeesStep(), append([]sql.OrderTerm{term}, terms...)...)
 	}
 }
 
@@ -210,6 +215,13 @@ func newCreatorStep() *sqlgraph.Step {
 		sqlgraph.Edge(sqlgraph.M2O, true, CreatorTable, CreatorColumn),
 	)
 }
+func newUpdaterStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(UpdaterInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.M2O, true, UpdaterTable, UpdaterColumn),
+	)
+}
 func newParentStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
@@ -217,11 +229,11 @@ func newParentStep() *sqlgraph.Step {
 		sqlgraph.Edge(sqlgraph.M2O, true, ParentTable, ParentColumn),
 	)
 }
-func newEmployeeDepartmentStep() *sqlgraph.Step {
+func newEmployeesStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
-		sqlgraph.To(EmployeeDepartmentInverseTable, FieldID),
-		sqlgraph.Edge(sqlgraph.O2M, false, EmployeeDepartmentTable, EmployeeDepartmentColumn),
+		sqlgraph.To(EmployeesInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.O2M, false, EmployeesTable, EmployeesColumn),
 	)
 }
 func newChildrenStep() *sqlgraph.Step {

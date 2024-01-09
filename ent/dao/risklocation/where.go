@@ -80,9 +80,9 @@ func UpdatedAt(v time.Time) predicate.RiskLocation {
 	return predicate.RiskLocation(sql.FieldEQ(FieldUpdatedAt, v))
 }
 
-// Title applies equality check predicate on the "title" field. It's identical to TitleEQ.
-func Title(v string) predicate.RiskLocation {
-	return predicate.RiskLocation(sql.FieldEQ(FieldTitle, v))
+// Name applies equality check predicate on the "name" field. It's identical to NameEQ.
+func Name(v string) predicate.RiskLocation {
+	return predicate.RiskLocation(sql.FieldEQ(FieldName, v))
 }
 
 // CreatedAtEQ applies the EQ predicate on the "created_at" field.
@@ -255,69 +255,69 @@ func UpdatedAtLTE(v time.Time) predicate.RiskLocation {
 	return predicate.RiskLocation(sql.FieldLTE(FieldUpdatedAt, v))
 }
 
-// TitleEQ applies the EQ predicate on the "title" field.
-func TitleEQ(v string) predicate.RiskLocation {
-	return predicate.RiskLocation(sql.FieldEQ(FieldTitle, v))
+// NameEQ applies the EQ predicate on the "name" field.
+func NameEQ(v string) predicate.RiskLocation {
+	return predicate.RiskLocation(sql.FieldEQ(FieldName, v))
 }
 
-// TitleNEQ applies the NEQ predicate on the "title" field.
-func TitleNEQ(v string) predicate.RiskLocation {
-	return predicate.RiskLocation(sql.FieldNEQ(FieldTitle, v))
+// NameNEQ applies the NEQ predicate on the "name" field.
+func NameNEQ(v string) predicate.RiskLocation {
+	return predicate.RiskLocation(sql.FieldNEQ(FieldName, v))
 }
 
-// TitleIn applies the In predicate on the "title" field.
-func TitleIn(vs ...string) predicate.RiskLocation {
-	return predicate.RiskLocation(sql.FieldIn(FieldTitle, vs...))
+// NameIn applies the In predicate on the "name" field.
+func NameIn(vs ...string) predicate.RiskLocation {
+	return predicate.RiskLocation(sql.FieldIn(FieldName, vs...))
 }
 
-// TitleNotIn applies the NotIn predicate on the "title" field.
-func TitleNotIn(vs ...string) predicate.RiskLocation {
-	return predicate.RiskLocation(sql.FieldNotIn(FieldTitle, vs...))
+// NameNotIn applies the NotIn predicate on the "name" field.
+func NameNotIn(vs ...string) predicate.RiskLocation {
+	return predicate.RiskLocation(sql.FieldNotIn(FieldName, vs...))
 }
 
-// TitleGT applies the GT predicate on the "title" field.
-func TitleGT(v string) predicate.RiskLocation {
-	return predicate.RiskLocation(sql.FieldGT(FieldTitle, v))
+// NameGT applies the GT predicate on the "name" field.
+func NameGT(v string) predicate.RiskLocation {
+	return predicate.RiskLocation(sql.FieldGT(FieldName, v))
 }
 
-// TitleGTE applies the GTE predicate on the "title" field.
-func TitleGTE(v string) predicate.RiskLocation {
-	return predicate.RiskLocation(sql.FieldGTE(FieldTitle, v))
+// NameGTE applies the GTE predicate on the "name" field.
+func NameGTE(v string) predicate.RiskLocation {
+	return predicate.RiskLocation(sql.FieldGTE(FieldName, v))
 }
 
-// TitleLT applies the LT predicate on the "title" field.
-func TitleLT(v string) predicate.RiskLocation {
-	return predicate.RiskLocation(sql.FieldLT(FieldTitle, v))
+// NameLT applies the LT predicate on the "name" field.
+func NameLT(v string) predicate.RiskLocation {
+	return predicate.RiskLocation(sql.FieldLT(FieldName, v))
 }
 
-// TitleLTE applies the LTE predicate on the "title" field.
-func TitleLTE(v string) predicate.RiskLocation {
-	return predicate.RiskLocation(sql.FieldLTE(FieldTitle, v))
+// NameLTE applies the LTE predicate on the "name" field.
+func NameLTE(v string) predicate.RiskLocation {
+	return predicate.RiskLocation(sql.FieldLTE(FieldName, v))
 }
 
-// TitleContains applies the Contains predicate on the "title" field.
-func TitleContains(v string) predicate.RiskLocation {
-	return predicate.RiskLocation(sql.FieldContains(FieldTitle, v))
+// NameContains applies the Contains predicate on the "name" field.
+func NameContains(v string) predicate.RiskLocation {
+	return predicate.RiskLocation(sql.FieldContains(FieldName, v))
 }
 
-// TitleHasPrefix applies the HasPrefix predicate on the "title" field.
-func TitleHasPrefix(v string) predicate.RiskLocation {
-	return predicate.RiskLocation(sql.FieldHasPrefix(FieldTitle, v))
+// NameHasPrefix applies the HasPrefix predicate on the "name" field.
+func NameHasPrefix(v string) predicate.RiskLocation {
+	return predicate.RiskLocation(sql.FieldHasPrefix(FieldName, v))
 }
 
-// TitleHasSuffix applies the HasSuffix predicate on the "title" field.
-func TitleHasSuffix(v string) predicate.RiskLocation {
-	return predicate.RiskLocation(sql.FieldHasSuffix(FieldTitle, v))
+// NameHasSuffix applies the HasSuffix predicate on the "name" field.
+func NameHasSuffix(v string) predicate.RiskLocation {
+	return predicate.RiskLocation(sql.FieldHasSuffix(FieldName, v))
 }
 
-// TitleEqualFold applies the EqualFold predicate on the "title" field.
-func TitleEqualFold(v string) predicate.RiskLocation {
-	return predicate.RiskLocation(sql.FieldEqualFold(FieldTitle, v))
+// NameEqualFold applies the EqualFold predicate on the "name" field.
+func NameEqualFold(v string) predicate.RiskLocation {
+	return predicate.RiskLocation(sql.FieldEqualFold(FieldName, v))
 }
 
-// TitleContainsFold applies the ContainsFold predicate on the "title" field.
-func TitleContainsFold(v string) predicate.RiskLocation {
-	return predicate.RiskLocation(sql.FieldContainsFold(FieldTitle, v))
+// NameContainsFold applies the ContainsFold predicate on the "name" field.
+func NameContainsFold(v string) predicate.RiskLocation {
+	return predicate.RiskLocation(sql.FieldContainsFold(FieldName, v))
 }
 
 // HasCreator applies the HasEdge predicate on the "creator" edge.
@@ -343,21 +343,21 @@ func HasCreatorWith(preds ...predicate.Admin) predicate.RiskLocation {
 	})
 }
 
-// HasUpdator applies the HasEdge predicate on the "updator" edge.
-func HasUpdator() predicate.RiskLocation {
+// HasUpdater applies the HasEdge predicate on the "updater" edge.
+func HasUpdater() predicate.RiskLocation {
 	return predicate.RiskLocation(func(s *sql.Selector) {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(Table, FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, true, UpdatorTable, UpdatorColumn),
+			sqlgraph.Edge(sqlgraph.M2O, true, UpdaterTable, UpdaterColumn),
 		)
 		sqlgraph.HasNeighbors(s, step)
 	})
 }
 
-// HasUpdatorWith applies the HasEdge predicate on the "updator" edge with a given conditions (other predicates).
-func HasUpdatorWith(preds ...predicate.Admin) predicate.RiskLocation {
+// HasUpdaterWith applies the HasEdge predicate on the "updater" edge with a given conditions (other predicates).
+func HasUpdaterWith(preds ...predicate.Admin) predicate.RiskLocation {
 	return predicate.RiskLocation(func(s *sql.Selector) {
-		step := newUpdatorStep()
+		step := newUpdaterStep()
 		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
 			for _, p := range preds {
 				p(s)
@@ -366,21 +366,21 @@ func HasUpdatorWith(preds ...predicate.Admin) predicate.RiskLocation {
 	})
 }
 
-// HasRiskRiskLocation applies the HasEdge predicate on the "risk_risk_location" edge.
-func HasRiskRiskLocation() predicate.RiskLocation {
+// HasRisk applies the HasEdge predicate on the "risk" edge.
+func HasRisk() predicate.RiskLocation {
 	return predicate.RiskLocation(func(s *sql.Selector) {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(Table, FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, false, RiskRiskLocationTable, RiskRiskLocationColumn),
+			sqlgraph.Edge(sqlgraph.O2M, false, RiskTable, RiskColumn),
 		)
 		sqlgraph.HasNeighbors(s, step)
 	})
 }
 
-// HasRiskRiskLocationWith applies the HasEdge predicate on the "risk_risk_location" edge with a given conditions (other predicates).
-func HasRiskRiskLocationWith(preds ...predicate.Risk) predicate.RiskLocation {
+// HasRiskWith applies the HasEdge predicate on the "risk" edge with a given conditions (other predicates).
+func HasRiskWith(preds ...predicate.Risk) predicate.RiskLocation {
 	return predicate.RiskLocation(func(s *sql.Selector) {
-		step := newRiskRiskLocationStep()
+		step := newRiskStep()
 		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
 			for _, p := range preds {
 				p(s)

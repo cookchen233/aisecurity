@@ -38,7 +38,7 @@ func init() {
 	_log.SetFlags(log.LstdFlags | log.Lmicroseconds)
 }
 
-func RequestLogMiddleware() gin.HandlerFunc {
+func JoyRequestLog() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		// this if block is where important things happen for rotation
 		// changing output file for logger

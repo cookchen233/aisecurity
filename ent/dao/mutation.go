@@ -7,6 +7,7 @@ import (
 	"aisecurity/ent/dao/adminrole"
 	"aisecurity/ent/dao/department"
 	"aisecurity/ent/dao/employee"
+	"aisecurity/ent/dao/occupation"
 	"aisecurity/ent/dao/predicate"
 	"aisecurity/ent/dao/risk"
 	"aisecurity/ent/dao/riskcategory"
@@ -35,6 +36,7 @@ const (
 	TypeAdminRole    = "AdminRole"
 	TypeDepartment   = "Department"
 	TypeEmployee     = "Employee"
+	TypeOccupation   = "Occupation"
 	TypeRisk         = "Risk"
 	TypeRiskCategory = "RiskCategory"
 	TypeRiskLocation = "RiskLocation"
@@ -51,63 +53,68 @@ type AdminMutation struct {
 	updated_at                   *time.Time
 	username                     *string
 	password                     *string
-	name                         *string
+	nickname                     *string
+	real_name                    *string
+	avatar                       *string
 	clearedFields                map[string]struct{}
 	creator                      *int
 	clearedcreator               bool
-	updator                      *int
-	clearedupdator               bool
+	updater                      *int
+	clearedupdater               bool
 	admin_roles                  map[int]struct{}
 	removedadmin_roles           map[int]struct{}
 	clearedadmin_roles           bool
 	admin_creator                map[int]struct{}
 	removedadmin_creator         map[int]struct{}
 	clearedadmin_creator         bool
-	admin_updator                map[int]struct{}
-	removedadmin_updator         map[int]struct{}
-	clearedadmin_updator         bool
+	admin_updater                map[int]struct{}
+	removedadmin_updater         map[int]struct{}
+	clearedadmin_updater         bool
 	admin_role_creator           map[int]struct{}
 	removedadmin_role_creator    map[int]struct{}
 	clearedadmin_role_creator    bool
-	admin_role_updator           map[int]struct{}
-	removedadmin_role_updator    map[int]struct{}
-	clearedadmin_role_updator    bool
+	admin_role_updater           map[int]struct{}
+	removedadmin_role_updater    map[int]struct{}
+	clearedadmin_role_updater    bool
 	risk_creator                 map[int]struct{}
 	removedrisk_creator          map[int]struct{}
 	clearedrisk_creator          bool
-	risk_updator                 map[int]struct{}
-	removedrisk_updator          map[int]struct{}
-	clearedrisk_updator          bool
-	risk_maintainer              map[int]struct{}
-	removedrisk_maintainer       map[int]struct{}
-	clearedrisk_maintainer       bool
+	risk_updater                 map[int]struct{}
+	removedrisk_updater          map[int]struct{}
+	clearedrisk_updater          bool
 	risk_location_creator        map[int]struct{}
 	removedrisk_location_creator map[int]struct{}
 	clearedrisk_location_creator bool
-	risk_location_updator        map[int]struct{}
-	removedrisk_location_updator map[int]struct{}
-	clearedrisk_location_updator bool
+	risk_location_updater        map[int]struct{}
+	removedrisk_location_updater map[int]struct{}
+	clearedrisk_location_updater bool
 	risk_category_creator        map[int]struct{}
 	removedrisk_category_creator map[int]struct{}
 	clearedrisk_category_creator bool
-	risk_category_updator        map[int]struct{}
-	removedrisk_category_updator map[int]struct{}
-	clearedrisk_category_updator bool
+	risk_category_updater        map[int]struct{}
+	removedrisk_category_updater map[int]struct{}
+	clearedrisk_category_updater bool
 	department_creator           map[int]struct{}
 	removeddepartment_creator    map[int]struct{}
 	cleareddepartment_creator    bool
-	department_updator           map[int]struct{}
-	removeddepartment_updator    map[int]struct{}
-	cleareddepartment_updator    bool
+	department_updater           map[int]struct{}
+	removeddepartment_updater    map[int]struct{}
+	cleareddepartment_updater    bool
 	employee_creator             map[int]struct{}
 	removedemployee_creator      map[int]struct{}
 	clearedemployee_creator      bool
-	employee_updator             map[int]struct{}
-	removedemployee_updator      map[int]struct{}
-	clearedemployee_updator      bool
-	employee_admin               map[int]struct{}
-	removedemployee_admin        map[int]struct{}
-	clearedemployee_admin        bool
+	employee_updater             map[int]struct{}
+	removedemployee_updater      map[int]struct{}
+	clearedemployee_updater      bool
+	employee                     map[int]struct{}
+	removedemployee              map[int]struct{}
+	clearedemployee              bool
+	occupation_creator           map[int]struct{}
+	removedoccupation_creator    map[int]struct{}
+	clearedoccupation_creator    bool
+	occupation_updater           map[int]struct{}
+	removedoccupation_updater    map[int]struct{}
+	clearedoccupation_updater    bool
 	done                         bool
 	oldValue                     func(context.Context) (*Admin, error)
 	predicates                   []predicate.Admin
@@ -334,12 +341,12 @@ func (m *AdminMutation) ResetDeletedAt() {
 
 // SetUpdatedBy sets the "updated_by" field.
 func (m *AdminMutation) SetUpdatedBy(i int) {
-	m.updator = &i
+	m.updater = &i
 }
 
 // UpdatedBy returns the value of the "updated_by" field in the mutation.
 func (m *AdminMutation) UpdatedBy() (r int, exists bool) {
-	v := m.updator
+	v := m.updater
 	if v == nil {
 		return
 	}
@@ -365,7 +372,7 @@ func (m *AdminMutation) OldUpdatedBy(ctx context.Context) (v int, err error) {
 
 // ResetUpdatedBy resets all changes to the "updated_by" field.
 func (m *AdminMutation) ResetUpdatedBy() {
-	m.updator = nil
+	m.updater = nil
 }
 
 // SetUpdatedAt sets the "updated_at" field.
@@ -476,53 +483,125 @@ func (m *AdminMutation) ResetPassword() {
 	m.password = nil
 }
 
-// SetName sets the "name" field.
-func (m *AdminMutation) SetName(s string) {
-	m.name = &s
+// SetNickname sets the "nickname" field.
+func (m *AdminMutation) SetNickname(s string) {
+	m.nickname = &s
 }
 
-// Name returns the value of the "name" field in the mutation.
-func (m *AdminMutation) Name() (r string, exists bool) {
-	v := m.name
+// Nickname returns the value of the "nickname" field in the mutation.
+func (m *AdminMutation) Nickname() (r string, exists bool) {
+	v := m.nickname
 	if v == nil {
 		return
 	}
 	return *v, true
 }
 
-// OldName returns the old "name" field's value of the Admin entity.
+// OldNickname returns the old "nickname" field's value of the Admin entity.
 // If the Admin object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *AdminMutation) OldName(ctx context.Context) (v string, err error) {
+func (m *AdminMutation) OldNickname(ctx context.Context) (v string, err error) {
 	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldName is only allowed on UpdateOne operations")
+		return v, errors.New("OldNickname is only allowed on UpdateOne operations")
 	}
 	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldName requires an ID field in the mutation")
+		return v, errors.New("OldNickname requires an ID field in the mutation")
 	}
 	oldValue, err := m.oldValue(ctx)
 	if err != nil {
-		return v, fmt.Errorf("querying old value for OldName: %w", err)
+		return v, fmt.Errorf("querying old value for OldNickname: %w", err)
 	}
-	return oldValue.Name, nil
+	return oldValue.Nickname, nil
 }
 
-// ClearName clears the value of the "name" field.
-func (m *AdminMutation) ClearName() {
-	m.name = nil
-	m.clearedFields[admin.FieldName] = struct{}{}
+// ResetNickname resets all changes to the "nickname" field.
+func (m *AdminMutation) ResetNickname() {
+	m.nickname = nil
 }
 
-// NameCleared returns if the "name" field was cleared in this mutation.
-func (m *AdminMutation) NameCleared() bool {
-	_, ok := m.clearedFields[admin.FieldName]
+// SetRealName sets the "real_name" field.
+func (m *AdminMutation) SetRealName(s string) {
+	m.real_name = &s
+}
+
+// RealName returns the value of the "real_name" field in the mutation.
+func (m *AdminMutation) RealName() (r string, exists bool) {
+	v := m.real_name
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldRealName returns the old "real_name" field's value of the Admin entity.
+// If the Admin object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *AdminMutation) OldRealName(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldRealName is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldRealName requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldRealName: %w", err)
+	}
+	return oldValue.RealName, nil
+}
+
+// ResetRealName resets all changes to the "real_name" field.
+func (m *AdminMutation) ResetRealName() {
+	m.real_name = nil
+}
+
+// SetAvatar sets the "avatar" field.
+func (m *AdminMutation) SetAvatar(s string) {
+	m.avatar = &s
+}
+
+// Avatar returns the value of the "avatar" field in the mutation.
+func (m *AdminMutation) Avatar() (r string, exists bool) {
+	v := m.avatar
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldAvatar returns the old "avatar" field's value of the Admin entity.
+// If the Admin object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *AdminMutation) OldAvatar(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldAvatar is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldAvatar requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldAvatar: %w", err)
+	}
+	return oldValue.Avatar, nil
+}
+
+// ClearAvatar clears the value of the "avatar" field.
+func (m *AdminMutation) ClearAvatar() {
+	m.avatar = nil
+	m.clearedFields[admin.FieldAvatar] = struct{}{}
+}
+
+// AvatarCleared returns if the "avatar" field was cleared in this mutation.
+func (m *AdminMutation) AvatarCleared() bool {
+	_, ok := m.clearedFields[admin.FieldAvatar]
 	return ok
 }
 
-// ResetName resets all changes to the "name" field.
-func (m *AdminMutation) ResetName() {
-	m.name = nil
-	delete(m.clearedFields, admin.FieldName)
+// ResetAvatar resets all changes to the "avatar" field.
+func (m *AdminMutation) ResetAvatar() {
+	m.avatar = nil
+	delete(m.clearedFields, admin.FieldAvatar)
 }
 
 // SetCreatorID sets the "creator" edge to the Admin entity by id.
@@ -565,44 +644,44 @@ func (m *AdminMutation) ResetCreator() {
 	m.clearedcreator = false
 }
 
-// SetUpdatorID sets the "updator" edge to the Admin entity by id.
-func (m *AdminMutation) SetUpdatorID(id int) {
-	m.updator = &id
+// SetUpdaterID sets the "updater" edge to the Admin entity by id.
+func (m *AdminMutation) SetUpdaterID(id int) {
+	m.updater = &id
 }
 
-// ClearUpdator clears the "updator" edge to the Admin entity.
-func (m *AdminMutation) ClearUpdator() {
-	m.clearedupdator = true
+// ClearUpdater clears the "updater" edge to the Admin entity.
+func (m *AdminMutation) ClearUpdater() {
+	m.clearedupdater = true
 	m.clearedFields[admin.FieldUpdatedBy] = struct{}{}
 }
 
-// UpdatorCleared reports if the "updator" edge to the Admin entity was cleared.
-func (m *AdminMutation) UpdatorCleared() bool {
-	return m.clearedupdator
+// UpdaterCleared reports if the "updater" edge to the Admin entity was cleared.
+func (m *AdminMutation) UpdaterCleared() bool {
+	return m.clearedupdater
 }
 
-// UpdatorID returns the "updator" edge ID in the mutation.
-func (m *AdminMutation) UpdatorID() (id int, exists bool) {
-	if m.updator != nil {
-		return *m.updator, true
+// UpdaterID returns the "updater" edge ID in the mutation.
+func (m *AdminMutation) UpdaterID() (id int, exists bool) {
+	if m.updater != nil {
+		return *m.updater, true
 	}
 	return
 }
 
-// UpdatorIDs returns the "updator" edge IDs in the mutation.
+// UpdaterIDs returns the "updater" edge IDs in the mutation.
 // Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
-// UpdatorID instead. It exists only for internal usage by the builders.
-func (m *AdminMutation) UpdatorIDs() (ids []int) {
-	if id := m.updator; id != nil {
+// UpdaterID instead. It exists only for internal usage by the builders.
+func (m *AdminMutation) UpdaterIDs() (ids []int) {
+	if id := m.updater; id != nil {
 		ids = append(ids, *id)
 	}
 	return
 }
 
-// ResetUpdator resets all changes to the "updator" edge.
-func (m *AdminMutation) ResetUpdator() {
-	m.updator = nil
-	m.clearedupdator = false
+// ResetUpdater resets all changes to the "updater" edge.
+func (m *AdminMutation) ResetUpdater() {
+	m.updater = nil
+	m.clearedupdater = false
 }
 
 // AddAdminRoleIDs adds the "admin_roles" edge to the AdminRole entity by ids.
@@ -713,58 +792,58 @@ func (m *AdminMutation) ResetAdminCreator() {
 	m.removedadmin_creator = nil
 }
 
-// AddAdminUpdatorIDs adds the "admin_updator" edge to the Admin entity by ids.
-func (m *AdminMutation) AddAdminUpdatorIDs(ids ...int) {
-	if m.admin_updator == nil {
-		m.admin_updator = make(map[int]struct{})
+// AddAdminUpdaterIDs adds the "admin_updater" edge to the Admin entity by ids.
+func (m *AdminMutation) AddAdminUpdaterIDs(ids ...int) {
+	if m.admin_updater == nil {
+		m.admin_updater = make(map[int]struct{})
 	}
 	for i := range ids {
-		m.admin_updator[ids[i]] = struct{}{}
+		m.admin_updater[ids[i]] = struct{}{}
 	}
 }
 
-// ClearAdminUpdator clears the "admin_updator" edge to the Admin entity.
-func (m *AdminMutation) ClearAdminUpdator() {
-	m.clearedadmin_updator = true
+// ClearAdminUpdater clears the "admin_updater" edge to the Admin entity.
+func (m *AdminMutation) ClearAdminUpdater() {
+	m.clearedadmin_updater = true
 }
 
-// AdminUpdatorCleared reports if the "admin_updator" edge to the Admin entity was cleared.
-func (m *AdminMutation) AdminUpdatorCleared() bool {
-	return m.clearedadmin_updator
+// AdminUpdaterCleared reports if the "admin_updater" edge to the Admin entity was cleared.
+func (m *AdminMutation) AdminUpdaterCleared() bool {
+	return m.clearedadmin_updater
 }
 
-// RemoveAdminUpdatorIDs removes the "admin_updator" edge to the Admin entity by IDs.
-func (m *AdminMutation) RemoveAdminUpdatorIDs(ids ...int) {
-	if m.removedadmin_updator == nil {
-		m.removedadmin_updator = make(map[int]struct{})
+// RemoveAdminUpdaterIDs removes the "admin_updater" edge to the Admin entity by IDs.
+func (m *AdminMutation) RemoveAdminUpdaterIDs(ids ...int) {
+	if m.removedadmin_updater == nil {
+		m.removedadmin_updater = make(map[int]struct{})
 	}
 	for i := range ids {
-		delete(m.admin_updator, ids[i])
-		m.removedadmin_updator[ids[i]] = struct{}{}
+		delete(m.admin_updater, ids[i])
+		m.removedadmin_updater[ids[i]] = struct{}{}
 	}
 }
 
-// RemovedAdminUpdator returns the removed IDs of the "admin_updator" edge to the Admin entity.
-func (m *AdminMutation) RemovedAdminUpdatorIDs() (ids []int) {
-	for id := range m.removedadmin_updator {
+// RemovedAdminUpdater returns the removed IDs of the "admin_updater" edge to the Admin entity.
+func (m *AdminMutation) RemovedAdminUpdaterIDs() (ids []int) {
+	for id := range m.removedadmin_updater {
 		ids = append(ids, id)
 	}
 	return
 }
 
-// AdminUpdatorIDs returns the "admin_updator" edge IDs in the mutation.
-func (m *AdminMutation) AdminUpdatorIDs() (ids []int) {
-	for id := range m.admin_updator {
+// AdminUpdaterIDs returns the "admin_updater" edge IDs in the mutation.
+func (m *AdminMutation) AdminUpdaterIDs() (ids []int) {
+	for id := range m.admin_updater {
 		ids = append(ids, id)
 	}
 	return
 }
 
-// ResetAdminUpdator resets all changes to the "admin_updator" edge.
-func (m *AdminMutation) ResetAdminUpdator() {
-	m.admin_updator = nil
-	m.clearedadmin_updator = false
-	m.removedadmin_updator = nil
+// ResetAdminUpdater resets all changes to the "admin_updater" edge.
+func (m *AdminMutation) ResetAdminUpdater() {
+	m.admin_updater = nil
+	m.clearedadmin_updater = false
+	m.removedadmin_updater = nil
 }
 
 // AddAdminRoleCreatorIDs adds the "admin_role_creator" edge to the AdminRole entity by ids.
@@ -821,58 +900,58 @@ func (m *AdminMutation) ResetAdminRoleCreator() {
 	m.removedadmin_role_creator = nil
 }
 
-// AddAdminRoleUpdatorIDs adds the "admin_role_updator" edge to the AdminRole entity by ids.
-func (m *AdminMutation) AddAdminRoleUpdatorIDs(ids ...int) {
-	if m.admin_role_updator == nil {
-		m.admin_role_updator = make(map[int]struct{})
+// AddAdminRoleUpdaterIDs adds the "admin_role_updater" edge to the AdminRole entity by ids.
+func (m *AdminMutation) AddAdminRoleUpdaterIDs(ids ...int) {
+	if m.admin_role_updater == nil {
+		m.admin_role_updater = make(map[int]struct{})
 	}
 	for i := range ids {
-		m.admin_role_updator[ids[i]] = struct{}{}
+		m.admin_role_updater[ids[i]] = struct{}{}
 	}
 }
 
-// ClearAdminRoleUpdator clears the "admin_role_updator" edge to the AdminRole entity.
-func (m *AdminMutation) ClearAdminRoleUpdator() {
-	m.clearedadmin_role_updator = true
+// ClearAdminRoleUpdater clears the "admin_role_updater" edge to the AdminRole entity.
+func (m *AdminMutation) ClearAdminRoleUpdater() {
+	m.clearedadmin_role_updater = true
 }
 
-// AdminRoleUpdatorCleared reports if the "admin_role_updator" edge to the AdminRole entity was cleared.
-func (m *AdminMutation) AdminRoleUpdatorCleared() bool {
-	return m.clearedadmin_role_updator
+// AdminRoleUpdaterCleared reports if the "admin_role_updater" edge to the AdminRole entity was cleared.
+func (m *AdminMutation) AdminRoleUpdaterCleared() bool {
+	return m.clearedadmin_role_updater
 }
 
-// RemoveAdminRoleUpdatorIDs removes the "admin_role_updator" edge to the AdminRole entity by IDs.
-func (m *AdminMutation) RemoveAdminRoleUpdatorIDs(ids ...int) {
-	if m.removedadmin_role_updator == nil {
-		m.removedadmin_role_updator = make(map[int]struct{})
+// RemoveAdminRoleUpdaterIDs removes the "admin_role_updater" edge to the AdminRole entity by IDs.
+func (m *AdminMutation) RemoveAdminRoleUpdaterIDs(ids ...int) {
+	if m.removedadmin_role_updater == nil {
+		m.removedadmin_role_updater = make(map[int]struct{})
 	}
 	for i := range ids {
-		delete(m.admin_role_updator, ids[i])
-		m.removedadmin_role_updator[ids[i]] = struct{}{}
+		delete(m.admin_role_updater, ids[i])
+		m.removedadmin_role_updater[ids[i]] = struct{}{}
 	}
 }
 
-// RemovedAdminRoleUpdator returns the removed IDs of the "admin_role_updator" edge to the AdminRole entity.
-func (m *AdminMutation) RemovedAdminRoleUpdatorIDs() (ids []int) {
-	for id := range m.removedadmin_role_updator {
+// RemovedAdminRoleUpdater returns the removed IDs of the "admin_role_updater" edge to the AdminRole entity.
+func (m *AdminMutation) RemovedAdminRoleUpdaterIDs() (ids []int) {
+	for id := range m.removedadmin_role_updater {
 		ids = append(ids, id)
 	}
 	return
 }
 
-// AdminRoleUpdatorIDs returns the "admin_role_updator" edge IDs in the mutation.
-func (m *AdminMutation) AdminRoleUpdatorIDs() (ids []int) {
-	for id := range m.admin_role_updator {
+// AdminRoleUpdaterIDs returns the "admin_role_updater" edge IDs in the mutation.
+func (m *AdminMutation) AdminRoleUpdaterIDs() (ids []int) {
+	for id := range m.admin_role_updater {
 		ids = append(ids, id)
 	}
 	return
 }
 
-// ResetAdminRoleUpdator resets all changes to the "admin_role_updator" edge.
-func (m *AdminMutation) ResetAdminRoleUpdator() {
-	m.admin_role_updator = nil
-	m.clearedadmin_role_updator = false
-	m.removedadmin_role_updator = nil
+// ResetAdminRoleUpdater resets all changes to the "admin_role_updater" edge.
+func (m *AdminMutation) ResetAdminRoleUpdater() {
+	m.admin_role_updater = nil
+	m.clearedadmin_role_updater = false
+	m.removedadmin_role_updater = nil
 }
 
 // AddRiskCreatorIDs adds the "risk_creator" edge to the Risk entity by ids.
@@ -929,112 +1008,58 @@ func (m *AdminMutation) ResetRiskCreator() {
 	m.removedrisk_creator = nil
 }
 
-// AddRiskUpdatorIDs adds the "risk_updator" edge to the Risk entity by ids.
-func (m *AdminMutation) AddRiskUpdatorIDs(ids ...int) {
-	if m.risk_updator == nil {
-		m.risk_updator = make(map[int]struct{})
+// AddRiskUpdaterIDs adds the "risk_updater" edge to the Risk entity by ids.
+func (m *AdminMutation) AddRiskUpdaterIDs(ids ...int) {
+	if m.risk_updater == nil {
+		m.risk_updater = make(map[int]struct{})
 	}
 	for i := range ids {
-		m.risk_updator[ids[i]] = struct{}{}
+		m.risk_updater[ids[i]] = struct{}{}
 	}
 }
 
-// ClearRiskUpdator clears the "risk_updator" edge to the Risk entity.
-func (m *AdminMutation) ClearRiskUpdator() {
-	m.clearedrisk_updator = true
+// ClearRiskUpdater clears the "risk_updater" edge to the Risk entity.
+func (m *AdminMutation) ClearRiskUpdater() {
+	m.clearedrisk_updater = true
 }
 
-// RiskUpdatorCleared reports if the "risk_updator" edge to the Risk entity was cleared.
-func (m *AdminMutation) RiskUpdatorCleared() bool {
-	return m.clearedrisk_updator
+// RiskUpdaterCleared reports if the "risk_updater" edge to the Risk entity was cleared.
+func (m *AdminMutation) RiskUpdaterCleared() bool {
+	return m.clearedrisk_updater
 }
 
-// RemoveRiskUpdatorIDs removes the "risk_updator" edge to the Risk entity by IDs.
-func (m *AdminMutation) RemoveRiskUpdatorIDs(ids ...int) {
-	if m.removedrisk_updator == nil {
-		m.removedrisk_updator = make(map[int]struct{})
+// RemoveRiskUpdaterIDs removes the "risk_updater" edge to the Risk entity by IDs.
+func (m *AdminMutation) RemoveRiskUpdaterIDs(ids ...int) {
+	if m.removedrisk_updater == nil {
+		m.removedrisk_updater = make(map[int]struct{})
 	}
 	for i := range ids {
-		delete(m.risk_updator, ids[i])
-		m.removedrisk_updator[ids[i]] = struct{}{}
+		delete(m.risk_updater, ids[i])
+		m.removedrisk_updater[ids[i]] = struct{}{}
 	}
 }
 
-// RemovedRiskUpdator returns the removed IDs of the "risk_updator" edge to the Risk entity.
-func (m *AdminMutation) RemovedRiskUpdatorIDs() (ids []int) {
-	for id := range m.removedrisk_updator {
+// RemovedRiskUpdater returns the removed IDs of the "risk_updater" edge to the Risk entity.
+func (m *AdminMutation) RemovedRiskUpdaterIDs() (ids []int) {
+	for id := range m.removedrisk_updater {
 		ids = append(ids, id)
 	}
 	return
 }
 
-// RiskUpdatorIDs returns the "risk_updator" edge IDs in the mutation.
-func (m *AdminMutation) RiskUpdatorIDs() (ids []int) {
-	for id := range m.risk_updator {
+// RiskUpdaterIDs returns the "risk_updater" edge IDs in the mutation.
+func (m *AdminMutation) RiskUpdaterIDs() (ids []int) {
+	for id := range m.risk_updater {
 		ids = append(ids, id)
 	}
 	return
 }
 
-// ResetRiskUpdator resets all changes to the "risk_updator" edge.
-func (m *AdminMutation) ResetRiskUpdator() {
-	m.risk_updator = nil
-	m.clearedrisk_updator = false
-	m.removedrisk_updator = nil
-}
-
-// AddRiskMaintainerIDs adds the "risk_maintainer" edge to the Risk entity by ids.
-func (m *AdminMutation) AddRiskMaintainerIDs(ids ...int) {
-	if m.risk_maintainer == nil {
-		m.risk_maintainer = make(map[int]struct{})
-	}
-	for i := range ids {
-		m.risk_maintainer[ids[i]] = struct{}{}
-	}
-}
-
-// ClearRiskMaintainer clears the "risk_maintainer" edge to the Risk entity.
-func (m *AdminMutation) ClearRiskMaintainer() {
-	m.clearedrisk_maintainer = true
-}
-
-// RiskMaintainerCleared reports if the "risk_maintainer" edge to the Risk entity was cleared.
-func (m *AdminMutation) RiskMaintainerCleared() bool {
-	return m.clearedrisk_maintainer
-}
-
-// RemoveRiskMaintainerIDs removes the "risk_maintainer" edge to the Risk entity by IDs.
-func (m *AdminMutation) RemoveRiskMaintainerIDs(ids ...int) {
-	if m.removedrisk_maintainer == nil {
-		m.removedrisk_maintainer = make(map[int]struct{})
-	}
-	for i := range ids {
-		delete(m.risk_maintainer, ids[i])
-		m.removedrisk_maintainer[ids[i]] = struct{}{}
-	}
-}
-
-// RemovedRiskMaintainer returns the removed IDs of the "risk_maintainer" edge to the Risk entity.
-func (m *AdminMutation) RemovedRiskMaintainerIDs() (ids []int) {
-	for id := range m.removedrisk_maintainer {
-		ids = append(ids, id)
-	}
-	return
-}
-
-// RiskMaintainerIDs returns the "risk_maintainer" edge IDs in the mutation.
-func (m *AdminMutation) RiskMaintainerIDs() (ids []int) {
-	for id := range m.risk_maintainer {
-		ids = append(ids, id)
-	}
-	return
-}
-
-// ResetRiskMaintainer resets all changes to the "risk_maintainer" edge.
-func (m *AdminMutation) ResetRiskMaintainer() {
-	m.risk_maintainer = nil
-	m.clearedrisk_maintainer = false
-	m.removedrisk_maintainer = nil
+// ResetRiskUpdater resets all changes to the "risk_updater" edge.
+func (m *AdminMutation) ResetRiskUpdater() {
+	m.risk_updater = nil
+	m.clearedrisk_updater = false
+	m.removedrisk_updater = nil
 }
 
 // AddRiskLocationCreatorIDs adds the "risk_location_creator" edge to the RiskLocation entity by ids.
@@ -1091,58 +1116,58 @@ func (m *AdminMutation) ResetRiskLocationCreator() {
 	m.removedrisk_location_creator = nil
 }
 
-// AddRiskLocationUpdatorIDs adds the "risk_location_updator" edge to the RiskLocation entity by ids.
-func (m *AdminMutation) AddRiskLocationUpdatorIDs(ids ...int) {
-	if m.risk_location_updator == nil {
-		m.risk_location_updator = make(map[int]struct{})
+// AddRiskLocationUpdaterIDs adds the "risk_location_updater" edge to the RiskLocation entity by ids.
+func (m *AdminMutation) AddRiskLocationUpdaterIDs(ids ...int) {
+	if m.risk_location_updater == nil {
+		m.risk_location_updater = make(map[int]struct{})
 	}
 	for i := range ids {
-		m.risk_location_updator[ids[i]] = struct{}{}
+		m.risk_location_updater[ids[i]] = struct{}{}
 	}
 }
 
-// ClearRiskLocationUpdator clears the "risk_location_updator" edge to the RiskLocation entity.
-func (m *AdminMutation) ClearRiskLocationUpdator() {
-	m.clearedrisk_location_updator = true
+// ClearRiskLocationUpdater clears the "risk_location_updater" edge to the RiskLocation entity.
+func (m *AdminMutation) ClearRiskLocationUpdater() {
+	m.clearedrisk_location_updater = true
 }
 
-// RiskLocationUpdatorCleared reports if the "risk_location_updator" edge to the RiskLocation entity was cleared.
-func (m *AdminMutation) RiskLocationUpdatorCleared() bool {
-	return m.clearedrisk_location_updator
+// RiskLocationUpdaterCleared reports if the "risk_location_updater" edge to the RiskLocation entity was cleared.
+func (m *AdminMutation) RiskLocationUpdaterCleared() bool {
+	return m.clearedrisk_location_updater
 }
 
-// RemoveRiskLocationUpdatorIDs removes the "risk_location_updator" edge to the RiskLocation entity by IDs.
-func (m *AdminMutation) RemoveRiskLocationUpdatorIDs(ids ...int) {
-	if m.removedrisk_location_updator == nil {
-		m.removedrisk_location_updator = make(map[int]struct{})
+// RemoveRiskLocationUpdaterIDs removes the "risk_location_updater" edge to the RiskLocation entity by IDs.
+func (m *AdminMutation) RemoveRiskLocationUpdaterIDs(ids ...int) {
+	if m.removedrisk_location_updater == nil {
+		m.removedrisk_location_updater = make(map[int]struct{})
 	}
 	for i := range ids {
-		delete(m.risk_location_updator, ids[i])
-		m.removedrisk_location_updator[ids[i]] = struct{}{}
+		delete(m.risk_location_updater, ids[i])
+		m.removedrisk_location_updater[ids[i]] = struct{}{}
 	}
 }
 
-// RemovedRiskLocationUpdator returns the removed IDs of the "risk_location_updator" edge to the RiskLocation entity.
-func (m *AdminMutation) RemovedRiskLocationUpdatorIDs() (ids []int) {
-	for id := range m.removedrisk_location_updator {
+// RemovedRiskLocationUpdater returns the removed IDs of the "risk_location_updater" edge to the RiskLocation entity.
+func (m *AdminMutation) RemovedRiskLocationUpdaterIDs() (ids []int) {
+	for id := range m.removedrisk_location_updater {
 		ids = append(ids, id)
 	}
 	return
 }
 
-// RiskLocationUpdatorIDs returns the "risk_location_updator" edge IDs in the mutation.
-func (m *AdminMutation) RiskLocationUpdatorIDs() (ids []int) {
-	for id := range m.risk_location_updator {
+// RiskLocationUpdaterIDs returns the "risk_location_updater" edge IDs in the mutation.
+func (m *AdminMutation) RiskLocationUpdaterIDs() (ids []int) {
+	for id := range m.risk_location_updater {
 		ids = append(ids, id)
 	}
 	return
 }
 
-// ResetRiskLocationUpdator resets all changes to the "risk_location_updator" edge.
-func (m *AdminMutation) ResetRiskLocationUpdator() {
-	m.risk_location_updator = nil
-	m.clearedrisk_location_updator = false
-	m.removedrisk_location_updator = nil
+// ResetRiskLocationUpdater resets all changes to the "risk_location_updater" edge.
+func (m *AdminMutation) ResetRiskLocationUpdater() {
+	m.risk_location_updater = nil
+	m.clearedrisk_location_updater = false
+	m.removedrisk_location_updater = nil
 }
 
 // AddRiskCategoryCreatorIDs adds the "risk_category_creator" edge to the RiskCategory entity by ids.
@@ -1199,58 +1224,58 @@ func (m *AdminMutation) ResetRiskCategoryCreator() {
 	m.removedrisk_category_creator = nil
 }
 
-// AddRiskCategoryUpdatorIDs adds the "risk_category_updator" edge to the RiskCategory entity by ids.
-func (m *AdminMutation) AddRiskCategoryUpdatorIDs(ids ...int) {
-	if m.risk_category_updator == nil {
-		m.risk_category_updator = make(map[int]struct{})
+// AddRiskCategoryUpdaterIDs adds the "risk_category_updater" edge to the RiskCategory entity by ids.
+func (m *AdminMutation) AddRiskCategoryUpdaterIDs(ids ...int) {
+	if m.risk_category_updater == nil {
+		m.risk_category_updater = make(map[int]struct{})
 	}
 	for i := range ids {
-		m.risk_category_updator[ids[i]] = struct{}{}
+		m.risk_category_updater[ids[i]] = struct{}{}
 	}
 }
 
-// ClearRiskCategoryUpdator clears the "risk_category_updator" edge to the RiskCategory entity.
-func (m *AdminMutation) ClearRiskCategoryUpdator() {
-	m.clearedrisk_category_updator = true
+// ClearRiskCategoryUpdater clears the "risk_category_updater" edge to the RiskCategory entity.
+func (m *AdminMutation) ClearRiskCategoryUpdater() {
+	m.clearedrisk_category_updater = true
 }
 
-// RiskCategoryUpdatorCleared reports if the "risk_category_updator" edge to the RiskCategory entity was cleared.
-func (m *AdminMutation) RiskCategoryUpdatorCleared() bool {
-	return m.clearedrisk_category_updator
+// RiskCategoryUpdaterCleared reports if the "risk_category_updater" edge to the RiskCategory entity was cleared.
+func (m *AdminMutation) RiskCategoryUpdaterCleared() bool {
+	return m.clearedrisk_category_updater
 }
 
-// RemoveRiskCategoryUpdatorIDs removes the "risk_category_updator" edge to the RiskCategory entity by IDs.
-func (m *AdminMutation) RemoveRiskCategoryUpdatorIDs(ids ...int) {
-	if m.removedrisk_category_updator == nil {
-		m.removedrisk_category_updator = make(map[int]struct{})
+// RemoveRiskCategoryUpdaterIDs removes the "risk_category_updater" edge to the RiskCategory entity by IDs.
+func (m *AdminMutation) RemoveRiskCategoryUpdaterIDs(ids ...int) {
+	if m.removedrisk_category_updater == nil {
+		m.removedrisk_category_updater = make(map[int]struct{})
 	}
 	for i := range ids {
-		delete(m.risk_category_updator, ids[i])
-		m.removedrisk_category_updator[ids[i]] = struct{}{}
+		delete(m.risk_category_updater, ids[i])
+		m.removedrisk_category_updater[ids[i]] = struct{}{}
 	}
 }
 
-// RemovedRiskCategoryUpdator returns the removed IDs of the "risk_category_updator" edge to the RiskCategory entity.
-func (m *AdminMutation) RemovedRiskCategoryUpdatorIDs() (ids []int) {
-	for id := range m.removedrisk_category_updator {
+// RemovedRiskCategoryUpdater returns the removed IDs of the "risk_category_updater" edge to the RiskCategory entity.
+func (m *AdminMutation) RemovedRiskCategoryUpdaterIDs() (ids []int) {
+	for id := range m.removedrisk_category_updater {
 		ids = append(ids, id)
 	}
 	return
 }
 
-// RiskCategoryUpdatorIDs returns the "risk_category_updator" edge IDs in the mutation.
-func (m *AdminMutation) RiskCategoryUpdatorIDs() (ids []int) {
-	for id := range m.risk_category_updator {
+// RiskCategoryUpdaterIDs returns the "risk_category_updater" edge IDs in the mutation.
+func (m *AdminMutation) RiskCategoryUpdaterIDs() (ids []int) {
+	for id := range m.risk_category_updater {
 		ids = append(ids, id)
 	}
 	return
 }
 
-// ResetRiskCategoryUpdator resets all changes to the "risk_category_updator" edge.
-func (m *AdminMutation) ResetRiskCategoryUpdator() {
-	m.risk_category_updator = nil
-	m.clearedrisk_category_updator = false
-	m.removedrisk_category_updator = nil
+// ResetRiskCategoryUpdater resets all changes to the "risk_category_updater" edge.
+func (m *AdminMutation) ResetRiskCategoryUpdater() {
+	m.risk_category_updater = nil
+	m.clearedrisk_category_updater = false
+	m.removedrisk_category_updater = nil
 }
 
 // AddDepartmentCreatorIDs adds the "department_creator" edge to the Department entity by ids.
@@ -1307,58 +1332,58 @@ func (m *AdminMutation) ResetDepartmentCreator() {
 	m.removeddepartment_creator = nil
 }
 
-// AddDepartmentUpdatorIDs adds the "department_updator" edge to the Department entity by ids.
-func (m *AdminMutation) AddDepartmentUpdatorIDs(ids ...int) {
-	if m.department_updator == nil {
-		m.department_updator = make(map[int]struct{})
+// AddDepartmentUpdaterIDs adds the "department_updater" edge to the Department entity by ids.
+func (m *AdminMutation) AddDepartmentUpdaterIDs(ids ...int) {
+	if m.department_updater == nil {
+		m.department_updater = make(map[int]struct{})
 	}
 	for i := range ids {
-		m.department_updator[ids[i]] = struct{}{}
+		m.department_updater[ids[i]] = struct{}{}
 	}
 }
 
-// ClearDepartmentUpdator clears the "department_updator" edge to the Department entity.
-func (m *AdminMutation) ClearDepartmentUpdator() {
-	m.cleareddepartment_updator = true
+// ClearDepartmentUpdater clears the "department_updater" edge to the Department entity.
+func (m *AdminMutation) ClearDepartmentUpdater() {
+	m.cleareddepartment_updater = true
 }
 
-// DepartmentUpdatorCleared reports if the "department_updator" edge to the Department entity was cleared.
-func (m *AdminMutation) DepartmentUpdatorCleared() bool {
-	return m.cleareddepartment_updator
+// DepartmentUpdaterCleared reports if the "department_updater" edge to the Department entity was cleared.
+func (m *AdminMutation) DepartmentUpdaterCleared() bool {
+	return m.cleareddepartment_updater
 }
 
-// RemoveDepartmentUpdatorIDs removes the "department_updator" edge to the Department entity by IDs.
-func (m *AdminMutation) RemoveDepartmentUpdatorIDs(ids ...int) {
-	if m.removeddepartment_updator == nil {
-		m.removeddepartment_updator = make(map[int]struct{})
+// RemoveDepartmentUpdaterIDs removes the "department_updater" edge to the Department entity by IDs.
+func (m *AdminMutation) RemoveDepartmentUpdaterIDs(ids ...int) {
+	if m.removeddepartment_updater == nil {
+		m.removeddepartment_updater = make(map[int]struct{})
 	}
 	for i := range ids {
-		delete(m.department_updator, ids[i])
-		m.removeddepartment_updator[ids[i]] = struct{}{}
+		delete(m.department_updater, ids[i])
+		m.removeddepartment_updater[ids[i]] = struct{}{}
 	}
 }
 
-// RemovedDepartmentUpdator returns the removed IDs of the "department_updator" edge to the Department entity.
-func (m *AdminMutation) RemovedDepartmentUpdatorIDs() (ids []int) {
-	for id := range m.removeddepartment_updator {
+// RemovedDepartmentUpdater returns the removed IDs of the "department_updater" edge to the Department entity.
+func (m *AdminMutation) RemovedDepartmentUpdaterIDs() (ids []int) {
+	for id := range m.removeddepartment_updater {
 		ids = append(ids, id)
 	}
 	return
 }
 
-// DepartmentUpdatorIDs returns the "department_updator" edge IDs in the mutation.
-func (m *AdminMutation) DepartmentUpdatorIDs() (ids []int) {
-	for id := range m.department_updator {
+// DepartmentUpdaterIDs returns the "department_updater" edge IDs in the mutation.
+func (m *AdminMutation) DepartmentUpdaterIDs() (ids []int) {
+	for id := range m.department_updater {
 		ids = append(ids, id)
 	}
 	return
 }
 
-// ResetDepartmentUpdator resets all changes to the "department_updator" edge.
-func (m *AdminMutation) ResetDepartmentUpdator() {
-	m.department_updator = nil
-	m.cleareddepartment_updator = false
-	m.removeddepartment_updator = nil
+// ResetDepartmentUpdater resets all changes to the "department_updater" edge.
+func (m *AdminMutation) ResetDepartmentUpdater() {
+	m.department_updater = nil
+	m.cleareddepartment_updater = false
+	m.removeddepartment_updater = nil
 }
 
 // AddEmployeeCreatorIDs adds the "employee_creator" edge to the Employee entity by ids.
@@ -1415,112 +1440,220 @@ func (m *AdminMutation) ResetEmployeeCreator() {
 	m.removedemployee_creator = nil
 }
 
-// AddEmployeeUpdatorIDs adds the "employee_updator" edge to the Employee entity by ids.
-func (m *AdminMutation) AddEmployeeUpdatorIDs(ids ...int) {
-	if m.employee_updator == nil {
-		m.employee_updator = make(map[int]struct{})
+// AddEmployeeUpdaterIDs adds the "employee_updater" edge to the Employee entity by ids.
+func (m *AdminMutation) AddEmployeeUpdaterIDs(ids ...int) {
+	if m.employee_updater == nil {
+		m.employee_updater = make(map[int]struct{})
 	}
 	for i := range ids {
-		m.employee_updator[ids[i]] = struct{}{}
+		m.employee_updater[ids[i]] = struct{}{}
 	}
 }
 
-// ClearEmployeeUpdator clears the "employee_updator" edge to the Employee entity.
-func (m *AdminMutation) ClearEmployeeUpdator() {
-	m.clearedemployee_updator = true
+// ClearEmployeeUpdater clears the "employee_updater" edge to the Employee entity.
+func (m *AdminMutation) ClearEmployeeUpdater() {
+	m.clearedemployee_updater = true
 }
 
-// EmployeeUpdatorCleared reports if the "employee_updator" edge to the Employee entity was cleared.
-func (m *AdminMutation) EmployeeUpdatorCleared() bool {
-	return m.clearedemployee_updator
+// EmployeeUpdaterCleared reports if the "employee_updater" edge to the Employee entity was cleared.
+func (m *AdminMutation) EmployeeUpdaterCleared() bool {
+	return m.clearedemployee_updater
 }
 
-// RemoveEmployeeUpdatorIDs removes the "employee_updator" edge to the Employee entity by IDs.
-func (m *AdminMutation) RemoveEmployeeUpdatorIDs(ids ...int) {
-	if m.removedemployee_updator == nil {
-		m.removedemployee_updator = make(map[int]struct{})
+// RemoveEmployeeUpdaterIDs removes the "employee_updater" edge to the Employee entity by IDs.
+func (m *AdminMutation) RemoveEmployeeUpdaterIDs(ids ...int) {
+	if m.removedemployee_updater == nil {
+		m.removedemployee_updater = make(map[int]struct{})
 	}
 	for i := range ids {
-		delete(m.employee_updator, ids[i])
-		m.removedemployee_updator[ids[i]] = struct{}{}
+		delete(m.employee_updater, ids[i])
+		m.removedemployee_updater[ids[i]] = struct{}{}
 	}
 }
 
-// RemovedEmployeeUpdator returns the removed IDs of the "employee_updator" edge to the Employee entity.
-func (m *AdminMutation) RemovedEmployeeUpdatorIDs() (ids []int) {
-	for id := range m.removedemployee_updator {
+// RemovedEmployeeUpdater returns the removed IDs of the "employee_updater" edge to the Employee entity.
+func (m *AdminMutation) RemovedEmployeeUpdaterIDs() (ids []int) {
+	for id := range m.removedemployee_updater {
 		ids = append(ids, id)
 	}
 	return
 }
 
-// EmployeeUpdatorIDs returns the "employee_updator" edge IDs in the mutation.
-func (m *AdminMutation) EmployeeUpdatorIDs() (ids []int) {
-	for id := range m.employee_updator {
+// EmployeeUpdaterIDs returns the "employee_updater" edge IDs in the mutation.
+func (m *AdminMutation) EmployeeUpdaterIDs() (ids []int) {
+	for id := range m.employee_updater {
 		ids = append(ids, id)
 	}
 	return
 }
 
-// ResetEmployeeUpdator resets all changes to the "employee_updator" edge.
-func (m *AdminMutation) ResetEmployeeUpdator() {
-	m.employee_updator = nil
-	m.clearedemployee_updator = false
-	m.removedemployee_updator = nil
+// ResetEmployeeUpdater resets all changes to the "employee_updater" edge.
+func (m *AdminMutation) ResetEmployeeUpdater() {
+	m.employee_updater = nil
+	m.clearedemployee_updater = false
+	m.removedemployee_updater = nil
 }
 
-// AddEmployeeAdminIDs adds the "employee_admin" edge to the Employee entity by ids.
-func (m *AdminMutation) AddEmployeeAdminIDs(ids ...int) {
-	if m.employee_admin == nil {
-		m.employee_admin = make(map[int]struct{})
+// AddEmployeeIDs adds the "employee" edge to the Employee entity by ids.
+func (m *AdminMutation) AddEmployeeIDs(ids ...int) {
+	if m.employee == nil {
+		m.employee = make(map[int]struct{})
 	}
 	for i := range ids {
-		m.employee_admin[ids[i]] = struct{}{}
+		m.employee[ids[i]] = struct{}{}
 	}
 }
 
-// ClearEmployeeAdmin clears the "employee_admin" edge to the Employee entity.
-func (m *AdminMutation) ClearEmployeeAdmin() {
-	m.clearedemployee_admin = true
+// ClearEmployee clears the "employee" edge to the Employee entity.
+func (m *AdminMutation) ClearEmployee() {
+	m.clearedemployee = true
 }
 
-// EmployeeAdminCleared reports if the "employee_admin" edge to the Employee entity was cleared.
-func (m *AdminMutation) EmployeeAdminCleared() bool {
-	return m.clearedemployee_admin
+// EmployeeCleared reports if the "employee" edge to the Employee entity was cleared.
+func (m *AdminMutation) EmployeeCleared() bool {
+	return m.clearedemployee
 }
 
-// RemoveEmployeeAdminIDs removes the "employee_admin" edge to the Employee entity by IDs.
-func (m *AdminMutation) RemoveEmployeeAdminIDs(ids ...int) {
-	if m.removedemployee_admin == nil {
-		m.removedemployee_admin = make(map[int]struct{})
+// RemoveEmployeeIDs removes the "employee" edge to the Employee entity by IDs.
+func (m *AdminMutation) RemoveEmployeeIDs(ids ...int) {
+	if m.removedemployee == nil {
+		m.removedemployee = make(map[int]struct{})
 	}
 	for i := range ids {
-		delete(m.employee_admin, ids[i])
-		m.removedemployee_admin[ids[i]] = struct{}{}
+		delete(m.employee, ids[i])
+		m.removedemployee[ids[i]] = struct{}{}
 	}
 }
 
-// RemovedEmployeeAdmin returns the removed IDs of the "employee_admin" edge to the Employee entity.
-func (m *AdminMutation) RemovedEmployeeAdminIDs() (ids []int) {
-	for id := range m.removedemployee_admin {
+// RemovedEmployee returns the removed IDs of the "employee" edge to the Employee entity.
+func (m *AdminMutation) RemovedEmployeeIDs() (ids []int) {
+	for id := range m.removedemployee {
 		ids = append(ids, id)
 	}
 	return
 }
 
-// EmployeeAdminIDs returns the "employee_admin" edge IDs in the mutation.
-func (m *AdminMutation) EmployeeAdminIDs() (ids []int) {
-	for id := range m.employee_admin {
+// EmployeeIDs returns the "employee" edge IDs in the mutation.
+func (m *AdminMutation) EmployeeIDs() (ids []int) {
+	for id := range m.employee {
 		ids = append(ids, id)
 	}
 	return
 }
 
-// ResetEmployeeAdmin resets all changes to the "employee_admin" edge.
-func (m *AdminMutation) ResetEmployeeAdmin() {
-	m.employee_admin = nil
-	m.clearedemployee_admin = false
-	m.removedemployee_admin = nil
+// ResetEmployee resets all changes to the "employee" edge.
+func (m *AdminMutation) ResetEmployee() {
+	m.employee = nil
+	m.clearedemployee = false
+	m.removedemployee = nil
+}
+
+// AddOccupationCreatorIDs adds the "occupation_creator" edge to the Occupation entity by ids.
+func (m *AdminMutation) AddOccupationCreatorIDs(ids ...int) {
+	if m.occupation_creator == nil {
+		m.occupation_creator = make(map[int]struct{})
+	}
+	for i := range ids {
+		m.occupation_creator[ids[i]] = struct{}{}
+	}
+}
+
+// ClearOccupationCreator clears the "occupation_creator" edge to the Occupation entity.
+func (m *AdminMutation) ClearOccupationCreator() {
+	m.clearedoccupation_creator = true
+}
+
+// OccupationCreatorCleared reports if the "occupation_creator" edge to the Occupation entity was cleared.
+func (m *AdminMutation) OccupationCreatorCleared() bool {
+	return m.clearedoccupation_creator
+}
+
+// RemoveOccupationCreatorIDs removes the "occupation_creator" edge to the Occupation entity by IDs.
+func (m *AdminMutation) RemoveOccupationCreatorIDs(ids ...int) {
+	if m.removedoccupation_creator == nil {
+		m.removedoccupation_creator = make(map[int]struct{})
+	}
+	for i := range ids {
+		delete(m.occupation_creator, ids[i])
+		m.removedoccupation_creator[ids[i]] = struct{}{}
+	}
+}
+
+// RemovedOccupationCreator returns the removed IDs of the "occupation_creator" edge to the Occupation entity.
+func (m *AdminMutation) RemovedOccupationCreatorIDs() (ids []int) {
+	for id := range m.removedoccupation_creator {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// OccupationCreatorIDs returns the "occupation_creator" edge IDs in the mutation.
+func (m *AdminMutation) OccupationCreatorIDs() (ids []int) {
+	for id := range m.occupation_creator {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// ResetOccupationCreator resets all changes to the "occupation_creator" edge.
+func (m *AdminMutation) ResetOccupationCreator() {
+	m.occupation_creator = nil
+	m.clearedoccupation_creator = false
+	m.removedoccupation_creator = nil
+}
+
+// AddOccupationUpdaterIDs adds the "occupation_updater" edge to the Occupation entity by ids.
+func (m *AdminMutation) AddOccupationUpdaterIDs(ids ...int) {
+	if m.occupation_updater == nil {
+		m.occupation_updater = make(map[int]struct{})
+	}
+	for i := range ids {
+		m.occupation_updater[ids[i]] = struct{}{}
+	}
+}
+
+// ClearOccupationUpdater clears the "occupation_updater" edge to the Occupation entity.
+func (m *AdminMutation) ClearOccupationUpdater() {
+	m.clearedoccupation_updater = true
+}
+
+// OccupationUpdaterCleared reports if the "occupation_updater" edge to the Occupation entity was cleared.
+func (m *AdminMutation) OccupationUpdaterCleared() bool {
+	return m.clearedoccupation_updater
+}
+
+// RemoveOccupationUpdaterIDs removes the "occupation_updater" edge to the Occupation entity by IDs.
+func (m *AdminMutation) RemoveOccupationUpdaterIDs(ids ...int) {
+	if m.removedoccupation_updater == nil {
+		m.removedoccupation_updater = make(map[int]struct{})
+	}
+	for i := range ids {
+		delete(m.occupation_updater, ids[i])
+		m.removedoccupation_updater[ids[i]] = struct{}{}
+	}
+}
+
+// RemovedOccupationUpdater returns the removed IDs of the "occupation_updater" edge to the Occupation entity.
+func (m *AdminMutation) RemovedOccupationUpdaterIDs() (ids []int) {
+	for id := range m.removedoccupation_updater {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// OccupationUpdaterIDs returns the "occupation_updater" edge IDs in the mutation.
+func (m *AdminMutation) OccupationUpdaterIDs() (ids []int) {
+	for id := range m.occupation_updater {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// ResetOccupationUpdater resets all changes to the "occupation_updater" edge.
+func (m *AdminMutation) ResetOccupationUpdater() {
+	m.occupation_updater = nil
+	m.clearedoccupation_updater = false
+	m.removedoccupation_updater = nil
 }
 
 // Where appends a list predicates to the AdminMutation builder.
@@ -1557,7 +1690,7 @@ func (m *AdminMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *AdminMutation) Fields() []string {
-	fields := make([]string, 0, 8)
+	fields := make([]string, 0, 10)
 	if m.created_at != nil {
 		fields = append(fields, admin.FieldCreatedAt)
 	}
@@ -1567,7 +1700,7 @@ func (m *AdminMutation) Fields() []string {
 	if m.deleted_at != nil {
 		fields = append(fields, admin.FieldDeletedAt)
 	}
-	if m.updator != nil {
+	if m.updater != nil {
 		fields = append(fields, admin.FieldUpdatedBy)
 	}
 	if m.updated_at != nil {
@@ -1579,8 +1712,14 @@ func (m *AdminMutation) Fields() []string {
 	if m.password != nil {
 		fields = append(fields, admin.FieldPassword)
 	}
-	if m.name != nil {
-		fields = append(fields, admin.FieldName)
+	if m.nickname != nil {
+		fields = append(fields, admin.FieldNickname)
+	}
+	if m.real_name != nil {
+		fields = append(fields, admin.FieldRealName)
+	}
+	if m.avatar != nil {
+		fields = append(fields, admin.FieldAvatar)
 	}
 	return fields
 }
@@ -1604,8 +1743,12 @@ func (m *AdminMutation) Field(name string) (ent.Value, bool) {
 		return m.Username()
 	case admin.FieldPassword:
 		return m.Password()
-	case admin.FieldName:
-		return m.Name()
+	case admin.FieldNickname:
+		return m.Nickname()
+	case admin.FieldRealName:
+		return m.RealName()
+	case admin.FieldAvatar:
+		return m.Avatar()
 	}
 	return nil, false
 }
@@ -1629,8 +1772,12 @@ func (m *AdminMutation) OldField(ctx context.Context, name string) (ent.Value, e
 		return m.OldUsername(ctx)
 	case admin.FieldPassword:
 		return m.OldPassword(ctx)
-	case admin.FieldName:
-		return m.OldName(ctx)
+	case admin.FieldNickname:
+		return m.OldNickname(ctx)
+	case admin.FieldRealName:
+		return m.OldRealName(ctx)
+	case admin.FieldAvatar:
+		return m.OldAvatar(ctx)
 	}
 	return nil, fmt.Errorf("unknown Admin field %s", name)
 }
@@ -1689,12 +1836,26 @@ func (m *AdminMutation) SetField(name string, value ent.Value) error {
 		}
 		m.SetPassword(v)
 		return nil
-	case admin.FieldName:
+	case admin.FieldNickname:
 		v, ok := value.(string)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
-		m.SetName(v)
+		m.SetNickname(v)
+		return nil
+	case admin.FieldRealName:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetRealName(v)
+		return nil
+	case admin.FieldAvatar:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetAvatar(v)
 		return nil
 	}
 	return fmt.Errorf("unknown Admin field %s", name)
@@ -1732,8 +1893,8 @@ func (m *AdminMutation) ClearedFields() []string {
 	if m.FieldCleared(admin.FieldDeletedAt) {
 		fields = append(fields, admin.FieldDeletedAt)
 	}
-	if m.FieldCleared(admin.FieldName) {
-		fields = append(fields, admin.FieldName)
+	if m.FieldCleared(admin.FieldAvatar) {
+		fields = append(fields, admin.FieldAvatar)
 	}
 	return fields
 }
@@ -1752,8 +1913,8 @@ func (m *AdminMutation) ClearField(name string) error {
 	case admin.FieldDeletedAt:
 		m.ClearDeletedAt()
 		return nil
-	case admin.FieldName:
-		m.ClearName()
+	case admin.FieldAvatar:
+		m.ClearAvatar()
 		return nil
 	}
 	return fmt.Errorf("unknown Admin nullable field %s", name)
@@ -1784,8 +1945,14 @@ func (m *AdminMutation) ResetField(name string) error {
 	case admin.FieldPassword:
 		m.ResetPassword()
 		return nil
-	case admin.FieldName:
-		m.ResetName()
+	case admin.FieldNickname:
+		m.ResetNickname()
+		return nil
+	case admin.FieldRealName:
+		m.ResetRealName()
+		return nil
+	case admin.FieldAvatar:
+		m.ResetAvatar()
 		return nil
 	}
 	return fmt.Errorf("unknown Admin field %s", name)
@@ -1793,12 +1960,12 @@ func (m *AdminMutation) ResetField(name string) error {
 
 // AddedEdges returns all edge names that were set/added in this mutation.
 func (m *AdminMutation) AddedEdges() []string {
-	edges := make([]string, 0, 19)
+	edges := make([]string, 0, 20)
 	if m.creator != nil {
 		edges = append(edges, admin.EdgeCreator)
 	}
-	if m.updator != nil {
-		edges = append(edges, admin.EdgeUpdator)
+	if m.updater != nil {
+		edges = append(edges, admin.EdgeUpdater)
 	}
 	if m.admin_roles != nil {
 		edges = append(edges, admin.EdgeAdminRoles)
@@ -1806,50 +1973,53 @@ func (m *AdminMutation) AddedEdges() []string {
 	if m.admin_creator != nil {
 		edges = append(edges, admin.EdgeAdminCreator)
 	}
-	if m.admin_updator != nil {
-		edges = append(edges, admin.EdgeAdminUpdator)
+	if m.admin_updater != nil {
+		edges = append(edges, admin.EdgeAdminUpdater)
 	}
 	if m.admin_role_creator != nil {
 		edges = append(edges, admin.EdgeAdminRoleCreator)
 	}
-	if m.admin_role_updator != nil {
-		edges = append(edges, admin.EdgeAdminRoleUpdator)
+	if m.admin_role_updater != nil {
+		edges = append(edges, admin.EdgeAdminRoleUpdater)
 	}
 	if m.risk_creator != nil {
 		edges = append(edges, admin.EdgeRiskCreator)
 	}
-	if m.risk_updator != nil {
-		edges = append(edges, admin.EdgeRiskUpdator)
-	}
-	if m.risk_maintainer != nil {
-		edges = append(edges, admin.EdgeRiskMaintainer)
+	if m.risk_updater != nil {
+		edges = append(edges, admin.EdgeRiskUpdater)
 	}
 	if m.risk_location_creator != nil {
 		edges = append(edges, admin.EdgeRiskLocationCreator)
 	}
-	if m.risk_location_updator != nil {
-		edges = append(edges, admin.EdgeRiskLocationUpdator)
+	if m.risk_location_updater != nil {
+		edges = append(edges, admin.EdgeRiskLocationUpdater)
 	}
 	if m.risk_category_creator != nil {
 		edges = append(edges, admin.EdgeRiskCategoryCreator)
 	}
-	if m.risk_category_updator != nil {
-		edges = append(edges, admin.EdgeRiskCategoryUpdator)
+	if m.risk_category_updater != nil {
+		edges = append(edges, admin.EdgeRiskCategoryUpdater)
 	}
 	if m.department_creator != nil {
 		edges = append(edges, admin.EdgeDepartmentCreator)
 	}
-	if m.department_updator != nil {
-		edges = append(edges, admin.EdgeDepartmentUpdator)
+	if m.department_updater != nil {
+		edges = append(edges, admin.EdgeDepartmentUpdater)
 	}
 	if m.employee_creator != nil {
 		edges = append(edges, admin.EdgeEmployeeCreator)
 	}
-	if m.employee_updator != nil {
-		edges = append(edges, admin.EdgeEmployeeUpdator)
+	if m.employee_updater != nil {
+		edges = append(edges, admin.EdgeEmployeeUpdater)
 	}
-	if m.employee_admin != nil {
-		edges = append(edges, admin.EdgeEmployeeAdmin)
+	if m.employee != nil {
+		edges = append(edges, admin.EdgeEmployee)
+	}
+	if m.occupation_creator != nil {
+		edges = append(edges, admin.EdgeOccupationCreator)
+	}
+	if m.occupation_updater != nil {
+		edges = append(edges, admin.EdgeOccupationUpdater)
 	}
 	return edges
 }
@@ -1862,8 +2032,8 @@ func (m *AdminMutation) AddedIDs(name string) []ent.Value {
 		if id := m.creator; id != nil {
 			return []ent.Value{*id}
 		}
-	case admin.EdgeUpdator:
-		if id := m.updator; id != nil {
+	case admin.EdgeUpdater:
+		if id := m.updater; id != nil {
 			return []ent.Value{*id}
 		}
 	case admin.EdgeAdminRoles:
@@ -1878,9 +2048,9 @@ func (m *AdminMutation) AddedIDs(name string) []ent.Value {
 			ids = append(ids, id)
 		}
 		return ids
-	case admin.EdgeAdminUpdator:
-		ids := make([]ent.Value, 0, len(m.admin_updator))
-		for id := range m.admin_updator {
+	case admin.EdgeAdminUpdater:
+		ids := make([]ent.Value, 0, len(m.admin_updater))
+		for id := range m.admin_updater {
 			ids = append(ids, id)
 		}
 		return ids
@@ -1890,9 +2060,9 @@ func (m *AdminMutation) AddedIDs(name string) []ent.Value {
 			ids = append(ids, id)
 		}
 		return ids
-	case admin.EdgeAdminRoleUpdator:
-		ids := make([]ent.Value, 0, len(m.admin_role_updator))
-		for id := range m.admin_role_updator {
+	case admin.EdgeAdminRoleUpdater:
+		ids := make([]ent.Value, 0, len(m.admin_role_updater))
+		for id := range m.admin_role_updater {
 			ids = append(ids, id)
 		}
 		return ids
@@ -1902,15 +2072,9 @@ func (m *AdminMutation) AddedIDs(name string) []ent.Value {
 			ids = append(ids, id)
 		}
 		return ids
-	case admin.EdgeRiskUpdator:
-		ids := make([]ent.Value, 0, len(m.risk_updator))
-		for id := range m.risk_updator {
-			ids = append(ids, id)
-		}
-		return ids
-	case admin.EdgeRiskMaintainer:
-		ids := make([]ent.Value, 0, len(m.risk_maintainer))
-		for id := range m.risk_maintainer {
+	case admin.EdgeRiskUpdater:
+		ids := make([]ent.Value, 0, len(m.risk_updater))
+		for id := range m.risk_updater {
 			ids = append(ids, id)
 		}
 		return ids
@@ -1920,9 +2084,9 @@ func (m *AdminMutation) AddedIDs(name string) []ent.Value {
 			ids = append(ids, id)
 		}
 		return ids
-	case admin.EdgeRiskLocationUpdator:
-		ids := make([]ent.Value, 0, len(m.risk_location_updator))
-		for id := range m.risk_location_updator {
+	case admin.EdgeRiskLocationUpdater:
+		ids := make([]ent.Value, 0, len(m.risk_location_updater))
+		for id := range m.risk_location_updater {
 			ids = append(ids, id)
 		}
 		return ids
@@ -1932,9 +2096,9 @@ func (m *AdminMutation) AddedIDs(name string) []ent.Value {
 			ids = append(ids, id)
 		}
 		return ids
-	case admin.EdgeRiskCategoryUpdator:
-		ids := make([]ent.Value, 0, len(m.risk_category_updator))
-		for id := range m.risk_category_updator {
+	case admin.EdgeRiskCategoryUpdater:
+		ids := make([]ent.Value, 0, len(m.risk_category_updater))
+		for id := range m.risk_category_updater {
 			ids = append(ids, id)
 		}
 		return ids
@@ -1944,9 +2108,9 @@ func (m *AdminMutation) AddedIDs(name string) []ent.Value {
 			ids = append(ids, id)
 		}
 		return ids
-	case admin.EdgeDepartmentUpdator:
-		ids := make([]ent.Value, 0, len(m.department_updator))
-		for id := range m.department_updator {
+	case admin.EdgeDepartmentUpdater:
+		ids := make([]ent.Value, 0, len(m.department_updater))
+		for id := range m.department_updater {
 			ids = append(ids, id)
 		}
 		return ids
@@ -1956,15 +2120,27 @@ func (m *AdminMutation) AddedIDs(name string) []ent.Value {
 			ids = append(ids, id)
 		}
 		return ids
-	case admin.EdgeEmployeeUpdator:
-		ids := make([]ent.Value, 0, len(m.employee_updator))
-		for id := range m.employee_updator {
+	case admin.EdgeEmployeeUpdater:
+		ids := make([]ent.Value, 0, len(m.employee_updater))
+		for id := range m.employee_updater {
 			ids = append(ids, id)
 		}
 		return ids
-	case admin.EdgeEmployeeAdmin:
-		ids := make([]ent.Value, 0, len(m.employee_admin))
-		for id := range m.employee_admin {
+	case admin.EdgeEmployee:
+		ids := make([]ent.Value, 0, len(m.employee))
+		for id := range m.employee {
+			ids = append(ids, id)
+		}
+		return ids
+	case admin.EdgeOccupationCreator:
+		ids := make([]ent.Value, 0, len(m.occupation_creator))
+		for id := range m.occupation_creator {
+			ids = append(ids, id)
+		}
+		return ids
+	case admin.EdgeOccupationUpdater:
+		ids := make([]ent.Value, 0, len(m.occupation_updater))
+		for id := range m.occupation_updater {
 			ids = append(ids, id)
 		}
 		return ids
@@ -1974,57 +2150,60 @@ func (m *AdminMutation) AddedIDs(name string) []ent.Value {
 
 // RemovedEdges returns all edge names that were removed in this mutation.
 func (m *AdminMutation) RemovedEdges() []string {
-	edges := make([]string, 0, 19)
+	edges := make([]string, 0, 20)
 	if m.removedadmin_roles != nil {
 		edges = append(edges, admin.EdgeAdminRoles)
 	}
 	if m.removedadmin_creator != nil {
 		edges = append(edges, admin.EdgeAdminCreator)
 	}
-	if m.removedadmin_updator != nil {
-		edges = append(edges, admin.EdgeAdminUpdator)
+	if m.removedadmin_updater != nil {
+		edges = append(edges, admin.EdgeAdminUpdater)
 	}
 	if m.removedadmin_role_creator != nil {
 		edges = append(edges, admin.EdgeAdminRoleCreator)
 	}
-	if m.removedadmin_role_updator != nil {
-		edges = append(edges, admin.EdgeAdminRoleUpdator)
+	if m.removedadmin_role_updater != nil {
+		edges = append(edges, admin.EdgeAdminRoleUpdater)
 	}
 	if m.removedrisk_creator != nil {
 		edges = append(edges, admin.EdgeRiskCreator)
 	}
-	if m.removedrisk_updator != nil {
-		edges = append(edges, admin.EdgeRiskUpdator)
-	}
-	if m.removedrisk_maintainer != nil {
-		edges = append(edges, admin.EdgeRiskMaintainer)
+	if m.removedrisk_updater != nil {
+		edges = append(edges, admin.EdgeRiskUpdater)
 	}
 	if m.removedrisk_location_creator != nil {
 		edges = append(edges, admin.EdgeRiskLocationCreator)
 	}
-	if m.removedrisk_location_updator != nil {
-		edges = append(edges, admin.EdgeRiskLocationUpdator)
+	if m.removedrisk_location_updater != nil {
+		edges = append(edges, admin.EdgeRiskLocationUpdater)
 	}
 	if m.removedrisk_category_creator != nil {
 		edges = append(edges, admin.EdgeRiskCategoryCreator)
 	}
-	if m.removedrisk_category_updator != nil {
-		edges = append(edges, admin.EdgeRiskCategoryUpdator)
+	if m.removedrisk_category_updater != nil {
+		edges = append(edges, admin.EdgeRiskCategoryUpdater)
 	}
 	if m.removeddepartment_creator != nil {
 		edges = append(edges, admin.EdgeDepartmentCreator)
 	}
-	if m.removeddepartment_updator != nil {
-		edges = append(edges, admin.EdgeDepartmentUpdator)
+	if m.removeddepartment_updater != nil {
+		edges = append(edges, admin.EdgeDepartmentUpdater)
 	}
 	if m.removedemployee_creator != nil {
 		edges = append(edges, admin.EdgeEmployeeCreator)
 	}
-	if m.removedemployee_updator != nil {
-		edges = append(edges, admin.EdgeEmployeeUpdator)
+	if m.removedemployee_updater != nil {
+		edges = append(edges, admin.EdgeEmployeeUpdater)
 	}
-	if m.removedemployee_admin != nil {
-		edges = append(edges, admin.EdgeEmployeeAdmin)
+	if m.removedemployee != nil {
+		edges = append(edges, admin.EdgeEmployee)
+	}
+	if m.removedoccupation_creator != nil {
+		edges = append(edges, admin.EdgeOccupationCreator)
+	}
+	if m.removedoccupation_updater != nil {
+		edges = append(edges, admin.EdgeOccupationUpdater)
 	}
 	return edges
 }
@@ -2045,9 +2224,9 @@ func (m *AdminMutation) RemovedIDs(name string) []ent.Value {
 			ids = append(ids, id)
 		}
 		return ids
-	case admin.EdgeAdminUpdator:
-		ids := make([]ent.Value, 0, len(m.removedadmin_updator))
-		for id := range m.removedadmin_updator {
+	case admin.EdgeAdminUpdater:
+		ids := make([]ent.Value, 0, len(m.removedadmin_updater))
+		for id := range m.removedadmin_updater {
 			ids = append(ids, id)
 		}
 		return ids
@@ -2057,9 +2236,9 @@ func (m *AdminMutation) RemovedIDs(name string) []ent.Value {
 			ids = append(ids, id)
 		}
 		return ids
-	case admin.EdgeAdminRoleUpdator:
-		ids := make([]ent.Value, 0, len(m.removedadmin_role_updator))
-		for id := range m.removedadmin_role_updator {
+	case admin.EdgeAdminRoleUpdater:
+		ids := make([]ent.Value, 0, len(m.removedadmin_role_updater))
+		for id := range m.removedadmin_role_updater {
 			ids = append(ids, id)
 		}
 		return ids
@@ -2069,15 +2248,9 @@ func (m *AdminMutation) RemovedIDs(name string) []ent.Value {
 			ids = append(ids, id)
 		}
 		return ids
-	case admin.EdgeRiskUpdator:
-		ids := make([]ent.Value, 0, len(m.removedrisk_updator))
-		for id := range m.removedrisk_updator {
-			ids = append(ids, id)
-		}
-		return ids
-	case admin.EdgeRiskMaintainer:
-		ids := make([]ent.Value, 0, len(m.removedrisk_maintainer))
-		for id := range m.removedrisk_maintainer {
+	case admin.EdgeRiskUpdater:
+		ids := make([]ent.Value, 0, len(m.removedrisk_updater))
+		for id := range m.removedrisk_updater {
 			ids = append(ids, id)
 		}
 		return ids
@@ -2087,9 +2260,9 @@ func (m *AdminMutation) RemovedIDs(name string) []ent.Value {
 			ids = append(ids, id)
 		}
 		return ids
-	case admin.EdgeRiskLocationUpdator:
-		ids := make([]ent.Value, 0, len(m.removedrisk_location_updator))
-		for id := range m.removedrisk_location_updator {
+	case admin.EdgeRiskLocationUpdater:
+		ids := make([]ent.Value, 0, len(m.removedrisk_location_updater))
+		for id := range m.removedrisk_location_updater {
 			ids = append(ids, id)
 		}
 		return ids
@@ -2099,9 +2272,9 @@ func (m *AdminMutation) RemovedIDs(name string) []ent.Value {
 			ids = append(ids, id)
 		}
 		return ids
-	case admin.EdgeRiskCategoryUpdator:
-		ids := make([]ent.Value, 0, len(m.removedrisk_category_updator))
-		for id := range m.removedrisk_category_updator {
+	case admin.EdgeRiskCategoryUpdater:
+		ids := make([]ent.Value, 0, len(m.removedrisk_category_updater))
+		for id := range m.removedrisk_category_updater {
 			ids = append(ids, id)
 		}
 		return ids
@@ -2111,9 +2284,9 @@ func (m *AdminMutation) RemovedIDs(name string) []ent.Value {
 			ids = append(ids, id)
 		}
 		return ids
-	case admin.EdgeDepartmentUpdator:
-		ids := make([]ent.Value, 0, len(m.removeddepartment_updator))
-		for id := range m.removeddepartment_updator {
+	case admin.EdgeDepartmentUpdater:
+		ids := make([]ent.Value, 0, len(m.removeddepartment_updater))
+		for id := range m.removeddepartment_updater {
 			ids = append(ids, id)
 		}
 		return ids
@@ -2123,15 +2296,27 @@ func (m *AdminMutation) RemovedIDs(name string) []ent.Value {
 			ids = append(ids, id)
 		}
 		return ids
-	case admin.EdgeEmployeeUpdator:
-		ids := make([]ent.Value, 0, len(m.removedemployee_updator))
-		for id := range m.removedemployee_updator {
+	case admin.EdgeEmployeeUpdater:
+		ids := make([]ent.Value, 0, len(m.removedemployee_updater))
+		for id := range m.removedemployee_updater {
 			ids = append(ids, id)
 		}
 		return ids
-	case admin.EdgeEmployeeAdmin:
-		ids := make([]ent.Value, 0, len(m.removedemployee_admin))
-		for id := range m.removedemployee_admin {
+	case admin.EdgeEmployee:
+		ids := make([]ent.Value, 0, len(m.removedemployee))
+		for id := range m.removedemployee {
+			ids = append(ids, id)
+		}
+		return ids
+	case admin.EdgeOccupationCreator:
+		ids := make([]ent.Value, 0, len(m.removedoccupation_creator))
+		for id := range m.removedoccupation_creator {
+			ids = append(ids, id)
+		}
+		return ids
+	case admin.EdgeOccupationUpdater:
+		ids := make([]ent.Value, 0, len(m.removedoccupation_updater))
+		for id := range m.removedoccupation_updater {
 			ids = append(ids, id)
 		}
 		return ids
@@ -2141,12 +2326,12 @@ func (m *AdminMutation) RemovedIDs(name string) []ent.Value {
 
 // ClearedEdges returns all edge names that were cleared in this mutation.
 func (m *AdminMutation) ClearedEdges() []string {
-	edges := make([]string, 0, 19)
+	edges := make([]string, 0, 20)
 	if m.clearedcreator {
 		edges = append(edges, admin.EdgeCreator)
 	}
-	if m.clearedupdator {
-		edges = append(edges, admin.EdgeUpdator)
+	if m.clearedupdater {
+		edges = append(edges, admin.EdgeUpdater)
 	}
 	if m.clearedadmin_roles {
 		edges = append(edges, admin.EdgeAdminRoles)
@@ -2154,50 +2339,53 @@ func (m *AdminMutation) ClearedEdges() []string {
 	if m.clearedadmin_creator {
 		edges = append(edges, admin.EdgeAdminCreator)
 	}
-	if m.clearedadmin_updator {
-		edges = append(edges, admin.EdgeAdminUpdator)
+	if m.clearedadmin_updater {
+		edges = append(edges, admin.EdgeAdminUpdater)
 	}
 	if m.clearedadmin_role_creator {
 		edges = append(edges, admin.EdgeAdminRoleCreator)
 	}
-	if m.clearedadmin_role_updator {
-		edges = append(edges, admin.EdgeAdminRoleUpdator)
+	if m.clearedadmin_role_updater {
+		edges = append(edges, admin.EdgeAdminRoleUpdater)
 	}
 	if m.clearedrisk_creator {
 		edges = append(edges, admin.EdgeRiskCreator)
 	}
-	if m.clearedrisk_updator {
-		edges = append(edges, admin.EdgeRiskUpdator)
-	}
-	if m.clearedrisk_maintainer {
-		edges = append(edges, admin.EdgeRiskMaintainer)
+	if m.clearedrisk_updater {
+		edges = append(edges, admin.EdgeRiskUpdater)
 	}
 	if m.clearedrisk_location_creator {
 		edges = append(edges, admin.EdgeRiskLocationCreator)
 	}
-	if m.clearedrisk_location_updator {
-		edges = append(edges, admin.EdgeRiskLocationUpdator)
+	if m.clearedrisk_location_updater {
+		edges = append(edges, admin.EdgeRiskLocationUpdater)
 	}
 	if m.clearedrisk_category_creator {
 		edges = append(edges, admin.EdgeRiskCategoryCreator)
 	}
-	if m.clearedrisk_category_updator {
-		edges = append(edges, admin.EdgeRiskCategoryUpdator)
+	if m.clearedrisk_category_updater {
+		edges = append(edges, admin.EdgeRiskCategoryUpdater)
 	}
 	if m.cleareddepartment_creator {
 		edges = append(edges, admin.EdgeDepartmentCreator)
 	}
-	if m.cleareddepartment_updator {
-		edges = append(edges, admin.EdgeDepartmentUpdator)
+	if m.cleareddepartment_updater {
+		edges = append(edges, admin.EdgeDepartmentUpdater)
 	}
 	if m.clearedemployee_creator {
 		edges = append(edges, admin.EdgeEmployeeCreator)
 	}
-	if m.clearedemployee_updator {
-		edges = append(edges, admin.EdgeEmployeeUpdator)
+	if m.clearedemployee_updater {
+		edges = append(edges, admin.EdgeEmployeeUpdater)
 	}
-	if m.clearedemployee_admin {
-		edges = append(edges, admin.EdgeEmployeeAdmin)
+	if m.clearedemployee {
+		edges = append(edges, admin.EdgeEmployee)
+	}
+	if m.clearedoccupation_creator {
+		edges = append(edges, admin.EdgeOccupationCreator)
+	}
+	if m.clearedoccupation_updater {
+		edges = append(edges, admin.EdgeOccupationUpdater)
 	}
 	return edges
 }
@@ -2208,42 +2396,44 @@ func (m *AdminMutation) EdgeCleared(name string) bool {
 	switch name {
 	case admin.EdgeCreator:
 		return m.clearedcreator
-	case admin.EdgeUpdator:
-		return m.clearedupdator
+	case admin.EdgeUpdater:
+		return m.clearedupdater
 	case admin.EdgeAdminRoles:
 		return m.clearedadmin_roles
 	case admin.EdgeAdminCreator:
 		return m.clearedadmin_creator
-	case admin.EdgeAdminUpdator:
-		return m.clearedadmin_updator
+	case admin.EdgeAdminUpdater:
+		return m.clearedadmin_updater
 	case admin.EdgeAdminRoleCreator:
 		return m.clearedadmin_role_creator
-	case admin.EdgeAdminRoleUpdator:
-		return m.clearedadmin_role_updator
+	case admin.EdgeAdminRoleUpdater:
+		return m.clearedadmin_role_updater
 	case admin.EdgeRiskCreator:
 		return m.clearedrisk_creator
-	case admin.EdgeRiskUpdator:
-		return m.clearedrisk_updator
-	case admin.EdgeRiskMaintainer:
-		return m.clearedrisk_maintainer
+	case admin.EdgeRiskUpdater:
+		return m.clearedrisk_updater
 	case admin.EdgeRiskLocationCreator:
 		return m.clearedrisk_location_creator
-	case admin.EdgeRiskLocationUpdator:
-		return m.clearedrisk_location_updator
+	case admin.EdgeRiskLocationUpdater:
+		return m.clearedrisk_location_updater
 	case admin.EdgeRiskCategoryCreator:
 		return m.clearedrisk_category_creator
-	case admin.EdgeRiskCategoryUpdator:
-		return m.clearedrisk_category_updator
+	case admin.EdgeRiskCategoryUpdater:
+		return m.clearedrisk_category_updater
 	case admin.EdgeDepartmentCreator:
 		return m.cleareddepartment_creator
-	case admin.EdgeDepartmentUpdator:
-		return m.cleareddepartment_updator
+	case admin.EdgeDepartmentUpdater:
+		return m.cleareddepartment_updater
 	case admin.EdgeEmployeeCreator:
 		return m.clearedemployee_creator
-	case admin.EdgeEmployeeUpdator:
-		return m.clearedemployee_updator
-	case admin.EdgeEmployeeAdmin:
-		return m.clearedemployee_admin
+	case admin.EdgeEmployeeUpdater:
+		return m.clearedemployee_updater
+	case admin.EdgeEmployee:
+		return m.clearedemployee
+	case admin.EdgeOccupationCreator:
+		return m.clearedoccupation_creator
+	case admin.EdgeOccupationUpdater:
+		return m.clearedoccupation_updater
 	}
 	return false
 }
@@ -2255,8 +2445,8 @@ func (m *AdminMutation) ClearEdge(name string) error {
 	case admin.EdgeCreator:
 		m.ClearCreator()
 		return nil
-	case admin.EdgeUpdator:
-		m.ClearUpdator()
+	case admin.EdgeUpdater:
+		m.ClearUpdater()
 		return nil
 	}
 	return fmt.Errorf("unknown Admin unique edge %s", name)
@@ -2269,8 +2459,8 @@ func (m *AdminMutation) ResetEdge(name string) error {
 	case admin.EdgeCreator:
 		m.ResetCreator()
 		return nil
-	case admin.EdgeUpdator:
-		m.ResetUpdator()
+	case admin.EdgeUpdater:
+		m.ResetUpdater()
 		return nil
 	case admin.EdgeAdminRoles:
 		m.ResetAdminRoles()
@@ -2278,50 +2468,53 @@ func (m *AdminMutation) ResetEdge(name string) error {
 	case admin.EdgeAdminCreator:
 		m.ResetAdminCreator()
 		return nil
-	case admin.EdgeAdminUpdator:
-		m.ResetAdminUpdator()
+	case admin.EdgeAdminUpdater:
+		m.ResetAdminUpdater()
 		return nil
 	case admin.EdgeAdminRoleCreator:
 		m.ResetAdminRoleCreator()
 		return nil
-	case admin.EdgeAdminRoleUpdator:
-		m.ResetAdminRoleUpdator()
+	case admin.EdgeAdminRoleUpdater:
+		m.ResetAdminRoleUpdater()
 		return nil
 	case admin.EdgeRiskCreator:
 		m.ResetRiskCreator()
 		return nil
-	case admin.EdgeRiskUpdator:
-		m.ResetRiskUpdator()
-		return nil
-	case admin.EdgeRiskMaintainer:
-		m.ResetRiskMaintainer()
+	case admin.EdgeRiskUpdater:
+		m.ResetRiskUpdater()
 		return nil
 	case admin.EdgeRiskLocationCreator:
 		m.ResetRiskLocationCreator()
 		return nil
-	case admin.EdgeRiskLocationUpdator:
-		m.ResetRiskLocationUpdator()
+	case admin.EdgeRiskLocationUpdater:
+		m.ResetRiskLocationUpdater()
 		return nil
 	case admin.EdgeRiskCategoryCreator:
 		m.ResetRiskCategoryCreator()
 		return nil
-	case admin.EdgeRiskCategoryUpdator:
-		m.ResetRiskCategoryUpdator()
+	case admin.EdgeRiskCategoryUpdater:
+		m.ResetRiskCategoryUpdater()
 		return nil
 	case admin.EdgeDepartmentCreator:
 		m.ResetDepartmentCreator()
 		return nil
-	case admin.EdgeDepartmentUpdator:
-		m.ResetDepartmentUpdator()
+	case admin.EdgeDepartmentUpdater:
+		m.ResetDepartmentUpdater()
 		return nil
 	case admin.EdgeEmployeeCreator:
 		m.ResetEmployeeCreator()
 		return nil
-	case admin.EdgeEmployeeUpdator:
-		m.ResetEmployeeUpdator()
+	case admin.EdgeEmployeeUpdater:
+		m.ResetEmployeeUpdater()
 		return nil
-	case admin.EdgeEmployeeAdmin:
-		m.ResetEmployeeAdmin()
+	case admin.EdgeEmployee:
+		m.ResetEmployee()
+		return nil
+	case admin.EdgeOccupationCreator:
+		m.ResetOccupationCreator()
+		return nil
+	case admin.EdgeOccupationUpdater:
+		m.ResetOccupationUpdater()
 		return nil
 	}
 	return fmt.Errorf("unknown Admin edge %s", name)
@@ -2340,8 +2533,8 @@ type AdminRoleMutation struct {
 	clearedFields  map[string]struct{}
 	creator        *int
 	clearedcreator bool
-	updator        *int
-	clearedupdator bool
+	updater        *int
+	clearedupdater bool
 	admins         map[int]struct{}
 	removedadmins  map[int]struct{}
 	clearedadmins  bool
@@ -2620,12 +2813,12 @@ func (m *AdminRoleMutation) ResetDeletedAt() {
 
 // SetUpdatedBy sets the "updated_by" field.
 func (m *AdminRoleMutation) SetUpdatedBy(i int) {
-	m.updator = &i
+	m.updater = &i
 }
 
 // UpdatedBy returns the value of the "updated_by" field in the mutation.
 func (m *AdminRoleMutation) UpdatedBy() (r int, exists bool) {
-	v := m.updator
+	v := m.updater
 	if v == nil {
 		return
 	}
@@ -2651,7 +2844,7 @@ func (m *AdminRoleMutation) OldUpdatedBy(ctx context.Context) (v int, err error)
 
 // ClearUpdatedBy clears the value of the "updated_by" field.
 func (m *AdminRoleMutation) ClearUpdatedBy() {
-	m.updator = nil
+	m.updater = nil
 	m.clearedFields[adminrole.FieldUpdatedBy] = struct{}{}
 }
 
@@ -2663,7 +2856,7 @@ func (m *AdminRoleMutation) UpdatedByCleared() bool {
 
 // ResetUpdatedBy resets all changes to the "updated_by" field.
 func (m *AdminRoleMutation) ResetUpdatedBy() {
-	m.updator = nil
+	m.updater = nil
 	delete(m.clearedFields, adminrole.FieldUpdatedBy)
 }
 
@@ -2743,44 +2936,44 @@ func (m *AdminRoleMutation) ResetCreator() {
 	m.clearedcreator = false
 }
 
-// SetUpdatorID sets the "updator" edge to the Admin entity by id.
-func (m *AdminRoleMutation) SetUpdatorID(id int) {
-	m.updator = &id
+// SetUpdaterID sets the "updater" edge to the Admin entity by id.
+func (m *AdminRoleMutation) SetUpdaterID(id int) {
+	m.updater = &id
 }
 
-// ClearUpdator clears the "updator" edge to the Admin entity.
-func (m *AdminRoleMutation) ClearUpdator() {
-	m.clearedupdator = true
+// ClearUpdater clears the "updater" edge to the Admin entity.
+func (m *AdminRoleMutation) ClearUpdater() {
+	m.clearedupdater = true
 	m.clearedFields[adminrole.FieldUpdatedBy] = struct{}{}
 }
 
-// UpdatorCleared reports if the "updator" edge to the Admin entity was cleared.
-func (m *AdminRoleMutation) UpdatorCleared() bool {
-	return m.UpdatedByCleared() || m.clearedupdator
+// UpdaterCleared reports if the "updater" edge to the Admin entity was cleared.
+func (m *AdminRoleMutation) UpdaterCleared() bool {
+	return m.UpdatedByCleared() || m.clearedupdater
 }
 
-// UpdatorID returns the "updator" edge ID in the mutation.
-func (m *AdminRoleMutation) UpdatorID() (id int, exists bool) {
-	if m.updator != nil {
-		return *m.updator, true
+// UpdaterID returns the "updater" edge ID in the mutation.
+func (m *AdminRoleMutation) UpdaterID() (id int, exists bool) {
+	if m.updater != nil {
+		return *m.updater, true
 	}
 	return
 }
 
-// UpdatorIDs returns the "updator" edge IDs in the mutation.
+// UpdaterIDs returns the "updater" edge IDs in the mutation.
 // Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
-// UpdatorID instead. It exists only for internal usage by the builders.
-func (m *AdminRoleMutation) UpdatorIDs() (ids []int) {
-	if id := m.updator; id != nil {
+// UpdaterID instead. It exists only for internal usage by the builders.
+func (m *AdminRoleMutation) UpdaterIDs() (ids []int) {
+	if id := m.updater; id != nil {
 		ids = append(ids, *id)
 	}
 	return
 }
 
-// ResetUpdator resets all changes to the "updator" edge.
-func (m *AdminRoleMutation) ResetUpdator() {
-	m.updator = nil
-	m.clearedupdator = false
+// ResetUpdater resets all changes to the "updater" edge.
+func (m *AdminRoleMutation) ResetUpdater() {
+	m.updater = nil
+	m.clearedupdater = false
 }
 
 // AddAdminIDs adds the "admins" edge to the Admin entity by ids.
@@ -2884,7 +3077,7 @@ func (m *AdminRoleMutation) Fields() []string {
 	if m.deleted_at != nil {
 		fields = append(fields, adminrole.FieldDeletedAt)
 	}
-	if m.updator != nil {
+	if m.updater != nil {
 		fields = append(fields, adminrole.FieldUpdatedBy)
 	}
 	if m.updated_at != nil {
@@ -3083,8 +3276,8 @@ func (m *AdminRoleMutation) AddedEdges() []string {
 	if m.creator != nil {
 		edges = append(edges, adminrole.EdgeCreator)
 	}
-	if m.updator != nil {
-		edges = append(edges, adminrole.EdgeUpdator)
+	if m.updater != nil {
+		edges = append(edges, adminrole.EdgeUpdater)
 	}
 	if m.admins != nil {
 		edges = append(edges, adminrole.EdgeAdmins)
@@ -3100,8 +3293,8 @@ func (m *AdminRoleMutation) AddedIDs(name string) []ent.Value {
 		if id := m.creator; id != nil {
 			return []ent.Value{*id}
 		}
-	case adminrole.EdgeUpdator:
-		if id := m.updator; id != nil {
+	case adminrole.EdgeUpdater:
+		if id := m.updater; id != nil {
 			return []ent.Value{*id}
 		}
 	case adminrole.EdgeAdmins:
@@ -3143,8 +3336,8 @@ func (m *AdminRoleMutation) ClearedEdges() []string {
 	if m.clearedcreator {
 		edges = append(edges, adminrole.EdgeCreator)
 	}
-	if m.clearedupdator {
-		edges = append(edges, adminrole.EdgeUpdator)
+	if m.clearedupdater {
+		edges = append(edges, adminrole.EdgeUpdater)
 	}
 	if m.clearedadmins {
 		edges = append(edges, adminrole.EdgeAdmins)
@@ -3158,8 +3351,8 @@ func (m *AdminRoleMutation) EdgeCleared(name string) bool {
 	switch name {
 	case adminrole.EdgeCreator:
 		return m.clearedcreator
-	case adminrole.EdgeUpdator:
-		return m.clearedupdator
+	case adminrole.EdgeUpdater:
+		return m.clearedupdater
 	case adminrole.EdgeAdmins:
 		return m.clearedadmins
 	}
@@ -3173,8 +3366,8 @@ func (m *AdminRoleMutation) ClearEdge(name string) error {
 	case adminrole.EdgeCreator:
 		m.ClearCreator()
 		return nil
-	case adminrole.EdgeUpdator:
-		m.ClearUpdator()
+	case adminrole.EdgeUpdater:
+		m.ClearUpdater()
 		return nil
 	}
 	return fmt.Errorf("unknown AdminRole unique edge %s", name)
@@ -3187,8 +3380,8 @@ func (m *AdminRoleMutation) ResetEdge(name string) error {
 	case adminrole.EdgeCreator:
 		m.ResetCreator()
 		return nil
-	case adminrole.EdgeUpdator:
-		m.ResetUpdator()
+	case adminrole.EdgeUpdater:
+		m.ResetUpdater()
 		return nil
 	case adminrole.EdgeAdmins:
 		m.ResetAdmins()
@@ -3200,29 +3393,29 @@ func (m *AdminRoleMutation) ResetEdge(name string) error {
 // DepartmentMutation represents an operation that mutates the Department nodes in the graph.
 type DepartmentMutation struct {
 	config
-	op                         Op
-	typ                        string
-	id                         *int
-	created_at                 *time.Time
-	deleted_at                 *time.Time
-	updated_by                 *int
-	addupdated_by              *int
-	updated_at                 *time.Time
-	title                      *string
-	clearedFields              map[string]struct{}
-	creator                    *int
-	clearedcreator             bool
-	parent                     *int
-	clearedparent              bool
-	employee_department        map[int]struct{}
-	removedemployee_department map[int]struct{}
-	clearedemployee_department bool
-	children                   map[int]struct{}
-	removedchildren            map[int]struct{}
-	clearedchildren            bool
-	done                       bool
-	oldValue                   func(context.Context) (*Department, error)
-	predicates                 []predicate.Department
+	op               Op
+	typ              string
+	id               *int
+	created_at       *time.Time
+	deleted_at       *time.Time
+	updated_at       *time.Time
+	name             *string
+	clearedFields    map[string]struct{}
+	creator          *int
+	clearedcreator   bool
+	updater          *int
+	clearedupdater   bool
+	parent           *int
+	clearedparent    bool
+	employees        map[int]struct{}
+	removedemployees map[int]struct{}
+	clearedemployees bool
+	children         map[int]struct{}
+	removedchildren  map[int]struct{}
+	clearedchildren  bool
+	done             bool
+	oldValue         func(context.Context) (*Department, error)
+	predicates       []predicate.Department
 }
 
 var _ ent.Mutation = (*DepartmentMutation)(nil)
@@ -3446,13 +3639,12 @@ func (m *DepartmentMutation) ResetDeletedAt() {
 
 // SetUpdatedBy sets the "updated_by" field.
 func (m *DepartmentMutation) SetUpdatedBy(i int) {
-	m.updated_by = &i
-	m.addupdated_by = nil
+	m.updater = &i
 }
 
 // UpdatedBy returns the value of the "updated_by" field in the mutation.
 func (m *DepartmentMutation) UpdatedBy() (r int, exists bool) {
-	v := m.updated_by
+	v := m.updater
 	if v == nil {
 		return
 	}
@@ -3476,28 +3668,9 @@ func (m *DepartmentMutation) OldUpdatedBy(ctx context.Context) (v int, err error
 	return oldValue.UpdatedBy, nil
 }
 
-// AddUpdatedBy adds i to the "updated_by" field.
-func (m *DepartmentMutation) AddUpdatedBy(i int) {
-	if m.addupdated_by != nil {
-		*m.addupdated_by += i
-	} else {
-		m.addupdated_by = &i
-	}
-}
-
-// AddedUpdatedBy returns the value that was added to the "updated_by" field in this mutation.
-func (m *DepartmentMutation) AddedUpdatedBy() (r int, exists bool) {
-	v := m.addupdated_by
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
 // ResetUpdatedBy resets all changes to the "updated_by" field.
 func (m *DepartmentMutation) ResetUpdatedBy() {
-	m.updated_by = nil
-	m.addupdated_by = nil
+	m.updater = nil
 }
 
 // SetUpdatedAt sets the "updated_at" field.
@@ -3536,40 +3709,40 @@ func (m *DepartmentMutation) ResetUpdatedAt() {
 	m.updated_at = nil
 }
 
-// SetTitle sets the "title" field.
-func (m *DepartmentMutation) SetTitle(s string) {
-	m.title = &s
+// SetName sets the "name" field.
+func (m *DepartmentMutation) SetName(s string) {
+	m.name = &s
 }
 
-// Title returns the value of the "title" field in the mutation.
-func (m *DepartmentMutation) Title() (r string, exists bool) {
-	v := m.title
+// Name returns the value of the "name" field in the mutation.
+func (m *DepartmentMutation) Name() (r string, exists bool) {
+	v := m.name
 	if v == nil {
 		return
 	}
 	return *v, true
 }
 
-// OldTitle returns the old "title" field's value of the Department entity.
+// OldName returns the old "name" field's value of the Department entity.
 // If the Department object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *DepartmentMutation) OldTitle(ctx context.Context) (v string, err error) {
+func (m *DepartmentMutation) OldName(ctx context.Context) (v string, err error) {
 	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldTitle is only allowed on UpdateOne operations")
+		return v, errors.New("OldName is only allowed on UpdateOne operations")
 	}
 	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldTitle requires an ID field in the mutation")
+		return v, errors.New("OldName requires an ID field in the mutation")
 	}
 	oldValue, err := m.oldValue(ctx)
 	if err != nil {
-		return v, fmt.Errorf("querying old value for OldTitle: %w", err)
+		return v, fmt.Errorf("querying old value for OldName: %w", err)
 	}
-	return oldValue.Title, nil
+	return oldValue.Name, nil
 }
 
-// ResetTitle resets all changes to the "title" field.
-func (m *DepartmentMutation) ResetTitle() {
-	m.title = nil
+// ResetName resets all changes to the "name" field.
+func (m *DepartmentMutation) ResetName() {
+	m.name = nil
 }
 
 // SetParentID sets the "parent_id" field.
@@ -3603,9 +3776,22 @@ func (m *DepartmentMutation) OldParentID(ctx context.Context) (v int, err error)
 	return oldValue.ParentID, nil
 }
 
+// ClearParentID clears the value of the "parent_id" field.
+func (m *DepartmentMutation) ClearParentID() {
+	m.parent = nil
+	m.clearedFields[department.FieldParentID] = struct{}{}
+}
+
+// ParentIDCleared returns if the "parent_id" field was cleared in this mutation.
+func (m *DepartmentMutation) ParentIDCleared() bool {
+	_, ok := m.clearedFields[department.FieldParentID]
+	return ok
+}
+
 // ResetParentID resets all changes to the "parent_id" field.
 func (m *DepartmentMutation) ResetParentID() {
 	m.parent = nil
+	delete(m.clearedFields, department.FieldParentID)
 }
 
 // SetCreatorID sets the "creator" edge to the Admin entity by id.
@@ -3648,6 +3834,46 @@ func (m *DepartmentMutation) ResetCreator() {
 	m.clearedcreator = false
 }
 
+// SetUpdaterID sets the "updater" edge to the Admin entity by id.
+func (m *DepartmentMutation) SetUpdaterID(id int) {
+	m.updater = &id
+}
+
+// ClearUpdater clears the "updater" edge to the Admin entity.
+func (m *DepartmentMutation) ClearUpdater() {
+	m.clearedupdater = true
+	m.clearedFields[department.FieldUpdatedBy] = struct{}{}
+}
+
+// UpdaterCleared reports if the "updater" edge to the Admin entity was cleared.
+func (m *DepartmentMutation) UpdaterCleared() bool {
+	return m.clearedupdater
+}
+
+// UpdaterID returns the "updater" edge ID in the mutation.
+func (m *DepartmentMutation) UpdaterID() (id int, exists bool) {
+	if m.updater != nil {
+		return *m.updater, true
+	}
+	return
+}
+
+// UpdaterIDs returns the "updater" edge IDs in the mutation.
+// Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
+// UpdaterID instead. It exists only for internal usage by the builders.
+func (m *DepartmentMutation) UpdaterIDs() (ids []int) {
+	if id := m.updater; id != nil {
+		ids = append(ids, *id)
+	}
+	return
+}
+
+// ResetUpdater resets all changes to the "updater" edge.
+func (m *DepartmentMutation) ResetUpdater() {
+	m.updater = nil
+	m.clearedupdater = false
+}
+
 // ClearParent clears the "parent" edge to the Department entity.
 func (m *DepartmentMutation) ClearParent() {
 	m.clearedparent = true
@@ -3656,7 +3882,7 @@ func (m *DepartmentMutation) ClearParent() {
 
 // ParentCleared reports if the "parent" edge to the Department entity was cleared.
 func (m *DepartmentMutation) ParentCleared() bool {
-	return m.clearedparent
+	return m.ParentIDCleared() || m.clearedparent
 }
 
 // ParentIDs returns the "parent" edge IDs in the mutation.
@@ -3675,58 +3901,58 @@ func (m *DepartmentMutation) ResetParent() {
 	m.clearedparent = false
 }
 
-// AddEmployeeDepartmentIDs adds the "employee_department" edge to the Employee entity by ids.
-func (m *DepartmentMutation) AddEmployeeDepartmentIDs(ids ...int) {
-	if m.employee_department == nil {
-		m.employee_department = make(map[int]struct{})
+// AddEmployeeIDs adds the "employees" edge to the Employee entity by ids.
+func (m *DepartmentMutation) AddEmployeeIDs(ids ...int) {
+	if m.employees == nil {
+		m.employees = make(map[int]struct{})
 	}
 	for i := range ids {
-		m.employee_department[ids[i]] = struct{}{}
+		m.employees[ids[i]] = struct{}{}
 	}
 }
 
-// ClearEmployeeDepartment clears the "employee_department" edge to the Employee entity.
-func (m *DepartmentMutation) ClearEmployeeDepartment() {
-	m.clearedemployee_department = true
+// ClearEmployees clears the "employees" edge to the Employee entity.
+func (m *DepartmentMutation) ClearEmployees() {
+	m.clearedemployees = true
 }
 
-// EmployeeDepartmentCleared reports if the "employee_department" edge to the Employee entity was cleared.
-func (m *DepartmentMutation) EmployeeDepartmentCleared() bool {
-	return m.clearedemployee_department
+// EmployeesCleared reports if the "employees" edge to the Employee entity was cleared.
+func (m *DepartmentMutation) EmployeesCleared() bool {
+	return m.clearedemployees
 }
 
-// RemoveEmployeeDepartmentIDs removes the "employee_department" edge to the Employee entity by IDs.
-func (m *DepartmentMutation) RemoveEmployeeDepartmentIDs(ids ...int) {
-	if m.removedemployee_department == nil {
-		m.removedemployee_department = make(map[int]struct{})
+// RemoveEmployeeIDs removes the "employees" edge to the Employee entity by IDs.
+func (m *DepartmentMutation) RemoveEmployeeIDs(ids ...int) {
+	if m.removedemployees == nil {
+		m.removedemployees = make(map[int]struct{})
 	}
 	for i := range ids {
-		delete(m.employee_department, ids[i])
-		m.removedemployee_department[ids[i]] = struct{}{}
+		delete(m.employees, ids[i])
+		m.removedemployees[ids[i]] = struct{}{}
 	}
 }
 
-// RemovedEmployeeDepartment returns the removed IDs of the "employee_department" edge to the Employee entity.
-func (m *DepartmentMutation) RemovedEmployeeDepartmentIDs() (ids []int) {
-	for id := range m.removedemployee_department {
+// RemovedEmployees returns the removed IDs of the "employees" edge to the Employee entity.
+func (m *DepartmentMutation) RemovedEmployeesIDs() (ids []int) {
+	for id := range m.removedemployees {
 		ids = append(ids, id)
 	}
 	return
 }
 
-// EmployeeDepartmentIDs returns the "employee_department" edge IDs in the mutation.
-func (m *DepartmentMutation) EmployeeDepartmentIDs() (ids []int) {
-	for id := range m.employee_department {
+// EmployeesIDs returns the "employees" edge IDs in the mutation.
+func (m *DepartmentMutation) EmployeesIDs() (ids []int) {
+	for id := range m.employees {
 		ids = append(ids, id)
 	}
 	return
 }
 
-// ResetEmployeeDepartment resets all changes to the "employee_department" edge.
-func (m *DepartmentMutation) ResetEmployeeDepartment() {
-	m.employee_department = nil
-	m.clearedemployee_department = false
-	m.removedemployee_department = nil
+// ResetEmployees resets all changes to the "employees" edge.
+func (m *DepartmentMutation) ResetEmployees() {
+	m.employees = nil
+	m.clearedemployees = false
+	m.removedemployees = nil
 }
 
 // AddChildIDs adds the "children" edge to the Department entity by ids.
@@ -3827,14 +4053,14 @@ func (m *DepartmentMutation) Fields() []string {
 	if m.deleted_at != nil {
 		fields = append(fields, department.FieldDeletedAt)
 	}
-	if m.updated_by != nil {
+	if m.updater != nil {
 		fields = append(fields, department.FieldUpdatedBy)
 	}
 	if m.updated_at != nil {
 		fields = append(fields, department.FieldUpdatedAt)
 	}
-	if m.title != nil {
-		fields = append(fields, department.FieldTitle)
+	if m.name != nil {
+		fields = append(fields, department.FieldName)
 	}
 	if m.parent != nil {
 		fields = append(fields, department.FieldParentID)
@@ -3857,8 +4083,8 @@ func (m *DepartmentMutation) Field(name string) (ent.Value, bool) {
 		return m.UpdatedBy()
 	case department.FieldUpdatedAt:
 		return m.UpdatedAt()
-	case department.FieldTitle:
-		return m.Title()
+	case department.FieldName:
+		return m.Name()
 	case department.FieldParentID:
 		return m.ParentID()
 	}
@@ -3880,8 +4106,8 @@ func (m *DepartmentMutation) OldField(ctx context.Context, name string) (ent.Val
 		return m.OldUpdatedBy(ctx)
 	case department.FieldUpdatedAt:
 		return m.OldUpdatedAt(ctx)
-	case department.FieldTitle:
-		return m.OldTitle(ctx)
+	case department.FieldName:
+		return m.OldName(ctx)
 	case department.FieldParentID:
 		return m.OldParentID(ctx)
 	}
@@ -3928,12 +4154,12 @@ func (m *DepartmentMutation) SetField(name string, value ent.Value) error {
 		}
 		m.SetUpdatedAt(v)
 		return nil
-	case department.FieldTitle:
+	case department.FieldName:
 		v, ok := value.(string)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
-		m.SetTitle(v)
+		m.SetName(v)
 		return nil
 	case department.FieldParentID:
 		v, ok := value.(int)
@@ -3950,9 +4176,6 @@ func (m *DepartmentMutation) SetField(name string, value ent.Value) error {
 // this mutation.
 func (m *DepartmentMutation) AddedFields() []string {
 	var fields []string
-	if m.addupdated_by != nil {
-		fields = append(fields, department.FieldUpdatedBy)
-	}
 	return fields
 }
 
@@ -3961,8 +4184,6 @@ func (m *DepartmentMutation) AddedFields() []string {
 // was not set, or was not defined in the schema.
 func (m *DepartmentMutation) AddedField(name string) (ent.Value, bool) {
 	switch name {
-	case department.FieldUpdatedBy:
-		return m.AddedUpdatedBy()
 	}
 	return nil, false
 }
@@ -3972,13 +4193,6 @@ func (m *DepartmentMutation) AddedField(name string) (ent.Value, bool) {
 // type.
 func (m *DepartmentMutation) AddField(name string, value ent.Value) error {
 	switch name {
-	case department.FieldUpdatedBy:
-		v, ok := value.(int)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.AddUpdatedBy(v)
-		return nil
 	}
 	return fmt.Errorf("unknown Department numeric field %s", name)
 }
@@ -3989,6 +4203,9 @@ func (m *DepartmentMutation) ClearedFields() []string {
 	var fields []string
 	if m.FieldCleared(department.FieldDeletedAt) {
 		fields = append(fields, department.FieldDeletedAt)
+	}
+	if m.FieldCleared(department.FieldParentID) {
+		fields = append(fields, department.FieldParentID)
 	}
 	return fields
 }
@@ -4006,6 +4223,9 @@ func (m *DepartmentMutation) ClearField(name string) error {
 	switch name {
 	case department.FieldDeletedAt:
 		m.ClearDeletedAt()
+		return nil
+	case department.FieldParentID:
+		m.ClearParentID()
 		return nil
 	}
 	return fmt.Errorf("unknown Department nullable field %s", name)
@@ -4030,8 +4250,8 @@ func (m *DepartmentMutation) ResetField(name string) error {
 	case department.FieldUpdatedAt:
 		m.ResetUpdatedAt()
 		return nil
-	case department.FieldTitle:
-		m.ResetTitle()
+	case department.FieldName:
+		m.ResetName()
 		return nil
 	case department.FieldParentID:
 		m.ResetParentID()
@@ -4042,15 +4262,18 @@ func (m *DepartmentMutation) ResetField(name string) error {
 
 // AddedEdges returns all edge names that were set/added in this mutation.
 func (m *DepartmentMutation) AddedEdges() []string {
-	edges := make([]string, 0, 4)
+	edges := make([]string, 0, 5)
 	if m.creator != nil {
 		edges = append(edges, department.EdgeCreator)
+	}
+	if m.updater != nil {
+		edges = append(edges, department.EdgeUpdater)
 	}
 	if m.parent != nil {
 		edges = append(edges, department.EdgeParent)
 	}
-	if m.employee_department != nil {
-		edges = append(edges, department.EdgeEmployeeDepartment)
+	if m.employees != nil {
+		edges = append(edges, department.EdgeEmployees)
 	}
 	if m.children != nil {
 		edges = append(edges, department.EdgeChildren)
@@ -4066,13 +4289,17 @@ func (m *DepartmentMutation) AddedIDs(name string) []ent.Value {
 		if id := m.creator; id != nil {
 			return []ent.Value{*id}
 		}
+	case department.EdgeUpdater:
+		if id := m.updater; id != nil {
+			return []ent.Value{*id}
+		}
 	case department.EdgeParent:
 		if id := m.parent; id != nil {
 			return []ent.Value{*id}
 		}
-	case department.EdgeEmployeeDepartment:
-		ids := make([]ent.Value, 0, len(m.employee_department))
-		for id := range m.employee_department {
+	case department.EdgeEmployees:
+		ids := make([]ent.Value, 0, len(m.employees))
+		for id := range m.employees {
 			ids = append(ids, id)
 		}
 		return ids
@@ -4088,9 +4315,9 @@ func (m *DepartmentMutation) AddedIDs(name string) []ent.Value {
 
 // RemovedEdges returns all edge names that were removed in this mutation.
 func (m *DepartmentMutation) RemovedEdges() []string {
-	edges := make([]string, 0, 4)
-	if m.removedemployee_department != nil {
-		edges = append(edges, department.EdgeEmployeeDepartment)
+	edges := make([]string, 0, 5)
+	if m.removedemployees != nil {
+		edges = append(edges, department.EdgeEmployees)
 	}
 	if m.removedchildren != nil {
 		edges = append(edges, department.EdgeChildren)
@@ -4102,9 +4329,9 @@ func (m *DepartmentMutation) RemovedEdges() []string {
 // the given name in this mutation.
 func (m *DepartmentMutation) RemovedIDs(name string) []ent.Value {
 	switch name {
-	case department.EdgeEmployeeDepartment:
-		ids := make([]ent.Value, 0, len(m.removedemployee_department))
-		for id := range m.removedemployee_department {
+	case department.EdgeEmployees:
+		ids := make([]ent.Value, 0, len(m.removedemployees))
+		for id := range m.removedemployees {
 			ids = append(ids, id)
 		}
 		return ids
@@ -4120,15 +4347,18 @@ func (m *DepartmentMutation) RemovedIDs(name string) []ent.Value {
 
 // ClearedEdges returns all edge names that were cleared in this mutation.
 func (m *DepartmentMutation) ClearedEdges() []string {
-	edges := make([]string, 0, 4)
+	edges := make([]string, 0, 5)
 	if m.clearedcreator {
 		edges = append(edges, department.EdgeCreator)
+	}
+	if m.clearedupdater {
+		edges = append(edges, department.EdgeUpdater)
 	}
 	if m.clearedparent {
 		edges = append(edges, department.EdgeParent)
 	}
-	if m.clearedemployee_department {
-		edges = append(edges, department.EdgeEmployeeDepartment)
+	if m.clearedemployees {
+		edges = append(edges, department.EdgeEmployees)
 	}
 	if m.clearedchildren {
 		edges = append(edges, department.EdgeChildren)
@@ -4142,10 +4372,12 @@ func (m *DepartmentMutation) EdgeCleared(name string) bool {
 	switch name {
 	case department.EdgeCreator:
 		return m.clearedcreator
+	case department.EdgeUpdater:
+		return m.clearedupdater
 	case department.EdgeParent:
 		return m.clearedparent
-	case department.EdgeEmployeeDepartment:
-		return m.clearedemployee_department
+	case department.EdgeEmployees:
+		return m.clearedemployees
 	case department.EdgeChildren:
 		return m.clearedchildren
 	}
@@ -4158,6 +4390,9 @@ func (m *DepartmentMutation) ClearEdge(name string) error {
 	switch name {
 	case department.EdgeCreator:
 		m.ClearCreator()
+		return nil
+	case department.EdgeUpdater:
+		m.ClearUpdater()
 		return nil
 	case department.EdgeParent:
 		m.ClearParent()
@@ -4173,11 +4408,14 @@ func (m *DepartmentMutation) ResetEdge(name string) error {
 	case department.EdgeCreator:
 		m.ResetCreator()
 		return nil
+	case department.EdgeUpdater:
+		m.ResetUpdater()
+		return nil
 	case department.EdgeParent:
 		m.ResetParent()
 		return nil
-	case department.EdgeEmployeeDepartment:
-		m.ResetEmployeeDepartment()
+	case department.EdgeEmployees:
+		m.ResetEmployees()
 		return nil
 	case department.EdgeChildren:
 		m.ResetChildren()
@@ -4194,22 +4432,25 @@ type EmployeeMutation struct {
 	id                     *int
 	created_at             *time.Time
 	deleted_at             *time.Time
-	updated_by             *int
-	addupdated_by          *int
 	updated_at             *time.Time
 	clearedFields          map[string]struct{}
 	creator                *int
 	clearedcreator         bool
+	updater                *int
+	clearedupdater         bool
 	admin                  *int
 	clearedadmin           bool
 	department             *int
 	cleareddepartment      bool
+	occupations            map[int]struct{}
+	removedoccupations     map[int]struct{}
+	clearedoccupations     bool
+	risk_reporter          map[int]struct{}
+	removedrisk_reporter   map[int]struct{}
+	clearedrisk_reporter   bool
 	risk_maintainer        map[int]struct{}
 	removedrisk_maintainer map[int]struct{}
 	clearedrisk_maintainer bool
-	risk_creator           map[int]struct{}
-	removedrisk_creator    map[int]struct{}
-	clearedrisk_creator    bool
 	done                   bool
 	oldValue               func(context.Context) (*Employee, error)
 	predicates             []predicate.Employee
@@ -4436,13 +4677,12 @@ func (m *EmployeeMutation) ResetDeletedAt() {
 
 // SetUpdatedBy sets the "updated_by" field.
 func (m *EmployeeMutation) SetUpdatedBy(i int) {
-	m.updated_by = &i
-	m.addupdated_by = nil
+	m.updater = &i
 }
 
 // UpdatedBy returns the value of the "updated_by" field in the mutation.
 func (m *EmployeeMutation) UpdatedBy() (r int, exists bool) {
-	v := m.updated_by
+	v := m.updater
 	if v == nil {
 		return
 	}
@@ -4466,28 +4706,9 @@ func (m *EmployeeMutation) OldUpdatedBy(ctx context.Context) (v int, err error) 
 	return oldValue.UpdatedBy, nil
 }
 
-// AddUpdatedBy adds i to the "updated_by" field.
-func (m *EmployeeMutation) AddUpdatedBy(i int) {
-	if m.addupdated_by != nil {
-		*m.addupdated_by += i
-	} else {
-		m.addupdated_by = &i
-	}
-}
-
-// AddedUpdatedBy returns the value that was added to the "updated_by" field in this mutation.
-func (m *EmployeeMutation) AddedUpdatedBy() (r int, exists bool) {
-	v := m.addupdated_by
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
 // ResetUpdatedBy resets all changes to the "updated_by" field.
 func (m *EmployeeMutation) ResetUpdatedBy() {
-	m.updated_by = nil
-	m.addupdated_by = nil
+	m.updater = nil
 }
 
 // SetUpdatedAt sets the "updated_at" field.
@@ -4638,6 +4859,46 @@ func (m *EmployeeMutation) ResetCreator() {
 	m.clearedcreator = false
 }
 
+// SetUpdaterID sets the "updater" edge to the Admin entity by id.
+func (m *EmployeeMutation) SetUpdaterID(id int) {
+	m.updater = &id
+}
+
+// ClearUpdater clears the "updater" edge to the Admin entity.
+func (m *EmployeeMutation) ClearUpdater() {
+	m.clearedupdater = true
+	m.clearedFields[employee.FieldUpdatedBy] = struct{}{}
+}
+
+// UpdaterCleared reports if the "updater" edge to the Admin entity was cleared.
+func (m *EmployeeMutation) UpdaterCleared() bool {
+	return m.clearedupdater
+}
+
+// UpdaterID returns the "updater" edge ID in the mutation.
+func (m *EmployeeMutation) UpdaterID() (id int, exists bool) {
+	if m.updater != nil {
+		return *m.updater, true
+	}
+	return
+}
+
+// UpdaterIDs returns the "updater" edge IDs in the mutation.
+// Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
+// UpdaterID instead. It exists only for internal usage by the builders.
+func (m *EmployeeMutation) UpdaterIDs() (ids []int) {
+	if id := m.updater; id != nil {
+		ids = append(ids, *id)
+	}
+	return
+}
+
+// ResetUpdater resets all changes to the "updater" edge.
+func (m *EmployeeMutation) ResetUpdater() {
+	m.updater = nil
+	m.clearedupdater = false
+}
+
 // ClearAdmin clears the "admin" edge to the Admin entity.
 func (m *EmployeeMutation) ClearAdmin() {
 	m.clearedadmin = true
@@ -4690,6 +4951,114 @@ func (m *EmployeeMutation) DepartmentIDs() (ids []int) {
 func (m *EmployeeMutation) ResetDepartment() {
 	m.department = nil
 	m.cleareddepartment = false
+}
+
+// AddOccupationIDs adds the "occupations" edge to the Occupation entity by ids.
+func (m *EmployeeMutation) AddOccupationIDs(ids ...int) {
+	if m.occupations == nil {
+		m.occupations = make(map[int]struct{})
+	}
+	for i := range ids {
+		m.occupations[ids[i]] = struct{}{}
+	}
+}
+
+// ClearOccupations clears the "occupations" edge to the Occupation entity.
+func (m *EmployeeMutation) ClearOccupations() {
+	m.clearedoccupations = true
+}
+
+// OccupationsCleared reports if the "occupations" edge to the Occupation entity was cleared.
+func (m *EmployeeMutation) OccupationsCleared() bool {
+	return m.clearedoccupations
+}
+
+// RemoveOccupationIDs removes the "occupations" edge to the Occupation entity by IDs.
+func (m *EmployeeMutation) RemoveOccupationIDs(ids ...int) {
+	if m.removedoccupations == nil {
+		m.removedoccupations = make(map[int]struct{})
+	}
+	for i := range ids {
+		delete(m.occupations, ids[i])
+		m.removedoccupations[ids[i]] = struct{}{}
+	}
+}
+
+// RemovedOccupations returns the removed IDs of the "occupations" edge to the Occupation entity.
+func (m *EmployeeMutation) RemovedOccupationsIDs() (ids []int) {
+	for id := range m.removedoccupations {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// OccupationsIDs returns the "occupations" edge IDs in the mutation.
+func (m *EmployeeMutation) OccupationsIDs() (ids []int) {
+	for id := range m.occupations {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// ResetOccupations resets all changes to the "occupations" edge.
+func (m *EmployeeMutation) ResetOccupations() {
+	m.occupations = nil
+	m.clearedoccupations = false
+	m.removedoccupations = nil
+}
+
+// AddRiskReporterIDs adds the "risk_reporter" edge to the Risk entity by ids.
+func (m *EmployeeMutation) AddRiskReporterIDs(ids ...int) {
+	if m.risk_reporter == nil {
+		m.risk_reporter = make(map[int]struct{})
+	}
+	for i := range ids {
+		m.risk_reporter[ids[i]] = struct{}{}
+	}
+}
+
+// ClearRiskReporter clears the "risk_reporter" edge to the Risk entity.
+func (m *EmployeeMutation) ClearRiskReporter() {
+	m.clearedrisk_reporter = true
+}
+
+// RiskReporterCleared reports if the "risk_reporter" edge to the Risk entity was cleared.
+func (m *EmployeeMutation) RiskReporterCleared() bool {
+	return m.clearedrisk_reporter
+}
+
+// RemoveRiskReporterIDs removes the "risk_reporter" edge to the Risk entity by IDs.
+func (m *EmployeeMutation) RemoveRiskReporterIDs(ids ...int) {
+	if m.removedrisk_reporter == nil {
+		m.removedrisk_reporter = make(map[int]struct{})
+	}
+	for i := range ids {
+		delete(m.risk_reporter, ids[i])
+		m.removedrisk_reporter[ids[i]] = struct{}{}
+	}
+}
+
+// RemovedRiskReporter returns the removed IDs of the "risk_reporter" edge to the Risk entity.
+func (m *EmployeeMutation) RemovedRiskReporterIDs() (ids []int) {
+	for id := range m.removedrisk_reporter {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// RiskReporterIDs returns the "risk_reporter" edge IDs in the mutation.
+func (m *EmployeeMutation) RiskReporterIDs() (ids []int) {
+	for id := range m.risk_reporter {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// ResetRiskReporter resets all changes to the "risk_reporter" edge.
+func (m *EmployeeMutation) ResetRiskReporter() {
+	m.risk_reporter = nil
+	m.clearedrisk_reporter = false
+	m.removedrisk_reporter = nil
 }
 
 // AddRiskMaintainerIDs adds the "risk_maintainer" edge to the Risk entity by ids.
@@ -4746,60 +5115,6 @@ func (m *EmployeeMutation) ResetRiskMaintainer() {
 	m.removedrisk_maintainer = nil
 }
 
-// AddRiskCreatorIDs adds the "risk_creator" edge to the Risk entity by ids.
-func (m *EmployeeMutation) AddRiskCreatorIDs(ids ...int) {
-	if m.risk_creator == nil {
-		m.risk_creator = make(map[int]struct{})
-	}
-	for i := range ids {
-		m.risk_creator[ids[i]] = struct{}{}
-	}
-}
-
-// ClearRiskCreator clears the "risk_creator" edge to the Risk entity.
-func (m *EmployeeMutation) ClearRiskCreator() {
-	m.clearedrisk_creator = true
-}
-
-// RiskCreatorCleared reports if the "risk_creator" edge to the Risk entity was cleared.
-func (m *EmployeeMutation) RiskCreatorCleared() bool {
-	return m.clearedrisk_creator
-}
-
-// RemoveRiskCreatorIDs removes the "risk_creator" edge to the Risk entity by IDs.
-func (m *EmployeeMutation) RemoveRiskCreatorIDs(ids ...int) {
-	if m.removedrisk_creator == nil {
-		m.removedrisk_creator = make(map[int]struct{})
-	}
-	for i := range ids {
-		delete(m.risk_creator, ids[i])
-		m.removedrisk_creator[ids[i]] = struct{}{}
-	}
-}
-
-// RemovedRiskCreator returns the removed IDs of the "risk_creator" edge to the Risk entity.
-func (m *EmployeeMutation) RemovedRiskCreatorIDs() (ids []int) {
-	for id := range m.removedrisk_creator {
-		ids = append(ids, id)
-	}
-	return
-}
-
-// RiskCreatorIDs returns the "risk_creator" edge IDs in the mutation.
-func (m *EmployeeMutation) RiskCreatorIDs() (ids []int) {
-	for id := range m.risk_creator {
-		ids = append(ids, id)
-	}
-	return
-}
-
-// ResetRiskCreator resets all changes to the "risk_creator" edge.
-func (m *EmployeeMutation) ResetRiskCreator() {
-	m.risk_creator = nil
-	m.clearedrisk_creator = false
-	m.removedrisk_creator = nil
-}
-
 // Where appends a list predicates to the EmployeeMutation builder.
 func (m *EmployeeMutation) Where(ps ...predicate.Employee) {
 	m.predicates = append(m.predicates, ps...)
@@ -4844,7 +5159,7 @@ func (m *EmployeeMutation) Fields() []string {
 	if m.deleted_at != nil {
 		fields = append(fields, employee.FieldDeletedAt)
 	}
-	if m.updated_by != nil {
+	if m.updater != nil {
 		fields = append(fields, employee.FieldUpdatedBy)
 	}
 	if m.updated_at != nil {
@@ -4967,9 +5282,6 @@ func (m *EmployeeMutation) SetField(name string, value ent.Value) error {
 // this mutation.
 func (m *EmployeeMutation) AddedFields() []string {
 	var fields []string
-	if m.addupdated_by != nil {
-		fields = append(fields, employee.FieldUpdatedBy)
-	}
 	return fields
 }
 
@@ -4978,8 +5290,6 @@ func (m *EmployeeMutation) AddedFields() []string {
 // was not set, or was not defined in the schema.
 func (m *EmployeeMutation) AddedField(name string) (ent.Value, bool) {
 	switch name {
-	case employee.FieldUpdatedBy:
-		return m.AddedUpdatedBy()
 	}
 	return nil, false
 }
@@ -4989,13 +5299,6 @@ func (m *EmployeeMutation) AddedField(name string) (ent.Value, bool) {
 // type.
 func (m *EmployeeMutation) AddField(name string, value ent.Value) error {
 	switch name {
-	case employee.FieldUpdatedBy:
-		v, ok := value.(int)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.AddUpdatedBy(v)
-		return nil
 	}
 	return fmt.Errorf("unknown Employee numeric field %s", name)
 }
@@ -5059,9 +5362,12 @@ func (m *EmployeeMutation) ResetField(name string) error {
 
 // AddedEdges returns all edge names that were set/added in this mutation.
 func (m *EmployeeMutation) AddedEdges() []string {
-	edges := make([]string, 0, 5)
+	edges := make([]string, 0, 7)
 	if m.creator != nil {
 		edges = append(edges, employee.EdgeCreator)
+	}
+	if m.updater != nil {
+		edges = append(edges, employee.EdgeUpdater)
 	}
 	if m.admin != nil {
 		edges = append(edges, employee.EdgeAdmin)
@@ -5069,11 +5375,14 @@ func (m *EmployeeMutation) AddedEdges() []string {
 	if m.department != nil {
 		edges = append(edges, employee.EdgeDepartment)
 	}
+	if m.occupations != nil {
+		edges = append(edges, employee.EdgeOccupations)
+	}
+	if m.risk_reporter != nil {
+		edges = append(edges, employee.EdgeRiskReporter)
+	}
 	if m.risk_maintainer != nil {
 		edges = append(edges, employee.EdgeRiskMaintainer)
-	}
-	if m.risk_creator != nil {
-		edges = append(edges, employee.EdgeRiskCreator)
 	}
 	return edges
 }
@@ -5086,6 +5395,10 @@ func (m *EmployeeMutation) AddedIDs(name string) []ent.Value {
 		if id := m.creator; id != nil {
 			return []ent.Value{*id}
 		}
+	case employee.EdgeUpdater:
+		if id := m.updater; id != nil {
+			return []ent.Value{*id}
+		}
 	case employee.EdgeAdmin:
 		if id := m.admin; id != nil {
 			return []ent.Value{*id}
@@ -5094,15 +5407,21 @@ func (m *EmployeeMutation) AddedIDs(name string) []ent.Value {
 		if id := m.department; id != nil {
 			return []ent.Value{*id}
 		}
-	case employee.EdgeRiskMaintainer:
-		ids := make([]ent.Value, 0, len(m.risk_maintainer))
-		for id := range m.risk_maintainer {
+	case employee.EdgeOccupations:
+		ids := make([]ent.Value, 0, len(m.occupations))
+		for id := range m.occupations {
 			ids = append(ids, id)
 		}
 		return ids
-	case employee.EdgeRiskCreator:
-		ids := make([]ent.Value, 0, len(m.risk_creator))
-		for id := range m.risk_creator {
+	case employee.EdgeRiskReporter:
+		ids := make([]ent.Value, 0, len(m.risk_reporter))
+		for id := range m.risk_reporter {
+			ids = append(ids, id)
+		}
+		return ids
+	case employee.EdgeRiskMaintainer:
+		ids := make([]ent.Value, 0, len(m.risk_maintainer))
+		for id := range m.risk_maintainer {
 			ids = append(ids, id)
 		}
 		return ids
@@ -5112,12 +5431,15 @@ func (m *EmployeeMutation) AddedIDs(name string) []ent.Value {
 
 // RemovedEdges returns all edge names that were removed in this mutation.
 func (m *EmployeeMutation) RemovedEdges() []string {
-	edges := make([]string, 0, 5)
+	edges := make([]string, 0, 7)
+	if m.removedoccupations != nil {
+		edges = append(edges, employee.EdgeOccupations)
+	}
+	if m.removedrisk_reporter != nil {
+		edges = append(edges, employee.EdgeRiskReporter)
+	}
 	if m.removedrisk_maintainer != nil {
 		edges = append(edges, employee.EdgeRiskMaintainer)
-	}
-	if m.removedrisk_creator != nil {
-		edges = append(edges, employee.EdgeRiskCreator)
 	}
 	return edges
 }
@@ -5126,15 +5448,21 @@ func (m *EmployeeMutation) RemovedEdges() []string {
 // the given name in this mutation.
 func (m *EmployeeMutation) RemovedIDs(name string) []ent.Value {
 	switch name {
-	case employee.EdgeRiskMaintainer:
-		ids := make([]ent.Value, 0, len(m.removedrisk_maintainer))
-		for id := range m.removedrisk_maintainer {
+	case employee.EdgeOccupations:
+		ids := make([]ent.Value, 0, len(m.removedoccupations))
+		for id := range m.removedoccupations {
 			ids = append(ids, id)
 		}
 		return ids
-	case employee.EdgeRiskCreator:
-		ids := make([]ent.Value, 0, len(m.removedrisk_creator))
-		for id := range m.removedrisk_creator {
+	case employee.EdgeRiskReporter:
+		ids := make([]ent.Value, 0, len(m.removedrisk_reporter))
+		for id := range m.removedrisk_reporter {
+			ids = append(ids, id)
+		}
+		return ids
+	case employee.EdgeRiskMaintainer:
+		ids := make([]ent.Value, 0, len(m.removedrisk_maintainer))
+		for id := range m.removedrisk_maintainer {
 			ids = append(ids, id)
 		}
 		return ids
@@ -5144,9 +5472,12 @@ func (m *EmployeeMutation) RemovedIDs(name string) []ent.Value {
 
 // ClearedEdges returns all edge names that were cleared in this mutation.
 func (m *EmployeeMutation) ClearedEdges() []string {
-	edges := make([]string, 0, 5)
+	edges := make([]string, 0, 7)
 	if m.clearedcreator {
 		edges = append(edges, employee.EdgeCreator)
+	}
+	if m.clearedupdater {
+		edges = append(edges, employee.EdgeUpdater)
 	}
 	if m.clearedadmin {
 		edges = append(edges, employee.EdgeAdmin)
@@ -5154,11 +5485,14 @@ func (m *EmployeeMutation) ClearedEdges() []string {
 	if m.cleareddepartment {
 		edges = append(edges, employee.EdgeDepartment)
 	}
+	if m.clearedoccupations {
+		edges = append(edges, employee.EdgeOccupations)
+	}
+	if m.clearedrisk_reporter {
+		edges = append(edges, employee.EdgeRiskReporter)
+	}
 	if m.clearedrisk_maintainer {
 		edges = append(edges, employee.EdgeRiskMaintainer)
-	}
-	if m.clearedrisk_creator {
-		edges = append(edges, employee.EdgeRiskCreator)
 	}
 	return edges
 }
@@ -5169,14 +5503,18 @@ func (m *EmployeeMutation) EdgeCleared(name string) bool {
 	switch name {
 	case employee.EdgeCreator:
 		return m.clearedcreator
+	case employee.EdgeUpdater:
+		return m.clearedupdater
 	case employee.EdgeAdmin:
 		return m.clearedadmin
 	case employee.EdgeDepartment:
 		return m.cleareddepartment
+	case employee.EdgeOccupations:
+		return m.clearedoccupations
+	case employee.EdgeRiskReporter:
+		return m.clearedrisk_reporter
 	case employee.EdgeRiskMaintainer:
 		return m.clearedrisk_maintainer
-	case employee.EdgeRiskCreator:
-		return m.clearedrisk_creator
 	}
 	return false
 }
@@ -5187,6 +5525,9 @@ func (m *EmployeeMutation) ClearEdge(name string) error {
 	switch name {
 	case employee.EdgeCreator:
 		m.ClearCreator()
+		return nil
+	case employee.EdgeUpdater:
+		m.ClearUpdater()
 		return nil
 	case employee.EdgeAdmin:
 		m.ClearAdmin()
@@ -5205,20 +5546,931 @@ func (m *EmployeeMutation) ResetEdge(name string) error {
 	case employee.EdgeCreator:
 		m.ResetCreator()
 		return nil
+	case employee.EdgeUpdater:
+		m.ResetUpdater()
+		return nil
 	case employee.EdgeAdmin:
 		m.ResetAdmin()
 		return nil
 	case employee.EdgeDepartment:
 		m.ResetDepartment()
 		return nil
+	case employee.EdgeOccupations:
+		m.ResetOccupations()
+		return nil
+	case employee.EdgeRiskReporter:
+		m.ResetRiskReporter()
+		return nil
 	case employee.EdgeRiskMaintainer:
 		m.ResetRiskMaintainer()
 		return nil
-	case employee.EdgeRiskCreator:
-		m.ResetRiskCreator()
-		return nil
 	}
 	return fmt.Errorf("unknown Employee edge %s", name)
+}
+
+// OccupationMutation represents an operation that mutates the Occupation nodes in the graph.
+type OccupationMutation struct {
+	config
+	op               Op
+	typ              string
+	id               *int
+	created_at       *time.Time
+	deleted_at       *time.Time
+	updated_at       *time.Time
+	name             *string
+	description      *string
+	clearedFields    map[string]struct{}
+	creator          *int
+	clearedcreator   bool
+	updater          *int
+	clearedupdater   bool
+	employees        map[int]struct{}
+	removedemployees map[int]struct{}
+	clearedemployees bool
+	done             bool
+	oldValue         func(context.Context) (*Occupation, error)
+	predicates       []predicate.Occupation
+}
+
+var _ ent.Mutation = (*OccupationMutation)(nil)
+
+// occupationOption allows management of the mutation configuration using functional options.
+type occupationOption func(*OccupationMutation)
+
+// newOccupationMutation creates new mutation for the Occupation entity.
+func newOccupationMutation(c config, op Op, opts ...occupationOption) *OccupationMutation {
+	m := &OccupationMutation{
+		config:        c,
+		op:            op,
+		typ:           TypeOccupation,
+		clearedFields: make(map[string]struct{}),
+	}
+	for _, opt := range opts {
+		opt(m)
+	}
+	return m
+}
+
+// withOccupationID sets the ID field of the mutation.
+func withOccupationID(id int) occupationOption {
+	return func(m *OccupationMutation) {
+		var (
+			err   error
+			once  sync.Once
+			value *Occupation
+		)
+		m.oldValue = func(ctx context.Context) (*Occupation, error) {
+			once.Do(func() {
+				if m.done {
+					err = errors.New("querying old values post mutation is not allowed")
+				} else {
+					value, err = m.Client().Occupation.Get(ctx, id)
+				}
+			})
+			return value, err
+		}
+		m.id = &id
+	}
+}
+
+// withOccupation sets the old Occupation of the mutation.
+func withOccupation(node *Occupation) occupationOption {
+	return func(m *OccupationMutation) {
+		m.oldValue = func(context.Context) (*Occupation, error) {
+			return node, nil
+		}
+		m.id = &node.ID
+	}
+}
+
+// Client returns a new `ent.Client` from the mutation. If the mutation was
+// executed in a transaction (ent.Tx), a transactional client is returned.
+func (m OccupationMutation) Client() *Client {
+	client := &Client{config: m.config}
+	client.init()
+	return client
+}
+
+// Tx returns an `ent.Tx` for mutations that were executed in transactions;
+// it returns an error otherwise.
+func (m OccupationMutation) Tx() (*Tx, error) {
+	if _, ok := m.driver.(*txDriver); !ok {
+		return nil, errors.New("dao: mutation is not running in a transaction")
+	}
+	tx := &Tx{config: m.config}
+	tx.init()
+	return tx, nil
+}
+
+// ID returns the ID value in the mutation. Note that the ID is only available
+// if it was provided to the builder or after it was returned from the database.
+func (m *OccupationMutation) ID() (id int, exists bool) {
+	if m.id == nil {
+		return
+	}
+	return *m.id, true
+}
+
+// IDs queries the database and returns the entity ids that match the mutation's predicate.
+// That means, if the mutation is applied within a transaction with an isolation level such
+// as sql.LevelSerializable, the returned ids match the ids of the rows that will be updated
+// or updated by the mutation.
+func (m *OccupationMutation) IDs(ctx context.Context) ([]int, error) {
+	switch {
+	case m.op.Is(OpUpdateOne | OpDeleteOne):
+		id, exists := m.ID()
+		if exists {
+			return []int{id}, nil
+		}
+		fallthrough
+	case m.op.Is(OpUpdate | OpDelete):
+		return m.Client().Occupation.Query().Where(m.predicates...).IDs(ctx)
+	default:
+		return nil, fmt.Errorf("IDs is not allowed on %s operations", m.op)
+	}
+}
+
+// SetCreatedAt sets the "created_at" field.
+func (m *OccupationMutation) SetCreatedAt(t time.Time) {
+	m.created_at = &t
+}
+
+// CreatedAt returns the value of the "created_at" field in the mutation.
+func (m *OccupationMutation) CreatedAt() (r time.Time, exists bool) {
+	v := m.created_at
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldCreatedAt returns the old "created_at" field's value of the Occupation entity.
+// If the Occupation object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *OccupationMutation) OldCreatedAt(ctx context.Context) (v time.Time, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldCreatedAt is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldCreatedAt requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldCreatedAt: %w", err)
+	}
+	return oldValue.CreatedAt, nil
+}
+
+// ResetCreatedAt resets all changes to the "created_at" field.
+func (m *OccupationMutation) ResetCreatedAt() {
+	m.created_at = nil
+}
+
+// SetCreatedBy sets the "created_by" field.
+func (m *OccupationMutation) SetCreatedBy(i int) {
+	m.creator = &i
+}
+
+// CreatedBy returns the value of the "created_by" field in the mutation.
+func (m *OccupationMutation) CreatedBy() (r int, exists bool) {
+	v := m.creator
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldCreatedBy returns the old "created_by" field's value of the Occupation entity.
+// If the Occupation object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *OccupationMutation) OldCreatedBy(ctx context.Context) (v int, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldCreatedBy is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldCreatedBy requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldCreatedBy: %w", err)
+	}
+	return oldValue.CreatedBy, nil
+}
+
+// ResetCreatedBy resets all changes to the "created_by" field.
+func (m *OccupationMutation) ResetCreatedBy() {
+	m.creator = nil
+}
+
+// SetDeletedAt sets the "deleted_at" field.
+func (m *OccupationMutation) SetDeletedAt(t time.Time) {
+	m.deleted_at = &t
+}
+
+// DeletedAt returns the value of the "deleted_at" field in the mutation.
+func (m *OccupationMutation) DeletedAt() (r time.Time, exists bool) {
+	v := m.deleted_at
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldDeletedAt returns the old "deleted_at" field's value of the Occupation entity.
+// If the Occupation object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *OccupationMutation) OldDeletedAt(ctx context.Context) (v *time.Time, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldDeletedAt is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldDeletedAt requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldDeletedAt: %w", err)
+	}
+	return oldValue.DeletedAt, nil
+}
+
+// ClearDeletedAt clears the value of the "deleted_at" field.
+func (m *OccupationMutation) ClearDeletedAt() {
+	m.deleted_at = nil
+	m.clearedFields[occupation.FieldDeletedAt] = struct{}{}
+}
+
+// DeletedAtCleared returns if the "deleted_at" field was cleared in this mutation.
+func (m *OccupationMutation) DeletedAtCleared() bool {
+	_, ok := m.clearedFields[occupation.FieldDeletedAt]
+	return ok
+}
+
+// ResetDeletedAt resets all changes to the "deleted_at" field.
+func (m *OccupationMutation) ResetDeletedAt() {
+	m.deleted_at = nil
+	delete(m.clearedFields, occupation.FieldDeletedAt)
+}
+
+// SetUpdatedBy sets the "updated_by" field.
+func (m *OccupationMutation) SetUpdatedBy(i int) {
+	m.updater = &i
+}
+
+// UpdatedBy returns the value of the "updated_by" field in the mutation.
+func (m *OccupationMutation) UpdatedBy() (r int, exists bool) {
+	v := m.updater
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldUpdatedBy returns the old "updated_by" field's value of the Occupation entity.
+// If the Occupation object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *OccupationMutation) OldUpdatedBy(ctx context.Context) (v int, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldUpdatedBy is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldUpdatedBy requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldUpdatedBy: %w", err)
+	}
+	return oldValue.UpdatedBy, nil
+}
+
+// ResetUpdatedBy resets all changes to the "updated_by" field.
+func (m *OccupationMutation) ResetUpdatedBy() {
+	m.updater = nil
+}
+
+// SetUpdatedAt sets the "updated_at" field.
+func (m *OccupationMutation) SetUpdatedAt(t time.Time) {
+	m.updated_at = &t
+}
+
+// UpdatedAt returns the value of the "updated_at" field in the mutation.
+func (m *OccupationMutation) UpdatedAt() (r time.Time, exists bool) {
+	v := m.updated_at
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldUpdatedAt returns the old "updated_at" field's value of the Occupation entity.
+// If the Occupation object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *OccupationMutation) OldUpdatedAt(ctx context.Context) (v time.Time, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldUpdatedAt is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldUpdatedAt requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldUpdatedAt: %w", err)
+	}
+	return oldValue.UpdatedAt, nil
+}
+
+// ResetUpdatedAt resets all changes to the "updated_at" field.
+func (m *OccupationMutation) ResetUpdatedAt() {
+	m.updated_at = nil
+}
+
+// SetName sets the "name" field.
+func (m *OccupationMutation) SetName(s string) {
+	m.name = &s
+}
+
+// Name returns the value of the "name" field in the mutation.
+func (m *OccupationMutation) Name() (r string, exists bool) {
+	v := m.name
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldName returns the old "name" field's value of the Occupation entity.
+// If the Occupation object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *OccupationMutation) OldName(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldName is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldName requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldName: %w", err)
+	}
+	return oldValue.Name, nil
+}
+
+// ResetName resets all changes to the "name" field.
+func (m *OccupationMutation) ResetName() {
+	m.name = nil
+}
+
+// SetDescription sets the "description" field.
+func (m *OccupationMutation) SetDescription(s string) {
+	m.description = &s
+}
+
+// Description returns the value of the "description" field in the mutation.
+func (m *OccupationMutation) Description() (r string, exists bool) {
+	v := m.description
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldDescription returns the old "description" field's value of the Occupation entity.
+// If the Occupation object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *OccupationMutation) OldDescription(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldDescription is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldDescription requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldDescription: %w", err)
+	}
+	return oldValue.Description, nil
+}
+
+// ClearDescription clears the value of the "description" field.
+func (m *OccupationMutation) ClearDescription() {
+	m.description = nil
+	m.clearedFields[occupation.FieldDescription] = struct{}{}
+}
+
+// DescriptionCleared returns if the "description" field was cleared in this mutation.
+func (m *OccupationMutation) DescriptionCleared() bool {
+	_, ok := m.clearedFields[occupation.FieldDescription]
+	return ok
+}
+
+// ResetDescription resets all changes to the "description" field.
+func (m *OccupationMutation) ResetDescription() {
+	m.description = nil
+	delete(m.clearedFields, occupation.FieldDescription)
+}
+
+// SetCreatorID sets the "creator" edge to the Admin entity by id.
+func (m *OccupationMutation) SetCreatorID(id int) {
+	m.creator = &id
+}
+
+// ClearCreator clears the "creator" edge to the Admin entity.
+func (m *OccupationMutation) ClearCreator() {
+	m.clearedcreator = true
+	m.clearedFields[occupation.FieldCreatedBy] = struct{}{}
+}
+
+// CreatorCleared reports if the "creator" edge to the Admin entity was cleared.
+func (m *OccupationMutation) CreatorCleared() bool {
+	return m.clearedcreator
+}
+
+// CreatorID returns the "creator" edge ID in the mutation.
+func (m *OccupationMutation) CreatorID() (id int, exists bool) {
+	if m.creator != nil {
+		return *m.creator, true
+	}
+	return
+}
+
+// CreatorIDs returns the "creator" edge IDs in the mutation.
+// Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
+// CreatorID instead. It exists only for internal usage by the builders.
+func (m *OccupationMutation) CreatorIDs() (ids []int) {
+	if id := m.creator; id != nil {
+		ids = append(ids, *id)
+	}
+	return
+}
+
+// ResetCreator resets all changes to the "creator" edge.
+func (m *OccupationMutation) ResetCreator() {
+	m.creator = nil
+	m.clearedcreator = false
+}
+
+// SetUpdaterID sets the "updater" edge to the Admin entity by id.
+func (m *OccupationMutation) SetUpdaterID(id int) {
+	m.updater = &id
+}
+
+// ClearUpdater clears the "updater" edge to the Admin entity.
+func (m *OccupationMutation) ClearUpdater() {
+	m.clearedupdater = true
+	m.clearedFields[occupation.FieldUpdatedBy] = struct{}{}
+}
+
+// UpdaterCleared reports if the "updater" edge to the Admin entity was cleared.
+func (m *OccupationMutation) UpdaterCleared() bool {
+	return m.clearedupdater
+}
+
+// UpdaterID returns the "updater" edge ID in the mutation.
+func (m *OccupationMutation) UpdaterID() (id int, exists bool) {
+	if m.updater != nil {
+		return *m.updater, true
+	}
+	return
+}
+
+// UpdaterIDs returns the "updater" edge IDs in the mutation.
+// Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
+// UpdaterID instead. It exists only for internal usage by the builders.
+func (m *OccupationMutation) UpdaterIDs() (ids []int) {
+	if id := m.updater; id != nil {
+		ids = append(ids, *id)
+	}
+	return
+}
+
+// ResetUpdater resets all changes to the "updater" edge.
+func (m *OccupationMutation) ResetUpdater() {
+	m.updater = nil
+	m.clearedupdater = false
+}
+
+// AddEmployeeIDs adds the "employees" edge to the Employee entity by ids.
+func (m *OccupationMutation) AddEmployeeIDs(ids ...int) {
+	if m.employees == nil {
+		m.employees = make(map[int]struct{})
+	}
+	for i := range ids {
+		m.employees[ids[i]] = struct{}{}
+	}
+}
+
+// ClearEmployees clears the "employees" edge to the Employee entity.
+func (m *OccupationMutation) ClearEmployees() {
+	m.clearedemployees = true
+}
+
+// EmployeesCleared reports if the "employees" edge to the Employee entity was cleared.
+func (m *OccupationMutation) EmployeesCleared() bool {
+	return m.clearedemployees
+}
+
+// RemoveEmployeeIDs removes the "employees" edge to the Employee entity by IDs.
+func (m *OccupationMutation) RemoveEmployeeIDs(ids ...int) {
+	if m.removedemployees == nil {
+		m.removedemployees = make(map[int]struct{})
+	}
+	for i := range ids {
+		delete(m.employees, ids[i])
+		m.removedemployees[ids[i]] = struct{}{}
+	}
+}
+
+// RemovedEmployees returns the removed IDs of the "employees" edge to the Employee entity.
+func (m *OccupationMutation) RemovedEmployeesIDs() (ids []int) {
+	for id := range m.removedemployees {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// EmployeesIDs returns the "employees" edge IDs in the mutation.
+func (m *OccupationMutation) EmployeesIDs() (ids []int) {
+	for id := range m.employees {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// ResetEmployees resets all changes to the "employees" edge.
+func (m *OccupationMutation) ResetEmployees() {
+	m.employees = nil
+	m.clearedemployees = false
+	m.removedemployees = nil
+}
+
+// Where appends a list predicates to the OccupationMutation builder.
+func (m *OccupationMutation) Where(ps ...predicate.Occupation) {
+	m.predicates = append(m.predicates, ps...)
+}
+
+// WhereP appends storage-level predicates to the OccupationMutation builder. Using this method,
+// users can use type-assertion to append predicates that do not depend on any generated package.
+func (m *OccupationMutation) WhereP(ps ...func(*sql.Selector)) {
+	p := make([]predicate.Occupation, len(ps))
+	for i := range ps {
+		p[i] = ps[i]
+	}
+	m.Where(p...)
+}
+
+// Op returns the operation name.
+func (m *OccupationMutation) Op() Op {
+	return m.op
+}
+
+// SetOp allows setting the mutation operation.
+func (m *OccupationMutation) SetOp(op Op) {
+	m.op = op
+}
+
+// Type returns the node type of this mutation (Occupation).
+func (m *OccupationMutation) Type() string {
+	return m.typ
+}
+
+// Fields returns all fields that were changed during this mutation. Note that in
+// order to get all numeric fields that were incremented/decremented, call
+// AddedFields().
+func (m *OccupationMutation) Fields() []string {
+	fields := make([]string, 0, 7)
+	if m.created_at != nil {
+		fields = append(fields, occupation.FieldCreatedAt)
+	}
+	if m.creator != nil {
+		fields = append(fields, occupation.FieldCreatedBy)
+	}
+	if m.deleted_at != nil {
+		fields = append(fields, occupation.FieldDeletedAt)
+	}
+	if m.updater != nil {
+		fields = append(fields, occupation.FieldUpdatedBy)
+	}
+	if m.updated_at != nil {
+		fields = append(fields, occupation.FieldUpdatedAt)
+	}
+	if m.name != nil {
+		fields = append(fields, occupation.FieldName)
+	}
+	if m.description != nil {
+		fields = append(fields, occupation.FieldDescription)
+	}
+	return fields
+}
+
+// Field returns the value of a field with the given name. The second boolean
+// return value indicates that this field was not set, or was not defined in the
+// schema.
+func (m *OccupationMutation) Field(name string) (ent.Value, bool) {
+	switch name {
+	case occupation.FieldCreatedAt:
+		return m.CreatedAt()
+	case occupation.FieldCreatedBy:
+		return m.CreatedBy()
+	case occupation.FieldDeletedAt:
+		return m.DeletedAt()
+	case occupation.FieldUpdatedBy:
+		return m.UpdatedBy()
+	case occupation.FieldUpdatedAt:
+		return m.UpdatedAt()
+	case occupation.FieldName:
+		return m.Name()
+	case occupation.FieldDescription:
+		return m.Description()
+	}
+	return nil, false
+}
+
+// OldField returns the old value of the field from the database. An error is
+// returned if the mutation operation is not UpdateOne, or the query to the
+// database failed.
+func (m *OccupationMutation) OldField(ctx context.Context, name string) (ent.Value, error) {
+	switch name {
+	case occupation.FieldCreatedAt:
+		return m.OldCreatedAt(ctx)
+	case occupation.FieldCreatedBy:
+		return m.OldCreatedBy(ctx)
+	case occupation.FieldDeletedAt:
+		return m.OldDeletedAt(ctx)
+	case occupation.FieldUpdatedBy:
+		return m.OldUpdatedBy(ctx)
+	case occupation.FieldUpdatedAt:
+		return m.OldUpdatedAt(ctx)
+	case occupation.FieldName:
+		return m.OldName(ctx)
+	case occupation.FieldDescription:
+		return m.OldDescription(ctx)
+	}
+	return nil, fmt.Errorf("unknown Occupation field %s", name)
+}
+
+// SetField sets the value of a field with the given name. It returns an error if
+// the field is not defined in the schema, or if the type mismatched the field
+// type.
+func (m *OccupationMutation) SetField(name string, value ent.Value) error {
+	switch name {
+	case occupation.FieldCreatedAt:
+		v, ok := value.(time.Time)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetCreatedAt(v)
+		return nil
+	case occupation.FieldCreatedBy:
+		v, ok := value.(int)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetCreatedBy(v)
+		return nil
+	case occupation.FieldDeletedAt:
+		v, ok := value.(time.Time)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetDeletedAt(v)
+		return nil
+	case occupation.FieldUpdatedBy:
+		v, ok := value.(int)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetUpdatedBy(v)
+		return nil
+	case occupation.FieldUpdatedAt:
+		v, ok := value.(time.Time)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetUpdatedAt(v)
+		return nil
+	case occupation.FieldName:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetName(v)
+		return nil
+	case occupation.FieldDescription:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetDescription(v)
+		return nil
+	}
+	return fmt.Errorf("unknown Occupation field %s", name)
+}
+
+// AddedFields returns all numeric fields that were incremented/decremented during
+// this mutation.
+func (m *OccupationMutation) AddedFields() []string {
+	var fields []string
+	return fields
+}
+
+// AddedField returns the numeric value that was incremented/decremented on a field
+// with the given name. The second boolean return value indicates that this field
+// was not set, or was not defined in the schema.
+func (m *OccupationMutation) AddedField(name string) (ent.Value, bool) {
+	switch name {
+	}
+	return nil, false
+}
+
+// AddField adds the value to the field with the given name. It returns an error if
+// the field is not defined in the schema, or if the type mismatched the field
+// type.
+func (m *OccupationMutation) AddField(name string, value ent.Value) error {
+	switch name {
+	}
+	return fmt.Errorf("unknown Occupation numeric field %s", name)
+}
+
+// ClearedFields returns all nullable fields that were cleared during this
+// mutation.
+func (m *OccupationMutation) ClearedFields() []string {
+	var fields []string
+	if m.FieldCleared(occupation.FieldDeletedAt) {
+		fields = append(fields, occupation.FieldDeletedAt)
+	}
+	if m.FieldCleared(occupation.FieldDescription) {
+		fields = append(fields, occupation.FieldDescription)
+	}
+	return fields
+}
+
+// FieldCleared returns a boolean indicating if a field with the given name was
+// cleared in this mutation.
+func (m *OccupationMutation) FieldCleared(name string) bool {
+	_, ok := m.clearedFields[name]
+	return ok
+}
+
+// ClearField clears the value of the field with the given name. It returns an
+// error if the field is not defined in the schema.
+func (m *OccupationMutation) ClearField(name string) error {
+	switch name {
+	case occupation.FieldDeletedAt:
+		m.ClearDeletedAt()
+		return nil
+	case occupation.FieldDescription:
+		m.ClearDescription()
+		return nil
+	}
+	return fmt.Errorf("unknown Occupation nullable field %s", name)
+}
+
+// ResetField resets all changes in the mutation for the field with the given name.
+// It returns an error if the field is not defined in the schema.
+func (m *OccupationMutation) ResetField(name string) error {
+	switch name {
+	case occupation.FieldCreatedAt:
+		m.ResetCreatedAt()
+		return nil
+	case occupation.FieldCreatedBy:
+		m.ResetCreatedBy()
+		return nil
+	case occupation.FieldDeletedAt:
+		m.ResetDeletedAt()
+		return nil
+	case occupation.FieldUpdatedBy:
+		m.ResetUpdatedBy()
+		return nil
+	case occupation.FieldUpdatedAt:
+		m.ResetUpdatedAt()
+		return nil
+	case occupation.FieldName:
+		m.ResetName()
+		return nil
+	case occupation.FieldDescription:
+		m.ResetDescription()
+		return nil
+	}
+	return fmt.Errorf("unknown Occupation field %s", name)
+}
+
+// AddedEdges returns all edge names that were set/added in this mutation.
+func (m *OccupationMutation) AddedEdges() []string {
+	edges := make([]string, 0, 3)
+	if m.creator != nil {
+		edges = append(edges, occupation.EdgeCreator)
+	}
+	if m.updater != nil {
+		edges = append(edges, occupation.EdgeUpdater)
+	}
+	if m.employees != nil {
+		edges = append(edges, occupation.EdgeEmployees)
+	}
+	return edges
+}
+
+// AddedIDs returns all IDs (to other nodes) that were added for the given edge
+// name in this mutation.
+func (m *OccupationMutation) AddedIDs(name string) []ent.Value {
+	switch name {
+	case occupation.EdgeCreator:
+		if id := m.creator; id != nil {
+			return []ent.Value{*id}
+		}
+	case occupation.EdgeUpdater:
+		if id := m.updater; id != nil {
+			return []ent.Value{*id}
+		}
+	case occupation.EdgeEmployees:
+		ids := make([]ent.Value, 0, len(m.employees))
+		for id := range m.employees {
+			ids = append(ids, id)
+		}
+		return ids
+	}
+	return nil
+}
+
+// RemovedEdges returns all edge names that were removed in this mutation.
+func (m *OccupationMutation) RemovedEdges() []string {
+	edges := make([]string, 0, 3)
+	if m.removedemployees != nil {
+		edges = append(edges, occupation.EdgeEmployees)
+	}
+	return edges
+}
+
+// RemovedIDs returns all IDs (to other nodes) that were removed for the edge with
+// the given name in this mutation.
+func (m *OccupationMutation) RemovedIDs(name string) []ent.Value {
+	switch name {
+	case occupation.EdgeEmployees:
+		ids := make([]ent.Value, 0, len(m.removedemployees))
+		for id := range m.removedemployees {
+			ids = append(ids, id)
+		}
+		return ids
+	}
+	return nil
+}
+
+// ClearedEdges returns all edge names that were cleared in this mutation.
+func (m *OccupationMutation) ClearedEdges() []string {
+	edges := make([]string, 0, 3)
+	if m.clearedcreator {
+		edges = append(edges, occupation.EdgeCreator)
+	}
+	if m.clearedupdater {
+		edges = append(edges, occupation.EdgeUpdater)
+	}
+	if m.clearedemployees {
+		edges = append(edges, occupation.EdgeEmployees)
+	}
+	return edges
+}
+
+// EdgeCleared returns a boolean which indicates if the edge with the given name
+// was cleared in this mutation.
+func (m *OccupationMutation) EdgeCleared(name string) bool {
+	switch name {
+	case occupation.EdgeCreator:
+		return m.clearedcreator
+	case occupation.EdgeUpdater:
+		return m.clearedupdater
+	case occupation.EdgeEmployees:
+		return m.clearedemployees
+	}
+	return false
+}
+
+// ClearEdge clears the value of the edge with the given name. It returns an error
+// if that edge is not defined in the schema.
+func (m *OccupationMutation) ClearEdge(name string) error {
+	switch name {
+	case occupation.EdgeCreator:
+		m.ClearCreator()
+		return nil
+	case occupation.EdgeUpdater:
+		m.ClearUpdater()
+		return nil
+	}
+	return fmt.Errorf("unknown Occupation unique edge %s", name)
+}
+
+// ResetEdge resets all changes to the edge with the given name in this mutation.
+// It returns an error if the edge is not defined in the schema.
+func (m *OccupationMutation) ResetEdge(name string) error {
+	switch name {
+	case occupation.EdgeCreator:
+		m.ResetCreator()
+		return nil
+	case occupation.EdgeUpdater:
+		m.ResetUpdater()
+		return nil
+	case occupation.EdgeEmployees:
+		m.ResetEmployees()
+		return nil
+	}
+	return fmt.Errorf("unknown Occupation edge %s", name)
 }
 
 // RiskMutation represents an operation that mutates the Risk nodes in the graph.
@@ -5247,14 +6499,16 @@ type RiskMutation struct {
 	clearedFields        map[string]struct{}
 	creator              *int
 	clearedcreator       bool
-	updator              *int
-	clearedupdator       bool
-	maintainer           *int
-	clearedmaintainer    bool
+	updater              *int
+	clearedupdater       bool
 	risk_category        *int
 	clearedrisk_category bool
 	risk_location        *int
 	clearedrisk_location bool
+	reporter             *int
+	clearedreporter      bool
+	maintainer           *int
+	clearedmaintainer    bool
 	done                 bool
 	oldValue             func(context.Context) (*Risk, error)
 	predicates           []predicate.Risk
@@ -5481,12 +6735,12 @@ func (m *RiskMutation) ResetDeletedAt() {
 
 // SetUpdatedBy sets the "updated_by" field.
 func (m *RiskMutation) SetUpdatedBy(i int) {
-	m.updator = &i
+	m.updater = &i
 }
 
 // UpdatedBy returns the value of the "updated_by" field in the mutation.
 func (m *RiskMutation) UpdatedBy() (r int, exists bool) {
-	v := m.updator
+	v := m.updater
 	if v == nil {
 		return
 	}
@@ -5512,7 +6766,7 @@ func (m *RiskMutation) OldUpdatedBy(ctx context.Context) (v int, err error) {
 
 // ResetUpdatedBy resets all changes to the "updated_by" field.
 func (m *RiskMutation) ResetUpdatedBy() {
-	m.updator = nil
+	m.updater = nil
 }
 
 // SetUpdatedAt sets the "updated_at" field.
@@ -5618,9 +6872,22 @@ func (m *RiskMutation) OldContent(ctx context.Context) (v string, err error) {
 	return oldValue.Content, nil
 }
 
+// ClearContent clears the value of the "content" field.
+func (m *RiskMutation) ClearContent() {
+	m.content = nil
+	m.clearedFields[risk.FieldContent] = struct{}{}
+}
+
+// ContentCleared returns if the "content" field was cleared in this mutation.
+func (m *RiskMutation) ContentCleared() bool {
+	_, ok := m.clearedFields[risk.FieldContent]
+	return ok
+}
+
 // ResetContent resets all changes to the "content" field.
 func (m *RiskMutation) ResetContent() {
 	m.content = nil
+	delete(m.clearedFields, risk.FieldContent)
 }
 
 // SetImages sets the "images" field.
@@ -5773,6 +7040,42 @@ func (m *RiskMutation) OldRiskLocationID(ctx context.Context) (v int, err error)
 // ResetRiskLocationID resets all changes to the "risk_location_id" field.
 func (m *RiskMutation) ResetRiskLocationID() {
 	m.risk_location = nil
+}
+
+// SetReporterID sets the "reporter_id" field.
+func (m *RiskMutation) SetReporterID(i int) {
+	m.reporter = &i
+}
+
+// ReporterID returns the value of the "reporter_id" field in the mutation.
+func (m *RiskMutation) ReporterID() (r int, exists bool) {
+	v := m.reporter
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldReporterID returns the old "reporter_id" field's value of the Risk entity.
+// If the Risk object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *RiskMutation) OldReporterID(ctx context.Context) (v int, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldReporterID is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldReporterID requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldReporterID: %w", err)
+	}
+	return oldValue.ReporterID, nil
+}
+
+// ResetReporterID resets all changes to the "reporter_id" field.
+func (m *RiskMutation) ResetReporterID() {
+	m.reporter = nil
 }
 
 // SetMaintainerID sets the "maintainer_id" field.
@@ -5952,18 +7255,18 @@ func (m *RiskMutation) ResetDueTime() {
 	m.due_time = nil
 }
 
-// SetCreatorID sets the "creator" edge to the Employee entity by id.
+// SetCreatorID sets the "creator" edge to the Admin entity by id.
 func (m *RiskMutation) SetCreatorID(id int) {
 	m.creator = &id
 }
 
-// ClearCreator clears the "creator" edge to the Employee entity.
+// ClearCreator clears the "creator" edge to the Admin entity.
 func (m *RiskMutation) ClearCreator() {
 	m.clearedcreator = true
 	m.clearedFields[risk.FieldCreatedBy] = struct{}{}
 }
 
-// CreatorCleared reports if the "creator" edge to the Employee entity was cleared.
+// CreatorCleared reports if the "creator" edge to the Admin entity was cleared.
 func (m *RiskMutation) CreatorCleared() bool {
 	return m.clearedcreator
 }
@@ -5992,71 +7295,44 @@ func (m *RiskMutation) ResetCreator() {
 	m.clearedcreator = false
 }
 
-// SetUpdatorID sets the "updator" edge to the Admin entity by id.
-func (m *RiskMutation) SetUpdatorID(id int) {
-	m.updator = &id
+// SetUpdaterID sets the "updater" edge to the Admin entity by id.
+func (m *RiskMutation) SetUpdaterID(id int) {
+	m.updater = &id
 }
 
-// ClearUpdator clears the "updator" edge to the Admin entity.
-func (m *RiskMutation) ClearUpdator() {
-	m.clearedupdator = true
+// ClearUpdater clears the "updater" edge to the Admin entity.
+func (m *RiskMutation) ClearUpdater() {
+	m.clearedupdater = true
 	m.clearedFields[risk.FieldUpdatedBy] = struct{}{}
 }
 
-// UpdatorCleared reports if the "updator" edge to the Admin entity was cleared.
-func (m *RiskMutation) UpdatorCleared() bool {
-	return m.clearedupdator
+// UpdaterCleared reports if the "updater" edge to the Admin entity was cleared.
+func (m *RiskMutation) UpdaterCleared() bool {
+	return m.clearedupdater
 }
 
-// UpdatorID returns the "updator" edge ID in the mutation.
-func (m *RiskMutation) UpdatorID() (id int, exists bool) {
-	if m.updator != nil {
-		return *m.updator, true
+// UpdaterID returns the "updater" edge ID in the mutation.
+func (m *RiskMutation) UpdaterID() (id int, exists bool) {
+	if m.updater != nil {
+		return *m.updater, true
 	}
 	return
 }
 
-// UpdatorIDs returns the "updator" edge IDs in the mutation.
+// UpdaterIDs returns the "updater" edge IDs in the mutation.
 // Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
-// UpdatorID instead. It exists only for internal usage by the builders.
-func (m *RiskMutation) UpdatorIDs() (ids []int) {
-	if id := m.updator; id != nil {
+// UpdaterID instead. It exists only for internal usage by the builders.
+func (m *RiskMutation) UpdaterIDs() (ids []int) {
+	if id := m.updater; id != nil {
 		ids = append(ids, *id)
 	}
 	return
 }
 
-// ResetUpdator resets all changes to the "updator" edge.
-func (m *RiskMutation) ResetUpdator() {
-	m.updator = nil
-	m.clearedupdator = false
-}
-
-// ClearMaintainer clears the "maintainer" edge to the Employee entity.
-func (m *RiskMutation) ClearMaintainer() {
-	m.clearedmaintainer = true
-	m.clearedFields[risk.FieldMaintainerID] = struct{}{}
-}
-
-// MaintainerCleared reports if the "maintainer" edge to the Employee entity was cleared.
-func (m *RiskMutation) MaintainerCleared() bool {
-	return m.clearedmaintainer
-}
-
-// MaintainerIDs returns the "maintainer" edge IDs in the mutation.
-// Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
-// MaintainerID instead. It exists only for internal usage by the builders.
-func (m *RiskMutation) MaintainerIDs() (ids []int) {
-	if id := m.maintainer; id != nil {
-		ids = append(ids, *id)
-	}
-	return
-}
-
-// ResetMaintainer resets all changes to the "maintainer" edge.
-func (m *RiskMutation) ResetMaintainer() {
-	m.maintainer = nil
-	m.clearedmaintainer = false
+// ResetUpdater resets all changes to the "updater" edge.
+func (m *RiskMutation) ResetUpdater() {
+	m.updater = nil
+	m.clearedupdater = false
 }
 
 // ClearRiskCategory clears the "risk_category" edge to the RiskCategory entity.
@@ -6113,6 +7389,60 @@ func (m *RiskMutation) ResetRiskLocation() {
 	m.clearedrisk_location = false
 }
 
+// ClearReporter clears the "reporter" edge to the Employee entity.
+func (m *RiskMutation) ClearReporter() {
+	m.clearedreporter = true
+	m.clearedFields[risk.FieldReporterID] = struct{}{}
+}
+
+// ReporterCleared reports if the "reporter" edge to the Employee entity was cleared.
+func (m *RiskMutation) ReporterCleared() bool {
+	return m.clearedreporter
+}
+
+// ReporterIDs returns the "reporter" edge IDs in the mutation.
+// Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
+// ReporterID instead. It exists only for internal usage by the builders.
+func (m *RiskMutation) ReporterIDs() (ids []int) {
+	if id := m.reporter; id != nil {
+		ids = append(ids, *id)
+	}
+	return
+}
+
+// ResetReporter resets all changes to the "reporter" edge.
+func (m *RiskMutation) ResetReporter() {
+	m.reporter = nil
+	m.clearedreporter = false
+}
+
+// ClearMaintainer clears the "maintainer" edge to the Employee entity.
+func (m *RiskMutation) ClearMaintainer() {
+	m.clearedmaintainer = true
+	m.clearedFields[risk.FieldMaintainerID] = struct{}{}
+}
+
+// MaintainerCleared reports if the "maintainer" edge to the Employee entity was cleared.
+func (m *RiskMutation) MaintainerCleared() bool {
+	return m.clearedmaintainer
+}
+
+// MaintainerIDs returns the "maintainer" edge IDs in the mutation.
+// Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
+// MaintainerID instead. It exists only for internal usage by the builders.
+func (m *RiskMutation) MaintainerIDs() (ids []int) {
+	if id := m.maintainer; id != nil {
+		ids = append(ids, *id)
+	}
+	return
+}
+
+// ResetMaintainer resets all changes to the "maintainer" edge.
+func (m *RiskMutation) ResetMaintainer() {
+	m.maintainer = nil
+	m.clearedmaintainer = false
+}
+
 // Where appends a list predicates to the RiskMutation builder.
 func (m *RiskMutation) Where(ps ...predicate.Risk) {
 	m.predicates = append(m.predicates, ps...)
@@ -6147,7 +7477,7 @@ func (m *RiskMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *RiskMutation) Fields() []string {
-	fields := make([]string, 0, 14)
+	fields := make([]string, 0, 15)
 	if m.created_at != nil {
 		fields = append(fields, risk.FieldCreatedAt)
 	}
@@ -6157,7 +7487,7 @@ func (m *RiskMutation) Fields() []string {
 	if m.deleted_at != nil {
 		fields = append(fields, risk.FieldDeletedAt)
 	}
-	if m.updator != nil {
+	if m.updater != nil {
 		fields = append(fields, risk.FieldUpdatedBy)
 	}
 	if m.updated_at != nil {
@@ -6177,6 +7507,9 @@ func (m *RiskMutation) Fields() []string {
 	}
 	if m.risk_location != nil {
 		fields = append(fields, risk.FieldRiskLocationID)
+	}
+	if m.reporter != nil {
+		fields = append(fields, risk.FieldReporterID)
 	}
 	if m.maintainer != nil {
 		fields = append(fields, risk.FieldMaintainerID)
@@ -6218,6 +7551,8 @@ func (m *RiskMutation) Field(name string) (ent.Value, bool) {
 		return m.RiskCategoryID()
 	case risk.FieldRiskLocationID:
 		return m.RiskLocationID()
+	case risk.FieldReporterID:
+		return m.ReporterID()
 	case risk.FieldMaintainerID:
 		return m.MaintainerID()
 	case risk.FieldMeasures:
@@ -6255,6 +7590,8 @@ func (m *RiskMutation) OldField(ctx context.Context, name string) (ent.Value, er
 		return m.OldRiskCategoryID(ctx)
 	case risk.FieldRiskLocationID:
 		return m.OldRiskLocationID(ctx)
+	case risk.FieldReporterID:
+		return m.OldReporterID(ctx)
 	case risk.FieldMaintainerID:
 		return m.OldMaintainerID(ctx)
 	case risk.FieldMeasures:
@@ -6345,6 +7682,13 @@ func (m *RiskMutation) SetField(name string, value ent.Value) error {
 		}
 		m.SetRiskLocationID(v)
 		return nil
+	case risk.FieldReporterID:
+		v, ok := value.(int)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetReporterID(v)
+		return nil
 	case risk.FieldMaintainerID:
 		v, ok := value.(int)
 		if !ok {
@@ -6421,6 +7765,9 @@ func (m *RiskMutation) ClearedFields() []string {
 	if m.FieldCleared(risk.FieldDeletedAt) {
 		fields = append(fields, risk.FieldDeletedAt)
 	}
+	if m.FieldCleared(risk.FieldContent) {
+		fields = append(fields, risk.FieldContent)
+	}
 	if m.FieldCleared(risk.FieldImages) {
 		fields = append(fields, risk.FieldImages)
 	}
@@ -6443,6 +7790,9 @@ func (m *RiskMutation) ClearField(name string) error {
 	switch name {
 	case risk.FieldDeletedAt:
 		m.ClearDeletedAt()
+		return nil
+	case risk.FieldContent:
+		m.ClearContent()
 		return nil
 	case risk.FieldImages:
 		m.ClearImages()
@@ -6488,6 +7838,9 @@ func (m *RiskMutation) ResetField(name string) error {
 	case risk.FieldRiskLocationID:
 		m.ResetRiskLocationID()
 		return nil
+	case risk.FieldReporterID:
+		m.ResetReporterID()
+		return nil
 	case risk.FieldMaintainerID:
 		m.ResetMaintainerID()
 		return nil
@@ -6506,21 +7859,24 @@ func (m *RiskMutation) ResetField(name string) error {
 
 // AddedEdges returns all edge names that were set/added in this mutation.
 func (m *RiskMutation) AddedEdges() []string {
-	edges := make([]string, 0, 5)
+	edges := make([]string, 0, 6)
 	if m.creator != nil {
 		edges = append(edges, risk.EdgeCreator)
 	}
-	if m.updator != nil {
-		edges = append(edges, risk.EdgeUpdator)
-	}
-	if m.maintainer != nil {
-		edges = append(edges, risk.EdgeMaintainer)
+	if m.updater != nil {
+		edges = append(edges, risk.EdgeUpdater)
 	}
 	if m.risk_category != nil {
 		edges = append(edges, risk.EdgeRiskCategory)
 	}
 	if m.risk_location != nil {
 		edges = append(edges, risk.EdgeRiskLocation)
+	}
+	if m.reporter != nil {
+		edges = append(edges, risk.EdgeReporter)
+	}
+	if m.maintainer != nil {
+		edges = append(edges, risk.EdgeMaintainer)
 	}
 	return edges
 }
@@ -6533,12 +7889,8 @@ func (m *RiskMutation) AddedIDs(name string) []ent.Value {
 		if id := m.creator; id != nil {
 			return []ent.Value{*id}
 		}
-	case risk.EdgeUpdator:
-		if id := m.updator; id != nil {
-			return []ent.Value{*id}
-		}
-	case risk.EdgeMaintainer:
-		if id := m.maintainer; id != nil {
+	case risk.EdgeUpdater:
+		if id := m.updater; id != nil {
 			return []ent.Value{*id}
 		}
 	case risk.EdgeRiskCategory:
@@ -6549,13 +7901,21 @@ func (m *RiskMutation) AddedIDs(name string) []ent.Value {
 		if id := m.risk_location; id != nil {
 			return []ent.Value{*id}
 		}
+	case risk.EdgeReporter:
+		if id := m.reporter; id != nil {
+			return []ent.Value{*id}
+		}
+	case risk.EdgeMaintainer:
+		if id := m.maintainer; id != nil {
+			return []ent.Value{*id}
+		}
 	}
 	return nil
 }
 
 // RemovedEdges returns all edge names that were removed in this mutation.
 func (m *RiskMutation) RemovedEdges() []string {
-	edges := make([]string, 0, 5)
+	edges := make([]string, 0, 6)
 	return edges
 }
 
@@ -6567,21 +7927,24 @@ func (m *RiskMutation) RemovedIDs(name string) []ent.Value {
 
 // ClearedEdges returns all edge names that were cleared in this mutation.
 func (m *RiskMutation) ClearedEdges() []string {
-	edges := make([]string, 0, 5)
+	edges := make([]string, 0, 6)
 	if m.clearedcreator {
 		edges = append(edges, risk.EdgeCreator)
 	}
-	if m.clearedupdator {
-		edges = append(edges, risk.EdgeUpdator)
-	}
-	if m.clearedmaintainer {
-		edges = append(edges, risk.EdgeMaintainer)
+	if m.clearedupdater {
+		edges = append(edges, risk.EdgeUpdater)
 	}
 	if m.clearedrisk_category {
 		edges = append(edges, risk.EdgeRiskCategory)
 	}
 	if m.clearedrisk_location {
 		edges = append(edges, risk.EdgeRiskLocation)
+	}
+	if m.clearedreporter {
+		edges = append(edges, risk.EdgeReporter)
+	}
+	if m.clearedmaintainer {
+		edges = append(edges, risk.EdgeMaintainer)
 	}
 	return edges
 }
@@ -6592,14 +7955,16 @@ func (m *RiskMutation) EdgeCleared(name string) bool {
 	switch name {
 	case risk.EdgeCreator:
 		return m.clearedcreator
-	case risk.EdgeUpdator:
-		return m.clearedupdator
-	case risk.EdgeMaintainer:
-		return m.clearedmaintainer
+	case risk.EdgeUpdater:
+		return m.clearedupdater
 	case risk.EdgeRiskCategory:
 		return m.clearedrisk_category
 	case risk.EdgeRiskLocation:
 		return m.clearedrisk_location
+	case risk.EdgeReporter:
+		return m.clearedreporter
+	case risk.EdgeMaintainer:
+		return m.clearedmaintainer
 	}
 	return false
 }
@@ -6611,17 +7976,20 @@ func (m *RiskMutation) ClearEdge(name string) error {
 	case risk.EdgeCreator:
 		m.ClearCreator()
 		return nil
-	case risk.EdgeUpdator:
-		m.ClearUpdator()
-		return nil
-	case risk.EdgeMaintainer:
-		m.ClearMaintainer()
+	case risk.EdgeUpdater:
+		m.ClearUpdater()
 		return nil
 	case risk.EdgeRiskCategory:
 		m.ClearRiskCategory()
 		return nil
 	case risk.EdgeRiskLocation:
 		m.ClearRiskLocation()
+		return nil
+	case risk.EdgeReporter:
+		m.ClearReporter()
+		return nil
+	case risk.EdgeMaintainer:
+		m.ClearMaintainer()
 		return nil
 	}
 	return fmt.Errorf("unknown Risk unique edge %s", name)
@@ -6634,17 +8002,20 @@ func (m *RiskMutation) ResetEdge(name string) error {
 	case risk.EdgeCreator:
 		m.ResetCreator()
 		return nil
-	case risk.EdgeUpdator:
-		m.ResetUpdator()
-		return nil
-	case risk.EdgeMaintainer:
-		m.ResetMaintainer()
+	case risk.EdgeUpdater:
+		m.ResetUpdater()
 		return nil
 	case risk.EdgeRiskCategory:
 		m.ResetRiskCategory()
 		return nil
 	case risk.EdgeRiskLocation:
 		m.ResetRiskLocation()
+		return nil
+	case risk.EdgeReporter:
+		m.ResetReporter()
+		return nil
+	case risk.EdgeMaintainer:
+		m.ResetMaintainer()
 		return nil
 	}
 	return fmt.Errorf("unknown Risk edge %s", name)
@@ -6653,24 +8024,24 @@ func (m *RiskMutation) ResetEdge(name string) error {
 // RiskCategoryMutation represents an operation that mutates the RiskCategory nodes in the graph.
 type RiskCategoryMutation struct {
 	config
-	op                        Op
-	typ                       string
-	id                        *int
-	created_at                *time.Time
-	deleted_at                *time.Time
-	updated_at                *time.Time
-	title                     *string
-	clearedFields             map[string]struct{}
-	creator                   *int
-	clearedcreator            bool
-	updator                   *int
-	clearedupdator            bool
-	risk_risk_category        map[int]struct{}
-	removedrisk_risk_category map[int]struct{}
-	clearedrisk_risk_category bool
-	done                      bool
-	oldValue                  func(context.Context) (*RiskCategory, error)
-	predicates                []predicate.RiskCategory
+	op             Op
+	typ            string
+	id             *int
+	created_at     *time.Time
+	deleted_at     *time.Time
+	updated_at     *time.Time
+	name           *string
+	clearedFields  map[string]struct{}
+	creator        *int
+	clearedcreator bool
+	updater        *int
+	clearedupdater bool
+	risk           map[int]struct{}
+	removedrisk    map[int]struct{}
+	clearedrisk    bool
+	done           bool
+	oldValue       func(context.Context) (*RiskCategory, error)
+	predicates     []predicate.RiskCategory
 }
 
 var _ ent.Mutation = (*RiskCategoryMutation)(nil)
@@ -6894,12 +8265,12 @@ func (m *RiskCategoryMutation) ResetDeletedAt() {
 
 // SetUpdatedBy sets the "updated_by" field.
 func (m *RiskCategoryMutation) SetUpdatedBy(i int) {
-	m.updator = &i
+	m.updater = &i
 }
 
 // UpdatedBy returns the value of the "updated_by" field in the mutation.
 func (m *RiskCategoryMutation) UpdatedBy() (r int, exists bool) {
-	v := m.updator
+	v := m.updater
 	if v == nil {
 		return
 	}
@@ -6925,7 +8296,7 @@ func (m *RiskCategoryMutation) OldUpdatedBy(ctx context.Context) (v int, err err
 
 // ResetUpdatedBy resets all changes to the "updated_by" field.
 func (m *RiskCategoryMutation) ResetUpdatedBy() {
-	m.updator = nil
+	m.updater = nil
 }
 
 // SetUpdatedAt sets the "updated_at" field.
@@ -6964,40 +8335,40 @@ func (m *RiskCategoryMutation) ResetUpdatedAt() {
 	m.updated_at = nil
 }
 
-// SetTitle sets the "title" field.
-func (m *RiskCategoryMutation) SetTitle(s string) {
-	m.title = &s
+// SetName sets the "name" field.
+func (m *RiskCategoryMutation) SetName(s string) {
+	m.name = &s
 }
 
-// Title returns the value of the "title" field in the mutation.
-func (m *RiskCategoryMutation) Title() (r string, exists bool) {
-	v := m.title
+// Name returns the value of the "name" field in the mutation.
+func (m *RiskCategoryMutation) Name() (r string, exists bool) {
+	v := m.name
 	if v == nil {
 		return
 	}
 	return *v, true
 }
 
-// OldTitle returns the old "title" field's value of the RiskCategory entity.
+// OldName returns the old "name" field's value of the RiskCategory entity.
 // If the RiskCategory object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *RiskCategoryMutation) OldTitle(ctx context.Context) (v string, err error) {
+func (m *RiskCategoryMutation) OldName(ctx context.Context) (v string, err error) {
 	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldTitle is only allowed on UpdateOne operations")
+		return v, errors.New("OldName is only allowed on UpdateOne operations")
 	}
 	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldTitle requires an ID field in the mutation")
+		return v, errors.New("OldName requires an ID field in the mutation")
 	}
 	oldValue, err := m.oldValue(ctx)
 	if err != nil {
-		return v, fmt.Errorf("querying old value for OldTitle: %w", err)
+		return v, fmt.Errorf("querying old value for OldName: %w", err)
 	}
-	return oldValue.Title, nil
+	return oldValue.Name, nil
 }
 
-// ResetTitle resets all changes to the "title" field.
-func (m *RiskCategoryMutation) ResetTitle() {
-	m.title = nil
+// ResetName resets all changes to the "name" field.
+func (m *RiskCategoryMutation) ResetName() {
+	m.name = nil
 }
 
 // SetCreatorID sets the "creator" edge to the Admin entity by id.
@@ -7040,98 +8411,98 @@ func (m *RiskCategoryMutation) ResetCreator() {
 	m.clearedcreator = false
 }
 
-// SetUpdatorID sets the "updator" edge to the Admin entity by id.
-func (m *RiskCategoryMutation) SetUpdatorID(id int) {
-	m.updator = &id
+// SetUpdaterID sets the "updater" edge to the Admin entity by id.
+func (m *RiskCategoryMutation) SetUpdaterID(id int) {
+	m.updater = &id
 }
 
-// ClearUpdator clears the "updator" edge to the Admin entity.
-func (m *RiskCategoryMutation) ClearUpdator() {
-	m.clearedupdator = true
+// ClearUpdater clears the "updater" edge to the Admin entity.
+func (m *RiskCategoryMutation) ClearUpdater() {
+	m.clearedupdater = true
 	m.clearedFields[riskcategory.FieldUpdatedBy] = struct{}{}
 }
 
-// UpdatorCleared reports if the "updator" edge to the Admin entity was cleared.
-func (m *RiskCategoryMutation) UpdatorCleared() bool {
-	return m.clearedupdator
+// UpdaterCleared reports if the "updater" edge to the Admin entity was cleared.
+func (m *RiskCategoryMutation) UpdaterCleared() bool {
+	return m.clearedupdater
 }
 
-// UpdatorID returns the "updator" edge ID in the mutation.
-func (m *RiskCategoryMutation) UpdatorID() (id int, exists bool) {
-	if m.updator != nil {
-		return *m.updator, true
+// UpdaterID returns the "updater" edge ID in the mutation.
+func (m *RiskCategoryMutation) UpdaterID() (id int, exists bool) {
+	if m.updater != nil {
+		return *m.updater, true
 	}
 	return
 }
 
-// UpdatorIDs returns the "updator" edge IDs in the mutation.
+// UpdaterIDs returns the "updater" edge IDs in the mutation.
 // Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
-// UpdatorID instead. It exists only for internal usage by the builders.
-func (m *RiskCategoryMutation) UpdatorIDs() (ids []int) {
-	if id := m.updator; id != nil {
+// UpdaterID instead. It exists only for internal usage by the builders.
+func (m *RiskCategoryMutation) UpdaterIDs() (ids []int) {
+	if id := m.updater; id != nil {
 		ids = append(ids, *id)
 	}
 	return
 }
 
-// ResetUpdator resets all changes to the "updator" edge.
-func (m *RiskCategoryMutation) ResetUpdator() {
-	m.updator = nil
-	m.clearedupdator = false
+// ResetUpdater resets all changes to the "updater" edge.
+func (m *RiskCategoryMutation) ResetUpdater() {
+	m.updater = nil
+	m.clearedupdater = false
 }
 
-// AddRiskRiskCategoryIDs adds the "risk_risk_category" edge to the Risk entity by ids.
-func (m *RiskCategoryMutation) AddRiskRiskCategoryIDs(ids ...int) {
-	if m.risk_risk_category == nil {
-		m.risk_risk_category = make(map[int]struct{})
+// AddRiskIDs adds the "risk" edge to the Risk entity by ids.
+func (m *RiskCategoryMutation) AddRiskIDs(ids ...int) {
+	if m.risk == nil {
+		m.risk = make(map[int]struct{})
 	}
 	for i := range ids {
-		m.risk_risk_category[ids[i]] = struct{}{}
+		m.risk[ids[i]] = struct{}{}
 	}
 }
 
-// ClearRiskRiskCategory clears the "risk_risk_category" edge to the Risk entity.
-func (m *RiskCategoryMutation) ClearRiskRiskCategory() {
-	m.clearedrisk_risk_category = true
+// ClearRisk clears the "risk" edge to the Risk entity.
+func (m *RiskCategoryMutation) ClearRisk() {
+	m.clearedrisk = true
 }
 
-// RiskRiskCategoryCleared reports if the "risk_risk_category" edge to the Risk entity was cleared.
-func (m *RiskCategoryMutation) RiskRiskCategoryCleared() bool {
-	return m.clearedrisk_risk_category
+// RiskCleared reports if the "risk" edge to the Risk entity was cleared.
+func (m *RiskCategoryMutation) RiskCleared() bool {
+	return m.clearedrisk
 }
 
-// RemoveRiskRiskCategoryIDs removes the "risk_risk_category" edge to the Risk entity by IDs.
-func (m *RiskCategoryMutation) RemoveRiskRiskCategoryIDs(ids ...int) {
-	if m.removedrisk_risk_category == nil {
-		m.removedrisk_risk_category = make(map[int]struct{})
+// RemoveRiskIDs removes the "risk" edge to the Risk entity by IDs.
+func (m *RiskCategoryMutation) RemoveRiskIDs(ids ...int) {
+	if m.removedrisk == nil {
+		m.removedrisk = make(map[int]struct{})
 	}
 	for i := range ids {
-		delete(m.risk_risk_category, ids[i])
-		m.removedrisk_risk_category[ids[i]] = struct{}{}
+		delete(m.risk, ids[i])
+		m.removedrisk[ids[i]] = struct{}{}
 	}
 }
 
-// RemovedRiskRiskCategory returns the removed IDs of the "risk_risk_category" edge to the Risk entity.
-func (m *RiskCategoryMutation) RemovedRiskRiskCategoryIDs() (ids []int) {
-	for id := range m.removedrisk_risk_category {
+// RemovedRisk returns the removed IDs of the "risk" edge to the Risk entity.
+func (m *RiskCategoryMutation) RemovedRiskIDs() (ids []int) {
+	for id := range m.removedrisk {
 		ids = append(ids, id)
 	}
 	return
 }
 
-// RiskRiskCategoryIDs returns the "risk_risk_category" edge IDs in the mutation.
-func (m *RiskCategoryMutation) RiskRiskCategoryIDs() (ids []int) {
-	for id := range m.risk_risk_category {
+// RiskIDs returns the "risk" edge IDs in the mutation.
+func (m *RiskCategoryMutation) RiskIDs() (ids []int) {
+	for id := range m.risk {
 		ids = append(ids, id)
 	}
 	return
 }
 
-// ResetRiskRiskCategory resets all changes to the "risk_risk_category" edge.
-func (m *RiskCategoryMutation) ResetRiskRiskCategory() {
-	m.risk_risk_category = nil
-	m.clearedrisk_risk_category = false
-	m.removedrisk_risk_category = nil
+// ResetRisk resets all changes to the "risk" edge.
+func (m *RiskCategoryMutation) ResetRisk() {
+	m.risk = nil
+	m.clearedrisk = false
+	m.removedrisk = nil
 }
 
 // Where appends a list predicates to the RiskCategoryMutation builder.
@@ -7178,14 +8549,14 @@ func (m *RiskCategoryMutation) Fields() []string {
 	if m.deleted_at != nil {
 		fields = append(fields, riskcategory.FieldDeletedAt)
 	}
-	if m.updator != nil {
+	if m.updater != nil {
 		fields = append(fields, riskcategory.FieldUpdatedBy)
 	}
 	if m.updated_at != nil {
 		fields = append(fields, riskcategory.FieldUpdatedAt)
 	}
-	if m.title != nil {
-		fields = append(fields, riskcategory.FieldTitle)
+	if m.name != nil {
+		fields = append(fields, riskcategory.FieldName)
 	}
 	return fields
 }
@@ -7205,8 +8576,8 @@ func (m *RiskCategoryMutation) Field(name string) (ent.Value, bool) {
 		return m.UpdatedBy()
 	case riskcategory.FieldUpdatedAt:
 		return m.UpdatedAt()
-	case riskcategory.FieldTitle:
-		return m.Title()
+	case riskcategory.FieldName:
+		return m.Name()
 	}
 	return nil, false
 }
@@ -7226,8 +8597,8 @@ func (m *RiskCategoryMutation) OldField(ctx context.Context, name string) (ent.V
 		return m.OldUpdatedBy(ctx)
 	case riskcategory.FieldUpdatedAt:
 		return m.OldUpdatedAt(ctx)
-	case riskcategory.FieldTitle:
-		return m.OldTitle(ctx)
+	case riskcategory.FieldName:
+		return m.OldName(ctx)
 	}
 	return nil, fmt.Errorf("unknown RiskCategory field %s", name)
 }
@@ -7272,12 +8643,12 @@ func (m *RiskCategoryMutation) SetField(name string, value ent.Value) error {
 		}
 		m.SetUpdatedAt(v)
 		return nil
-	case riskcategory.FieldTitle:
+	case riskcategory.FieldName:
 		v, ok := value.(string)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
-		m.SetTitle(v)
+		m.SetName(v)
 		return nil
 	}
 	return fmt.Errorf("unknown RiskCategory field %s", name)
@@ -7355,8 +8726,8 @@ func (m *RiskCategoryMutation) ResetField(name string) error {
 	case riskcategory.FieldUpdatedAt:
 		m.ResetUpdatedAt()
 		return nil
-	case riskcategory.FieldTitle:
-		m.ResetTitle()
+	case riskcategory.FieldName:
+		m.ResetName()
 		return nil
 	}
 	return fmt.Errorf("unknown RiskCategory field %s", name)
@@ -7368,11 +8739,11 @@ func (m *RiskCategoryMutation) AddedEdges() []string {
 	if m.creator != nil {
 		edges = append(edges, riskcategory.EdgeCreator)
 	}
-	if m.updator != nil {
-		edges = append(edges, riskcategory.EdgeUpdator)
+	if m.updater != nil {
+		edges = append(edges, riskcategory.EdgeUpdater)
 	}
-	if m.risk_risk_category != nil {
-		edges = append(edges, riskcategory.EdgeRiskRiskCategory)
+	if m.risk != nil {
+		edges = append(edges, riskcategory.EdgeRisk)
 	}
 	return edges
 }
@@ -7385,13 +8756,13 @@ func (m *RiskCategoryMutation) AddedIDs(name string) []ent.Value {
 		if id := m.creator; id != nil {
 			return []ent.Value{*id}
 		}
-	case riskcategory.EdgeUpdator:
-		if id := m.updator; id != nil {
+	case riskcategory.EdgeUpdater:
+		if id := m.updater; id != nil {
 			return []ent.Value{*id}
 		}
-	case riskcategory.EdgeRiskRiskCategory:
-		ids := make([]ent.Value, 0, len(m.risk_risk_category))
-		for id := range m.risk_risk_category {
+	case riskcategory.EdgeRisk:
+		ids := make([]ent.Value, 0, len(m.risk))
+		for id := range m.risk {
 			ids = append(ids, id)
 		}
 		return ids
@@ -7402,8 +8773,8 @@ func (m *RiskCategoryMutation) AddedIDs(name string) []ent.Value {
 // RemovedEdges returns all edge names that were removed in this mutation.
 func (m *RiskCategoryMutation) RemovedEdges() []string {
 	edges := make([]string, 0, 3)
-	if m.removedrisk_risk_category != nil {
-		edges = append(edges, riskcategory.EdgeRiskRiskCategory)
+	if m.removedrisk != nil {
+		edges = append(edges, riskcategory.EdgeRisk)
 	}
 	return edges
 }
@@ -7412,9 +8783,9 @@ func (m *RiskCategoryMutation) RemovedEdges() []string {
 // the given name in this mutation.
 func (m *RiskCategoryMutation) RemovedIDs(name string) []ent.Value {
 	switch name {
-	case riskcategory.EdgeRiskRiskCategory:
-		ids := make([]ent.Value, 0, len(m.removedrisk_risk_category))
-		for id := range m.removedrisk_risk_category {
+	case riskcategory.EdgeRisk:
+		ids := make([]ent.Value, 0, len(m.removedrisk))
+		for id := range m.removedrisk {
 			ids = append(ids, id)
 		}
 		return ids
@@ -7428,11 +8799,11 @@ func (m *RiskCategoryMutation) ClearedEdges() []string {
 	if m.clearedcreator {
 		edges = append(edges, riskcategory.EdgeCreator)
 	}
-	if m.clearedupdator {
-		edges = append(edges, riskcategory.EdgeUpdator)
+	if m.clearedupdater {
+		edges = append(edges, riskcategory.EdgeUpdater)
 	}
-	if m.clearedrisk_risk_category {
-		edges = append(edges, riskcategory.EdgeRiskRiskCategory)
+	if m.clearedrisk {
+		edges = append(edges, riskcategory.EdgeRisk)
 	}
 	return edges
 }
@@ -7443,10 +8814,10 @@ func (m *RiskCategoryMutation) EdgeCleared(name string) bool {
 	switch name {
 	case riskcategory.EdgeCreator:
 		return m.clearedcreator
-	case riskcategory.EdgeUpdator:
-		return m.clearedupdator
-	case riskcategory.EdgeRiskRiskCategory:
-		return m.clearedrisk_risk_category
+	case riskcategory.EdgeUpdater:
+		return m.clearedupdater
+	case riskcategory.EdgeRisk:
+		return m.clearedrisk
 	}
 	return false
 }
@@ -7458,8 +8829,8 @@ func (m *RiskCategoryMutation) ClearEdge(name string) error {
 	case riskcategory.EdgeCreator:
 		m.ClearCreator()
 		return nil
-	case riskcategory.EdgeUpdator:
-		m.ClearUpdator()
+	case riskcategory.EdgeUpdater:
+		m.ClearUpdater()
 		return nil
 	}
 	return fmt.Errorf("unknown RiskCategory unique edge %s", name)
@@ -7472,11 +8843,11 @@ func (m *RiskCategoryMutation) ResetEdge(name string) error {
 	case riskcategory.EdgeCreator:
 		m.ResetCreator()
 		return nil
-	case riskcategory.EdgeUpdator:
-		m.ResetUpdator()
+	case riskcategory.EdgeUpdater:
+		m.ResetUpdater()
 		return nil
-	case riskcategory.EdgeRiskRiskCategory:
-		m.ResetRiskRiskCategory()
+	case riskcategory.EdgeRisk:
+		m.ResetRisk()
 		return nil
 	}
 	return fmt.Errorf("unknown RiskCategory edge %s", name)
@@ -7485,24 +8856,24 @@ func (m *RiskCategoryMutation) ResetEdge(name string) error {
 // RiskLocationMutation represents an operation that mutates the RiskLocation nodes in the graph.
 type RiskLocationMutation struct {
 	config
-	op                        Op
-	typ                       string
-	id                        *int
-	created_at                *time.Time
-	deleted_at                *time.Time
-	updated_at                *time.Time
-	title                     *string
-	clearedFields             map[string]struct{}
-	creator                   *int
-	clearedcreator            bool
-	updator                   *int
-	clearedupdator            bool
-	risk_risk_location        map[int]struct{}
-	removedrisk_risk_location map[int]struct{}
-	clearedrisk_risk_location bool
-	done                      bool
-	oldValue                  func(context.Context) (*RiskLocation, error)
-	predicates                []predicate.RiskLocation
+	op             Op
+	typ            string
+	id             *int
+	created_at     *time.Time
+	deleted_at     *time.Time
+	updated_at     *time.Time
+	name           *string
+	clearedFields  map[string]struct{}
+	creator        *int
+	clearedcreator bool
+	updater        *int
+	clearedupdater bool
+	risk           map[int]struct{}
+	removedrisk    map[int]struct{}
+	clearedrisk    bool
+	done           bool
+	oldValue       func(context.Context) (*RiskLocation, error)
+	predicates     []predicate.RiskLocation
 }
 
 var _ ent.Mutation = (*RiskLocationMutation)(nil)
@@ -7726,12 +9097,12 @@ func (m *RiskLocationMutation) ResetDeletedAt() {
 
 // SetUpdatedBy sets the "updated_by" field.
 func (m *RiskLocationMutation) SetUpdatedBy(i int) {
-	m.updator = &i
+	m.updater = &i
 }
 
 // UpdatedBy returns the value of the "updated_by" field in the mutation.
 func (m *RiskLocationMutation) UpdatedBy() (r int, exists bool) {
-	v := m.updator
+	v := m.updater
 	if v == nil {
 		return
 	}
@@ -7757,7 +9128,7 @@ func (m *RiskLocationMutation) OldUpdatedBy(ctx context.Context) (v int, err err
 
 // ResetUpdatedBy resets all changes to the "updated_by" field.
 func (m *RiskLocationMutation) ResetUpdatedBy() {
-	m.updator = nil
+	m.updater = nil
 }
 
 // SetUpdatedAt sets the "updated_at" field.
@@ -7796,40 +9167,40 @@ func (m *RiskLocationMutation) ResetUpdatedAt() {
 	m.updated_at = nil
 }
 
-// SetTitle sets the "title" field.
-func (m *RiskLocationMutation) SetTitle(s string) {
-	m.title = &s
+// SetName sets the "name" field.
+func (m *RiskLocationMutation) SetName(s string) {
+	m.name = &s
 }
 
-// Title returns the value of the "title" field in the mutation.
-func (m *RiskLocationMutation) Title() (r string, exists bool) {
-	v := m.title
+// Name returns the value of the "name" field in the mutation.
+func (m *RiskLocationMutation) Name() (r string, exists bool) {
+	v := m.name
 	if v == nil {
 		return
 	}
 	return *v, true
 }
 
-// OldTitle returns the old "title" field's value of the RiskLocation entity.
+// OldName returns the old "name" field's value of the RiskLocation entity.
 // If the RiskLocation object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *RiskLocationMutation) OldTitle(ctx context.Context) (v string, err error) {
+func (m *RiskLocationMutation) OldName(ctx context.Context) (v string, err error) {
 	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldTitle is only allowed on UpdateOne operations")
+		return v, errors.New("OldName is only allowed on UpdateOne operations")
 	}
 	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldTitle requires an ID field in the mutation")
+		return v, errors.New("OldName requires an ID field in the mutation")
 	}
 	oldValue, err := m.oldValue(ctx)
 	if err != nil {
-		return v, fmt.Errorf("querying old value for OldTitle: %w", err)
+		return v, fmt.Errorf("querying old value for OldName: %w", err)
 	}
-	return oldValue.Title, nil
+	return oldValue.Name, nil
 }
 
-// ResetTitle resets all changes to the "title" field.
-func (m *RiskLocationMutation) ResetTitle() {
-	m.title = nil
+// ResetName resets all changes to the "name" field.
+func (m *RiskLocationMutation) ResetName() {
+	m.name = nil
 }
 
 // SetCreatorID sets the "creator" edge to the Admin entity by id.
@@ -7872,98 +9243,98 @@ func (m *RiskLocationMutation) ResetCreator() {
 	m.clearedcreator = false
 }
 
-// SetUpdatorID sets the "updator" edge to the Admin entity by id.
-func (m *RiskLocationMutation) SetUpdatorID(id int) {
-	m.updator = &id
+// SetUpdaterID sets the "updater" edge to the Admin entity by id.
+func (m *RiskLocationMutation) SetUpdaterID(id int) {
+	m.updater = &id
 }
 
-// ClearUpdator clears the "updator" edge to the Admin entity.
-func (m *RiskLocationMutation) ClearUpdator() {
-	m.clearedupdator = true
+// ClearUpdater clears the "updater" edge to the Admin entity.
+func (m *RiskLocationMutation) ClearUpdater() {
+	m.clearedupdater = true
 	m.clearedFields[risklocation.FieldUpdatedBy] = struct{}{}
 }
 
-// UpdatorCleared reports if the "updator" edge to the Admin entity was cleared.
-func (m *RiskLocationMutation) UpdatorCleared() bool {
-	return m.clearedupdator
+// UpdaterCleared reports if the "updater" edge to the Admin entity was cleared.
+func (m *RiskLocationMutation) UpdaterCleared() bool {
+	return m.clearedupdater
 }
 
-// UpdatorID returns the "updator" edge ID in the mutation.
-func (m *RiskLocationMutation) UpdatorID() (id int, exists bool) {
-	if m.updator != nil {
-		return *m.updator, true
+// UpdaterID returns the "updater" edge ID in the mutation.
+func (m *RiskLocationMutation) UpdaterID() (id int, exists bool) {
+	if m.updater != nil {
+		return *m.updater, true
 	}
 	return
 }
 
-// UpdatorIDs returns the "updator" edge IDs in the mutation.
+// UpdaterIDs returns the "updater" edge IDs in the mutation.
 // Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
-// UpdatorID instead. It exists only for internal usage by the builders.
-func (m *RiskLocationMutation) UpdatorIDs() (ids []int) {
-	if id := m.updator; id != nil {
+// UpdaterID instead. It exists only for internal usage by the builders.
+func (m *RiskLocationMutation) UpdaterIDs() (ids []int) {
+	if id := m.updater; id != nil {
 		ids = append(ids, *id)
 	}
 	return
 }
 
-// ResetUpdator resets all changes to the "updator" edge.
-func (m *RiskLocationMutation) ResetUpdator() {
-	m.updator = nil
-	m.clearedupdator = false
+// ResetUpdater resets all changes to the "updater" edge.
+func (m *RiskLocationMutation) ResetUpdater() {
+	m.updater = nil
+	m.clearedupdater = false
 }
 
-// AddRiskRiskLocationIDs adds the "risk_risk_location" edge to the Risk entity by ids.
-func (m *RiskLocationMutation) AddRiskRiskLocationIDs(ids ...int) {
-	if m.risk_risk_location == nil {
-		m.risk_risk_location = make(map[int]struct{})
+// AddRiskIDs adds the "risk" edge to the Risk entity by ids.
+func (m *RiskLocationMutation) AddRiskIDs(ids ...int) {
+	if m.risk == nil {
+		m.risk = make(map[int]struct{})
 	}
 	for i := range ids {
-		m.risk_risk_location[ids[i]] = struct{}{}
+		m.risk[ids[i]] = struct{}{}
 	}
 }
 
-// ClearRiskRiskLocation clears the "risk_risk_location" edge to the Risk entity.
-func (m *RiskLocationMutation) ClearRiskRiskLocation() {
-	m.clearedrisk_risk_location = true
+// ClearRisk clears the "risk" edge to the Risk entity.
+func (m *RiskLocationMutation) ClearRisk() {
+	m.clearedrisk = true
 }
 
-// RiskRiskLocationCleared reports if the "risk_risk_location" edge to the Risk entity was cleared.
-func (m *RiskLocationMutation) RiskRiskLocationCleared() bool {
-	return m.clearedrisk_risk_location
+// RiskCleared reports if the "risk" edge to the Risk entity was cleared.
+func (m *RiskLocationMutation) RiskCleared() bool {
+	return m.clearedrisk
 }
 
-// RemoveRiskRiskLocationIDs removes the "risk_risk_location" edge to the Risk entity by IDs.
-func (m *RiskLocationMutation) RemoveRiskRiskLocationIDs(ids ...int) {
-	if m.removedrisk_risk_location == nil {
-		m.removedrisk_risk_location = make(map[int]struct{})
+// RemoveRiskIDs removes the "risk" edge to the Risk entity by IDs.
+func (m *RiskLocationMutation) RemoveRiskIDs(ids ...int) {
+	if m.removedrisk == nil {
+		m.removedrisk = make(map[int]struct{})
 	}
 	for i := range ids {
-		delete(m.risk_risk_location, ids[i])
-		m.removedrisk_risk_location[ids[i]] = struct{}{}
+		delete(m.risk, ids[i])
+		m.removedrisk[ids[i]] = struct{}{}
 	}
 }
 
-// RemovedRiskRiskLocation returns the removed IDs of the "risk_risk_location" edge to the Risk entity.
-func (m *RiskLocationMutation) RemovedRiskRiskLocationIDs() (ids []int) {
-	for id := range m.removedrisk_risk_location {
+// RemovedRisk returns the removed IDs of the "risk" edge to the Risk entity.
+func (m *RiskLocationMutation) RemovedRiskIDs() (ids []int) {
+	for id := range m.removedrisk {
 		ids = append(ids, id)
 	}
 	return
 }
 
-// RiskRiskLocationIDs returns the "risk_risk_location" edge IDs in the mutation.
-func (m *RiskLocationMutation) RiskRiskLocationIDs() (ids []int) {
-	for id := range m.risk_risk_location {
+// RiskIDs returns the "risk" edge IDs in the mutation.
+func (m *RiskLocationMutation) RiskIDs() (ids []int) {
+	for id := range m.risk {
 		ids = append(ids, id)
 	}
 	return
 }
 
-// ResetRiskRiskLocation resets all changes to the "risk_risk_location" edge.
-func (m *RiskLocationMutation) ResetRiskRiskLocation() {
-	m.risk_risk_location = nil
-	m.clearedrisk_risk_location = false
-	m.removedrisk_risk_location = nil
+// ResetRisk resets all changes to the "risk" edge.
+func (m *RiskLocationMutation) ResetRisk() {
+	m.risk = nil
+	m.clearedrisk = false
+	m.removedrisk = nil
 }
 
 // Where appends a list predicates to the RiskLocationMutation builder.
@@ -8010,14 +9381,14 @@ func (m *RiskLocationMutation) Fields() []string {
 	if m.deleted_at != nil {
 		fields = append(fields, risklocation.FieldDeletedAt)
 	}
-	if m.updator != nil {
+	if m.updater != nil {
 		fields = append(fields, risklocation.FieldUpdatedBy)
 	}
 	if m.updated_at != nil {
 		fields = append(fields, risklocation.FieldUpdatedAt)
 	}
-	if m.title != nil {
-		fields = append(fields, risklocation.FieldTitle)
+	if m.name != nil {
+		fields = append(fields, risklocation.FieldName)
 	}
 	return fields
 }
@@ -8037,8 +9408,8 @@ func (m *RiskLocationMutation) Field(name string) (ent.Value, bool) {
 		return m.UpdatedBy()
 	case risklocation.FieldUpdatedAt:
 		return m.UpdatedAt()
-	case risklocation.FieldTitle:
-		return m.Title()
+	case risklocation.FieldName:
+		return m.Name()
 	}
 	return nil, false
 }
@@ -8058,8 +9429,8 @@ func (m *RiskLocationMutation) OldField(ctx context.Context, name string) (ent.V
 		return m.OldUpdatedBy(ctx)
 	case risklocation.FieldUpdatedAt:
 		return m.OldUpdatedAt(ctx)
-	case risklocation.FieldTitle:
-		return m.OldTitle(ctx)
+	case risklocation.FieldName:
+		return m.OldName(ctx)
 	}
 	return nil, fmt.Errorf("unknown RiskLocation field %s", name)
 }
@@ -8104,12 +9475,12 @@ func (m *RiskLocationMutation) SetField(name string, value ent.Value) error {
 		}
 		m.SetUpdatedAt(v)
 		return nil
-	case risklocation.FieldTitle:
+	case risklocation.FieldName:
 		v, ok := value.(string)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
-		m.SetTitle(v)
+		m.SetName(v)
 		return nil
 	}
 	return fmt.Errorf("unknown RiskLocation field %s", name)
@@ -8187,8 +9558,8 @@ func (m *RiskLocationMutation) ResetField(name string) error {
 	case risklocation.FieldUpdatedAt:
 		m.ResetUpdatedAt()
 		return nil
-	case risklocation.FieldTitle:
-		m.ResetTitle()
+	case risklocation.FieldName:
+		m.ResetName()
 		return nil
 	}
 	return fmt.Errorf("unknown RiskLocation field %s", name)
@@ -8200,11 +9571,11 @@ func (m *RiskLocationMutation) AddedEdges() []string {
 	if m.creator != nil {
 		edges = append(edges, risklocation.EdgeCreator)
 	}
-	if m.updator != nil {
-		edges = append(edges, risklocation.EdgeUpdator)
+	if m.updater != nil {
+		edges = append(edges, risklocation.EdgeUpdater)
 	}
-	if m.risk_risk_location != nil {
-		edges = append(edges, risklocation.EdgeRiskRiskLocation)
+	if m.risk != nil {
+		edges = append(edges, risklocation.EdgeRisk)
 	}
 	return edges
 }
@@ -8217,13 +9588,13 @@ func (m *RiskLocationMutation) AddedIDs(name string) []ent.Value {
 		if id := m.creator; id != nil {
 			return []ent.Value{*id}
 		}
-	case risklocation.EdgeUpdator:
-		if id := m.updator; id != nil {
+	case risklocation.EdgeUpdater:
+		if id := m.updater; id != nil {
 			return []ent.Value{*id}
 		}
-	case risklocation.EdgeRiskRiskLocation:
-		ids := make([]ent.Value, 0, len(m.risk_risk_location))
-		for id := range m.risk_risk_location {
+	case risklocation.EdgeRisk:
+		ids := make([]ent.Value, 0, len(m.risk))
+		for id := range m.risk {
 			ids = append(ids, id)
 		}
 		return ids
@@ -8234,8 +9605,8 @@ func (m *RiskLocationMutation) AddedIDs(name string) []ent.Value {
 // RemovedEdges returns all edge names that were removed in this mutation.
 func (m *RiskLocationMutation) RemovedEdges() []string {
 	edges := make([]string, 0, 3)
-	if m.removedrisk_risk_location != nil {
-		edges = append(edges, risklocation.EdgeRiskRiskLocation)
+	if m.removedrisk != nil {
+		edges = append(edges, risklocation.EdgeRisk)
 	}
 	return edges
 }
@@ -8244,9 +9615,9 @@ func (m *RiskLocationMutation) RemovedEdges() []string {
 // the given name in this mutation.
 func (m *RiskLocationMutation) RemovedIDs(name string) []ent.Value {
 	switch name {
-	case risklocation.EdgeRiskRiskLocation:
-		ids := make([]ent.Value, 0, len(m.removedrisk_risk_location))
-		for id := range m.removedrisk_risk_location {
+	case risklocation.EdgeRisk:
+		ids := make([]ent.Value, 0, len(m.removedrisk))
+		for id := range m.removedrisk {
 			ids = append(ids, id)
 		}
 		return ids
@@ -8260,11 +9631,11 @@ func (m *RiskLocationMutation) ClearedEdges() []string {
 	if m.clearedcreator {
 		edges = append(edges, risklocation.EdgeCreator)
 	}
-	if m.clearedupdator {
-		edges = append(edges, risklocation.EdgeUpdator)
+	if m.clearedupdater {
+		edges = append(edges, risklocation.EdgeUpdater)
 	}
-	if m.clearedrisk_risk_location {
-		edges = append(edges, risklocation.EdgeRiskRiskLocation)
+	if m.clearedrisk {
+		edges = append(edges, risklocation.EdgeRisk)
 	}
 	return edges
 }
@@ -8275,10 +9646,10 @@ func (m *RiskLocationMutation) EdgeCleared(name string) bool {
 	switch name {
 	case risklocation.EdgeCreator:
 		return m.clearedcreator
-	case risklocation.EdgeUpdator:
-		return m.clearedupdator
-	case risklocation.EdgeRiskRiskLocation:
-		return m.clearedrisk_risk_location
+	case risklocation.EdgeUpdater:
+		return m.clearedupdater
+	case risklocation.EdgeRisk:
+		return m.clearedrisk
 	}
 	return false
 }
@@ -8290,8 +9661,8 @@ func (m *RiskLocationMutation) ClearEdge(name string) error {
 	case risklocation.EdgeCreator:
 		m.ClearCreator()
 		return nil
-	case risklocation.EdgeUpdator:
-		m.ClearUpdator()
+	case risklocation.EdgeUpdater:
+		m.ClearUpdater()
 		return nil
 	}
 	return fmt.Errorf("unknown RiskLocation unique edge %s", name)
@@ -8304,11 +9675,11 @@ func (m *RiskLocationMutation) ResetEdge(name string) error {
 	case risklocation.EdgeCreator:
 		m.ResetCreator()
 		return nil
-	case risklocation.EdgeUpdator:
-		m.ResetUpdator()
+	case risklocation.EdgeUpdater:
+		m.ResetUpdater()
 		return nil
-	case risklocation.EdgeRiskRiskLocation:
-		m.ResetRiskRiskLocation()
+	case risklocation.EdgeRisk:
+		m.ResetRisk()
 		return nil
 	}
 	return fmt.Errorf("unknown RiskLocation edge %s", name)

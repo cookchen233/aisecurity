@@ -2,6 +2,8 @@ package handlers
 
 import (
 	"aisecurity/services"
+	"aisecurity/structs"
+	"aisecurity/utils/http"
 	"context"
 	"errors"
 	"fmt"
@@ -14,22 +16,29 @@ import (
 )
 
 type IHandler interface {
-	SetContext(c context.Context)
+	SetContext(ctx context.Context)
+	Create(c *gin.Context)
+	GetList(c *gin.Context)
+	GetDetails(c *gin.Context)
+	Update(c *gin.Context)
+	Delete(c *gin.Context)
 }
 
 type Handler struct {
-	HandlerService services.IService
+	Service services.IService
+	Filter  structs.IFilter
+	Entity  structs.IEntity
 }
 
 func Convert(handler IHandler, handerFunc gin.HandlerFunc) gin.HandlerFunc {
-	return func(ctx *gin.Context) {
-		handler.SetContext(ctx)
-		handerFunc(ctx)
+	return func(c *gin.Context) {
+		handler.SetContext(c)
+		handerFunc(c)
 	}
 }
 
 func (handler *Handler) SetContext(ctx context.Context) {
-	handler.HandlerService.SetContext(ctx)
+	handler.Service.SetContext(ctx)
 }
 
 func (handler *Handler) Validate(data interface{}) error {
@@ -55,4 +64,81 @@ func (handler *Handler) Validate(data interface{}) error {
 		return fmt.Errorf("%v", errMsgs)
 	}
 	return nil
+}
+
+func (handler *Handler) Create(c *gin.Context) {
+	if err := c.ShouldBindJSON(handler.Entity); err != nil {
+		http.Error(c, err, 900)
+		return
+	}
+	if err := handler.Validate(handler.Entity); err != nil {
+		http.Error(c, err, 900)
+		return
+	}
+	saved, err := handler.Service.Create(handler.Entity)
+	if err != nil {
+		http.Error(c, err, 1000)
+		return
+	}
+	http.Success(c, saved)
+}
+
+func (handler *Handler) Update(c *gin.Context) {
+	if err := c.ShouldBindJSON(handler.Entity); err != nil {
+		http.Error(c, err, 900)
+		return
+	}
+	if err := handler.Validate(handler.Entity); err != nil {
+		http.Error(c, err, 900)
+		return
+	}
+	saved, err := handler.Service.Update(handler.Entity)
+	if err != nil {
+		http.Error(c, err, 1000)
+		return
+	}
+	http.Success(c, saved)
+}
+
+func (handler *Handler) GetList(c *gin.Context) {
+	if err := c.ShouldBindQuery(handler.Filter); err != nil {
+		http.Error(c, err, 900)
+		return
+	}
+	list, err := handler.Service.GetList(handler.Filter)
+	if err != nil {
+		http.Error(c, err, 1000)
+		return
+	}
+	http.Success(c, list)
+}
+
+func (handler *Handler) GetDetails(c *gin.Context) {
+	if err := c.ShouldBindQuery(handler.Filter); err != nil {
+		http.Error(c, err, 900)
+		return
+	}
+	details, err := handler.Service.GetDetails(handler.Filter)
+	if err != nil {
+		http.Error(c, err, 1000)
+		return
+	}
+	http.Success(c, details)
+}
+
+func (handler *Handler) Delete(c *gin.Context) {
+	if err := c.ShouldBindJSON(handler.Entity); err != nil {
+		http.Error(c, err, 900)
+		return
+	}
+	if err := handler.Validate(handler.Entity); err != nil {
+		http.Error(c, err, 900)
+		return
+	}
+	err := handler.Service.Delete(handler.Entity)
+	if err != nil {
+		http.Error(c, err, 1000)
+		return
+	}
+	http.Success(c, nil)
 }

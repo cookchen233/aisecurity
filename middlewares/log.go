@@ -22,8 +22,8 @@ import (
 	"go.uber.org/zap"
 )
 
-// LoggerMiddleware ref: https://github.com/gin-gonic/gin/blob/v1.9.0/logger.go#L182
-func LogMiddleware() gin.HandlerFunc {
+// RequestLog ref: https://github.com/gin-gonic/gin/blob/v1.9.0/logger.go#L182
+func RequestLog() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		// Start timer
 		start := time.Now()
@@ -91,7 +91,7 @@ func LogMiddleware() gin.HandlerFunc {
 		//}
 		stackTraces := make([][]string, 0, len(c.Errors))
 		for _, e := range c.Errors {
-			stackTraces = append(stackTraces, strings.Split(fmt.Sprintf("%+v", e.Err), "\n\t"))
+			stackTraces = append(stackTraces, strings.Split(strings.Replace(fmt.Sprintf("%+v", e.Err), "\t", "", -1), "\n"))
 		}
 		zfs = append(zfs, zap.String("latency", fmt.Sprintf("%s", latency)))
 		zfs = append(zfs, zap.Int("status", c.Writer.Status()))
@@ -119,11 +119,13 @@ func LogMiddleware() gin.HandlerFunc {
 	}
 }
 
-// RecoveryMiddleware ref: https://github.com/gin-gonic/gin/blob/v1.9.0/recovery.go#L33
-func RecoveryMiddleware() gin.HandlerFunc {
+// Recovery ref: https://github.com/gin-gonic/gin/blob/v1.9.0/recovery.go#L33
+func Recovery() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		defer func() {
 			if err := recover(); err != nil {
+				fmt.Println("==============================================================================================================================")
+
 				// Check for a broken connection, as it is not really a
 				// condition that warrants a panic stack trace.
 				var brokenPipe bool
@@ -154,13 +156,13 @@ func RecoveryMiddleware() gin.HandlerFunc {
 				}
 				c.Error(panicErr)
 				if brokenPipe {
-					utils.Logger.Error(c.Request.URL.String(),
+					utils.Logger.Fatal(c.Request.URL.String(),
 						zap.Any("err", err),
 						zap.String("headers", headersToStr),
 						zap.Stack("stack"),
 					)
 				} else {
-					utils.Logger.Error(c.Request.URL.String(),
+					utils.Logger.Fatal(c.Request.URL.String(),
 						zap.Any("err", err),
 						zap.String("headers", headersToStr),
 						zap.Stack("stack"),
@@ -168,6 +170,7 @@ func RecoveryMiddleware() gin.HandlerFunc {
 					)
 				}
 				http2.Error(c, panicErr, properties.ServerError)
+				return
 			}
 		}()
 		c.Next()

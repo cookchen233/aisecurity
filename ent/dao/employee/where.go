@@ -220,26 +220,6 @@ func UpdatedByNotIn(vs ...int) predicate.Employee {
 	return predicate.Employee(sql.FieldNotIn(FieldUpdatedBy, vs...))
 }
 
-// UpdatedByGT applies the GT predicate on the "updated_by" field.
-func UpdatedByGT(v int) predicate.Employee {
-	return predicate.Employee(sql.FieldGT(FieldUpdatedBy, v))
-}
-
-// UpdatedByGTE applies the GTE predicate on the "updated_by" field.
-func UpdatedByGTE(v int) predicate.Employee {
-	return predicate.Employee(sql.FieldGTE(FieldUpdatedBy, v))
-}
-
-// UpdatedByLT applies the LT predicate on the "updated_by" field.
-func UpdatedByLT(v int) predicate.Employee {
-	return predicate.Employee(sql.FieldLT(FieldUpdatedBy, v))
-}
-
-// UpdatedByLTE applies the LTE predicate on the "updated_by" field.
-func UpdatedByLTE(v int) predicate.Employee {
-	return predicate.Employee(sql.FieldLTE(FieldUpdatedBy, v))
-}
-
 // UpdatedAtEQ applies the EQ predicate on the "updated_at" field.
 func UpdatedAtEQ(v time.Time) predicate.Employee {
 	return predicate.Employee(sql.FieldEQ(FieldUpdatedAt, v))
@@ -343,6 +323,29 @@ func HasCreatorWith(preds ...predicate.Admin) predicate.Employee {
 	})
 }
 
+// HasUpdater applies the HasEdge predicate on the "updater" edge.
+func HasUpdater() predicate.Employee {
+	return predicate.Employee(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, UpdaterTable, UpdaterColumn),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasUpdaterWith applies the HasEdge predicate on the "updater" edge with a given conditions (other predicates).
+func HasUpdaterWith(preds ...predicate.Admin) predicate.Employee {
+	return predicate.Employee(func(s *sql.Selector) {
+		step := newUpdaterStep()
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
+}
+
 // HasAdmin applies the HasEdge predicate on the "admin" edge.
 func HasAdmin() predicate.Employee {
 	return predicate.Employee(func(s *sql.Selector) {
@@ -389,6 +392,52 @@ func HasDepartmentWith(preds ...predicate.Department) predicate.Employee {
 	})
 }
 
+// HasOccupations applies the HasEdge predicate on the "occupations" edge.
+func HasOccupations() predicate.Employee {
+	return predicate.Employee(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.M2M, true, OccupationsTable, OccupationsPrimaryKey...),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasOccupationsWith applies the HasEdge predicate on the "occupations" edge with a given conditions (other predicates).
+func HasOccupationsWith(preds ...predicate.Occupation) predicate.Employee {
+	return predicate.Employee(func(s *sql.Selector) {
+		step := newOccupationsStep()
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
+}
+
+// HasRiskReporter applies the HasEdge predicate on the "risk_reporter" edge.
+func HasRiskReporter() predicate.Employee {
+	return predicate.Employee(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, RiskReporterTable, RiskReporterColumn),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasRiskReporterWith applies the HasEdge predicate on the "risk_reporter" edge with a given conditions (other predicates).
+func HasRiskReporterWith(preds ...predicate.Risk) predicate.Employee {
+	return predicate.Employee(func(s *sql.Selector) {
+		step := newRiskReporterStep()
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
+}
+
 // HasRiskMaintainer applies the HasEdge predicate on the "risk_maintainer" edge.
 func HasRiskMaintainer() predicate.Employee {
 	return predicate.Employee(func(s *sql.Selector) {
@@ -404,29 +453,6 @@ func HasRiskMaintainer() predicate.Employee {
 func HasRiskMaintainerWith(preds ...predicate.Risk) predicate.Employee {
 	return predicate.Employee(func(s *sql.Selector) {
 		step := newRiskMaintainerStep()
-		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
-			for _, p := range preds {
-				p(s)
-			}
-		})
-	})
-}
-
-// HasRiskCreator applies the HasEdge predicate on the "risk_creator" edge.
-func HasRiskCreator() predicate.Employee {
-	return predicate.Employee(func(s *sql.Selector) {
-		step := sqlgraph.NewStep(
-			sqlgraph.From(Table, FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, false, RiskCreatorTable, RiskCreatorColumn),
-		)
-		sqlgraph.HasNeighbors(s, step)
-	})
-}
-
-// HasRiskCreatorWith applies the HasEdge predicate on the "risk_creator" edge with a given conditions (other predicates).
-func HasRiskCreatorWith(preds ...predicate.Risk) predicate.Employee {
-	return predicate.Employee(func(s *sql.Selector) {
-		step := newRiskCreatorStep()
 		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
 			for _, p := range preds {
 				p(s)

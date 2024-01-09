@@ -5,7 +5,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func AuditMiddleware() gin.HandlerFunc {
+func DatabaseAudit() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		// Start timer
 		session := sessions.Default(c)

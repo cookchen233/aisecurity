@@ -20,15 +20,15 @@ import (
 // DepartmentQuery is the builder for querying Department entities.
 type DepartmentQuery struct {
 	config
-	ctx                    *QueryContext
-	order                  []department.OrderOption
-	inters                 []Interceptor
-	predicates             []predicate.Department
-	withCreator            *AdminQuery
-	withParent             *DepartmentQuery
-	withEmployeeDepartment *EmployeeQuery
-	withChildren           *DepartmentQuery
-	withFKs                bool
+	ctx           *QueryContext
+	order         []department.OrderOption
+	inters        []Interceptor
+	predicates    []predicate.Department
+	withCreator   *AdminQuery
+	withUpdater   *AdminQuery
+	withParent    *DepartmentQuery
+	withEmployees *EmployeeQuery
+	withChildren  *DepartmentQuery
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
 	path func(context.Context) (*sql.Selector, error)
@@ -87,6 +87,28 @@ func (dq *DepartmentQuery) QueryCreator() *AdminQuery {
 	return query
 }
 
+// QueryUpdater chains the current query on the "updater" edge.
+func (dq *DepartmentQuery) QueryUpdater() *AdminQuery {
+	query := (&AdminClient{config: dq.config}).Query()
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := dq.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := dq.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(department.Table, department.FieldID, selector),
+			sqlgraph.To(admin.Table, admin.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, department.UpdaterTable, department.UpdaterColumn),
+		)
+		fromU = sqlgraph.SetNeighbors(dq.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
+}
+
 // QueryParent chains the current query on the "parent" edge.
 func (dq *DepartmentQuery) QueryParent() *DepartmentQuery {
 	query := (&DepartmentClient{config: dq.config}).Query()
@@ -109,8 +131,8 @@ func (dq *DepartmentQuery) QueryParent() *DepartmentQuery {
 	return query
 }
 
-// QueryEmployeeDepartment chains the current query on the "employee_department" edge.
-func (dq *DepartmentQuery) QueryEmployeeDepartment() *EmployeeQuery {
+// QueryEmployees chains the current query on the "employees" edge.
+func (dq *DepartmentQuery) QueryEmployees() *EmployeeQuery {
 	query := (&EmployeeClient{config: dq.config}).Query()
 	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
 		if err := dq.prepareQuery(ctx); err != nil {
@@ -123,7 +145,7 @@ func (dq *DepartmentQuery) QueryEmployeeDepartment() *EmployeeQuery {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(department.Table, department.FieldID, selector),
 			sqlgraph.To(employee.Table, employee.FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, false, department.EmployeeDepartmentTable, department.EmployeeDepartmentColumn),
+			sqlgraph.Edge(sqlgraph.O2M, false, department.EmployeesTable, department.EmployeesColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(dq.driver.Dialect(), step)
 		return fromU, nil
@@ -340,15 +362,16 @@ func (dq *DepartmentQuery) Clone() *DepartmentQuery {
 		return nil
 	}
 	return &DepartmentQuery{
-		config:                 dq.config,
-		ctx:                    dq.ctx.Clone(),
-		order:                  append([]department.OrderOption{}, dq.order...),
-		inters:                 append([]Interceptor{}, dq.inters...),
-		predicates:             append([]predicate.Department{}, dq.predicates...),
-		withCreator:            dq.withCreator.Clone(),
-		withParent:             dq.withParent.Clone(),
-		withEmployeeDepartment: dq.withEmployeeDepartment.Clone(),
-		withChildren:           dq.withChildren.Clone(),
+		config:        dq.config,
+		ctx:           dq.ctx.Clone(),
+		order:         append([]department.OrderOption{}, dq.order...),
+		inters:        append([]Interceptor{}, dq.inters...),
+		predicates:    append([]predicate.Department{}, dq.predicates...),
+		withCreator:   dq.withCreator.Clone(),
+		withUpdater:   dq.withUpdater.Clone(),
+		withParent:    dq.withParent.Clone(),
+		withEmployees: dq.withEmployees.Clone(),
+		withChildren:  dq.withChildren.Clone(),
 		// clone intermediate query.
 		sql:  dq.sql.Clone(),
 		path: dq.path,
@@ -366,6 +389,17 @@ func (dq *DepartmentQuery) WithCreator(opts ...func(*AdminQuery)) *DepartmentQue
 	return dq
 }
 
+// WithUpdater tells the query-builder to eager-load the nodes that are connected to
+// the "updater" edge. The optional arguments are used to configure the query builder of the edge.
+func (dq *DepartmentQuery) WithUpdater(opts ...func(*AdminQuery)) *DepartmentQuery {
+	query := (&AdminClient{config: dq.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	dq.withUpdater = query
+	return dq
+}
+
 // WithParent tells the query-builder to eager-load the nodes that are connected to
 // the "parent" edge. The optional arguments are used to configure the query builder of the edge.
 func (dq *DepartmentQuery) WithParent(opts ...func(*DepartmentQuery)) *DepartmentQuery {
@@ -377,14 +411,14 @@ func (dq *DepartmentQuery) WithParent(opts ...func(*DepartmentQuery)) *Departmen
 	return dq
 }
 
-// WithEmployeeDepartment tells the query-builder to eager-load the nodes that are connected to
-// the "employee_department" edge. The optional arguments are used to configure the query builder of the edge.
-func (dq *DepartmentQuery) WithEmployeeDepartment(opts ...func(*EmployeeQuery)) *DepartmentQuery {
+// WithEmployees tells the query-builder to eager-load the nodes that are connected to
+// the "employees" edge. The optional arguments are used to configure the query builder of the edge.
+func (dq *DepartmentQuery) WithEmployees(opts ...func(*EmployeeQuery)) *DepartmentQuery {
 	query := (&EmployeeClient{config: dq.config}).Query()
 	for _, opt := range opts {
 		opt(query)
 	}
-	dq.withEmployeeDepartment = query
+	dq.withEmployees = query
 	return dq
 }
 
@@ -476,18 +510,15 @@ func (dq *DepartmentQuery) prepareQuery(ctx context.Context) error {
 func (dq *DepartmentQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Department, error) {
 	var (
 		nodes       = []*Department{}
-		withFKs     = dq.withFKs
 		_spec       = dq.querySpec()
-		loadedTypes = [4]bool{
+		loadedTypes = [5]bool{
 			dq.withCreator != nil,
+			dq.withUpdater != nil,
 			dq.withParent != nil,
-			dq.withEmployeeDepartment != nil,
+			dq.withEmployees != nil,
 			dq.withChildren != nil,
 		}
 	)
-	if withFKs {
-		_spec.Node.Columns = append(_spec.Node.Columns, department.ForeignKeys...)
-	}
 	_spec.ScanValues = func(columns []string) ([]any, error) {
 		return (*Department).scanValues(nil, columns)
 	}
@@ -512,16 +543,22 @@ func (dq *DepartmentQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*D
 			return nil, err
 		}
 	}
+	if query := dq.withUpdater; query != nil {
+		if err := dq.loadUpdater(ctx, query, nodes, nil,
+			func(n *Department, e *Admin) { n.Edges.Updater = e }); err != nil {
+			return nil, err
+		}
+	}
 	if query := dq.withParent; query != nil {
 		if err := dq.loadParent(ctx, query, nodes, nil,
 			func(n *Department, e *Department) { n.Edges.Parent = e }); err != nil {
 			return nil, err
 		}
 	}
-	if query := dq.withEmployeeDepartment; query != nil {
-		if err := dq.loadEmployeeDepartment(ctx, query, nodes,
-			func(n *Department) { n.Edges.EmployeeDepartment = []*Employee{} },
-			func(n *Department, e *Employee) { n.Edges.EmployeeDepartment = append(n.Edges.EmployeeDepartment, e) }); err != nil {
+	if query := dq.withEmployees; query != nil {
+		if err := dq.loadEmployees(ctx, query, nodes,
+			func(n *Department) { n.Edges.Employees = []*Employee{} },
+			func(n *Department, e *Employee) { n.Edges.Employees = append(n.Edges.Employees, e) }); err != nil {
 			return nil, err
 		}
 	}
@@ -564,6 +601,35 @@ func (dq *DepartmentQuery) loadCreator(ctx context.Context, query *AdminQuery, n
 	}
 	return nil
 }
+func (dq *DepartmentQuery) loadUpdater(ctx context.Context, query *AdminQuery, nodes []*Department, init func(*Department), assign func(*Department, *Admin)) error {
+	ids := make([]int, 0, len(nodes))
+	nodeids := make(map[int][]*Department)
+	for i := range nodes {
+		fk := nodes[i].UpdatedBy
+		if _, ok := nodeids[fk]; !ok {
+			ids = append(ids, fk)
+		}
+		nodeids[fk] = append(nodeids[fk], nodes[i])
+	}
+	if len(ids) == 0 {
+		return nil
+	}
+	query.Where(admin.IDIn(ids...))
+	neighbors, err := query.All(ctx)
+	if err != nil {
+		return err
+	}
+	for _, n := range neighbors {
+		nodes, ok := nodeids[n.ID]
+		if !ok {
+			return fmt.Errorf(`unexpected foreign-key "updated_by" returned %v`, n.ID)
+		}
+		for i := range nodes {
+			assign(nodes[i], n)
+		}
+	}
+	return nil
+}
 func (dq *DepartmentQuery) loadParent(ctx context.Context, query *DepartmentQuery, nodes []*Department, init func(*Department), assign func(*Department, *Department)) error {
 	ids := make([]int, 0, len(nodes))
 	nodeids := make(map[int][]*Department)
@@ -593,7 +659,7 @@ func (dq *DepartmentQuery) loadParent(ctx context.Context, query *DepartmentQuer
 	}
 	return nil
 }
-func (dq *DepartmentQuery) loadEmployeeDepartment(ctx context.Context, query *EmployeeQuery, nodes []*Department, init func(*Department), assign func(*Department, *Employee)) error {
+func (dq *DepartmentQuery) loadEmployees(ctx context.Context, query *EmployeeQuery, nodes []*Department, init func(*Department), assign func(*Department, *Employee)) error {
 	fks := make([]driver.Value, 0, len(nodes))
 	nodeids := make(map[int]*Department)
 	for i := range nodes {
@@ -603,12 +669,11 @@ func (dq *DepartmentQuery) loadEmployeeDepartment(ctx context.Context, query *Em
 			init(nodes[i])
 		}
 	}
-	query.withFKs = true
 	if len(query.ctx.Fields) > 0 {
 		query.ctx.AppendFieldOnce(employee.FieldDepartmentID)
 	}
 	query.Where(predicate.Employee(func(s *sql.Selector) {
-		s.Where(sql.InValues(s.C(department.EmployeeDepartmentColumn), fks...))
+		s.Where(sql.InValues(s.C(department.EmployeesColumn), fks...))
 	}))
 	neighbors, err := query.All(ctx)
 	if err != nil {
@@ -634,7 +699,6 @@ func (dq *DepartmentQuery) loadChildren(ctx context.Context, query *DepartmentQu
 			init(nodes[i])
 		}
 	}
-	query.withFKs = true
 	if len(query.ctx.Fields) > 0 {
 		query.ctx.AppendFieldOnce(department.FieldParentID)
 	}
@@ -683,6 +747,9 @@ func (dq *DepartmentQuery) querySpec() *sqlgraph.QuerySpec {
 		}
 		if dq.withCreator != nil {
 			_spec.Node.AddColumnOnce(department.FieldCreatedBy)
+		}
+		if dq.withUpdater != nil {
+			_spec.Node.AddColumnOnce(department.FieldUpdatedBy)
 		}
 		if dq.withParent != nil {
 			_spec.Node.AddColumnOnce(department.FieldParentID)

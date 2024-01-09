@@ -7,6 +7,7 @@ import (
 	"aisecurity/ent/dao/adminrole"
 	"aisecurity/ent/dao/department"
 	"aisecurity/ent/dao/employee"
+	"aisecurity/ent/dao/occupation"
 	"aisecurity/ent/dao/risk"
 	"aisecurity/ent/dao/riskcategory"
 	"aisecurity/ent/dao/risklocation"
@@ -92,16 +93,28 @@ func (ac *AdminCreate) SetPassword(s string) *AdminCreate {
 	return ac
 }
 
-// SetName sets the "name" field.
-func (ac *AdminCreate) SetName(s string) *AdminCreate {
-	ac.mutation.SetName(s)
+// SetNickname sets the "nickname" field.
+func (ac *AdminCreate) SetNickname(s string) *AdminCreate {
+	ac.mutation.SetNickname(s)
 	return ac
 }
 
-// SetNillableName sets the "name" field if the given value is not nil.
-func (ac *AdminCreate) SetNillableName(s *string) *AdminCreate {
+// SetRealName sets the "real_name" field.
+func (ac *AdminCreate) SetRealName(s string) *AdminCreate {
+	ac.mutation.SetRealName(s)
+	return ac
+}
+
+// SetAvatar sets the "avatar" field.
+func (ac *AdminCreate) SetAvatar(s string) *AdminCreate {
+	ac.mutation.SetAvatar(s)
+	return ac
+}
+
+// SetNillableAvatar sets the "avatar" field if the given value is not nil.
+func (ac *AdminCreate) SetNillableAvatar(s *string) *AdminCreate {
 	if s != nil {
-		ac.SetName(*s)
+		ac.SetAvatar(*s)
 	}
 	return ac
 }
@@ -117,15 +130,15 @@ func (ac *AdminCreate) SetCreator(a *Admin) *AdminCreate {
 	return ac.SetCreatorID(a.ID)
 }
 
-// SetUpdatorID sets the "updator" edge to the Admin entity by ID.
-func (ac *AdminCreate) SetUpdatorID(id int) *AdminCreate {
-	ac.mutation.SetUpdatorID(id)
+// SetUpdaterID sets the "updater" edge to the Admin entity by ID.
+func (ac *AdminCreate) SetUpdaterID(id int) *AdminCreate {
+	ac.mutation.SetUpdaterID(id)
 	return ac
 }
 
-// SetUpdator sets the "updator" edge to the Admin entity.
-func (ac *AdminCreate) SetUpdator(a *Admin) *AdminCreate {
-	return ac.SetUpdatorID(a.ID)
+// SetUpdater sets the "updater" edge to the Admin entity.
+func (ac *AdminCreate) SetUpdater(a *Admin) *AdminCreate {
+	return ac.SetUpdaterID(a.ID)
 }
 
 // AddAdminRoleIDs adds the "admin_roles" edge to the AdminRole entity by IDs.
@@ -158,19 +171,19 @@ func (ac *AdminCreate) AddAdminCreator(a ...*Admin) *AdminCreate {
 	return ac.AddAdminCreatorIDs(ids...)
 }
 
-// AddAdminUpdatorIDs adds the "admin_updator" edge to the Admin entity by IDs.
-func (ac *AdminCreate) AddAdminUpdatorIDs(ids ...int) *AdminCreate {
-	ac.mutation.AddAdminUpdatorIDs(ids...)
+// AddAdminUpdaterIDs adds the "admin_updater" edge to the Admin entity by IDs.
+func (ac *AdminCreate) AddAdminUpdaterIDs(ids ...int) *AdminCreate {
+	ac.mutation.AddAdminUpdaterIDs(ids...)
 	return ac
 }
 
-// AddAdminUpdator adds the "admin_updator" edges to the Admin entity.
-func (ac *AdminCreate) AddAdminUpdator(a ...*Admin) *AdminCreate {
+// AddAdminUpdater adds the "admin_updater" edges to the Admin entity.
+func (ac *AdminCreate) AddAdminUpdater(a ...*Admin) *AdminCreate {
 	ids := make([]int, len(a))
 	for i := range a {
 		ids[i] = a[i].ID
 	}
-	return ac.AddAdminUpdatorIDs(ids...)
+	return ac.AddAdminUpdaterIDs(ids...)
 }
 
 // AddAdminRoleCreatorIDs adds the "admin_role_creator" edge to the AdminRole entity by IDs.
@@ -188,19 +201,19 @@ func (ac *AdminCreate) AddAdminRoleCreator(a ...*AdminRole) *AdminCreate {
 	return ac.AddAdminRoleCreatorIDs(ids...)
 }
 
-// AddAdminRoleUpdatorIDs adds the "admin_role_updator" edge to the AdminRole entity by IDs.
-func (ac *AdminCreate) AddAdminRoleUpdatorIDs(ids ...int) *AdminCreate {
-	ac.mutation.AddAdminRoleUpdatorIDs(ids...)
+// AddAdminRoleUpdaterIDs adds the "admin_role_updater" edge to the AdminRole entity by IDs.
+func (ac *AdminCreate) AddAdminRoleUpdaterIDs(ids ...int) *AdminCreate {
+	ac.mutation.AddAdminRoleUpdaterIDs(ids...)
 	return ac
 }
 
-// AddAdminRoleUpdator adds the "admin_role_updator" edges to the AdminRole entity.
-func (ac *AdminCreate) AddAdminRoleUpdator(a ...*AdminRole) *AdminCreate {
+// AddAdminRoleUpdater adds the "admin_role_updater" edges to the AdminRole entity.
+func (ac *AdminCreate) AddAdminRoleUpdater(a ...*AdminRole) *AdminCreate {
 	ids := make([]int, len(a))
 	for i := range a {
 		ids[i] = a[i].ID
 	}
-	return ac.AddAdminRoleUpdatorIDs(ids...)
+	return ac.AddAdminRoleUpdaterIDs(ids...)
 }
 
 // AddRiskCreatorIDs adds the "risk_creator" edge to the Risk entity by IDs.
@@ -218,34 +231,19 @@ func (ac *AdminCreate) AddRiskCreator(r ...*Risk) *AdminCreate {
 	return ac.AddRiskCreatorIDs(ids...)
 }
 
-// AddRiskUpdatorIDs adds the "risk_updator" edge to the Risk entity by IDs.
-func (ac *AdminCreate) AddRiskUpdatorIDs(ids ...int) *AdminCreate {
-	ac.mutation.AddRiskUpdatorIDs(ids...)
+// AddRiskUpdaterIDs adds the "risk_updater" edge to the Risk entity by IDs.
+func (ac *AdminCreate) AddRiskUpdaterIDs(ids ...int) *AdminCreate {
+	ac.mutation.AddRiskUpdaterIDs(ids...)
 	return ac
 }
 
-// AddRiskUpdator adds the "risk_updator" edges to the Risk entity.
-func (ac *AdminCreate) AddRiskUpdator(r ...*Risk) *AdminCreate {
+// AddRiskUpdater adds the "risk_updater" edges to the Risk entity.
+func (ac *AdminCreate) AddRiskUpdater(r ...*Risk) *AdminCreate {
 	ids := make([]int, len(r))
 	for i := range r {
 		ids[i] = r[i].ID
 	}
-	return ac.AddRiskUpdatorIDs(ids...)
-}
-
-// AddRiskMaintainerIDs adds the "risk_maintainer" edge to the Risk entity by IDs.
-func (ac *AdminCreate) AddRiskMaintainerIDs(ids ...int) *AdminCreate {
-	ac.mutation.AddRiskMaintainerIDs(ids...)
-	return ac
-}
-
-// AddRiskMaintainer adds the "risk_maintainer" edges to the Risk entity.
-func (ac *AdminCreate) AddRiskMaintainer(r ...*Risk) *AdminCreate {
-	ids := make([]int, len(r))
-	for i := range r {
-		ids[i] = r[i].ID
-	}
-	return ac.AddRiskMaintainerIDs(ids...)
+	return ac.AddRiskUpdaterIDs(ids...)
 }
 
 // AddRiskLocationCreatorIDs adds the "risk_location_creator" edge to the RiskLocation entity by IDs.
@@ -263,19 +261,19 @@ func (ac *AdminCreate) AddRiskLocationCreator(r ...*RiskLocation) *AdminCreate {
 	return ac.AddRiskLocationCreatorIDs(ids...)
 }
 
-// AddRiskLocationUpdatorIDs adds the "risk_location_updator" edge to the RiskLocation entity by IDs.
-func (ac *AdminCreate) AddRiskLocationUpdatorIDs(ids ...int) *AdminCreate {
-	ac.mutation.AddRiskLocationUpdatorIDs(ids...)
+// AddRiskLocationUpdaterIDs adds the "risk_location_updater" edge to the RiskLocation entity by IDs.
+func (ac *AdminCreate) AddRiskLocationUpdaterIDs(ids ...int) *AdminCreate {
+	ac.mutation.AddRiskLocationUpdaterIDs(ids...)
 	return ac
 }
 
-// AddRiskLocationUpdator adds the "risk_location_updator" edges to the RiskLocation entity.
-func (ac *AdminCreate) AddRiskLocationUpdator(r ...*RiskLocation) *AdminCreate {
+// AddRiskLocationUpdater adds the "risk_location_updater" edges to the RiskLocation entity.
+func (ac *AdminCreate) AddRiskLocationUpdater(r ...*RiskLocation) *AdminCreate {
 	ids := make([]int, len(r))
 	for i := range r {
 		ids[i] = r[i].ID
 	}
-	return ac.AddRiskLocationUpdatorIDs(ids...)
+	return ac.AddRiskLocationUpdaterIDs(ids...)
 }
 
 // AddRiskCategoryCreatorIDs adds the "risk_category_creator" edge to the RiskCategory entity by IDs.
@@ -293,19 +291,19 @@ func (ac *AdminCreate) AddRiskCategoryCreator(r ...*RiskCategory) *AdminCreate {
 	return ac.AddRiskCategoryCreatorIDs(ids...)
 }
 
-// AddRiskCategoryUpdatorIDs adds the "risk_category_updator" edge to the RiskCategory entity by IDs.
-func (ac *AdminCreate) AddRiskCategoryUpdatorIDs(ids ...int) *AdminCreate {
-	ac.mutation.AddRiskCategoryUpdatorIDs(ids...)
+// AddRiskCategoryUpdaterIDs adds the "risk_category_updater" edge to the RiskCategory entity by IDs.
+func (ac *AdminCreate) AddRiskCategoryUpdaterIDs(ids ...int) *AdminCreate {
+	ac.mutation.AddRiskCategoryUpdaterIDs(ids...)
 	return ac
 }
 
-// AddRiskCategoryUpdator adds the "risk_category_updator" edges to the RiskCategory entity.
-func (ac *AdminCreate) AddRiskCategoryUpdator(r ...*RiskCategory) *AdminCreate {
+// AddRiskCategoryUpdater adds the "risk_category_updater" edges to the RiskCategory entity.
+func (ac *AdminCreate) AddRiskCategoryUpdater(r ...*RiskCategory) *AdminCreate {
 	ids := make([]int, len(r))
 	for i := range r {
 		ids[i] = r[i].ID
 	}
-	return ac.AddRiskCategoryUpdatorIDs(ids...)
+	return ac.AddRiskCategoryUpdaterIDs(ids...)
 }
 
 // AddDepartmentCreatorIDs adds the "department_creator" edge to the Department entity by IDs.
@@ -323,19 +321,19 @@ func (ac *AdminCreate) AddDepartmentCreator(d ...*Department) *AdminCreate {
 	return ac.AddDepartmentCreatorIDs(ids...)
 }
 
-// AddDepartmentUpdatorIDs adds the "department_updator" edge to the Department entity by IDs.
-func (ac *AdminCreate) AddDepartmentUpdatorIDs(ids ...int) *AdminCreate {
-	ac.mutation.AddDepartmentUpdatorIDs(ids...)
+// AddDepartmentUpdaterIDs adds the "department_updater" edge to the Department entity by IDs.
+func (ac *AdminCreate) AddDepartmentUpdaterIDs(ids ...int) *AdminCreate {
+	ac.mutation.AddDepartmentUpdaterIDs(ids...)
 	return ac
 }
 
-// AddDepartmentUpdator adds the "department_updator" edges to the Department entity.
-func (ac *AdminCreate) AddDepartmentUpdator(d ...*Department) *AdminCreate {
+// AddDepartmentUpdater adds the "department_updater" edges to the Department entity.
+func (ac *AdminCreate) AddDepartmentUpdater(d ...*Department) *AdminCreate {
 	ids := make([]int, len(d))
 	for i := range d {
 		ids[i] = d[i].ID
 	}
-	return ac.AddDepartmentUpdatorIDs(ids...)
+	return ac.AddDepartmentUpdaterIDs(ids...)
 }
 
 // AddEmployeeCreatorIDs adds the "employee_creator" edge to the Employee entity by IDs.
@@ -353,34 +351,64 @@ func (ac *AdminCreate) AddEmployeeCreator(e ...*Employee) *AdminCreate {
 	return ac.AddEmployeeCreatorIDs(ids...)
 }
 
-// AddEmployeeUpdatorIDs adds the "employee_updator" edge to the Employee entity by IDs.
-func (ac *AdminCreate) AddEmployeeUpdatorIDs(ids ...int) *AdminCreate {
-	ac.mutation.AddEmployeeUpdatorIDs(ids...)
+// AddEmployeeUpdaterIDs adds the "employee_updater" edge to the Employee entity by IDs.
+func (ac *AdminCreate) AddEmployeeUpdaterIDs(ids ...int) *AdminCreate {
+	ac.mutation.AddEmployeeUpdaterIDs(ids...)
 	return ac
 }
 
-// AddEmployeeUpdator adds the "employee_updator" edges to the Employee entity.
-func (ac *AdminCreate) AddEmployeeUpdator(e ...*Employee) *AdminCreate {
+// AddEmployeeUpdater adds the "employee_updater" edges to the Employee entity.
+func (ac *AdminCreate) AddEmployeeUpdater(e ...*Employee) *AdminCreate {
 	ids := make([]int, len(e))
 	for i := range e {
 		ids[i] = e[i].ID
 	}
-	return ac.AddEmployeeUpdatorIDs(ids...)
+	return ac.AddEmployeeUpdaterIDs(ids...)
 }
 
-// AddEmployeeAdminIDs adds the "employee_admin" edge to the Employee entity by IDs.
-func (ac *AdminCreate) AddEmployeeAdminIDs(ids ...int) *AdminCreate {
-	ac.mutation.AddEmployeeAdminIDs(ids...)
+// AddEmployeeIDs adds the "employee" edge to the Employee entity by IDs.
+func (ac *AdminCreate) AddEmployeeIDs(ids ...int) *AdminCreate {
+	ac.mutation.AddEmployeeIDs(ids...)
 	return ac
 }
 
-// AddEmployeeAdmin adds the "employee_admin" edges to the Employee entity.
-func (ac *AdminCreate) AddEmployeeAdmin(e ...*Employee) *AdminCreate {
+// AddEmployee adds the "employee" edges to the Employee entity.
+func (ac *AdminCreate) AddEmployee(e ...*Employee) *AdminCreate {
 	ids := make([]int, len(e))
 	for i := range e {
 		ids[i] = e[i].ID
 	}
-	return ac.AddEmployeeAdminIDs(ids...)
+	return ac.AddEmployeeIDs(ids...)
+}
+
+// AddOccupationCreatorIDs adds the "occupation_creator" edge to the Occupation entity by IDs.
+func (ac *AdminCreate) AddOccupationCreatorIDs(ids ...int) *AdminCreate {
+	ac.mutation.AddOccupationCreatorIDs(ids...)
+	return ac
+}
+
+// AddOccupationCreator adds the "occupation_creator" edges to the Occupation entity.
+func (ac *AdminCreate) AddOccupationCreator(o ...*Occupation) *AdminCreate {
+	ids := make([]int, len(o))
+	for i := range o {
+		ids[i] = o[i].ID
+	}
+	return ac.AddOccupationCreatorIDs(ids...)
+}
+
+// AddOccupationUpdaterIDs adds the "occupation_updater" edge to the Occupation entity by IDs.
+func (ac *AdminCreate) AddOccupationUpdaterIDs(ids ...int) *AdminCreate {
+	ac.mutation.AddOccupationUpdaterIDs(ids...)
+	return ac
+}
+
+// AddOccupationUpdater adds the "occupation_updater" edges to the Occupation entity.
+func (ac *AdminCreate) AddOccupationUpdater(o ...*Occupation) *AdminCreate {
+	ids := make([]int, len(o))
+	for i := range o {
+		ids[i] = o[i].ID
+	}
+	return ac.AddOccupationUpdaterIDs(ids...)
 }
 
 // Mutation returns the AdminMutation object of the builder.
@@ -477,16 +505,32 @@ func (ac *AdminCreate) check() error {
 			return &ValidationError{Name: "password", err: fmt.Errorf(`dao: validator failed for field "Admin.password": %w`, err)}
 		}
 	}
-	if v, ok := ac.mutation.Name(); ok {
-		if err := admin.NameValidator(v); err != nil {
-			return &ValidationError{Name: "name", err: fmt.Errorf(`dao: validator failed for field "Admin.name": %w`, err)}
+	if _, ok := ac.mutation.Nickname(); !ok {
+		return &ValidationError{Name: "nickname", err: errors.New(`dao: missing required field "Admin.nickname"`)}
+	}
+	if v, ok := ac.mutation.Nickname(); ok {
+		if err := admin.NicknameValidator(v); err != nil {
+			return &ValidationError{Name: "nickname", err: fmt.Errorf(`dao: validator failed for field "Admin.nickname": %w`, err)}
+		}
+	}
+	if _, ok := ac.mutation.RealName(); !ok {
+		return &ValidationError{Name: "real_name", err: errors.New(`dao: missing required field "Admin.real_name"`)}
+	}
+	if v, ok := ac.mutation.RealName(); ok {
+		if err := admin.RealNameValidator(v); err != nil {
+			return &ValidationError{Name: "real_name", err: fmt.Errorf(`dao: validator failed for field "Admin.real_name": %w`, err)}
+		}
+	}
+	if v, ok := ac.mutation.Avatar(); ok {
+		if err := admin.AvatarValidator(v); err != nil {
+			return &ValidationError{Name: "avatar", err: fmt.Errorf(`dao: validator failed for field "Admin.avatar": %w`, err)}
 		}
 	}
 	if _, ok := ac.mutation.CreatorID(); !ok {
 		return &ValidationError{Name: "creator", err: errors.New(`dao: missing required edge "Admin.creator"`)}
 	}
-	if _, ok := ac.mutation.UpdatorID(); !ok {
-		return &ValidationError{Name: "updator", err: errors.New(`dao: missing required edge "Admin.updator"`)}
+	if _, ok := ac.mutation.UpdaterID(); !ok {
+		return &ValidationError{Name: "updater", err: errors.New(`dao: missing required edge "Admin.updater"`)}
 	}
 	return nil
 }
@@ -534,9 +578,17 @@ func (ac *AdminCreate) createSpec() (*Admin, *sqlgraph.CreateSpec) {
 		_spec.SetField(admin.FieldPassword, field.TypeString, value)
 		_node.Password = value
 	}
-	if value, ok := ac.mutation.Name(); ok {
-		_spec.SetField(admin.FieldName, field.TypeString, value)
-		_node.Name = value
+	if value, ok := ac.mutation.Nickname(); ok {
+		_spec.SetField(admin.FieldNickname, field.TypeString, value)
+		_node.Nickname = value
+	}
+	if value, ok := ac.mutation.RealName(); ok {
+		_spec.SetField(admin.FieldRealName, field.TypeString, value)
+		_node.RealName = value
+	}
+	if value, ok := ac.mutation.Avatar(); ok {
+		_spec.SetField(admin.FieldAvatar, field.TypeString, value)
+		_node.Avatar = value
 	}
 	if nodes := ac.mutation.CreatorIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
@@ -555,12 +607,12 @@ func (ac *AdminCreate) createSpec() (*Admin, *sqlgraph.CreateSpec) {
 		_node.CreatedBy = nodes[0]
 		_spec.Edges = append(_spec.Edges, edge)
 	}
-	if nodes := ac.mutation.UpdatorIDs(); len(nodes) > 0 {
+	if nodes := ac.mutation.UpdaterIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: true,
-			Table:   admin.UpdatorTable,
-			Columns: []string{admin.UpdatorColumn},
+			Table:   admin.UpdaterTable,
+			Columns: []string{admin.UpdaterColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(admin.FieldID, field.TypeInt),
@@ -604,12 +656,12 @@ func (ac *AdminCreate) createSpec() (*Admin, *sqlgraph.CreateSpec) {
 		}
 		_spec.Edges = append(_spec.Edges, edge)
 	}
-	if nodes := ac.mutation.AdminUpdatorIDs(); len(nodes) > 0 {
+	if nodes := ac.mutation.AdminUpdaterIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
-			Table:   admin.AdminUpdatorTable,
-			Columns: []string{admin.AdminUpdatorColumn},
+			Table:   admin.AdminUpdaterTable,
+			Columns: []string{admin.AdminUpdaterColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(admin.FieldID, field.TypeInt),
@@ -636,12 +688,12 @@ func (ac *AdminCreate) createSpec() (*Admin, *sqlgraph.CreateSpec) {
 		}
 		_spec.Edges = append(_spec.Edges, edge)
 	}
-	if nodes := ac.mutation.AdminRoleUpdatorIDs(); len(nodes) > 0 {
+	if nodes := ac.mutation.AdminRoleUpdaterIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
-			Table:   admin.AdminRoleUpdatorTable,
-			Columns: []string{admin.AdminRoleUpdatorColumn},
+			Table:   admin.AdminRoleUpdaterTable,
+			Columns: []string{admin.AdminRoleUpdaterColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(adminrole.FieldID, field.TypeInt),
@@ -668,28 +720,12 @@ func (ac *AdminCreate) createSpec() (*Admin, *sqlgraph.CreateSpec) {
 		}
 		_spec.Edges = append(_spec.Edges, edge)
 	}
-	if nodes := ac.mutation.RiskUpdatorIDs(); len(nodes) > 0 {
+	if nodes := ac.mutation.RiskUpdaterIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
-			Table:   admin.RiskUpdatorTable,
-			Columns: []string{admin.RiskUpdatorColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(risk.FieldID, field.TypeInt),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges = append(_spec.Edges, edge)
-	}
-	if nodes := ac.mutation.RiskMaintainerIDs(); len(nodes) > 0 {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
-			Inverse: false,
-			Table:   admin.RiskMaintainerTable,
-			Columns: []string{admin.RiskMaintainerColumn},
+			Table:   admin.RiskUpdaterTable,
+			Columns: []string{admin.RiskUpdaterColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(risk.FieldID, field.TypeInt),
@@ -716,12 +752,12 @@ func (ac *AdminCreate) createSpec() (*Admin, *sqlgraph.CreateSpec) {
 		}
 		_spec.Edges = append(_spec.Edges, edge)
 	}
-	if nodes := ac.mutation.RiskLocationUpdatorIDs(); len(nodes) > 0 {
+	if nodes := ac.mutation.RiskLocationUpdaterIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
-			Table:   admin.RiskLocationUpdatorTable,
-			Columns: []string{admin.RiskLocationUpdatorColumn},
+			Table:   admin.RiskLocationUpdaterTable,
+			Columns: []string{admin.RiskLocationUpdaterColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(risklocation.FieldID, field.TypeInt),
@@ -748,12 +784,12 @@ func (ac *AdminCreate) createSpec() (*Admin, *sqlgraph.CreateSpec) {
 		}
 		_spec.Edges = append(_spec.Edges, edge)
 	}
-	if nodes := ac.mutation.RiskCategoryUpdatorIDs(); len(nodes) > 0 {
+	if nodes := ac.mutation.RiskCategoryUpdaterIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
-			Table:   admin.RiskCategoryUpdatorTable,
-			Columns: []string{admin.RiskCategoryUpdatorColumn},
+			Table:   admin.RiskCategoryUpdaterTable,
+			Columns: []string{admin.RiskCategoryUpdaterColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(riskcategory.FieldID, field.TypeInt),
@@ -780,12 +816,12 @@ func (ac *AdminCreate) createSpec() (*Admin, *sqlgraph.CreateSpec) {
 		}
 		_spec.Edges = append(_spec.Edges, edge)
 	}
-	if nodes := ac.mutation.DepartmentUpdatorIDs(); len(nodes) > 0 {
+	if nodes := ac.mutation.DepartmentUpdaterIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
-			Table:   admin.DepartmentUpdatorTable,
-			Columns: []string{admin.DepartmentUpdatorColumn},
+			Table:   admin.DepartmentUpdaterTable,
+			Columns: []string{admin.DepartmentUpdaterColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(department.FieldID, field.TypeInt),
@@ -812,12 +848,12 @@ func (ac *AdminCreate) createSpec() (*Admin, *sqlgraph.CreateSpec) {
 		}
 		_spec.Edges = append(_spec.Edges, edge)
 	}
-	if nodes := ac.mutation.EmployeeUpdatorIDs(); len(nodes) > 0 {
+	if nodes := ac.mutation.EmployeeUpdaterIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
-			Table:   admin.EmployeeUpdatorTable,
-			Columns: []string{admin.EmployeeUpdatorColumn},
+			Table:   admin.EmployeeUpdaterTable,
+			Columns: []string{admin.EmployeeUpdaterColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(employee.FieldID, field.TypeInt),
@@ -828,15 +864,47 @@ func (ac *AdminCreate) createSpec() (*Admin, *sqlgraph.CreateSpec) {
 		}
 		_spec.Edges = append(_spec.Edges, edge)
 	}
-	if nodes := ac.mutation.EmployeeAdminIDs(); len(nodes) > 0 {
+	if nodes := ac.mutation.EmployeeIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
-			Table:   admin.EmployeeAdminTable,
-			Columns: []string{admin.EmployeeAdminColumn},
+			Table:   admin.EmployeeTable,
+			Columns: []string{admin.EmployeeColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(employee.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := ac.mutation.OccupationCreatorIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   admin.OccupationCreatorTable,
+			Columns: []string{admin.OccupationCreatorColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(occupation.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := ac.mutation.OccupationUpdaterIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   admin.OccupationUpdaterTable,
+			Columns: []string{admin.OccupationUpdaterColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(occupation.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {

@@ -7,6 +7,7 @@ import (
 	"aisecurity/ent/dao/adminrole"
 	"aisecurity/ent/dao/department"
 	"aisecurity/ent/dao/employee"
+	"aisecurity/ent/dao/occupation"
 	"aisecurity/ent/dao/predicate"
 	"aisecurity/ent/dao/risk"
 	"aisecurity/ent/dao/riskcategory"
@@ -29,24 +30,25 @@ type AdminQuery struct {
 	inters                  []Interceptor
 	predicates              []predicate.Admin
 	withCreator             *AdminQuery
-	withUpdator             *AdminQuery
+	withUpdater             *AdminQuery
 	withAdminRoles          *AdminRoleQuery
 	withAdminCreator        *AdminQuery
-	withAdminUpdator        *AdminQuery
+	withAdminUpdater        *AdminQuery
 	withAdminRoleCreator    *AdminRoleQuery
-	withAdminRoleUpdator    *AdminRoleQuery
+	withAdminRoleUpdater    *AdminRoleQuery
 	withRiskCreator         *RiskQuery
-	withRiskUpdator         *RiskQuery
-	withRiskMaintainer      *RiskQuery
+	withRiskUpdater         *RiskQuery
 	withRiskLocationCreator *RiskLocationQuery
-	withRiskLocationUpdator *RiskLocationQuery
+	withRiskLocationUpdater *RiskLocationQuery
 	withRiskCategoryCreator *RiskCategoryQuery
-	withRiskCategoryUpdator *RiskCategoryQuery
+	withRiskCategoryUpdater *RiskCategoryQuery
 	withDepartmentCreator   *DepartmentQuery
-	withDepartmentUpdator   *DepartmentQuery
+	withDepartmentUpdater   *DepartmentQuery
 	withEmployeeCreator     *EmployeeQuery
-	withEmployeeUpdator     *EmployeeQuery
-	withEmployeeAdmin       *EmployeeQuery
+	withEmployeeUpdater     *EmployeeQuery
+	withEmployee            *EmployeeQuery
+	withOccupationCreator   *OccupationQuery
+	withOccupationUpdater   *OccupationQuery
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
 	path func(context.Context) (*sql.Selector, error)
@@ -105,8 +107,8 @@ func (aq *AdminQuery) QueryCreator() *AdminQuery {
 	return query
 }
 
-// QueryUpdator chains the current query on the "updator" edge.
-func (aq *AdminQuery) QueryUpdator() *AdminQuery {
+// QueryUpdater chains the current query on the "updater" edge.
+func (aq *AdminQuery) QueryUpdater() *AdminQuery {
 	query := (&AdminClient{config: aq.config}).Query()
 	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
 		if err := aq.prepareQuery(ctx); err != nil {
@@ -119,7 +121,7 @@ func (aq *AdminQuery) QueryUpdator() *AdminQuery {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(admin.Table, admin.FieldID, selector),
 			sqlgraph.To(admin.Table, admin.FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, true, admin.UpdatorTable, admin.UpdatorColumn),
+			sqlgraph.Edge(sqlgraph.M2O, true, admin.UpdaterTable, admin.UpdaterColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(aq.driver.Dialect(), step)
 		return fromU, nil
@@ -171,8 +173,8 @@ func (aq *AdminQuery) QueryAdminCreator() *AdminQuery {
 	return query
 }
 
-// QueryAdminUpdator chains the current query on the "admin_updator" edge.
-func (aq *AdminQuery) QueryAdminUpdator() *AdminQuery {
+// QueryAdminUpdater chains the current query on the "admin_updater" edge.
+func (aq *AdminQuery) QueryAdminUpdater() *AdminQuery {
 	query := (&AdminClient{config: aq.config}).Query()
 	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
 		if err := aq.prepareQuery(ctx); err != nil {
@@ -185,7 +187,7 @@ func (aq *AdminQuery) QueryAdminUpdator() *AdminQuery {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(admin.Table, admin.FieldID, selector),
 			sqlgraph.To(admin.Table, admin.FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, false, admin.AdminUpdatorTable, admin.AdminUpdatorColumn),
+			sqlgraph.Edge(sqlgraph.O2M, false, admin.AdminUpdaterTable, admin.AdminUpdaterColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(aq.driver.Dialect(), step)
 		return fromU, nil
@@ -215,8 +217,8 @@ func (aq *AdminQuery) QueryAdminRoleCreator() *AdminRoleQuery {
 	return query
 }
 
-// QueryAdminRoleUpdator chains the current query on the "admin_role_updator" edge.
-func (aq *AdminQuery) QueryAdminRoleUpdator() *AdminRoleQuery {
+// QueryAdminRoleUpdater chains the current query on the "admin_role_updater" edge.
+func (aq *AdminQuery) QueryAdminRoleUpdater() *AdminRoleQuery {
 	query := (&AdminRoleClient{config: aq.config}).Query()
 	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
 		if err := aq.prepareQuery(ctx); err != nil {
@@ -229,7 +231,7 @@ func (aq *AdminQuery) QueryAdminRoleUpdator() *AdminRoleQuery {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(admin.Table, admin.FieldID, selector),
 			sqlgraph.To(adminrole.Table, adminrole.FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, false, admin.AdminRoleUpdatorTable, admin.AdminRoleUpdatorColumn),
+			sqlgraph.Edge(sqlgraph.O2M, false, admin.AdminRoleUpdaterTable, admin.AdminRoleUpdaterColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(aq.driver.Dialect(), step)
 		return fromU, nil
@@ -259,8 +261,8 @@ func (aq *AdminQuery) QueryRiskCreator() *RiskQuery {
 	return query
 }
 
-// QueryRiskUpdator chains the current query on the "risk_updator" edge.
-func (aq *AdminQuery) QueryRiskUpdator() *RiskQuery {
+// QueryRiskUpdater chains the current query on the "risk_updater" edge.
+func (aq *AdminQuery) QueryRiskUpdater() *RiskQuery {
 	query := (&RiskClient{config: aq.config}).Query()
 	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
 		if err := aq.prepareQuery(ctx); err != nil {
@@ -273,29 +275,7 @@ func (aq *AdminQuery) QueryRiskUpdator() *RiskQuery {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(admin.Table, admin.FieldID, selector),
 			sqlgraph.To(risk.Table, risk.FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, false, admin.RiskUpdatorTable, admin.RiskUpdatorColumn),
-		)
-		fromU = sqlgraph.SetNeighbors(aq.driver.Dialect(), step)
-		return fromU, nil
-	}
-	return query
-}
-
-// QueryRiskMaintainer chains the current query on the "risk_maintainer" edge.
-func (aq *AdminQuery) QueryRiskMaintainer() *RiskQuery {
-	query := (&RiskClient{config: aq.config}).Query()
-	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
-		if err := aq.prepareQuery(ctx); err != nil {
-			return nil, err
-		}
-		selector := aq.sqlQuery(ctx)
-		if err := selector.Err(); err != nil {
-			return nil, err
-		}
-		step := sqlgraph.NewStep(
-			sqlgraph.From(admin.Table, admin.FieldID, selector),
-			sqlgraph.To(risk.Table, risk.FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, false, admin.RiskMaintainerTable, admin.RiskMaintainerColumn),
+			sqlgraph.Edge(sqlgraph.O2M, false, admin.RiskUpdaterTable, admin.RiskUpdaterColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(aq.driver.Dialect(), step)
 		return fromU, nil
@@ -325,8 +305,8 @@ func (aq *AdminQuery) QueryRiskLocationCreator() *RiskLocationQuery {
 	return query
 }
 
-// QueryRiskLocationUpdator chains the current query on the "risk_location_updator" edge.
-func (aq *AdminQuery) QueryRiskLocationUpdator() *RiskLocationQuery {
+// QueryRiskLocationUpdater chains the current query on the "risk_location_updater" edge.
+func (aq *AdminQuery) QueryRiskLocationUpdater() *RiskLocationQuery {
 	query := (&RiskLocationClient{config: aq.config}).Query()
 	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
 		if err := aq.prepareQuery(ctx); err != nil {
@@ -339,7 +319,7 @@ func (aq *AdminQuery) QueryRiskLocationUpdator() *RiskLocationQuery {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(admin.Table, admin.FieldID, selector),
 			sqlgraph.To(risklocation.Table, risklocation.FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, false, admin.RiskLocationUpdatorTable, admin.RiskLocationUpdatorColumn),
+			sqlgraph.Edge(sqlgraph.O2M, false, admin.RiskLocationUpdaterTable, admin.RiskLocationUpdaterColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(aq.driver.Dialect(), step)
 		return fromU, nil
@@ -369,8 +349,8 @@ func (aq *AdminQuery) QueryRiskCategoryCreator() *RiskCategoryQuery {
 	return query
 }
 
-// QueryRiskCategoryUpdator chains the current query on the "risk_category_updator" edge.
-func (aq *AdminQuery) QueryRiskCategoryUpdator() *RiskCategoryQuery {
+// QueryRiskCategoryUpdater chains the current query on the "risk_category_updater" edge.
+func (aq *AdminQuery) QueryRiskCategoryUpdater() *RiskCategoryQuery {
 	query := (&RiskCategoryClient{config: aq.config}).Query()
 	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
 		if err := aq.prepareQuery(ctx); err != nil {
@@ -383,7 +363,7 @@ func (aq *AdminQuery) QueryRiskCategoryUpdator() *RiskCategoryQuery {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(admin.Table, admin.FieldID, selector),
 			sqlgraph.To(riskcategory.Table, riskcategory.FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, false, admin.RiskCategoryUpdatorTable, admin.RiskCategoryUpdatorColumn),
+			sqlgraph.Edge(sqlgraph.O2M, false, admin.RiskCategoryUpdaterTable, admin.RiskCategoryUpdaterColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(aq.driver.Dialect(), step)
 		return fromU, nil
@@ -413,8 +393,8 @@ func (aq *AdminQuery) QueryDepartmentCreator() *DepartmentQuery {
 	return query
 }
 
-// QueryDepartmentUpdator chains the current query on the "department_updator" edge.
-func (aq *AdminQuery) QueryDepartmentUpdator() *DepartmentQuery {
+// QueryDepartmentUpdater chains the current query on the "department_updater" edge.
+func (aq *AdminQuery) QueryDepartmentUpdater() *DepartmentQuery {
 	query := (&DepartmentClient{config: aq.config}).Query()
 	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
 		if err := aq.prepareQuery(ctx); err != nil {
@@ -427,7 +407,7 @@ func (aq *AdminQuery) QueryDepartmentUpdator() *DepartmentQuery {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(admin.Table, admin.FieldID, selector),
 			sqlgraph.To(department.Table, department.FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, false, admin.DepartmentUpdatorTable, admin.DepartmentUpdatorColumn),
+			sqlgraph.Edge(sqlgraph.O2M, false, admin.DepartmentUpdaterTable, admin.DepartmentUpdaterColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(aq.driver.Dialect(), step)
 		return fromU, nil
@@ -457,8 +437,8 @@ func (aq *AdminQuery) QueryEmployeeCreator() *EmployeeQuery {
 	return query
 }
 
-// QueryEmployeeUpdator chains the current query on the "employee_updator" edge.
-func (aq *AdminQuery) QueryEmployeeUpdator() *EmployeeQuery {
+// QueryEmployeeUpdater chains the current query on the "employee_updater" edge.
+func (aq *AdminQuery) QueryEmployeeUpdater() *EmployeeQuery {
 	query := (&EmployeeClient{config: aq.config}).Query()
 	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
 		if err := aq.prepareQuery(ctx); err != nil {
@@ -471,7 +451,7 @@ func (aq *AdminQuery) QueryEmployeeUpdator() *EmployeeQuery {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(admin.Table, admin.FieldID, selector),
 			sqlgraph.To(employee.Table, employee.FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, false, admin.EmployeeUpdatorTable, admin.EmployeeUpdatorColumn),
+			sqlgraph.Edge(sqlgraph.O2M, false, admin.EmployeeUpdaterTable, admin.EmployeeUpdaterColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(aq.driver.Dialect(), step)
 		return fromU, nil
@@ -479,8 +459,8 @@ func (aq *AdminQuery) QueryEmployeeUpdator() *EmployeeQuery {
 	return query
 }
 
-// QueryEmployeeAdmin chains the current query on the "employee_admin" edge.
-func (aq *AdminQuery) QueryEmployeeAdmin() *EmployeeQuery {
+// QueryEmployee chains the current query on the "employee" edge.
+func (aq *AdminQuery) QueryEmployee() *EmployeeQuery {
 	query := (&EmployeeClient{config: aq.config}).Query()
 	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
 		if err := aq.prepareQuery(ctx); err != nil {
@@ -493,7 +473,51 @@ func (aq *AdminQuery) QueryEmployeeAdmin() *EmployeeQuery {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(admin.Table, admin.FieldID, selector),
 			sqlgraph.To(employee.Table, employee.FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, false, admin.EmployeeAdminTable, admin.EmployeeAdminColumn),
+			sqlgraph.Edge(sqlgraph.O2M, false, admin.EmployeeTable, admin.EmployeeColumn),
+		)
+		fromU = sqlgraph.SetNeighbors(aq.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
+}
+
+// QueryOccupationCreator chains the current query on the "occupation_creator" edge.
+func (aq *AdminQuery) QueryOccupationCreator() *OccupationQuery {
+	query := (&OccupationClient{config: aq.config}).Query()
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := aq.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := aq.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(admin.Table, admin.FieldID, selector),
+			sqlgraph.To(occupation.Table, occupation.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, admin.OccupationCreatorTable, admin.OccupationCreatorColumn),
+		)
+		fromU = sqlgraph.SetNeighbors(aq.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
+}
+
+// QueryOccupationUpdater chains the current query on the "occupation_updater" edge.
+func (aq *AdminQuery) QueryOccupationUpdater() *OccupationQuery {
+	query := (&OccupationClient{config: aq.config}).Query()
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := aq.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := aq.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(admin.Table, admin.FieldID, selector),
+			sqlgraph.To(occupation.Table, occupation.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, admin.OccupationUpdaterTable, admin.OccupationUpdaterColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(aq.driver.Dialect(), step)
 		return fromU, nil
@@ -694,24 +718,25 @@ func (aq *AdminQuery) Clone() *AdminQuery {
 		inters:                  append([]Interceptor{}, aq.inters...),
 		predicates:              append([]predicate.Admin{}, aq.predicates...),
 		withCreator:             aq.withCreator.Clone(),
-		withUpdator:             aq.withUpdator.Clone(),
+		withUpdater:             aq.withUpdater.Clone(),
 		withAdminRoles:          aq.withAdminRoles.Clone(),
 		withAdminCreator:        aq.withAdminCreator.Clone(),
-		withAdminUpdator:        aq.withAdminUpdator.Clone(),
+		withAdminUpdater:        aq.withAdminUpdater.Clone(),
 		withAdminRoleCreator:    aq.withAdminRoleCreator.Clone(),
-		withAdminRoleUpdator:    aq.withAdminRoleUpdator.Clone(),
+		withAdminRoleUpdater:    aq.withAdminRoleUpdater.Clone(),
 		withRiskCreator:         aq.withRiskCreator.Clone(),
-		withRiskUpdator:         aq.withRiskUpdator.Clone(),
-		withRiskMaintainer:      aq.withRiskMaintainer.Clone(),
+		withRiskUpdater:         aq.withRiskUpdater.Clone(),
 		withRiskLocationCreator: aq.withRiskLocationCreator.Clone(),
-		withRiskLocationUpdator: aq.withRiskLocationUpdator.Clone(),
+		withRiskLocationUpdater: aq.withRiskLocationUpdater.Clone(),
 		withRiskCategoryCreator: aq.withRiskCategoryCreator.Clone(),
-		withRiskCategoryUpdator: aq.withRiskCategoryUpdator.Clone(),
+		withRiskCategoryUpdater: aq.withRiskCategoryUpdater.Clone(),
 		withDepartmentCreator:   aq.withDepartmentCreator.Clone(),
-		withDepartmentUpdator:   aq.withDepartmentUpdator.Clone(),
+		withDepartmentUpdater:   aq.withDepartmentUpdater.Clone(),
 		withEmployeeCreator:     aq.withEmployeeCreator.Clone(),
-		withEmployeeUpdator:     aq.withEmployeeUpdator.Clone(),
-		withEmployeeAdmin:       aq.withEmployeeAdmin.Clone(),
+		withEmployeeUpdater:     aq.withEmployeeUpdater.Clone(),
+		withEmployee:            aq.withEmployee.Clone(),
+		withOccupationCreator:   aq.withOccupationCreator.Clone(),
+		withOccupationUpdater:   aq.withOccupationUpdater.Clone(),
 		// clone intermediate query.
 		sql:  aq.sql.Clone(),
 		path: aq.path,
@@ -729,14 +754,14 @@ func (aq *AdminQuery) WithCreator(opts ...func(*AdminQuery)) *AdminQuery {
 	return aq
 }
 
-// WithUpdator tells the query-builder to eager-load the nodes that are connected to
-// the "updator" edge. The optional arguments are used to configure the query builder of the edge.
-func (aq *AdminQuery) WithUpdator(opts ...func(*AdminQuery)) *AdminQuery {
+// WithUpdater tells the query-builder to eager-load the nodes that are connected to
+// the "updater" edge. The optional arguments are used to configure the query builder of the edge.
+func (aq *AdminQuery) WithUpdater(opts ...func(*AdminQuery)) *AdminQuery {
 	query := (&AdminClient{config: aq.config}).Query()
 	for _, opt := range opts {
 		opt(query)
 	}
-	aq.withUpdator = query
+	aq.withUpdater = query
 	return aq
 }
 
@@ -762,14 +787,14 @@ func (aq *AdminQuery) WithAdminCreator(opts ...func(*AdminQuery)) *AdminQuery {
 	return aq
 }
 
-// WithAdminUpdator tells the query-builder to eager-load the nodes that are connected to
-// the "admin_updator" edge. The optional arguments are used to configure the query builder of the edge.
-func (aq *AdminQuery) WithAdminUpdator(opts ...func(*AdminQuery)) *AdminQuery {
+// WithAdminUpdater tells the query-builder to eager-load the nodes that are connected to
+// the "admin_updater" edge. The optional arguments are used to configure the query builder of the edge.
+func (aq *AdminQuery) WithAdminUpdater(opts ...func(*AdminQuery)) *AdminQuery {
 	query := (&AdminClient{config: aq.config}).Query()
 	for _, opt := range opts {
 		opt(query)
 	}
-	aq.withAdminUpdator = query
+	aq.withAdminUpdater = query
 	return aq
 }
 
@@ -784,14 +809,14 @@ func (aq *AdminQuery) WithAdminRoleCreator(opts ...func(*AdminRoleQuery)) *Admin
 	return aq
 }
 
-// WithAdminRoleUpdator tells the query-builder to eager-load the nodes that are connected to
-// the "admin_role_updator" edge. The optional arguments are used to configure the query builder of the edge.
-func (aq *AdminQuery) WithAdminRoleUpdator(opts ...func(*AdminRoleQuery)) *AdminQuery {
+// WithAdminRoleUpdater tells the query-builder to eager-load the nodes that are connected to
+// the "admin_role_updater" edge. The optional arguments are used to configure the query builder of the edge.
+func (aq *AdminQuery) WithAdminRoleUpdater(opts ...func(*AdminRoleQuery)) *AdminQuery {
 	query := (&AdminRoleClient{config: aq.config}).Query()
 	for _, opt := range opts {
 		opt(query)
 	}
-	aq.withAdminRoleUpdator = query
+	aq.withAdminRoleUpdater = query
 	return aq
 }
 
@@ -806,25 +831,14 @@ func (aq *AdminQuery) WithRiskCreator(opts ...func(*RiskQuery)) *AdminQuery {
 	return aq
 }
 
-// WithRiskUpdator tells the query-builder to eager-load the nodes that are connected to
-// the "risk_updator" edge. The optional arguments are used to configure the query builder of the edge.
-func (aq *AdminQuery) WithRiskUpdator(opts ...func(*RiskQuery)) *AdminQuery {
+// WithRiskUpdater tells the query-builder to eager-load the nodes that are connected to
+// the "risk_updater" edge. The optional arguments are used to configure the query builder of the edge.
+func (aq *AdminQuery) WithRiskUpdater(opts ...func(*RiskQuery)) *AdminQuery {
 	query := (&RiskClient{config: aq.config}).Query()
 	for _, opt := range opts {
 		opt(query)
 	}
-	aq.withRiskUpdator = query
-	return aq
-}
-
-// WithRiskMaintainer tells the query-builder to eager-load the nodes that are connected to
-// the "risk_maintainer" edge. The optional arguments are used to configure the query builder of the edge.
-func (aq *AdminQuery) WithRiskMaintainer(opts ...func(*RiskQuery)) *AdminQuery {
-	query := (&RiskClient{config: aq.config}).Query()
-	for _, opt := range opts {
-		opt(query)
-	}
-	aq.withRiskMaintainer = query
+	aq.withRiskUpdater = query
 	return aq
 }
 
@@ -839,14 +853,14 @@ func (aq *AdminQuery) WithRiskLocationCreator(opts ...func(*RiskLocationQuery)) 
 	return aq
 }
 
-// WithRiskLocationUpdator tells the query-builder to eager-load the nodes that are connected to
-// the "risk_location_updator" edge. The optional arguments are used to configure the query builder of the edge.
-func (aq *AdminQuery) WithRiskLocationUpdator(opts ...func(*RiskLocationQuery)) *AdminQuery {
+// WithRiskLocationUpdater tells the query-builder to eager-load the nodes that are connected to
+// the "risk_location_updater" edge. The optional arguments are used to configure the query builder of the edge.
+func (aq *AdminQuery) WithRiskLocationUpdater(opts ...func(*RiskLocationQuery)) *AdminQuery {
 	query := (&RiskLocationClient{config: aq.config}).Query()
 	for _, opt := range opts {
 		opt(query)
 	}
-	aq.withRiskLocationUpdator = query
+	aq.withRiskLocationUpdater = query
 	return aq
 }
 
@@ -861,14 +875,14 @@ func (aq *AdminQuery) WithRiskCategoryCreator(opts ...func(*RiskCategoryQuery)) 
 	return aq
 }
 
-// WithRiskCategoryUpdator tells the query-builder to eager-load the nodes that are connected to
-// the "risk_category_updator" edge. The optional arguments are used to configure the query builder of the edge.
-func (aq *AdminQuery) WithRiskCategoryUpdator(opts ...func(*RiskCategoryQuery)) *AdminQuery {
+// WithRiskCategoryUpdater tells the query-builder to eager-load the nodes that are connected to
+// the "risk_category_updater" edge. The optional arguments are used to configure the query builder of the edge.
+func (aq *AdminQuery) WithRiskCategoryUpdater(opts ...func(*RiskCategoryQuery)) *AdminQuery {
 	query := (&RiskCategoryClient{config: aq.config}).Query()
 	for _, opt := range opts {
 		opt(query)
 	}
-	aq.withRiskCategoryUpdator = query
+	aq.withRiskCategoryUpdater = query
 	return aq
 }
 
@@ -883,14 +897,14 @@ func (aq *AdminQuery) WithDepartmentCreator(opts ...func(*DepartmentQuery)) *Adm
 	return aq
 }
 
-// WithDepartmentUpdator tells the query-builder to eager-load the nodes that are connected to
-// the "department_updator" edge. The optional arguments are used to configure the query builder of the edge.
-func (aq *AdminQuery) WithDepartmentUpdator(opts ...func(*DepartmentQuery)) *AdminQuery {
+// WithDepartmentUpdater tells the query-builder to eager-load the nodes that are connected to
+// the "department_updater" edge. The optional arguments are used to configure the query builder of the edge.
+func (aq *AdminQuery) WithDepartmentUpdater(opts ...func(*DepartmentQuery)) *AdminQuery {
 	query := (&DepartmentClient{config: aq.config}).Query()
 	for _, opt := range opts {
 		opt(query)
 	}
-	aq.withDepartmentUpdator = query
+	aq.withDepartmentUpdater = query
 	return aq
 }
 
@@ -905,25 +919,47 @@ func (aq *AdminQuery) WithEmployeeCreator(opts ...func(*EmployeeQuery)) *AdminQu
 	return aq
 }
 
-// WithEmployeeUpdator tells the query-builder to eager-load the nodes that are connected to
-// the "employee_updator" edge. The optional arguments are used to configure the query builder of the edge.
-func (aq *AdminQuery) WithEmployeeUpdator(opts ...func(*EmployeeQuery)) *AdminQuery {
+// WithEmployeeUpdater tells the query-builder to eager-load the nodes that are connected to
+// the "employee_updater" edge. The optional arguments are used to configure the query builder of the edge.
+func (aq *AdminQuery) WithEmployeeUpdater(opts ...func(*EmployeeQuery)) *AdminQuery {
 	query := (&EmployeeClient{config: aq.config}).Query()
 	for _, opt := range opts {
 		opt(query)
 	}
-	aq.withEmployeeUpdator = query
+	aq.withEmployeeUpdater = query
 	return aq
 }
 
-// WithEmployeeAdmin tells the query-builder to eager-load the nodes that are connected to
-// the "employee_admin" edge. The optional arguments are used to configure the query builder of the edge.
-func (aq *AdminQuery) WithEmployeeAdmin(opts ...func(*EmployeeQuery)) *AdminQuery {
+// WithEmployee tells the query-builder to eager-load the nodes that are connected to
+// the "employee" edge. The optional arguments are used to configure the query builder of the edge.
+func (aq *AdminQuery) WithEmployee(opts ...func(*EmployeeQuery)) *AdminQuery {
 	query := (&EmployeeClient{config: aq.config}).Query()
 	for _, opt := range opts {
 		opt(query)
 	}
-	aq.withEmployeeAdmin = query
+	aq.withEmployee = query
+	return aq
+}
+
+// WithOccupationCreator tells the query-builder to eager-load the nodes that are connected to
+// the "occupation_creator" edge. The optional arguments are used to configure the query builder of the edge.
+func (aq *AdminQuery) WithOccupationCreator(opts ...func(*OccupationQuery)) *AdminQuery {
+	query := (&OccupationClient{config: aq.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	aq.withOccupationCreator = query
+	return aq
+}
+
+// WithOccupationUpdater tells the query-builder to eager-load the nodes that are connected to
+// the "occupation_updater" edge. The optional arguments are used to configure the query builder of the edge.
+func (aq *AdminQuery) WithOccupationUpdater(opts ...func(*OccupationQuery)) *AdminQuery {
+	query := (&OccupationClient{config: aq.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	aq.withOccupationUpdater = query
 	return aq
 }
 
@@ -1005,26 +1041,27 @@ func (aq *AdminQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Admin,
 	var (
 		nodes       = []*Admin{}
 		_spec       = aq.querySpec()
-		loadedTypes = [19]bool{
+		loadedTypes = [20]bool{
 			aq.withCreator != nil,
-			aq.withUpdator != nil,
+			aq.withUpdater != nil,
 			aq.withAdminRoles != nil,
 			aq.withAdminCreator != nil,
-			aq.withAdminUpdator != nil,
+			aq.withAdminUpdater != nil,
 			aq.withAdminRoleCreator != nil,
-			aq.withAdminRoleUpdator != nil,
+			aq.withAdminRoleUpdater != nil,
 			aq.withRiskCreator != nil,
-			aq.withRiskUpdator != nil,
-			aq.withRiskMaintainer != nil,
+			aq.withRiskUpdater != nil,
 			aq.withRiskLocationCreator != nil,
-			aq.withRiskLocationUpdator != nil,
+			aq.withRiskLocationUpdater != nil,
 			aq.withRiskCategoryCreator != nil,
-			aq.withRiskCategoryUpdator != nil,
+			aq.withRiskCategoryUpdater != nil,
 			aq.withDepartmentCreator != nil,
-			aq.withDepartmentUpdator != nil,
+			aq.withDepartmentUpdater != nil,
 			aq.withEmployeeCreator != nil,
-			aq.withEmployeeUpdator != nil,
-			aq.withEmployeeAdmin != nil,
+			aq.withEmployeeUpdater != nil,
+			aq.withEmployee != nil,
+			aq.withOccupationCreator != nil,
+			aq.withOccupationUpdater != nil,
 		}
 	)
 	_spec.ScanValues = func(columns []string) ([]any, error) {
@@ -1051,9 +1088,9 @@ func (aq *AdminQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Admin,
 			return nil, err
 		}
 	}
-	if query := aq.withUpdator; query != nil {
-		if err := aq.loadUpdator(ctx, query, nodes, nil,
-			func(n *Admin, e *Admin) { n.Edges.Updator = e }); err != nil {
+	if query := aq.withUpdater; query != nil {
+		if err := aq.loadUpdater(ctx, query, nodes, nil,
+			func(n *Admin, e *Admin) { n.Edges.Updater = e }); err != nil {
 			return nil, err
 		}
 	}
@@ -1071,10 +1108,10 @@ func (aq *AdminQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Admin,
 			return nil, err
 		}
 	}
-	if query := aq.withAdminUpdator; query != nil {
-		if err := aq.loadAdminUpdator(ctx, query, nodes,
-			func(n *Admin) { n.Edges.AdminUpdator = []*Admin{} },
-			func(n *Admin, e *Admin) { n.Edges.AdminUpdator = append(n.Edges.AdminUpdator, e) }); err != nil {
+	if query := aq.withAdminUpdater; query != nil {
+		if err := aq.loadAdminUpdater(ctx, query, nodes,
+			func(n *Admin) { n.Edges.AdminUpdater = []*Admin{} },
+			func(n *Admin, e *Admin) { n.Edges.AdminUpdater = append(n.Edges.AdminUpdater, e) }); err != nil {
 			return nil, err
 		}
 	}
@@ -1085,10 +1122,10 @@ func (aq *AdminQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Admin,
 			return nil, err
 		}
 	}
-	if query := aq.withAdminRoleUpdator; query != nil {
-		if err := aq.loadAdminRoleUpdator(ctx, query, nodes,
-			func(n *Admin) { n.Edges.AdminRoleUpdator = []*AdminRole{} },
-			func(n *Admin, e *AdminRole) { n.Edges.AdminRoleUpdator = append(n.Edges.AdminRoleUpdator, e) }); err != nil {
+	if query := aq.withAdminRoleUpdater; query != nil {
+		if err := aq.loadAdminRoleUpdater(ctx, query, nodes,
+			func(n *Admin) { n.Edges.AdminRoleUpdater = []*AdminRole{} },
+			func(n *Admin, e *AdminRole) { n.Edges.AdminRoleUpdater = append(n.Edges.AdminRoleUpdater, e) }); err != nil {
 			return nil, err
 		}
 	}
@@ -1099,17 +1136,10 @@ func (aq *AdminQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Admin,
 			return nil, err
 		}
 	}
-	if query := aq.withRiskUpdator; query != nil {
-		if err := aq.loadRiskUpdator(ctx, query, nodes,
-			func(n *Admin) { n.Edges.RiskUpdator = []*Risk{} },
-			func(n *Admin, e *Risk) { n.Edges.RiskUpdator = append(n.Edges.RiskUpdator, e) }); err != nil {
-			return nil, err
-		}
-	}
-	if query := aq.withRiskMaintainer; query != nil {
-		if err := aq.loadRiskMaintainer(ctx, query, nodes,
-			func(n *Admin) { n.Edges.RiskMaintainer = []*Risk{} },
-			func(n *Admin, e *Risk) { n.Edges.RiskMaintainer = append(n.Edges.RiskMaintainer, e) }); err != nil {
+	if query := aq.withRiskUpdater; query != nil {
+		if err := aq.loadRiskUpdater(ctx, query, nodes,
+			func(n *Admin) { n.Edges.RiskUpdater = []*Risk{} },
+			func(n *Admin, e *Risk) { n.Edges.RiskUpdater = append(n.Edges.RiskUpdater, e) }); err != nil {
 			return nil, err
 		}
 	}
@@ -1120,10 +1150,10 @@ func (aq *AdminQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Admin,
 			return nil, err
 		}
 	}
-	if query := aq.withRiskLocationUpdator; query != nil {
-		if err := aq.loadRiskLocationUpdator(ctx, query, nodes,
-			func(n *Admin) { n.Edges.RiskLocationUpdator = []*RiskLocation{} },
-			func(n *Admin, e *RiskLocation) { n.Edges.RiskLocationUpdator = append(n.Edges.RiskLocationUpdator, e) }); err != nil {
+	if query := aq.withRiskLocationUpdater; query != nil {
+		if err := aq.loadRiskLocationUpdater(ctx, query, nodes,
+			func(n *Admin) { n.Edges.RiskLocationUpdater = []*RiskLocation{} },
+			func(n *Admin, e *RiskLocation) { n.Edges.RiskLocationUpdater = append(n.Edges.RiskLocationUpdater, e) }); err != nil {
 			return nil, err
 		}
 	}
@@ -1134,10 +1164,10 @@ func (aq *AdminQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Admin,
 			return nil, err
 		}
 	}
-	if query := aq.withRiskCategoryUpdator; query != nil {
-		if err := aq.loadRiskCategoryUpdator(ctx, query, nodes,
-			func(n *Admin) { n.Edges.RiskCategoryUpdator = []*RiskCategory{} },
-			func(n *Admin, e *RiskCategory) { n.Edges.RiskCategoryUpdator = append(n.Edges.RiskCategoryUpdator, e) }); err != nil {
+	if query := aq.withRiskCategoryUpdater; query != nil {
+		if err := aq.loadRiskCategoryUpdater(ctx, query, nodes,
+			func(n *Admin) { n.Edges.RiskCategoryUpdater = []*RiskCategory{} },
+			func(n *Admin, e *RiskCategory) { n.Edges.RiskCategoryUpdater = append(n.Edges.RiskCategoryUpdater, e) }); err != nil {
 			return nil, err
 		}
 	}
@@ -1148,10 +1178,10 @@ func (aq *AdminQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Admin,
 			return nil, err
 		}
 	}
-	if query := aq.withDepartmentUpdator; query != nil {
-		if err := aq.loadDepartmentUpdator(ctx, query, nodes,
-			func(n *Admin) { n.Edges.DepartmentUpdator = []*Department{} },
-			func(n *Admin, e *Department) { n.Edges.DepartmentUpdator = append(n.Edges.DepartmentUpdator, e) }); err != nil {
+	if query := aq.withDepartmentUpdater; query != nil {
+		if err := aq.loadDepartmentUpdater(ctx, query, nodes,
+			func(n *Admin) { n.Edges.DepartmentUpdater = []*Department{} },
+			func(n *Admin, e *Department) { n.Edges.DepartmentUpdater = append(n.Edges.DepartmentUpdater, e) }); err != nil {
 			return nil, err
 		}
 	}
@@ -1162,17 +1192,31 @@ func (aq *AdminQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Admin,
 			return nil, err
 		}
 	}
-	if query := aq.withEmployeeUpdator; query != nil {
-		if err := aq.loadEmployeeUpdator(ctx, query, nodes,
-			func(n *Admin) { n.Edges.EmployeeUpdator = []*Employee{} },
-			func(n *Admin, e *Employee) { n.Edges.EmployeeUpdator = append(n.Edges.EmployeeUpdator, e) }); err != nil {
+	if query := aq.withEmployeeUpdater; query != nil {
+		if err := aq.loadEmployeeUpdater(ctx, query, nodes,
+			func(n *Admin) { n.Edges.EmployeeUpdater = []*Employee{} },
+			func(n *Admin, e *Employee) { n.Edges.EmployeeUpdater = append(n.Edges.EmployeeUpdater, e) }); err != nil {
 			return nil, err
 		}
 	}
-	if query := aq.withEmployeeAdmin; query != nil {
-		if err := aq.loadEmployeeAdmin(ctx, query, nodes,
-			func(n *Admin) { n.Edges.EmployeeAdmin = []*Employee{} },
-			func(n *Admin, e *Employee) { n.Edges.EmployeeAdmin = append(n.Edges.EmployeeAdmin, e) }); err != nil {
+	if query := aq.withEmployee; query != nil {
+		if err := aq.loadEmployee(ctx, query, nodes,
+			func(n *Admin) { n.Edges.Employee = []*Employee{} },
+			func(n *Admin, e *Employee) { n.Edges.Employee = append(n.Edges.Employee, e) }); err != nil {
+			return nil, err
+		}
+	}
+	if query := aq.withOccupationCreator; query != nil {
+		if err := aq.loadOccupationCreator(ctx, query, nodes,
+			func(n *Admin) { n.Edges.OccupationCreator = []*Occupation{} },
+			func(n *Admin, e *Occupation) { n.Edges.OccupationCreator = append(n.Edges.OccupationCreator, e) }); err != nil {
+			return nil, err
+		}
+	}
+	if query := aq.withOccupationUpdater; query != nil {
+		if err := aq.loadOccupationUpdater(ctx, query, nodes,
+			func(n *Admin) { n.Edges.OccupationUpdater = []*Occupation{} },
+			func(n *Admin, e *Occupation) { n.Edges.OccupationUpdater = append(n.Edges.OccupationUpdater, e) }); err != nil {
 			return nil, err
 		}
 	}
@@ -1208,7 +1252,7 @@ func (aq *AdminQuery) loadCreator(ctx context.Context, query *AdminQuery, nodes 
 	}
 	return nil
 }
-func (aq *AdminQuery) loadUpdator(ctx context.Context, query *AdminQuery, nodes []*Admin, init func(*Admin), assign func(*Admin, *Admin)) error {
+func (aq *AdminQuery) loadUpdater(ctx context.Context, query *AdminQuery, nodes []*Admin, init func(*Admin), assign func(*Admin, *Admin)) error {
 	ids := make([]int, 0, len(nodes))
 	nodeids := make(map[int][]*Admin)
 	for i := range nodes {
@@ -1328,7 +1372,7 @@ func (aq *AdminQuery) loadAdminCreator(ctx context.Context, query *AdminQuery, n
 	}
 	return nil
 }
-func (aq *AdminQuery) loadAdminUpdator(ctx context.Context, query *AdminQuery, nodes []*Admin, init func(*Admin), assign func(*Admin, *Admin)) error {
+func (aq *AdminQuery) loadAdminUpdater(ctx context.Context, query *AdminQuery, nodes []*Admin, init func(*Admin), assign func(*Admin, *Admin)) error {
 	fks := make([]driver.Value, 0, len(nodes))
 	nodeids := make(map[int]*Admin)
 	for i := range nodes {
@@ -1342,7 +1386,7 @@ func (aq *AdminQuery) loadAdminUpdator(ctx context.Context, query *AdminQuery, n
 		query.ctx.AppendFieldOnce(admin.FieldUpdatedBy)
 	}
 	query.Where(predicate.Admin(func(s *sql.Selector) {
-		s.Where(sql.InValues(s.C(admin.AdminUpdatorColumn), fks...))
+		s.Where(sql.InValues(s.C(admin.AdminUpdaterColumn), fks...))
 	}))
 	neighbors, err := query.All(ctx)
 	if err != nil {
@@ -1388,7 +1432,7 @@ func (aq *AdminQuery) loadAdminRoleCreator(ctx context.Context, query *AdminRole
 	}
 	return nil
 }
-func (aq *AdminQuery) loadAdminRoleUpdator(ctx context.Context, query *AdminRoleQuery, nodes []*Admin, init func(*Admin), assign func(*Admin, *AdminRole)) error {
+func (aq *AdminQuery) loadAdminRoleUpdater(ctx context.Context, query *AdminRoleQuery, nodes []*Admin, init func(*Admin), assign func(*Admin, *AdminRole)) error {
 	fks := make([]driver.Value, 0, len(nodes))
 	nodeids := make(map[int]*Admin)
 	for i := range nodes {
@@ -1402,7 +1446,7 @@ func (aq *AdminQuery) loadAdminRoleUpdator(ctx context.Context, query *AdminRole
 		query.ctx.AppendFieldOnce(adminrole.FieldUpdatedBy)
 	}
 	query.Where(predicate.AdminRole(func(s *sql.Selector) {
-		s.Where(sql.InValues(s.C(admin.AdminRoleUpdatorColumn), fks...))
+		s.Where(sql.InValues(s.C(admin.AdminRoleUpdaterColumn), fks...))
 	}))
 	neighbors, err := query.All(ctx)
 	if err != nil {
@@ -1428,7 +1472,9 @@ func (aq *AdminQuery) loadRiskCreator(ctx context.Context, query *RiskQuery, nod
 			init(nodes[i])
 		}
 	}
-	query.withFKs = true
+	if len(query.ctx.Fields) > 0 {
+		query.ctx.AppendFieldOnce(risk.FieldCreatedBy)
+	}
 	query.Where(predicate.Risk(func(s *sql.Selector) {
 		s.Where(sql.InValues(s.C(admin.RiskCreatorColumn), fks...))
 	}))
@@ -1437,19 +1483,16 @@ func (aq *AdminQuery) loadRiskCreator(ctx context.Context, query *RiskQuery, nod
 		return err
 	}
 	for _, n := range neighbors {
-		fk := n.admin_risk_creator
-		if fk == nil {
-			return fmt.Errorf(`foreign-key "admin_risk_creator" is nil for node %v`, n.ID)
-		}
-		node, ok := nodeids[*fk]
+		fk := n.CreatedBy
+		node, ok := nodeids[fk]
 		if !ok {
-			return fmt.Errorf(`unexpected referenced foreign-key "admin_risk_creator" returned %v for node %v`, *fk, n.ID)
+			return fmt.Errorf(`unexpected referenced foreign-key "created_by" returned %v for node %v`, fk, n.ID)
 		}
 		assign(node, n)
 	}
 	return nil
 }
-func (aq *AdminQuery) loadRiskUpdator(ctx context.Context, query *RiskQuery, nodes []*Admin, init func(*Admin), assign func(*Admin, *Risk)) error {
+func (aq *AdminQuery) loadRiskUpdater(ctx context.Context, query *RiskQuery, nodes []*Admin, init func(*Admin), assign func(*Admin, *Risk)) error {
 	fks := make([]driver.Value, 0, len(nodes))
 	nodeids := make(map[int]*Admin)
 	for i := range nodes {
@@ -1459,12 +1502,11 @@ func (aq *AdminQuery) loadRiskUpdator(ctx context.Context, query *RiskQuery, nod
 			init(nodes[i])
 		}
 	}
-	query.withFKs = true
 	if len(query.ctx.Fields) > 0 {
 		query.ctx.AppendFieldOnce(risk.FieldUpdatedBy)
 	}
 	query.Where(predicate.Risk(func(s *sql.Selector) {
-		s.Where(sql.InValues(s.C(admin.RiskUpdatorColumn), fks...))
+		s.Where(sql.InValues(s.C(admin.RiskUpdaterColumn), fks...))
 	}))
 	neighbors, err := query.All(ctx)
 	if err != nil {
@@ -1475,37 +1517,6 @@ func (aq *AdminQuery) loadRiskUpdator(ctx context.Context, query *RiskQuery, nod
 		node, ok := nodeids[fk]
 		if !ok {
 			return fmt.Errorf(`unexpected referenced foreign-key "updated_by" returned %v for node %v`, fk, n.ID)
-		}
-		assign(node, n)
-	}
-	return nil
-}
-func (aq *AdminQuery) loadRiskMaintainer(ctx context.Context, query *RiskQuery, nodes []*Admin, init func(*Admin), assign func(*Admin, *Risk)) error {
-	fks := make([]driver.Value, 0, len(nodes))
-	nodeids := make(map[int]*Admin)
-	for i := range nodes {
-		fks = append(fks, nodes[i].ID)
-		nodeids[nodes[i].ID] = nodes[i]
-		if init != nil {
-			init(nodes[i])
-		}
-	}
-	query.withFKs = true
-	query.Where(predicate.Risk(func(s *sql.Selector) {
-		s.Where(sql.InValues(s.C(admin.RiskMaintainerColumn), fks...))
-	}))
-	neighbors, err := query.All(ctx)
-	if err != nil {
-		return err
-	}
-	for _, n := range neighbors {
-		fk := n.admin_risk_maintainer
-		if fk == nil {
-			return fmt.Errorf(`foreign-key "admin_risk_maintainer" is nil for node %v`, n.ID)
-		}
-		node, ok := nodeids[*fk]
-		if !ok {
-			return fmt.Errorf(`unexpected referenced foreign-key "admin_risk_maintainer" returned %v for node %v`, *fk, n.ID)
 		}
 		assign(node, n)
 	}
@@ -1541,7 +1552,7 @@ func (aq *AdminQuery) loadRiskLocationCreator(ctx context.Context, query *RiskLo
 	}
 	return nil
 }
-func (aq *AdminQuery) loadRiskLocationUpdator(ctx context.Context, query *RiskLocationQuery, nodes []*Admin, init func(*Admin), assign func(*Admin, *RiskLocation)) error {
+func (aq *AdminQuery) loadRiskLocationUpdater(ctx context.Context, query *RiskLocationQuery, nodes []*Admin, init func(*Admin), assign func(*Admin, *RiskLocation)) error {
 	fks := make([]driver.Value, 0, len(nodes))
 	nodeids := make(map[int]*Admin)
 	for i := range nodes {
@@ -1555,7 +1566,7 @@ func (aq *AdminQuery) loadRiskLocationUpdator(ctx context.Context, query *RiskLo
 		query.ctx.AppendFieldOnce(risklocation.FieldUpdatedBy)
 	}
 	query.Where(predicate.RiskLocation(func(s *sql.Selector) {
-		s.Where(sql.InValues(s.C(admin.RiskLocationUpdatorColumn), fks...))
+		s.Where(sql.InValues(s.C(admin.RiskLocationUpdaterColumn), fks...))
 	}))
 	neighbors, err := query.All(ctx)
 	if err != nil {
@@ -1601,7 +1612,7 @@ func (aq *AdminQuery) loadRiskCategoryCreator(ctx context.Context, query *RiskCa
 	}
 	return nil
 }
-func (aq *AdminQuery) loadRiskCategoryUpdator(ctx context.Context, query *RiskCategoryQuery, nodes []*Admin, init func(*Admin), assign func(*Admin, *RiskCategory)) error {
+func (aq *AdminQuery) loadRiskCategoryUpdater(ctx context.Context, query *RiskCategoryQuery, nodes []*Admin, init func(*Admin), assign func(*Admin, *RiskCategory)) error {
 	fks := make([]driver.Value, 0, len(nodes))
 	nodeids := make(map[int]*Admin)
 	for i := range nodes {
@@ -1615,7 +1626,7 @@ func (aq *AdminQuery) loadRiskCategoryUpdator(ctx context.Context, query *RiskCa
 		query.ctx.AppendFieldOnce(riskcategory.FieldUpdatedBy)
 	}
 	query.Where(predicate.RiskCategory(func(s *sql.Selector) {
-		s.Where(sql.InValues(s.C(admin.RiskCategoryUpdatorColumn), fks...))
+		s.Where(sql.InValues(s.C(admin.RiskCategoryUpdaterColumn), fks...))
 	}))
 	neighbors, err := query.All(ctx)
 	if err != nil {
@@ -1641,7 +1652,6 @@ func (aq *AdminQuery) loadDepartmentCreator(ctx context.Context, query *Departme
 			init(nodes[i])
 		}
 	}
-	query.withFKs = true
 	if len(query.ctx.Fields) > 0 {
 		query.ctx.AppendFieldOnce(department.FieldCreatedBy)
 	}
@@ -1662,7 +1672,7 @@ func (aq *AdminQuery) loadDepartmentCreator(ctx context.Context, query *Departme
 	}
 	return nil
 }
-func (aq *AdminQuery) loadDepartmentUpdator(ctx context.Context, query *DepartmentQuery, nodes []*Admin, init func(*Admin), assign func(*Admin, *Department)) error {
+func (aq *AdminQuery) loadDepartmentUpdater(ctx context.Context, query *DepartmentQuery, nodes []*Admin, init func(*Admin), assign func(*Admin, *Department)) error {
 	fks := make([]driver.Value, 0, len(nodes))
 	nodeids := make(map[int]*Admin)
 	for i := range nodes {
@@ -1672,22 +1682,21 @@ func (aq *AdminQuery) loadDepartmentUpdator(ctx context.Context, query *Departme
 			init(nodes[i])
 		}
 	}
-	query.withFKs = true
+	if len(query.ctx.Fields) > 0 {
+		query.ctx.AppendFieldOnce(department.FieldUpdatedBy)
+	}
 	query.Where(predicate.Department(func(s *sql.Selector) {
-		s.Where(sql.InValues(s.C(admin.DepartmentUpdatorColumn), fks...))
+		s.Where(sql.InValues(s.C(admin.DepartmentUpdaterColumn), fks...))
 	}))
 	neighbors, err := query.All(ctx)
 	if err != nil {
 		return err
 	}
 	for _, n := range neighbors {
-		fk := n.admin_department_updator
-		if fk == nil {
-			return fmt.Errorf(`foreign-key "admin_department_updator" is nil for node %v`, n.ID)
-		}
-		node, ok := nodeids[*fk]
+		fk := n.UpdatedBy
+		node, ok := nodeids[fk]
 		if !ok {
-			return fmt.Errorf(`unexpected referenced foreign-key "admin_department_updator" returned %v for node %v`, *fk, n.ID)
+			return fmt.Errorf(`unexpected referenced foreign-key "updated_by" returned %v for node %v`, fk, n.ID)
 		}
 		assign(node, n)
 	}
@@ -1703,7 +1712,6 @@ func (aq *AdminQuery) loadEmployeeCreator(ctx context.Context, query *EmployeeQu
 			init(nodes[i])
 		}
 	}
-	query.withFKs = true
 	if len(query.ctx.Fields) > 0 {
 		query.ctx.AppendFieldOnce(employee.FieldCreatedBy)
 	}
@@ -1724,7 +1732,7 @@ func (aq *AdminQuery) loadEmployeeCreator(ctx context.Context, query *EmployeeQu
 	}
 	return nil
 }
-func (aq *AdminQuery) loadEmployeeUpdator(ctx context.Context, query *EmployeeQuery, nodes []*Admin, init func(*Admin), assign func(*Admin, *Employee)) error {
+func (aq *AdminQuery) loadEmployeeUpdater(ctx context.Context, query *EmployeeQuery, nodes []*Admin, init func(*Admin), assign func(*Admin, *Employee)) error {
 	fks := make([]driver.Value, 0, len(nodes))
 	nodeids := make(map[int]*Admin)
 	for i := range nodes {
@@ -1734,28 +1742,27 @@ func (aq *AdminQuery) loadEmployeeUpdator(ctx context.Context, query *EmployeeQu
 			init(nodes[i])
 		}
 	}
-	query.withFKs = true
+	if len(query.ctx.Fields) > 0 {
+		query.ctx.AppendFieldOnce(employee.FieldUpdatedBy)
+	}
 	query.Where(predicate.Employee(func(s *sql.Selector) {
-		s.Where(sql.InValues(s.C(admin.EmployeeUpdatorColumn), fks...))
+		s.Where(sql.InValues(s.C(admin.EmployeeUpdaterColumn), fks...))
 	}))
 	neighbors, err := query.All(ctx)
 	if err != nil {
 		return err
 	}
 	for _, n := range neighbors {
-		fk := n.admin_employee_updator
-		if fk == nil {
-			return fmt.Errorf(`foreign-key "admin_employee_updator" is nil for node %v`, n.ID)
-		}
-		node, ok := nodeids[*fk]
+		fk := n.UpdatedBy
+		node, ok := nodeids[fk]
 		if !ok {
-			return fmt.Errorf(`unexpected referenced foreign-key "admin_employee_updator" returned %v for node %v`, *fk, n.ID)
+			return fmt.Errorf(`unexpected referenced foreign-key "updated_by" returned %v for node %v`, fk, n.ID)
 		}
 		assign(node, n)
 	}
 	return nil
 }
-func (aq *AdminQuery) loadEmployeeAdmin(ctx context.Context, query *EmployeeQuery, nodes []*Admin, init func(*Admin), assign func(*Admin, *Employee)) error {
+func (aq *AdminQuery) loadEmployee(ctx context.Context, query *EmployeeQuery, nodes []*Admin, init func(*Admin), assign func(*Admin, *Employee)) error {
 	fks := make([]driver.Value, 0, len(nodes))
 	nodeids := make(map[int]*Admin)
 	for i := range nodes {
@@ -1765,12 +1772,11 @@ func (aq *AdminQuery) loadEmployeeAdmin(ctx context.Context, query *EmployeeQuer
 			init(nodes[i])
 		}
 	}
-	query.withFKs = true
 	if len(query.ctx.Fields) > 0 {
 		query.ctx.AppendFieldOnce(employee.FieldAdminID)
 	}
 	query.Where(predicate.Employee(func(s *sql.Selector) {
-		s.Where(sql.InValues(s.C(admin.EmployeeAdminColumn), fks...))
+		s.Where(sql.InValues(s.C(admin.EmployeeColumn), fks...))
 	}))
 	neighbors, err := query.All(ctx)
 	if err != nil {
@@ -1781,6 +1787,66 @@ func (aq *AdminQuery) loadEmployeeAdmin(ctx context.Context, query *EmployeeQuer
 		node, ok := nodeids[fk]
 		if !ok {
 			return fmt.Errorf(`unexpected referenced foreign-key "admin_id" returned %v for node %v`, fk, n.ID)
+		}
+		assign(node, n)
+	}
+	return nil
+}
+func (aq *AdminQuery) loadOccupationCreator(ctx context.Context, query *OccupationQuery, nodes []*Admin, init func(*Admin), assign func(*Admin, *Occupation)) error {
+	fks := make([]driver.Value, 0, len(nodes))
+	nodeids := make(map[int]*Admin)
+	for i := range nodes {
+		fks = append(fks, nodes[i].ID)
+		nodeids[nodes[i].ID] = nodes[i]
+		if init != nil {
+			init(nodes[i])
+		}
+	}
+	if len(query.ctx.Fields) > 0 {
+		query.ctx.AppendFieldOnce(occupation.FieldCreatedBy)
+	}
+	query.Where(predicate.Occupation(func(s *sql.Selector) {
+		s.Where(sql.InValues(s.C(admin.OccupationCreatorColumn), fks...))
+	}))
+	neighbors, err := query.All(ctx)
+	if err != nil {
+		return err
+	}
+	for _, n := range neighbors {
+		fk := n.CreatedBy
+		node, ok := nodeids[fk]
+		if !ok {
+			return fmt.Errorf(`unexpected referenced foreign-key "created_by" returned %v for node %v`, fk, n.ID)
+		}
+		assign(node, n)
+	}
+	return nil
+}
+func (aq *AdminQuery) loadOccupationUpdater(ctx context.Context, query *OccupationQuery, nodes []*Admin, init func(*Admin), assign func(*Admin, *Occupation)) error {
+	fks := make([]driver.Value, 0, len(nodes))
+	nodeids := make(map[int]*Admin)
+	for i := range nodes {
+		fks = append(fks, nodes[i].ID)
+		nodeids[nodes[i].ID] = nodes[i]
+		if init != nil {
+			init(nodes[i])
+		}
+	}
+	if len(query.ctx.Fields) > 0 {
+		query.ctx.AppendFieldOnce(occupation.FieldUpdatedBy)
+	}
+	query.Where(predicate.Occupation(func(s *sql.Selector) {
+		s.Where(sql.InValues(s.C(admin.OccupationUpdaterColumn), fks...))
+	}))
+	neighbors, err := query.All(ctx)
+	if err != nil {
+		return err
+	}
+	for _, n := range neighbors {
+		fk := n.UpdatedBy
+		node, ok := nodeids[fk]
+		if !ok {
+			return fmt.Errorf(`unexpected referenced foreign-key "updated_by" returned %v for node %v`, fk, n.ID)
 		}
 		assign(node, n)
 	}
@@ -1815,7 +1881,7 @@ func (aq *AdminQuery) querySpec() *sqlgraph.QuerySpec {
 		if aq.withCreator != nil {
 			_spec.Node.AddColumnOnce(admin.FieldCreatedBy)
 		}
-		if aq.withUpdator != nil {
+		if aq.withUpdater != nil {
 			_spec.Node.AddColumnOnce(admin.FieldUpdatedBy)
 		}
 	}

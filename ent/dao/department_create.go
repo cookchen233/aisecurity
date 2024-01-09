@@ -76,15 +76,23 @@ func (dc *DepartmentCreate) SetNillableUpdatedAt(t *time.Time) *DepartmentCreate
 	return dc
 }
 
-// SetTitle sets the "title" field.
-func (dc *DepartmentCreate) SetTitle(s string) *DepartmentCreate {
-	dc.mutation.SetTitle(s)
+// SetName sets the "name" field.
+func (dc *DepartmentCreate) SetName(s string) *DepartmentCreate {
+	dc.mutation.SetName(s)
 	return dc
 }
 
 // SetParentID sets the "parent_id" field.
 func (dc *DepartmentCreate) SetParentID(i int) *DepartmentCreate {
 	dc.mutation.SetParentID(i)
+	return dc
+}
+
+// SetNillableParentID sets the "parent_id" field if the given value is not nil.
+func (dc *DepartmentCreate) SetNillableParentID(i *int) *DepartmentCreate {
+	if i != nil {
+		dc.SetParentID(*i)
+	}
 	return dc
 }
 
@@ -99,24 +107,35 @@ func (dc *DepartmentCreate) SetCreator(a *Admin) *DepartmentCreate {
 	return dc.SetCreatorID(a.ID)
 }
 
+// SetUpdaterID sets the "updater" edge to the Admin entity by ID.
+func (dc *DepartmentCreate) SetUpdaterID(id int) *DepartmentCreate {
+	dc.mutation.SetUpdaterID(id)
+	return dc
+}
+
+// SetUpdater sets the "updater" edge to the Admin entity.
+func (dc *DepartmentCreate) SetUpdater(a *Admin) *DepartmentCreate {
+	return dc.SetUpdaterID(a.ID)
+}
+
 // SetParent sets the "parent" edge to the Department entity.
 func (dc *DepartmentCreate) SetParent(d *Department) *DepartmentCreate {
 	return dc.SetParentID(d.ID)
 }
 
-// AddEmployeeDepartmentIDs adds the "employee_department" edge to the Employee entity by IDs.
-func (dc *DepartmentCreate) AddEmployeeDepartmentIDs(ids ...int) *DepartmentCreate {
-	dc.mutation.AddEmployeeDepartmentIDs(ids...)
+// AddEmployeeIDs adds the "employees" edge to the Employee entity by IDs.
+func (dc *DepartmentCreate) AddEmployeeIDs(ids ...int) *DepartmentCreate {
+	dc.mutation.AddEmployeeIDs(ids...)
 	return dc
 }
 
-// AddEmployeeDepartment adds the "employee_department" edges to the Employee entity.
-func (dc *DepartmentCreate) AddEmployeeDepartment(e ...*Employee) *DepartmentCreate {
+// AddEmployees adds the "employees" edges to the Employee entity.
+func (dc *DepartmentCreate) AddEmployees(e ...*Employee) *DepartmentCreate {
 	ids := make([]int, len(e))
 	for i := range e {
 		ids[i] = e[i].ID
 	}
-	return dc.AddEmployeeDepartmentIDs(ids...)
+	return dc.AddEmployeeIDs(ids...)
 }
 
 // AddChildIDs adds the "children" edge to the Department entity by IDs.
@@ -212,16 +231,13 @@ func (dc *DepartmentCreate) check() error {
 	if _, ok := dc.mutation.UpdatedAt(); !ok {
 		return &ValidationError{Name: "updated_at", err: errors.New(`dao: missing required field "Department.updated_at"`)}
 	}
-	if _, ok := dc.mutation.Title(); !ok {
-		return &ValidationError{Name: "title", err: errors.New(`dao: missing required field "Department.title"`)}
+	if _, ok := dc.mutation.Name(); !ok {
+		return &ValidationError{Name: "name", err: errors.New(`dao: missing required field "Department.name"`)}
 	}
-	if v, ok := dc.mutation.Title(); ok {
-		if err := department.TitleValidator(v); err != nil {
-			return &ValidationError{Name: "title", err: fmt.Errorf(`dao: validator failed for field "Department.title": %w`, err)}
+	if v, ok := dc.mutation.Name(); ok {
+		if err := department.NameValidator(v); err != nil {
+			return &ValidationError{Name: "name", err: fmt.Errorf(`dao: validator failed for field "Department.name": %w`, err)}
 		}
-	}
-	if _, ok := dc.mutation.ParentID(); !ok {
-		return &ValidationError{Name: "parent_id", err: errors.New(`dao: missing required field "Department.parent_id"`)}
 	}
 	if v, ok := dc.mutation.ParentID(); ok {
 		if err := department.ParentIDValidator(v); err != nil {
@@ -231,8 +247,8 @@ func (dc *DepartmentCreate) check() error {
 	if _, ok := dc.mutation.CreatorID(); !ok {
 		return &ValidationError{Name: "creator", err: errors.New(`dao: missing required edge "Department.creator"`)}
 	}
-	if _, ok := dc.mutation.ParentID(); !ok {
-		return &ValidationError{Name: "parent", err: errors.New(`dao: missing required edge "Department.parent"`)}
+	if _, ok := dc.mutation.UpdaterID(); !ok {
+		return &ValidationError{Name: "updater", err: errors.New(`dao: missing required edge "Department.updater"`)}
 	}
 	return nil
 }
@@ -268,17 +284,13 @@ func (dc *DepartmentCreate) createSpec() (*Department, *sqlgraph.CreateSpec) {
 		_spec.SetField(department.FieldDeletedAt, field.TypeTime, value)
 		_node.DeletedAt = &value
 	}
-	if value, ok := dc.mutation.UpdatedBy(); ok {
-		_spec.SetField(department.FieldUpdatedBy, field.TypeInt, value)
-		_node.UpdatedBy = value
-	}
 	if value, ok := dc.mutation.UpdatedAt(); ok {
 		_spec.SetField(department.FieldUpdatedAt, field.TypeTime, value)
 		_node.UpdatedAt = value
 	}
-	if value, ok := dc.mutation.Title(); ok {
-		_spec.SetField(department.FieldTitle, field.TypeString, value)
-		_node.Title = value
+	if value, ok := dc.mutation.Name(); ok {
+		_spec.SetField(department.FieldName, field.TypeString, value)
+		_node.Name = value
 	}
 	if nodes := dc.mutation.CreatorIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
@@ -295,6 +307,23 @@ func (dc *DepartmentCreate) createSpec() (*Department, *sqlgraph.CreateSpec) {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
 		_node.CreatedBy = nodes[0]
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := dc.mutation.UpdaterIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   department.UpdaterTable,
+			Columns: []string{department.UpdaterColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(admin.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_node.UpdatedBy = nodes[0]
 		_spec.Edges = append(_spec.Edges, edge)
 	}
 	if nodes := dc.mutation.ParentIDs(); len(nodes) > 0 {
@@ -314,12 +343,12 @@ func (dc *DepartmentCreate) createSpec() (*Department, *sqlgraph.CreateSpec) {
 		_node.ParentID = nodes[0]
 		_spec.Edges = append(_spec.Edges, edge)
 	}
-	if nodes := dc.mutation.EmployeeDepartmentIDs(); len(nodes) > 0 {
+	if nodes := dc.mutation.EmployeesIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
-			Table:   department.EmployeeDepartmentTable,
-			Columns: []string{department.EmployeeDepartmentColumn},
+			Table:   department.EmployeesTable,
+			Columns: []string{department.EmployeesColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(employee.FieldID, field.TypeInt),

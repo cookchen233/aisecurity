@@ -28,8 +28,8 @@ type RiskCategory struct {
 	UpdatedBy int `json:"updated_by"`
 	// 最后更新时间
 	UpdatedAt time.Time `json:"updated_at"`
-	// 标题
-	Title string `json:"title" validate:"required"`
+	// 名称
+	Name string `json:"name" validate:"required"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the RiskCategoryQuery when eager-loading is set.
 	Edges        RiskCategoryEdges `json:"edges"`
@@ -40,10 +40,10 @@ type RiskCategory struct {
 type RiskCategoryEdges struct {
 	// Creator holds the value of the creator edge.
 	Creator *Admin `json:"creator,omitempty"`
-	// Updator holds the value of the updator edge.
-	Updator *Admin `json:"updator,omitempty"`
-	// RiskRiskCategory holds the value of the risk_risk_category edge.
-	RiskRiskCategory []*Risk `json:"risk_risk_category,omitempty"`
+	// Updater holds the value of the updater edge.
+	Updater *Admin `json:"updater,omitempty"`
+	// Risk holds the value of the risk edge.
+	Risk []*Risk `json:"risk,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
 	loadedTypes [3]bool
@@ -62,26 +62,26 @@ func (e RiskCategoryEdges) CreatorOrErr() (*Admin, error) {
 	return nil, &NotLoadedError{edge: "creator"}
 }
 
-// UpdatorOrErr returns the Updator value or an error if the edge
+// UpdaterOrErr returns the Updater value or an error if the edge
 // was not loaded in eager-loading, or loaded but was not found.
-func (e RiskCategoryEdges) UpdatorOrErr() (*Admin, error) {
+func (e RiskCategoryEdges) UpdaterOrErr() (*Admin, error) {
 	if e.loadedTypes[1] {
-		if e.Updator == nil {
+		if e.Updater == nil {
 			// Edge was loaded but was not found.
 			return nil, &NotFoundError{label: admin.Label}
 		}
-		return e.Updator, nil
+		return e.Updater, nil
 	}
-	return nil, &NotLoadedError{edge: "updator"}
+	return nil, &NotLoadedError{edge: "updater"}
 }
 
-// RiskRiskCategoryOrErr returns the RiskRiskCategory value or an error if the edge
+// RiskOrErr returns the Risk value or an error if the edge
 // was not loaded in eager-loading.
-func (e RiskCategoryEdges) RiskRiskCategoryOrErr() ([]*Risk, error) {
+func (e RiskCategoryEdges) RiskOrErr() ([]*Risk, error) {
 	if e.loadedTypes[2] {
-		return e.RiskRiskCategory, nil
+		return e.Risk, nil
 	}
-	return nil, &NotLoadedError{edge: "risk_risk_category"}
+	return nil, &NotLoadedError{edge: "risk"}
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
@@ -91,7 +91,7 @@ func (*RiskCategory) scanValues(columns []string) ([]any, error) {
 		switch columns[i] {
 		case riskcategory.FieldID, riskcategory.FieldCreatedBy, riskcategory.FieldUpdatedBy:
 			values[i] = new(sql.NullInt64)
-		case riskcategory.FieldTitle:
+		case riskcategory.FieldName:
 			values[i] = new(sql.NullString)
 		case riskcategory.FieldCreatedAt, riskcategory.FieldDeletedAt, riskcategory.FieldUpdatedAt:
 			values[i] = new(sql.NullTime)
@@ -147,11 +147,11 @@ func (rc *RiskCategory) assignValues(columns []string, values []any) error {
 			} else if value.Valid {
 				rc.UpdatedAt = value.Time
 			}
-		case riskcategory.FieldTitle:
+		case riskcategory.FieldName:
 			if value, ok := values[i].(*sql.NullString); !ok {
-				return fmt.Errorf("unexpected type %T for field title", values[i])
+				return fmt.Errorf("unexpected type %T for field name", values[i])
 			} else if value.Valid {
-				rc.Title = value.String
+				rc.Name = value.String
 			}
 		default:
 			rc.selectValues.Set(columns[i], values[i])
@@ -171,14 +171,14 @@ func (rc *RiskCategory) QueryCreator() *AdminQuery {
 	return NewRiskCategoryClient(rc.config).QueryCreator(rc)
 }
 
-// QueryUpdator queries the "updator" edge of the RiskCategory entity.
-func (rc *RiskCategory) QueryUpdator() *AdminQuery {
-	return NewRiskCategoryClient(rc.config).QueryUpdator(rc)
+// QueryUpdater queries the "updater" edge of the RiskCategory entity.
+func (rc *RiskCategory) QueryUpdater() *AdminQuery {
+	return NewRiskCategoryClient(rc.config).QueryUpdater(rc)
 }
 
-// QueryRiskRiskCategory queries the "risk_risk_category" edge of the RiskCategory entity.
-func (rc *RiskCategory) QueryRiskRiskCategory() *RiskQuery {
-	return NewRiskCategoryClient(rc.config).QueryRiskRiskCategory(rc)
+// QueryRisk queries the "risk" edge of the RiskCategory entity.
+func (rc *RiskCategory) QueryRisk() *RiskQuery {
+	return NewRiskCategoryClient(rc.config).QueryRisk(rc)
 }
 
 // Update returns a builder for updating this RiskCategory.
@@ -221,8 +221,8 @@ func (rc *RiskCategory) String() string {
 	builder.WriteString("updated_at=")
 	builder.WriteString(rc.UpdatedAt.Format(time.ANSIC))
 	builder.WriteString(", ")
-	builder.WriteString("title=")
-	builder.WriteString(rc.Title)
+	builder.WriteString("name=")
+	builder.WriteString(rc.Name)
 	builder.WriteByte(')')
 	return builder.String()
 }

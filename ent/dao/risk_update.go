@@ -102,6 +102,12 @@ func (ru *RiskUpdate) SetNillableContent(s *string) *RiskUpdate {
 	return ru
 }
 
+// ClearContent clears the value of the "content" field.
+func (ru *RiskUpdate) ClearContent() *RiskUpdate {
+	ru.mutation.ClearContent()
+	return ru
+}
+
 // SetImages sets the "images" field.
 func (ru *RiskUpdate) SetImages(s []struct {
 	Title string "json:\"title\""
@@ -150,6 +156,20 @@ func (ru *RiskUpdate) SetRiskLocationID(i int) *RiskUpdate {
 func (ru *RiskUpdate) SetNillableRiskLocationID(i *int) *RiskUpdate {
 	if i != nil {
 		ru.SetRiskLocationID(*i)
+	}
+	return ru
+}
+
+// SetReporterID sets the "reporter_id" field.
+func (ru *RiskUpdate) SetReporterID(i int) *RiskUpdate {
+	ru.mutation.SetReporterID(i)
+	return ru
+}
+
+// SetNillableReporterID sets the "reporter_id" field if the given value is not nil.
+func (ru *RiskUpdate) SetNillableReporterID(i *int) *RiskUpdate {
+	if i != nil {
+		ru.SetReporterID(*i)
 	}
 	return ru
 }
@@ -223,20 +243,15 @@ func (ru *RiskUpdate) SetNillableDueTime(t *time.Time) *RiskUpdate {
 	return ru
 }
 
-// SetUpdatorID sets the "updator" edge to the Admin entity by ID.
-func (ru *RiskUpdate) SetUpdatorID(id int) *RiskUpdate {
-	ru.mutation.SetUpdatorID(id)
+// SetUpdaterID sets the "updater" edge to the Admin entity by ID.
+func (ru *RiskUpdate) SetUpdaterID(id int) *RiskUpdate {
+	ru.mutation.SetUpdaterID(id)
 	return ru
 }
 
-// SetUpdator sets the "updator" edge to the Admin entity.
-func (ru *RiskUpdate) SetUpdator(a *Admin) *RiskUpdate {
-	return ru.SetUpdatorID(a.ID)
-}
-
-// SetMaintainer sets the "maintainer" edge to the Employee entity.
-func (ru *RiskUpdate) SetMaintainer(e *Employee) *RiskUpdate {
-	return ru.SetMaintainerID(e.ID)
+// SetUpdater sets the "updater" edge to the Admin entity.
+func (ru *RiskUpdate) SetUpdater(a *Admin) *RiskUpdate {
+	return ru.SetUpdaterID(a.ID)
 }
 
 // SetRiskCategory sets the "risk_category" edge to the RiskCategory entity.
@@ -249,20 +264,24 @@ func (ru *RiskUpdate) SetRiskLocation(r *RiskLocation) *RiskUpdate {
 	return ru.SetRiskLocationID(r.ID)
 }
 
+// SetReporter sets the "reporter" edge to the Employee entity.
+func (ru *RiskUpdate) SetReporter(e *Employee) *RiskUpdate {
+	return ru.SetReporterID(e.ID)
+}
+
+// SetMaintainer sets the "maintainer" edge to the Employee entity.
+func (ru *RiskUpdate) SetMaintainer(e *Employee) *RiskUpdate {
+	return ru.SetMaintainerID(e.ID)
+}
+
 // Mutation returns the RiskMutation object of the builder.
 func (ru *RiskUpdate) Mutation() *RiskMutation {
 	return ru.mutation
 }
 
-// ClearUpdator clears the "updator" edge to the Admin entity.
-func (ru *RiskUpdate) ClearUpdator() *RiskUpdate {
-	ru.mutation.ClearUpdator()
-	return ru
-}
-
-// ClearMaintainer clears the "maintainer" edge to the Employee entity.
-func (ru *RiskUpdate) ClearMaintainer() *RiskUpdate {
-	ru.mutation.ClearMaintainer()
+// ClearUpdater clears the "updater" edge to the Admin entity.
+func (ru *RiskUpdate) ClearUpdater() *RiskUpdate {
+	ru.mutation.ClearUpdater()
 	return ru
 }
 
@@ -275,6 +294,18 @@ func (ru *RiskUpdate) ClearRiskCategory() *RiskUpdate {
 // ClearRiskLocation clears the "risk_location" edge to the RiskLocation entity.
 func (ru *RiskUpdate) ClearRiskLocation() *RiskUpdate {
 	ru.mutation.ClearRiskLocation()
+	return ru
+}
+
+// ClearReporter clears the "reporter" edge to the Employee entity.
+func (ru *RiskUpdate) ClearReporter() *RiskUpdate {
+	ru.mutation.ClearReporter()
+	return ru
+}
+
+// ClearMaintainer clears the "maintainer" edge to the Employee entity.
+func (ru *RiskUpdate) ClearMaintainer() *RiskUpdate {
+	ru.mutation.ClearMaintainer()
 	return ru
 }
 
@@ -342,6 +373,11 @@ func (ru *RiskUpdate) check() error {
 			return &ValidationError{Name: "risk_location_id", err: fmt.Errorf(`dao: validator failed for field "Risk.risk_location_id": %w`, err)}
 		}
 	}
+	if v, ok := ru.mutation.ReporterID(); ok {
+		if err := risk.ReporterIDValidator(v); err != nil {
+			return &ValidationError{Name: "reporter_id", err: fmt.Errorf(`dao: validator failed for field "Risk.reporter_id": %w`, err)}
+		}
+	}
 	if v, ok := ru.mutation.MaintainerID(); ok {
 		if err := risk.MaintainerIDValidator(v); err != nil {
 			return &ValidationError{Name: "maintainer_id", err: fmt.Errorf(`dao: validator failed for field "Risk.maintainer_id": %w`, err)}
@@ -355,17 +391,20 @@ func (ru *RiskUpdate) check() error {
 	if _, ok := ru.mutation.CreatorID(); ru.mutation.CreatorCleared() && !ok {
 		return errors.New(`dao: clearing a required unique edge "Risk.creator"`)
 	}
-	if _, ok := ru.mutation.UpdatorID(); ru.mutation.UpdatorCleared() && !ok {
-		return errors.New(`dao: clearing a required unique edge "Risk.updator"`)
-	}
-	if _, ok := ru.mutation.MaintainerID(); ru.mutation.MaintainerCleared() && !ok {
-		return errors.New(`dao: clearing a required unique edge "Risk.maintainer"`)
+	if _, ok := ru.mutation.UpdaterID(); ru.mutation.UpdaterCleared() && !ok {
+		return errors.New(`dao: clearing a required unique edge "Risk.updater"`)
 	}
 	if _, ok := ru.mutation.RiskCategoryID(); ru.mutation.RiskCategoryCleared() && !ok {
 		return errors.New(`dao: clearing a required unique edge "Risk.risk_category"`)
 	}
 	if _, ok := ru.mutation.RiskLocationID(); ru.mutation.RiskLocationCleared() && !ok {
 		return errors.New(`dao: clearing a required unique edge "Risk.risk_location"`)
+	}
+	if _, ok := ru.mutation.ReporterID(); ru.mutation.ReporterCleared() && !ok {
+		return errors.New(`dao: clearing a required unique edge "Risk.reporter"`)
+	}
+	if _, ok := ru.mutation.MaintainerID(); ru.mutation.MaintainerCleared() && !ok {
+		return errors.New(`dao: clearing a required unique edge "Risk.maintainer"`)
 	}
 	return nil
 }
@@ -397,6 +436,9 @@ func (ru *RiskUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	if value, ok := ru.mutation.Content(); ok {
 		_spec.SetField(risk.FieldContent, field.TypeString, value)
 	}
+	if ru.mutation.ContentCleared() {
+		_spec.ClearField(risk.FieldContent, field.TypeString)
+	}
 	if value, ok := ru.mutation.Images(); ok {
 		_spec.SetField(risk.FieldImages, field.TypeJSON, value)
 	}
@@ -423,12 +465,12 @@ func (ru *RiskUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	if value, ok := ru.mutation.DueTime(); ok {
 		_spec.SetField(risk.FieldDueTime, field.TypeTime, value)
 	}
-	if ru.mutation.UpdatorCleared() {
+	if ru.mutation.UpdaterCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: true,
-			Table:   risk.UpdatorTable,
-			Columns: []string{risk.UpdatorColumn},
+			Table:   risk.UpdaterTable,
+			Columns: []string{risk.UpdaterColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(admin.FieldID, field.TypeInt),
@@ -436,44 +478,15 @@ func (ru *RiskUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := ru.mutation.UpdatorIDs(); len(nodes) > 0 {
+	if nodes := ru.mutation.UpdaterIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: true,
-			Table:   risk.UpdatorTable,
-			Columns: []string{risk.UpdatorColumn},
+			Table:   risk.UpdaterTable,
+			Columns: []string{risk.UpdaterColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(admin.FieldID, field.TypeInt),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges.Add = append(_spec.Edges.Add, edge)
-	}
-	if ru.mutation.MaintainerCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2O,
-			Inverse: true,
-			Table:   risk.MaintainerTable,
-			Columns: []string{risk.MaintainerColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(employee.FieldID, field.TypeInt),
-			},
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := ru.mutation.MaintainerIDs(); len(nodes) > 0 {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2O,
-			Inverse: true,
-			Table:   risk.MaintainerTable,
-			Columns: []string{risk.MaintainerColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(employee.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {
@@ -532,6 +545,64 @@ func (ru *RiskUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(risklocation.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if ru.mutation.ReporterCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   risk.ReporterTable,
+			Columns: []string{risk.ReporterColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(employee.FieldID, field.TypeInt),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := ru.mutation.ReporterIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   risk.ReporterTable,
+			Columns: []string{risk.ReporterColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(employee.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if ru.mutation.MaintainerCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   risk.MaintainerTable,
+			Columns: []string{risk.MaintainerColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(employee.FieldID, field.TypeInt),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := ru.mutation.MaintainerIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   risk.MaintainerTable,
+			Columns: []string{risk.MaintainerColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(employee.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {
@@ -627,6 +698,12 @@ func (ruo *RiskUpdateOne) SetNillableContent(s *string) *RiskUpdateOne {
 	return ruo
 }
 
+// ClearContent clears the value of the "content" field.
+func (ruo *RiskUpdateOne) ClearContent() *RiskUpdateOne {
+	ruo.mutation.ClearContent()
+	return ruo
+}
+
 // SetImages sets the "images" field.
 func (ruo *RiskUpdateOne) SetImages(s []struct {
 	Title string "json:\"title\""
@@ -675,6 +752,20 @@ func (ruo *RiskUpdateOne) SetRiskLocationID(i int) *RiskUpdateOne {
 func (ruo *RiskUpdateOne) SetNillableRiskLocationID(i *int) *RiskUpdateOne {
 	if i != nil {
 		ruo.SetRiskLocationID(*i)
+	}
+	return ruo
+}
+
+// SetReporterID sets the "reporter_id" field.
+func (ruo *RiskUpdateOne) SetReporterID(i int) *RiskUpdateOne {
+	ruo.mutation.SetReporterID(i)
+	return ruo
+}
+
+// SetNillableReporterID sets the "reporter_id" field if the given value is not nil.
+func (ruo *RiskUpdateOne) SetNillableReporterID(i *int) *RiskUpdateOne {
+	if i != nil {
+		ruo.SetReporterID(*i)
 	}
 	return ruo
 }
@@ -748,20 +839,15 @@ func (ruo *RiskUpdateOne) SetNillableDueTime(t *time.Time) *RiskUpdateOne {
 	return ruo
 }
 
-// SetUpdatorID sets the "updator" edge to the Admin entity by ID.
-func (ruo *RiskUpdateOne) SetUpdatorID(id int) *RiskUpdateOne {
-	ruo.mutation.SetUpdatorID(id)
+// SetUpdaterID sets the "updater" edge to the Admin entity by ID.
+func (ruo *RiskUpdateOne) SetUpdaterID(id int) *RiskUpdateOne {
+	ruo.mutation.SetUpdaterID(id)
 	return ruo
 }
 
-// SetUpdator sets the "updator" edge to the Admin entity.
-func (ruo *RiskUpdateOne) SetUpdator(a *Admin) *RiskUpdateOne {
-	return ruo.SetUpdatorID(a.ID)
-}
-
-// SetMaintainer sets the "maintainer" edge to the Employee entity.
-func (ruo *RiskUpdateOne) SetMaintainer(e *Employee) *RiskUpdateOne {
-	return ruo.SetMaintainerID(e.ID)
+// SetUpdater sets the "updater" edge to the Admin entity.
+func (ruo *RiskUpdateOne) SetUpdater(a *Admin) *RiskUpdateOne {
+	return ruo.SetUpdaterID(a.ID)
 }
 
 // SetRiskCategory sets the "risk_category" edge to the RiskCategory entity.
@@ -774,20 +860,24 @@ func (ruo *RiskUpdateOne) SetRiskLocation(r *RiskLocation) *RiskUpdateOne {
 	return ruo.SetRiskLocationID(r.ID)
 }
 
+// SetReporter sets the "reporter" edge to the Employee entity.
+func (ruo *RiskUpdateOne) SetReporter(e *Employee) *RiskUpdateOne {
+	return ruo.SetReporterID(e.ID)
+}
+
+// SetMaintainer sets the "maintainer" edge to the Employee entity.
+func (ruo *RiskUpdateOne) SetMaintainer(e *Employee) *RiskUpdateOne {
+	return ruo.SetMaintainerID(e.ID)
+}
+
 // Mutation returns the RiskMutation object of the builder.
 func (ruo *RiskUpdateOne) Mutation() *RiskMutation {
 	return ruo.mutation
 }
 
-// ClearUpdator clears the "updator" edge to the Admin entity.
-func (ruo *RiskUpdateOne) ClearUpdator() *RiskUpdateOne {
-	ruo.mutation.ClearUpdator()
-	return ruo
-}
-
-// ClearMaintainer clears the "maintainer" edge to the Employee entity.
-func (ruo *RiskUpdateOne) ClearMaintainer() *RiskUpdateOne {
-	ruo.mutation.ClearMaintainer()
+// ClearUpdater clears the "updater" edge to the Admin entity.
+func (ruo *RiskUpdateOne) ClearUpdater() *RiskUpdateOne {
+	ruo.mutation.ClearUpdater()
 	return ruo
 }
 
@@ -800,6 +890,18 @@ func (ruo *RiskUpdateOne) ClearRiskCategory() *RiskUpdateOne {
 // ClearRiskLocation clears the "risk_location" edge to the RiskLocation entity.
 func (ruo *RiskUpdateOne) ClearRiskLocation() *RiskUpdateOne {
 	ruo.mutation.ClearRiskLocation()
+	return ruo
+}
+
+// ClearReporter clears the "reporter" edge to the Employee entity.
+func (ruo *RiskUpdateOne) ClearReporter() *RiskUpdateOne {
+	ruo.mutation.ClearReporter()
+	return ruo
+}
+
+// ClearMaintainer clears the "maintainer" edge to the Employee entity.
+func (ruo *RiskUpdateOne) ClearMaintainer() *RiskUpdateOne {
+	ruo.mutation.ClearMaintainer()
 	return ruo
 }
 
@@ -880,6 +982,11 @@ func (ruo *RiskUpdateOne) check() error {
 			return &ValidationError{Name: "risk_location_id", err: fmt.Errorf(`dao: validator failed for field "Risk.risk_location_id": %w`, err)}
 		}
 	}
+	if v, ok := ruo.mutation.ReporterID(); ok {
+		if err := risk.ReporterIDValidator(v); err != nil {
+			return &ValidationError{Name: "reporter_id", err: fmt.Errorf(`dao: validator failed for field "Risk.reporter_id": %w`, err)}
+		}
+	}
 	if v, ok := ruo.mutation.MaintainerID(); ok {
 		if err := risk.MaintainerIDValidator(v); err != nil {
 			return &ValidationError{Name: "maintainer_id", err: fmt.Errorf(`dao: validator failed for field "Risk.maintainer_id": %w`, err)}
@@ -893,17 +1000,20 @@ func (ruo *RiskUpdateOne) check() error {
 	if _, ok := ruo.mutation.CreatorID(); ruo.mutation.CreatorCleared() && !ok {
 		return errors.New(`dao: clearing a required unique edge "Risk.creator"`)
 	}
-	if _, ok := ruo.mutation.UpdatorID(); ruo.mutation.UpdatorCleared() && !ok {
-		return errors.New(`dao: clearing a required unique edge "Risk.updator"`)
-	}
-	if _, ok := ruo.mutation.MaintainerID(); ruo.mutation.MaintainerCleared() && !ok {
-		return errors.New(`dao: clearing a required unique edge "Risk.maintainer"`)
+	if _, ok := ruo.mutation.UpdaterID(); ruo.mutation.UpdaterCleared() && !ok {
+		return errors.New(`dao: clearing a required unique edge "Risk.updater"`)
 	}
 	if _, ok := ruo.mutation.RiskCategoryID(); ruo.mutation.RiskCategoryCleared() && !ok {
 		return errors.New(`dao: clearing a required unique edge "Risk.risk_category"`)
 	}
 	if _, ok := ruo.mutation.RiskLocationID(); ruo.mutation.RiskLocationCleared() && !ok {
 		return errors.New(`dao: clearing a required unique edge "Risk.risk_location"`)
+	}
+	if _, ok := ruo.mutation.ReporterID(); ruo.mutation.ReporterCleared() && !ok {
+		return errors.New(`dao: clearing a required unique edge "Risk.reporter"`)
+	}
+	if _, ok := ruo.mutation.MaintainerID(); ruo.mutation.MaintainerCleared() && !ok {
+		return errors.New(`dao: clearing a required unique edge "Risk.maintainer"`)
 	}
 	return nil
 }
@@ -952,6 +1062,9 @@ func (ruo *RiskUpdateOne) sqlSave(ctx context.Context) (_node *Risk, err error) 
 	if value, ok := ruo.mutation.Content(); ok {
 		_spec.SetField(risk.FieldContent, field.TypeString, value)
 	}
+	if ruo.mutation.ContentCleared() {
+		_spec.ClearField(risk.FieldContent, field.TypeString)
+	}
 	if value, ok := ruo.mutation.Images(); ok {
 		_spec.SetField(risk.FieldImages, field.TypeJSON, value)
 	}
@@ -978,12 +1091,12 @@ func (ruo *RiskUpdateOne) sqlSave(ctx context.Context) (_node *Risk, err error) 
 	if value, ok := ruo.mutation.DueTime(); ok {
 		_spec.SetField(risk.FieldDueTime, field.TypeTime, value)
 	}
-	if ruo.mutation.UpdatorCleared() {
+	if ruo.mutation.UpdaterCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: true,
-			Table:   risk.UpdatorTable,
-			Columns: []string{risk.UpdatorColumn},
+			Table:   risk.UpdaterTable,
+			Columns: []string{risk.UpdaterColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(admin.FieldID, field.TypeInt),
@@ -991,44 +1104,15 @@ func (ruo *RiskUpdateOne) sqlSave(ctx context.Context) (_node *Risk, err error) 
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := ruo.mutation.UpdatorIDs(); len(nodes) > 0 {
+	if nodes := ruo.mutation.UpdaterIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: true,
-			Table:   risk.UpdatorTable,
-			Columns: []string{risk.UpdatorColumn},
+			Table:   risk.UpdaterTable,
+			Columns: []string{risk.UpdaterColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(admin.FieldID, field.TypeInt),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges.Add = append(_spec.Edges.Add, edge)
-	}
-	if ruo.mutation.MaintainerCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2O,
-			Inverse: true,
-			Table:   risk.MaintainerTable,
-			Columns: []string{risk.MaintainerColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(employee.FieldID, field.TypeInt),
-			},
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := ruo.mutation.MaintainerIDs(); len(nodes) > 0 {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2O,
-			Inverse: true,
-			Table:   risk.MaintainerTable,
-			Columns: []string{risk.MaintainerColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(employee.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {
@@ -1087,6 +1171,64 @@ func (ruo *RiskUpdateOne) sqlSave(ctx context.Context) (_node *Risk, err error) 
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(risklocation.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if ruo.mutation.ReporterCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   risk.ReporterTable,
+			Columns: []string{risk.ReporterColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(employee.FieldID, field.TypeInt),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := ruo.mutation.ReporterIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   risk.ReporterTable,
+			Columns: []string{risk.ReporterColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(employee.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if ruo.mutation.MaintainerCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   risk.MaintainerTable,
+			Columns: []string{risk.MaintainerColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(employee.FieldID, field.TypeInt),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := ruo.mutation.MaintainerIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   risk.MaintainerTable,
+			Columns: []string{risk.MaintainerColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(employee.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {

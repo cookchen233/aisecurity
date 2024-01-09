@@ -3,8 +3,10 @@
 package dao
 
 import (
+	"aisecurity/ent/dao/admin"
 	"aisecurity/ent/dao/department"
 	"aisecurity/ent/dao/employee"
+	"aisecurity/ent/dao/occupation"
 	"aisecurity/ent/dao/predicate"
 	"aisecurity/ent/dao/risk"
 	"context"
@@ -52,7 +54,6 @@ func (eu *EmployeeUpdate) ClearDeletedAt() *EmployeeUpdate {
 
 // SetUpdatedBy sets the "updated_by" field.
 func (eu *EmployeeUpdate) SetUpdatedBy(i int) *EmployeeUpdate {
-	eu.mutation.ResetUpdatedBy()
 	eu.mutation.SetUpdatedBy(i)
 	return eu
 }
@@ -62,12 +63,6 @@ func (eu *EmployeeUpdate) SetNillableUpdatedBy(i *int) *EmployeeUpdate {
 	if i != nil {
 		eu.SetUpdatedBy(*i)
 	}
-	return eu
-}
-
-// AddUpdatedBy adds i to the "updated_by" field.
-func (eu *EmployeeUpdate) AddUpdatedBy(i int) *EmployeeUpdate {
-	eu.mutation.AddUpdatedBy(i)
 	return eu
 }
 
@@ -91,9 +86,50 @@ func (eu *EmployeeUpdate) SetNillableDepartmentID(i *int) *EmployeeUpdate {
 	return eu
 }
 
+// SetUpdaterID sets the "updater" edge to the Admin entity by ID.
+func (eu *EmployeeUpdate) SetUpdaterID(id int) *EmployeeUpdate {
+	eu.mutation.SetUpdaterID(id)
+	return eu
+}
+
+// SetUpdater sets the "updater" edge to the Admin entity.
+func (eu *EmployeeUpdate) SetUpdater(a *Admin) *EmployeeUpdate {
+	return eu.SetUpdaterID(a.ID)
+}
+
 // SetDepartment sets the "department" edge to the Department entity.
 func (eu *EmployeeUpdate) SetDepartment(d *Department) *EmployeeUpdate {
 	return eu.SetDepartmentID(d.ID)
+}
+
+// AddOccupationIDs adds the "occupations" edge to the Occupation entity by IDs.
+func (eu *EmployeeUpdate) AddOccupationIDs(ids ...int) *EmployeeUpdate {
+	eu.mutation.AddOccupationIDs(ids...)
+	return eu
+}
+
+// AddOccupations adds the "occupations" edges to the Occupation entity.
+func (eu *EmployeeUpdate) AddOccupations(o ...*Occupation) *EmployeeUpdate {
+	ids := make([]int, len(o))
+	for i := range o {
+		ids[i] = o[i].ID
+	}
+	return eu.AddOccupationIDs(ids...)
+}
+
+// AddRiskReporterIDs adds the "risk_reporter" edge to the Risk entity by IDs.
+func (eu *EmployeeUpdate) AddRiskReporterIDs(ids ...int) *EmployeeUpdate {
+	eu.mutation.AddRiskReporterIDs(ids...)
+	return eu
+}
+
+// AddRiskReporter adds the "risk_reporter" edges to the Risk entity.
+func (eu *EmployeeUpdate) AddRiskReporter(r ...*Risk) *EmployeeUpdate {
+	ids := make([]int, len(r))
+	for i := range r {
+		ids[i] = r[i].ID
+	}
+	return eu.AddRiskReporterIDs(ids...)
 }
 
 // AddRiskMaintainerIDs adds the "risk_maintainer" edge to the Risk entity by IDs.
@@ -111,30 +147,63 @@ func (eu *EmployeeUpdate) AddRiskMaintainer(r ...*Risk) *EmployeeUpdate {
 	return eu.AddRiskMaintainerIDs(ids...)
 }
 
-// AddRiskCreatorIDs adds the "risk_creator" edge to the Risk entity by IDs.
-func (eu *EmployeeUpdate) AddRiskCreatorIDs(ids ...int) *EmployeeUpdate {
-	eu.mutation.AddRiskCreatorIDs(ids...)
-	return eu
-}
-
-// AddRiskCreator adds the "risk_creator" edges to the Risk entity.
-func (eu *EmployeeUpdate) AddRiskCreator(r ...*Risk) *EmployeeUpdate {
-	ids := make([]int, len(r))
-	for i := range r {
-		ids[i] = r[i].ID
-	}
-	return eu.AddRiskCreatorIDs(ids...)
-}
-
 // Mutation returns the EmployeeMutation object of the builder.
 func (eu *EmployeeUpdate) Mutation() *EmployeeMutation {
 	return eu.mutation
+}
+
+// ClearUpdater clears the "updater" edge to the Admin entity.
+func (eu *EmployeeUpdate) ClearUpdater() *EmployeeUpdate {
+	eu.mutation.ClearUpdater()
+	return eu
 }
 
 // ClearDepartment clears the "department" edge to the Department entity.
 func (eu *EmployeeUpdate) ClearDepartment() *EmployeeUpdate {
 	eu.mutation.ClearDepartment()
 	return eu
+}
+
+// ClearOccupations clears all "occupations" edges to the Occupation entity.
+func (eu *EmployeeUpdate) ClearOccupations() *EmployeeUpdate {
+	eu.mutation.ClearOccupations()
+	return eu
+}
+
+// RemoveOccupationIDs removes the "occupations" edge to Occupation entities by IDs.
+func (eu *EmployeeUpdate) RemoveOccupationIDs(ids ...int) *EmployeeUpdate {
+	eu.mutation.RemoveOccupationIDs(ids...)
+	return eu
+}
+
+// RemoveOccupations removes "occupations" edges to Occupation entities.
+func (eu *EmployeeUpdate) RemoveOccupations(o ...*Occupation) *EmployeeUpdate {
+	ids := make([]int, len(o))
+	for i := range o {
+		ids[i] = o[i].ID
+	}
+	return eu.RemoveOccupationIDs(ids...)
+}
+
+// ClearRiskReporter clears all "risk_reporter" edges to the Risk entity.
+func (eu *EmployeeUpdate) ClearRiskReporter() *EmployeeUpdate {
+	eu.mutation.ClearRiskReporter()
+	return eu
+}
+
+// RemoveRiskReporterIDs removes the "risk_reporter" edge to Risk entities by IDs.
+func (eu *EmployeeUpdate) RemoveRiskReporterIDs(ids ...int) *EmployeeUpdate {
+	eu.mutation.RemoveRiskReporterIDs(ids...)
+	return eu
+}
+
+// RemoveRiskReporter removes "risk_reporter" edges to Risk entities.
+func (eu *EmployeeUpdate) RemoveRiskReporter(r ...*Risk) *EmployeeUpdate {
+	ids := make([]int, len(r))
+	for i := range r {
+		ids[i] = r[i].ID
+	}
+	return eu.RemoveRiskReporterIDs(ids...)
 }
 
 // ClearRiskMaintainer clears all "risk_maintainer" edges to the Risk entity.
@@ -156,27 +225,6 @@ func (eu *EmployeeUpdate) RemoveRiskMaintainer(r ...*Risk) *EmployeeUpdate {
 		ids[i] = r[i].ID
 	}
 	return eu.RemoveRiskMaintainerIDs(ids...)
-}
-
-// ClearRiskCreator clears all "risk_creator" edges to the Risk entity.
-func (eu *EmployeeUpdate) ClearRiskCreator() *EmployeeUpdate {
-	eu.mutation.ClearRiskCreator()
-	return eu
-}
-
-// RemoveRiskCreatorIDs removes the "risk_creator" edge to Risk entities by IDs.
-func (eu *EmployeeUpdate) RemoveRiskCreatorIDs(ids ...int) *EmployeeUpdate {
-	eu.mutation.RemoveRiskCreatorIDs(ids...)
-	return eu
-}
-
-// RemoveRiskCreator removes "risk_creator" edges to Risk entities.
-func (eu *EmployeeUpdate) RemoveRiskCreator(r ...*Risk) *EmployeeUpdate {
-	ids := make([]int, len(r))
-	for i := range r {
-		ids[i] = r[i].ID
-	}
-	return eu.RemoveRiskCreatorIDs(ids...)
 }
 
 // Save executes the query and returns the number of nodes affected by the update operation.
@@ -236,6 +284,9 @@ func (eu *EmployeeUpdate) check() error {
 	if _, ok := eu.mutation.CreatorID(); eu.mutation.CreatorCleared() && !ok {
 		return errors.New(`dao: clearing a required unique edge "Employee.creator"`)
 	}
+	if _, ok := eu.mutation.UpdaterID(); eu.mutation.UpdaterCleared() && !ok {
+		return errors.New(`dao: clearing a required unique edge "Employee.updater"`)
+	}
 	if _, ok := eu.mutation.AdminID(); eu.mutation.AdminCleared() && !ok {
 		return errors.New(`dao: clearing a required unique edge "Employee.admin"`)
 	}
@@ -263,14 +314,37 @@ func (eu *EmployeeUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	if eu.mutation.DeletedAtCleared() {
 		_spec.ClearField(employee.FieldDeletedAt, field.TypeTime)
 	}
-	if value, ok := eu.mutation.UpdatedBy(); ok {
-		_spec.SetField(employee.FieldUpdatedBy, field.TypeInt, value)
-	}
-	if value, ok := eu.mutation.AddedUpdatedBy(); ok {
-		_spec.AddField(employee.FieldUpdatedBy, field.TypeInt, value)
-	}
 	if value, ok := eu.mutation.UpdatedAt(); ok {
 		_spec.SetField(employee.FieldUpdatedAt, field.TypeTime, value)
+	}
+	if eu.mutation.UpdaterCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   employee.UpdaterTable,
+			Columns: []string{employee.UpdaterColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(admin.FieldID, field.TypeInt),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := eu.mutation.UpdaterIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   employee.UpdaterTable,
+			Columns: []string{employee.UpdaterColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(admin.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
 	if eu.mutation.DepartmentCleared() {
 		edge := &sqlgraph.EdgeSpec{
@@ -294,6 +368,96 @@ func (eu *EmployeeUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(department.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if eu.mutation.OccupationsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: true,
+			Table:   employee.OccupationsTable,
+			Columns: employee.OccupationsPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(occupation.FieldID, field.TypeInt),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := eu.mutation.RemovedOccupationsIDs(); len(nodes) > 0 && !eu.mutation.OccupationsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: true,
+			Table:   employee.OccupationsTable,
+			Columns: employee.OccupationsPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(occupation.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := eu.mutation.OccupationsIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: true,
+			Table:   employee.OccupationsTable,
+			Columns: employee.OccupationsPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(occupation.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if eu.mutation.RiskReporterCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   employee.RiskReporterTable,
+			Columns: []string{employee.RiskReporterColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(risk.FieldID, field.TypeInt),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := eu.mutation.RemovedRiskReporterIDs(); len(nodes) > 0 && !eu.mutation.RiskReporterCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   employee.RiskReporterTable,
+			Columns: []string{employee.RiskReporterColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(risk.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := eu.mutation.RiskReporterIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   employee.RiskReporterTable,
+			Columns: []string{employee.RiskReporterColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(risk.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {
@@ -346,51 +510,6 @@ func (eu *EmployeeUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if eu.mutation.RiskCreatorCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
-			Inverse: false,
-			Table:   employee.RiskCreatorTable,
-			Columns: []string{employee.RiskCreatorColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(risk.FieldID, field.TypeInt),
-			},
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := eu.mutation.RemovedRiskCreatorIDs(); len(nodes) > 0 && !eu.mutation.RiskCreatorCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
-			Inverse: false,
-			Table:   employee.RiskCreatorTable,
-			Columns: []string{employee.RiskCreatorColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(risk.FieldID, field.TypeInt),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := eu.mutation.RiskCreatorIDs(); len(nodes) > 0 {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
-			Inverse: false,
-			Table:   employee.RiskCreatorTable,
-			Columns: []string{employee.RiskCreatorColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(risk.FieldID, field.TypeInt),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges.Add = append(_spec.Edges.Add, edge)
-	}
 	if n, err = sqlgraph.UpdateNodes(ctx, eu.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
 			err = &NotFoundError{employee.Label}
@@ -433,7 +552,6 @@ func (euo *EmployeeUpdateOne) ClearDeletedAt() *EmployeeUpdateOne {
 
 // SetUpdatedBy sets the "updated_by" field.
 func (euo *EmployeeUpdateOne) SetUpdatedBy(i int) *EmployeeUpdateOne {
-	euo.mutation.ResetUpdatedBy()
 	euo.mutation.SetUpdatedBy(i)
 	return euo
 }
@@ -443,12 +561,6 @@ func (euo *EmployeeUpdateOne) SetNillableUpdatedBy(i *int) *EmployeeUpdateOne {
 	if i != nil {
 		euo.SetUpdatedBy(*i)
 	}
-	return euo
-}
-
-// AddUpdatedBy adds i to the "updated_by" field.
-func (euo *EmployeeUpdateOne) AddUpdatedBy(i int) *EmployeeUpdateOne {
-	euo.mutation.AddUpdatedBy(i)
 	return euo
 }
 
@@ -472,9 +584,50 @@ func (euo *EmployeeUpdateOne) SetNillableDepartmentID(i *int) *EmployeeUpdateOne
 	return euo
 }
 
+// SetUpdaterID sets the "updater" edge to the Admin entity by ID.
+func (euo *EmployeeUpdateOne) SetUpdaterID(id int) *EmployeeUpdateOne {
+	euo.mutation.SetUpdaterID(id)
+	return euo
+}
+
+// SetUpdater sets the "updater" edge to the Admin entity.
+func (euo *EmployeeUpdateOne) SetUpdater(a *Admin) *EmployeeUpdateOne {
+	return euo.SetUpdaterID(a.ID)
+}
+
 // SetDepartment sets the "department" edge to the Department entity.
 func (euo *EmployeeUpdateOne) SetDepartment(d *Department) *EmployeeUpdateOne {
 	return euo.SetDepartmentID(d.ID)
+}
+
+// AddOccupationIDs adds the "occupations" edge to the Occupation entity by IDs.
+func (euo *EmployeeUpdateOne) AddOccupationIDs(ids ...int) *EmployeeUpdateOne {
+	euo.mutation.AddOccupationIDs(ids...)
+	return euo
+}
+
+// AddOccupations adds the "occupations" edges to the Occupation entity.
+func (euo *EmployeeUpdateOne) AddOccupations(o ...*Occupation) *EmployeeUpdateOne {
+	ids := make([]int, len(o))
+	for i := range o {
+		ids[i] = o[i].ID
+	}
+	return euo.AddOccupationIDs(ids...)
+}
+
+// AddRiskReporterIDs adds the "risk_reporter" edge to the Risk entity by IDs.
+func (euo *EmployeeUpdateOne) AddRiskReporterIDs(ids ...int) *EmployeeUpdateOne {
+	euo.mutation.AddRiskReporterIDs(ids...)
+	return euo
+}
+
+// AddRiskReporter adds the "risk_reporter" edges to the Risk entity.
+func (euo *EmployeeUpdateOne) AddRiskReporter(r ...*Risk) *EmployeeUpdateOne {
+	ids := make([]int, len(r))
+	for i := range r {
+		ids[i] = r[i].ID
+	}
+	return euo.AddRiskReporterIDs(ids...)
 }
 
 // AddRiskMaintainerIDs adds the "risk_maintainer" edge to the Risk entity by IDs.
@@ -492,30 +645,63 @@ func (euo *EmployeeUpdateOne) AddRiskMaintainer(r ...*Risk) *EmployeeUpdateOne {
 	return euo.AddRiskMaintainerIDs(ids...)
 }
 
-// AddRiskCreatorIDs adds the "risk_creator" edge to the Risk entity by IDs.
-func (euo *EmployeeUpdateOne) AddRiskCreatorIDs(ids ...int) *EmployeeUpdateOne {
-	euo.mutation.AddRiskCreatorIDs(ids...)
-	return euo
-}
-
-// AddRiskCreator adds the "risk_creator" edges to the Risk entity.
-func (euo *EmployeeUpdateOne) AddRiskCreator(r ...*Risk) *EmployeeUpdateOne {
-	ids := make([]int, len(r))
-	for i := range r {
-		ids[i] = r[i].ID
-	}
-	return euo.AddRiskCreatorIDs(ids...)
-}
-
 // Mutation returns the EmployeeMutation object of the builder.
 func (euo *EmployeeUpdateOne) Mutation() *EmployeeMutation {
 	return euo.mutation
+}
+
+// ClearUpdater clears the "updater" edge to the Admin entity.
+func (euo *EmployeeUpdateOne) ClearUpdater() *EmployeeUpdateOne {
+	euo.mutation.ClearUpdater()
+	return euo
 }
 
 // ClearDepartment clears the "department" edge to the Department entity.
 func (euo *EmployeeUpdateOne) ClearDepartment() *EmployeeUpdateOne {
 	euo.mutation.ClearDepartment()
 	return euo
+}
+
+// ClearOccupations clears all "occupations" edges to the Occupation entity.
+func (euo *EmployeeUpdateOne) ClearOccupations() *EmployeeUpdateOne {
+	euo.mutation.ClearOccupations()
+	return euo
+}
+
+// RemoveOccupationIDs removes the "occupations" edge to Occupation entities by IDs.
+func (euo *EmployeeUpdateOne) RemoveOccupationIDs(ids ...int) *EmployeeUpdateOne {
+	euo.mutation.RemoveOccupationIDs(ids...)
+	return euo
+}
+
+// RemoveOccupations removes "occupations" edges to Occupation entities.
+func (euo *EmployeeUpdateOne) RemoveOccupations(o ...*Occupation) *EmployeeUpdateOne {
+	ids := make([]int, len(o))
+	for i := range o {
+		ids[i] = o[i].ID
+	}
+	return euo.RemoveOccupationIDs(ids...)
+}
+
+// ClearRiskReporter clears all "risk_reporter" edges to the Risk entity.
+func (euo *EmployeeUpdateOne) ClearRiskReporter() *EmployeeUpdateOne {
+	euo.mutation.ClearRiskReporter()
+	return euo
+}
+
+// RemoveRiskReporterIDs removes the "risk_reporter" edge to Risk entities by IDs.
+func (euo *EmployeeUpdateOne) RemoveRiskReporterIDs(ids ...int) *EmployeeUpdateOne {
+	euo.mutation.RemoveRiskReporterIDs(ids...)
+	return euo
+}
+
+// RemoveRiskReporter removes "risk_reporter" edges to Risk entities.
+func (euo *EmployeeUpdateOne) RemoveRiskReporter(r ...*Risk) *EmployeeUpdateOne {
+	ids := make([]int, len(r))
+	for i := range r {
+		ids[i] = r[i].ID
+	}
+	return euo.RemoveRiskReporterIDs(ids...)
 }
 
 // ClearRiskMaintainer clears all "risk_maintainer" edges to the Risk entity.
@@ -537,27 +723,6 @@ func (euo *EmployeeUpdateOne) RemoveRiskMaintainer(r ...*Risk) *EmployeeUpdateOn
 		ids[i] = r[i].ID
 	}
 	return euo.RemoveRiskMaintainerIDs(ids...)
-}
-
-// ClearRiskCreator clears all "risk_creator" edges to the Risk entity.
-func (euo *EmployeeUpdateOne) ClearRiskCreator() *EmployeeUpdateOne {
-	euo.mutation.ClearRiskCreator()
-	return euo
-}
-
-// RemoveRiskCreatorIDs removes the "risk_creator" edge to Risk entities by IDs.
-func (euo *EmployeeUpdateOne) RemoveRiskCreatorIDs(ids ...int) *EmployeeUpdateOne {
-	euo.mutation.RemoveRiskCreatorIDs(ids...)
-	return euo
-}
-
-// RemoveRiskCreator removes "risk_creator" edges to Risk entities.
-func (euo *EmployeeUpdateOne) RemoveRiskCreator(r ...*Risk) *EmployeeUpdateOne {
-	ids := make([]int, len(r))
-	for i := range r {
-		ids[i] = r[i].ID
-	}
-	return euo.RemoveRiskCreatorIDs(ids...)
 }
 
 // Where appends a list predicates to the EmployeeUpdate builder.
@@ -630,6 +795,9 @@ func (euo *EmployeeUpdateOne) check() error {
 	if _, ok := euo.mutation.CreatorID(); euo.mutation.CreatorCleared() && !ok {
 		return errors.New(`dao: clearing a required unique edge "Employee.creator"`)
 	}
+	if _, ok := euo.mutation.UpdaterID(); euo.mutation.UpdaterCleared() && !ok {
+		return errors.New(`dao: clearing a required unique edge "Employee.updater"`)
+	}
 	if _, ok := euo.mutation.AdminID(); euo.mutation.AdminCleared() && !ok {
 		return errors.New(`dao: clearing a required unique edge "Employee.admin"`)
 	}
@@ -674,14 +842,37 @@ func (euo *EmployeeUpdateOne) sqlSave(ctx context.Context) (_node *Employee, err
 	if euo.mutation.DeletedAtCleared() {
 		_spec.ClearField(employee.FieldDeletedAt, field.TypeTime)
 	}
-	if value, ok := euo.mutation.UpdatedBy(); ok {
-		_spec.SetField(employee.FieldUpdatedBy, field.TypeInt, value)
-	}
-	if value, ok := euo.mutation.AddedUpdatedBy(); ok {
-		_spec.AddField(employee.FieldUpdatedBy, field.TypeInt, value)
-	}
 	if value, ok := euo.mutation.UpdatedAt(); ok {
 		_spec.SetField(employee.FieldUpdatedAt, field.TypeTime, value)
+	}
+	if euo.mutation.UpdaterCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   employee.UpdaterTable,
+			Columns: []string{employee.UpdaterColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(admin.FieldID, field.TypeInt),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := euo.mutation.UpdaterIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   employee.UpdaterTable,
+			Columns: []string{employee.UpdaterColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(admin.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
 	if euo.mutation.DepartmentCleared() {
 		edge := &sqlgraph.EdgeSpec{
@@ -705,6 +896,96 @@ func (euo *EmployeeUpdateOne) sqlSave(ctx context.Context) (_node *Employee, err
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(department.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if euo.mutation.OccupationsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: true,
+			Table:   employee.OccupationsTable,
+			Columns: employee.OccupationsPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(occupation.FieldID, field.TypeInt),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := euo.mutation.RemovedOccupationsIDs(); len(nodes) > 0 && !euo.mutation.OccupationsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: true,
+			Table:   employee.OccupationsTable,
+			Columns: employee.OccupationsPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(occupation.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := euo.mutation.OccupationsIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: true,
+			Table:   employee.OccupationsTable,
+			Columns: employee.OccupationsPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(occupation.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if euo.mutation.RiskReporterCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   employee.RiskReporterTable,
+			Columns: []string{employee.RiskReporterColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(risk.FieldID, field.TypeInt),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := euo.mutation.RemovedRiskReporterIDs(); len(nodes) > 0 && !euo.mutation.RiskReporterCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   employee.RiskReporterTable,
+			Columns: []string{employee.RiskReporterColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(risk.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := euo.mutation.RiskReporterIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   employee.RiskReporterTable,
+			Columns: []string{employee.RiskReporterColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(risk.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {
@@ -747,51 +1028,6 @@ func (euo *EmployeeUpdateOne) sqlSave(ctx context.Context) (_node *Employee, err
 			Inverse: false,
 			Table:   employee.RiskMaintainerTable,
 			Columns: []string{employee.RiskMaintainerColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(risk.FieldID, field.TypeInt),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges.Add = append(_spec.Edges.Add, edge)
-	}
-	if euo.mutation.RiskCreatorCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
-			Inverse: false,
-			Table:   employee.RiskCreatorTable,
-			Columns: []string{employee.RiskCreatorColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(risk.FieldID, field.TypeInt),
-			},
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := euo.mutation.RemovedRiskCreatorIDs(); len(nodes) > 0 && !euo.mutation.RiskCreatorCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
-			Inverse: false,
-			Table:   employee.RiskCreatorTable,
-			Columns: []string{employee.RiskCreatorColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(risk.FieldID, field.TypeInt),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := euo.mutation.RiskCreatorIDs(); len(nodes) > 0 {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
-			Inverse: false,
-			Table:   employee.RiskCreatorTable,
-			Columns: []string{employee.RiskCreatorColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(risk.FieldID, field.TypeInt),

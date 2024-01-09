@@ -21,8 +21,8 @@ func (Department) Mixin() []ent.Mixin {
 // Fields of the Department.
 func (Department) Fields() []ent.Field {
 	return []ent.Field{
-		field.String("title").Comment("标题").MaxLen(255),
-		field.Int("parent_id").Comment("上级部门id").NonNegative(),
+		field.String("name").Comment("名称").NotEmpty().MaxLen(255).StructTag(`validate:"required"`),
+		field.Int("parent_id").Comment("上级部门id").Optional().NonNegative(),
 	}
 }
 
@@ -30,9 +30,11 @@ func (Department) Fields() []ent.Field {
 func (Department) Edges() []ent.Edge {
 	return []ent.Edge{
 		edge.From("creator", Admin.Type).Ref("department_creator").Field("created_by").Immutable().Unique().Required(),
-		edge.From("parent", Department.Type).Ref("children").Unique().Field("parent_id").Required(),
+		edge.From("updater", Admin.Type).Ref("department_updater").Field("updated_by").Required().Unique(),
 
-		edge.To("employee_department", Employee.Type),
+		edge.From("parent", Department.Type).Ref("children").Field("parent_id").Unique(),
+
+		edge.To("employees", Employee.Type),
 		edge.To("children", Department.Type),
 	}
 }

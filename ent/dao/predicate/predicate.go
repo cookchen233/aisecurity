@@ -18,6 +18,9 @@ type Department func(*sql.Selector)
 // Employee is the predicate function for employee builders.
 type Employee func(*sql.Selector)
 
+// Occupation is the predicate function for occupation builders.
+type Occupation func(*sql.Selector)
+
 // Risk is the predicate function for risk builders.
 type Risk func(*sql.Selector)
 

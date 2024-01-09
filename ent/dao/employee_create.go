@@ -6,6 +6,7 @@ import (
 	"aisecurity/ent/dao/admin"
 	"aisecurity/ent/dao/department"
 	"aisecurity/ent/dao/employee"
+	"aisecurity/ent/dao/occupation"
 	"aisecurity/ent/dao/risk"
 	"context"
 	"errors"
@@ -100,6 +101,17 @@ func (ec *EmployeeCreate) SetCreator(a *Admin) *EmployeeCreate {
 	return ec.SetCreatorID(a.ID)
 }
 
+// SetUpdaterID sets the "updater" edge to the Admin entity by ID.
+func (ec *EmployeeCreate) SetUpdaterID(id int) *EmployeeCreate {
+	ec.mutation.SetUpdaterID(id)
+	return ec
+}
+
+// SetUpdater sets the "updater" edge to the Admin entity.
+func (ec *EmployeeCreate) SetUpdater(a *Admin) *EmployeeCreate {
+	return ec.SetUpdaterID(a.ID)
+}
+
 // SetAdmin sets the "admin" edge to the Admin entity.
 func (ec *EmployeeCreate) SetAdmin(a *Admin) *EmployeeCreate {
 	return ec.SetAdminID(a.ID)
@@ -108,6 +120,36 @@ func (ec *EmployeeCreate) SetAdmin(a *Admin) *EmployeeCreate {
 // SetDepartment sets the "department" edge to the Department entity.
 func (ec *EmployeeCreate) SetDepartment(d *Department) *EmployeeCreate {
 	return ec.SetDepartmentID(d.ID)
+}
+
+// AddOccupationIDs adds the "occupations" edge to the Occupation entity by IDs.
+func (ec *EmployeeCreate) AddOccupationIDs(ids ...int) *EmployeeCreate {
+	ec.mutation.AddOccupationIDs(ids...)
+	return ec
+}
+
+// AddOccupations adds the "occupations" edges to the Occupation entity.
+func (ec *EmployeeCreate) AddOccupations(o ...*Occupation) *EmployeeCreate {
+	ids := make([]int, len(o))
+	for i := range o {
+		ids[i] = o[i].ID
+	}
+	return ec.AddOccupationIDs(ids...)
+}
+
+// AddRiskReporterIDs adds the "risk_reporter" edge to the Risk entity by IDs.
+func (ec *EmployeeCreate) AddRiskReporterIDs(ids ...int) *EmployeeCreate {
+	ec.mutation.AddRiskReporterIDs(ids...)
+	return ec
+}
+
+// AddRiskReporter adds the "risk_reporter" edges to the Risk entity.
+func (ec *EmployeeCreate) AddRiskReporter(r ...*Risk) *EmployeeCreate {
+	ids := make([]int, len(r))
+	for i := range r {
+		ids[i] = r[i].ID
+	}
+	return ec.AddRiskReporterIDs(ids...)
 }
 
 // AddRiskMaintainerIDs adds the "risk_maintainer" edge to the Risk entity by IDs.
@@ -123,21 +165,6 @@ func (ec *EmployeeCreate) AddRiskMaintainer(r ...*Risk) *EmployeeCreate {
 		ids[i] = r[i].ID
 	}
 	return ec.AddRiskMaintainerIDs(ids...)
-}
-
-// AddRiskCreatorIDs adds the "risk_creator" edge to the Risk entity by IDs.
-func (ec *EmployeeCreate) AddRiskCreatorIDs(ids ...int) *EmployeeCreate {
-	ec.mutation.AddRiskCreatorIDs(ids...)
-	return ec
-}
-
-// AddRiskCreator adds the "risk_creator" edges to the Risk entity.
-func (ec *EmployeeCreate) AddRiskCreator(r ...*Risk) *EmployeeCreate {
-	ids := make([]int, len(r))
-	for i := range r {
-		ids[i] = r[i].ID
-	}
-	return ec.AddRiskCreatorIDs(ids...)
 }
 
 // Mutation returns the EmployeeMutation object of the builder.
@@ -237,6 +264,9 @@ func (ec *EmployeeCreate) check() error {
 	if _, ok := ec.mutation.CreatorID(); !ok {
 		return &ValidationError{Name: "creator", err: errors.New(`dao: missing required edge "Employee.creator"`)}
 	}
+	if _, ok := ec.mutation.UpdaterID(); !ok {
+		return &ValidationError{Name: "updater", err: errors.New(`dao: missing required edge "Employee.updater"`)}
+	}
 	if _, ok := ec.mutation.AdminID(); !ok {
 		return &ValidationError{Name: "admin", err: errors.New(`dao: missing required edge "Employee.admin"`)}
 	}
@@ -277,10 +307,6 @@ func (ec *EmployeeCreate) createSpec() (*Employee, *sqlgraph.CreateSpec) {
 		_spec.SetField(employee.FieldDeletedAt, field.TypeTime, value)
 		_node.DeletedAt = &value
 	}
-	if value, ok := ec.mutation.UpdatedBy(); ok {
-		_spec.SetField(employee.FieldUpdatedBy, field.TypeInt, value)
-		_node.UpdatedBy = value
-	}
 	if value, ok := ec.mutation.UpdatedAt(); ok {
 		_spec.SetField(employee.FieldUpdatedAt, field.TypeTime, value)
 		_node.UpdatedAt = value
@@ -300,6 +326,23 @@ func (ec *EmployeeCreate) createSpec() (*Employee, *sqlgraph.CreateSpec) {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
 		_node.CreatedBy = nodes[0]
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := ec.mutation.UpdaterIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   employee.UpdaterTable,
+			Columns: []string{employee.UpdaterColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(admin.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_node.UpdatedBy = nodes[0]
 		_spec.Edges = append(_spec.Edges, edge)
 	}
 	if nodes := ec.mutation.AdminIDs(); len(nodes) > 0 {
@@ -336,12 +379,28 @@ func (ec *EmployeeCreate) createSpec() (*Employee, *sqlgraph.CreateSpec) {
 		_node.DepartmentID = nodes[0]
 		_spec.Edges = append(_spec.Edges, edge)
 	}
-	if nodes := ec.mutation.RiskMaintainerIDs(); len(nodes) > 0 {
+	if nodes := ec.mutation.OccupationsIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: true,
+			Table:   employee.OccupationsTable,
+			Columns: employee.OccupationsPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(occupation.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := ec.mutation.RiskReporterIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
-			Table:   employee.RiskMaintainerTable,
-			Columns: []string{employee.RiskMaintainerColumn},
+			Table:   employee.RiskReporterTable,
+			Columns: []string{employee.RiskReporterColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(risk.FieldID, field.TypeInt),
@@ -352,12 +411,12 @@ func (ec *EmployeeCreate) createSpec() (*Employee, *sqlgraph.CreateSpec) {
 		}
 		_spec.Edges = append(_spec.Edges, edge)
 	}
-	if nodes := ec.mutation.RiskCreatorIDs(); len(nodes) > 0 {
+	if nodes := ec.mutation.RiskMaintainerIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
-			Table:   employee.RiskCreatorTable,
-			Columns: []string{employee.RiskCreatorColumn},
+			Table:   employee.RiskMaintainerTable,
+			Columns: []string{employee.RiskMaintainerColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(risk.FieldID, field.TypeInt),

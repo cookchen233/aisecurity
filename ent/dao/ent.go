@@ -7,6 +7,7 @@ import (
 	"aisecurity/ent/dao/adminrole"
 	"aisecurity/ent/dao/department"
 	"aisecurity/ent/dao/employee"
+	"aisecurity/ent/dao/occupation"
 	"aisecurity/ent/dao/risk"
 	"aisecurity/ent/dao/riskcategory"
 	"aisecurity/ent/dao/risklocation"
@@ -83,6 +84,7 @@ func checkColumn(table, column string) error {
 			adminrole.Table:    adminrole.ValidColumn,
 			department.Table:   department.ValidColumn,
 			employee.Table:     employee.ValidColumn,
+			occupation.Table:   occupation.ValidColumn,
 			risk.Table:         risk.ValidColumn,
 			riskcategory.Table: riskcategory.ValidColumn,
 			risklocation.Table: risklocation.ValidColumn,

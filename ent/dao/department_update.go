@@ -3,6 +3,7 @@
 package dao
 
 import (
+	"aisecurity/ent/dao/admin"
 	"aisecurity/ent/dao/department"
 	"aisecurity/ent/dao/employee"
 	"aisecurity/ent/dao/predicate"
@@ -51,7 +52,6 @@ func (du *DepartmentUpdate) ClearDeletedAt() *DepartmentUpdate {
 
 // SetUpdatedBy sets the "updated_by" field.
 func (du *DepartmentUpdate) SetUpdatedBy(i int) *DepartmentUpdate {
-	du.mutation.ResetUpdatedBy()
 	du.mutation.SetUpdatedBy(i)
 	return du
 }
@@ -64,28 +64,22 @@ func (du *DepartmentUpdate) SetNillableUpdatedBy(i *int) *DepartmentUpdate {
 	return du
 }
 
-// AddUpdatedBy adds i to the "updated_by" field.
-func (du *DepartmentUpdate) AddUpdatedBy(i int) *DepartmentUpdate {
-	du.mutation.AddUpdatedBy(i)
-	return du
-}
-
 // SetUpdatedAt sets the "updated_at" field.
 func (du *DepartmentUpdate) SetUpdatedAt(t time.Time) *DepartmentUpdate {
 	du.mutation.SetUpdatedAt(t)
 	return du
 }
 
-// SetTitle sets the "title" field.
-func (du *DepartmentUpdate) SetTitle(s string) *DepartmentUpdate {
-	du.mutation.SetTitle(s)
+// SetName sets the "name" field.
+func (du *DepartmentUpdate) SetName(s string) *DepartmentUpdate {
+	du.mutation.SetName(s)
 	return du
 }
 
-// SetNillableTitle sets the "title" field if the given value is not nil.
-func (du *DepartmentUpdate) SetNillableTitle(s *string) *DepartmentUpdate {
+// SetNillableName sets the "name" field if the given value is not nil.
+func (du *DepartmentUpdate) SetNillableName(s *string) *DepartmentUpdate {
 	if s != nil {
-		du.SetTitle(*s)
+		du.SetName(*s)
 	}
 	return du
 }
@@ -104,24 +98,41 @@ func (du *DepartmentUpdate) SetNillableParentID(i *int) *DepartmentUpdate {
 	return du
 }
 
+// ClearParentID clears the value of the "parent_id" field.
+func (du *DepartmentUpdate) ClearParentID() *DepartmentUpdate {
+	du.mutation.ClearParentID()
+	return du
+}
+
+// SetUpdaterID sets the "updater" edge to the Admin entity by ID.
+func (du *DepartmentUpdate) SetUpdaterID(id int) *DepartmentUpdate {
+	du.mutation.SetUpdaterID(id)
+	return du
+}
+
+// SetUpdater sets the "updater" edge to the Admin entity.
+func (du *DepartmentUpdate) SetUpdater(a *Admin) *DepartmentUpdate {
+	return du.SetUpdaterID(a.ID)
+}
+
 // SetParent sets the "parent" edge to the Department entity.
 func (du *DepartmentUpdate) SetParent(d *Department) *DepartmentUpdate {
 	return du.SetParentID(d.ID)
 }
 
-// AddEmployeeDepartmentIDs adds the "employee_department" edge to the Employee entity by IDs.
-func (du *DepartmentUpdate) AddEmployeeDepartmentIDs(ids ...int) *DepartmentUpdate {
-	du.mutation.AddEmployeeDepartmentIDs(ids...)
+// AddEmployeeIDs adds the "employees" edge to the Employee entity by IDs.
+func (du *DepartmentUpdate) AddEmployeeIDs(ids ...int) *DepartmentUpdate {
+	du.mutation.AddEmployeeIDs(ids...)
 	return du
 }
 
-// AddEmployeeDepartment adds the "employee_department" edges to the Employee entity.
-func (du *DepartmentUpdate) AddEmployeeDepartment(e ...*Employee) *DepartmentUpdate {
+// AddEmployees adds the "employees" edges to the Employee entity.
+func (du *DepartmentUpdate) AddEmployees(e ...*Employee) *DepartmentUpdate {
 	ids := make([]int, len(e))
 	for i := range e {
 		ids[i] = e[i].ID
 	}
-	return du.AddEmployeeDepartmentIDs(ids...)
+	return du.AddEmployeeIDs(ids...)
 }
 
 // AddChildIDs adds the "children" edge to the Department entity by IDs.
@@ -144,31 +155,37 @@ func (du *DepartmentUpdate) Mutation() *DepartmentMutation {
 	return du.mutation
 }
 
+// ClearUpdater clears the "updater" edge to the Admin entity.
+func (du *DepartmentUpdate) ClearUpdater() *DepartmentUpdate {
+	du.mutation.ClearUpdater()
+	return du
+}
+
 // ClearParent clears the "parent" edge to the Department entity.
 func (du *DepartmentUpdate) ClearParent() *DepartmentUpdate {
 	du.mutation.ClearParent()
 	return du
 }
 
-// ClearEmployeeDepartment clears all "employee_department" edges to the Employee entity.
-func (du *DepartmentUpdate) ClearEmployeeDepartment() *DepartmentUpdate {
-	du.mutation.ClearEmployeeDepartment()
+// ClearEmployees clears all "employees" edges to the Employee entity.
+func (du *DepartmentUpdate) ClearEmployees() *DepartmentUpdate {
+	du.mutation.ClearEmployees()
 	return du
 }
 
-// RemoveEmployeeDepartmentIDs removes the "employee_department" edge to Employee entities by IDs.
-func (du *DepartmentUpdate) RemoveEmployeeDepartmentIDs(ids ...int) *DepartmentUpdate {
-	du.mutation.RemoveEmployeeDepartmentIDs(ids...)
+// RemoveEmployeeIDs removes the "employees" edge to Employee entities by IDs.
+func (du *DepartmentUpdate) RemoveEmployeeIDs(ids ...int) *DepartmentUpdate {
+	du.mutation.RemoveEmployeeIDs(ids...)
 	return du
 }
 
-// RemoveEmployeeDepartment removes "employee_department" edges to Employee entities.
-func (du *DepartmentUpdate) RemoveEmployeeDepartment(e ...*Employee) *DepartmentUpdate {
+// RemoveEmployees removes "employees" edges to Employee entities.
+func (du *DepartmentUpdate) RemoveEmployees(e ...*Employee) *DepartmentUpdate {
 	ids := make([]int, len(e))
 	for i := range e {
 		ids[i] = e[i].ID
 	}
-	return du.RemoveEmployeeDepartmentIDs(ids...)
+	return du.RemoveEmployeeIDs(ids...)
 }
 
 // ClearChildren clears all "children" edges to the Department entity.
@@ -241,9 +258,9 @@ func (du *DepartmentUpdate) check() error {
 			return &ValidationError{Name: "updated_by", err: fmt.Errorf(`dao: validator failed for field "Department.updated_by": %w`, err)}
 		}
 	}
-	if v, ok := du.mutation.Title(); ok {
-		if err := department.TitleValidator(v); err != nil {
-			return &ValidationError{Name: "title", err: fmt.Errorf(`dao: validator failed for field "Department.title": %w`, err)}
+	if v, ok := du.mutation.Name(); ok {
+		if err := department.NameValidator(v); err != nil {
+			return &ValidationError{Name: "name", err: fmt.Errorf(`dao: validator failed for field "Department.name": %w`, err)}
 		}
 	}
 	if v, ok := du.mutation.ParentID(); ok {
@@ -254,8 +271,8 @@ func (du *DepartmentUpdate) check() error {
 	if _, ok := du.mutation.CreatorID(); du.mutation.CreatorCleared() && !ok {
 		return errors.New(`dao: clearing a required unique edge "Department.creator"`)
 	}
-	if _, ok := du.mutation.ParentID(); du.mutation.ParentCleared() && !ok {
-		return errors.New(`dao: clearing a required unique edge "Department.parent"`)
+	if _, ok := du.mutation.UpdaterID(); du.mutation.UpdaterCleared() && !ok {
+		return errors.New(`dao: clearing a required unique edge "Department.updater"`)
 	}
 	return nil
 }
@@ -278,17 +295,40 @@ func (du *DepartmentUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	if du.mutation.DeletedAtCleared() {
 		_spec.ClearField(department.FieldDeletedAt, field.TypeTime)
 	}
-	if value, ok := du.mutation.UpdatedBy(); ok {
-		_spec.SetField(department.FieldUpdatedBy, field.TypeInt, value)
-	}
-	if value, ok := du.mutation.AddedUpdatedBy(); ok {
-		_spec.AddField(department.FieldUpdatedBy, field.TypeInt, value)
-	}
 	if value, ok := du.mutation.UpdatedAt(); ok {
 		_spec.SetField(department.FieldUpdatedAt, field.TypeTime, value)
 	}
-	if value, ok := du.mutation.Title(); ok {
-		_spec.SetField(department.FieldTitle, field.TypeString, value)
+	if value, ok := du.mutation.Name(); ok {
+		_spec.SetField(department.FieldName, field.TypeString, value)
+	}
+	if du.mutation.UpdaterCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   department.UpdaterTable,
+			Columns: []string{department.UpdaterColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(admin.FieldID, field.TypeInt),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := du.mutation.UpdaterIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   department.UpdaterTable,
+			Columns: []string{department.UpdaterColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(admin.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
 	if du.mutation.ParentCleared() {
 		edge := &sqlgraph.EdgeSpec{
@@ -319,12 +359,12 @@ func (du *DepartmentUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if du.mutation.EmployeeDepartmentCleared() {
+	if du.mutation.EmployeesCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
-			Table:   department.EmployeeDepartmentTable,
-			Columns: []string{department.EmployeeDepartmentColumn},
+			Table:   department.EmployeesTable,
+			Columns: []string{department.EmployeesColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(employee.FieldID, field.TypeInt),
@@ -332,12 +372,12 @@ func (du *DepartmentUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := du.mutation.RemovedEmployeeDepartmentIDs(); len(nodes) > 0 && !du.mutation.EmployeeDepartmentCleared() {
+	if nodes := du.mutation.RemovedEmployeesIDs(); len(nodes) > 0 && !du.mutation.EmployeesCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
-			Table:   department.EmployeeDepartmentTable,
-			Columns: []string{department.EmployeeDepartmentColumn},
+			Table:   department.EmployeesTable,
+			Columns: []string{department.EmployeesColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(employee.FieldID, field.TypeInt),
@@ -348,12 +388,12 @@ func (du *DepartmentUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := du.mutation.EmployeeDepartmentIDs(); len(nodes) > 0 {
+	if nodes := du.mutation.EmployeesIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
-			Table:   department.EmployeeDepartmentTable,
-			Columns: []string{department.EmployeeDepartmentColumn},
+			Table:   department.EmployeesTable,
+			Columns: []string{department.EmployeesColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(employee.FieldID, field.TypeInt),
@@ -451,7 +491,6 @@ func (duo *DepartmentUpdateOne) ClearDeletedAt() *DepartmentUpdateOne {
 
 // SetUpdatedBy sets the "updated_by" field.
 func (duo *DepartmentUpdateOne) SetUpdatedBy(i int) *DepartmentUpdateOne {
-	duo.mutation.ResetUpdatedBy()
 	duo.mutation.SetUpdatedBy(i)
 	return duo
 }
@@ -464,28 +503,22 @@ func (duo *DepartmentUpdateOne) SetNillableUpdatedBy(i *int) *DepartmentUpdateOn
 	return duo
 }
 
-// AddUpdatedBy adds i to the "updated_by" field.
-func (duo *DepartmentUpdateOne) AddUpdatedBy(i int) *DepartmentUpdateOne {
-	duo.mutation.AddUpdatedBy(i)
-	return duo
-}
-
 // SetUpdatedAt sets the "updated_at" field.
 func (duo *DepartmentUpdateOne) SetUpdatedAt(t time.Time) *DepartmentUpdateOne {
 	duo.mutation.SetUpdatedAt(t)
 	return duo
 }
 
-// SetTitle sets the "title" field.
-func (duo *DepartmentUpdateOne) SetTitle(s string) *DepartmentUpdateOne {
-	duo.mutation.SetTitle(s)
+// SetName sets the "name" field.
+func (duo *DepartmentUpdateOne) SetName(s string) *DepartmentUpdateOne {
+	duo.mutation.SetName(s)
 	return duo
 }
 
-// SetNillableTitle sets the "title" field if the given value is not nil.
-func (duo *DepartmentUpdateOne) SetNillableTitle(s *string) *DepartmentUpdateOne {
+// SetNillableName sets the "name" field if the given value is not nil.
+func (duo *DepartmentUpdateOne) SetNillableName(s *string) *DepartmentUpdateOne {
 	if s != nil {
-		duo.SetTitle(*s)
+		duo.SetName(*s)
 	}
 	return duo
 }
@@ -504,24 +537,41 @@ func (duo *DepartmentUpdateOne) SetNillableParentID(i *int) *DepartmentUpdateOne
 	return duo
 }
 
+// ClearParentID clears the value of the "parent_id" field.
+func (duo *DepartmentUpdateOne) ClearParentID() *DepartmentUpdateOne {
+	duo.mutation.ClearParentID()
+	return duo
+}
+
+// SetUpdaterID sets the "updater" edge to the Admin entity by ID.
+func (duo *DepartmentUpdateOne) SetUpdaterID(id int) *DepartmentUpdateOne {
+	duo.mutation.SetUpdaterID(id)
+	return duo
+}
+
+// SetUpdater sets the "updater" edge to the Admin entity.
+func (duo *DepartmentUpdateOne) SetUpdater(a *Admin) *DepartmentUpdateOne {
+	return duo.SetUpdaterID(a.ID)
+}
+
 // SetParent sets the "parent" edge to the Department entity.
 func (duo *DepartmentUpdateOne) SetParent(d *Department) *DepartmentUpdateOne {
 	return duo.SetParentID(d.ID)
 }
 
-// AddEmployeeDepartmentIDs adds the "employee_department" edge to the Employee entity by IDs.
-func (duo *DepartmentUpdateOne) AddEmployeeDepartmentIDs(ids ...int) *DepartmentUpdateOne {
-	duo.mutation.AddEmployeeDepartmentIDs(ids...)
+// AddEmployeeIDs adds the "employees" edge to the Employee entity by IDs.
+func (duo *DepartmentUpdateOne) AddEmployeeIDs(ids ...int) *DepartmentUpdateOne {
+	duo.mutation.AddEmployeeIDs(ids...)
 	return duo
 }
 
-// AddEmployeeDepartment adds the "employee_department" edges to the Employee entity.
-func (duo *DepartmentUpdateOne) AddEmployeeDepartment(e ...*Employee) *DepartmentUpdateOne {
+// AddEmployees adds the "employees" edges to the Employee entity.
+func (duo *DepartmentUpdateOne) AddEmployees(e ...*Employee) *DepartmentUpdateOne {
 	ids := make([]int, len(e))
 	for i := range e {
 		ids[i] = e[i].ID
 	}
-	return duo.AddEmployeeDepartmentIDs(ids...)
+	return duo.AddEmployeeIDs(ids...)
 }
 
 // AddChildIDs adds the "children" edge to the Department entity by IDs.
@@ -544,31 +594,37 @@ func (duo *DepartmentUpdateOne) Mutation() *DepartmentMutation {
 	return duo.mutation
 }
 
+// ClearUpdater clears the "updater" edge to the Admin entity.
+func (duo *DepartmentUpdateOne) ClearUpdater() *DepartmentUpdateOne {
+	duo.mutation.ClearUpdater()
+	return duo
+}
+
 // ClearParent clears the "parent" edge to the Department entity.
 func (duo *DepartmentUpdateOne) ClearParent() *DepartmentUpdateOne {
 	duo.mutation.ClearParent()
 	return duo
 }
 
-// ClearEmployeeDepartment clears all "employee_department" edges to the Employee entity.
-func (duo *DepartmentUpdateOne) ClearEmployeeDepartment() *DepartmentUpdateOne {
-	duo.mutation.ClearEmployeeDepartment()
+// ClearEmployees clears all "employees" edges to the Employee entity.
+func (duo *DepartmentUpdateOne) ClearEmployees() *DepartmentUpdateOne {
+	duo.mutation.ClearEmployees()
 	return duo
 }
 
-// RemoveEmployeeDepartmentIDs removes the "employee_department" edge to Employee entities by IDs.
-func (duo *DepartmentUpdateOne) RemoveEmployeeDepartmentIDs(ids ...int) *DepartmentUpdateOne {
-	duo.mutation.RemoveEmployeeDepartmentIDs(ids...)
+// RemoveEmployeeIDs removes the "employees" edge to Employee entities by IDs.
+func (duo *DepartmentUpdateOne) RemoveEmployeeIDs(ids ...int) *DepartmentUpdateOne {
+	duo.mutation.RemoveEmployeeIDs(ids...)
 	return duo
 }
 
-// RemoveEmployeeDepartment removes "employee_department" edges to Employee entities.
-func (duo *DepartmentUpdateOne) RemoveEmployeeDepartment(e ...*Employee) *DepartmentUpdateOne {
+// RemoveEmployees removes "employees" edges to Employee entities.
+func (duo *DepartmentUpdateOne) RemoveEmployees(e ...*Employee) *DepartmentUpdateOne {
 	ids := make([]int, len(e))
 	for i := range e {
 		ids[i] = e[i].ID
 	}
-	return duo.RemoveEmployeeDepartmentIDs(ids...)
+	return duo.RemoveEmployeeIDs(ids...)
 }
 
 // ClearChildren clears all "children" edges to the Department entity.
@@ -654,9 +710,9 @@ func (duo *DepartmentUpdateOne) check() error {
 			return &ValidationError{Name: "updated_by", err: fmt.Errorf(`dao: validator failed for field "Department.updated_by": %w`, err)}
 		}
 	}
-	if v, ok := duo.mutation.Title(); ok {
-		if err := department.TitleValidator(v); err != nil {
-			return &ValidationError{Name: "title", err: fmt.Errorf(`dao: validator failed for field "Department.title": %w`, err)}
+	if v, ok := duo.mutation.Name(); ok {
+		if err := department.NameValidator(v); err != nil {
+			return &ValidationError{Name: "name", err: fmt.Errorf(`dao: validator failed for field "Department.name": %w`, err)}
 		}
 	}
 	if v, ok := duo.mutation.ParentID(); ok {
@@ -667,8 +723,8 @@ func (duo *DepartmentUpdateOne) check() error {
 	if _, ok := duo.mutation.CreatorID(); duo.mutation.CreatorCleared() && !ok {
 		return errors.New(`dao: clearing a required unique edge "Department.creator"`)
 	}
-	if _, ok := duo.mutation.ParentID(); duo.mutation.ParentCleared() && !ok {
-		return errors.New(`dao: clearing a required unique edge "Department.parent"`)
+	if _, ok := duo.mutation.UpdaterID(); duo.mutation.UpdaterCleared() && !ok {
+		return errors.New(`dao: clearing a required unique edge "Department.updater"`)
 	}
 	return nil
 }
@@ -708,17 +764,40 @@ func (duo *DepartmentUpdateOne) sqlSave(ctx context.Context) (_node *Department,
 	if duo.mutation.DeletedAtCleared() {
 		_spec.ClearField(department.FieldDeletedAt, field.TypeTime)
 	}
-	if value, ok := duo.mutation.UpdatedBy(); ok {
-		_spec.SetField(department.FieldUpdatedBy, field.TypeInt, value)
-	}
-	if value, ok := duo.mutation.AddedUpdatedBy(); ok {
-		_spec.AddField(department.FieldUpdatedBy, field.TypeInt, value)
-	}
 	if value, ok := duo.mutation.UpdatedAt(); ok {
 		_spec.SetField(department.FieldUpdatedAt, field.TypeTime, value)
 	}
-	if value, ok := duo.mutation.Title(); ok {
-		_spec.SetField(department.FieldTitle, field.TypeString, value)
+	if value, ok := duo.mutation.Name(); ok {
+		_spec.SetField(department.FieldName, field.TypeString, value)
+	}
+	if duo.mutation.UpdaterCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   department.UpdaterTable,
+			Columns: []string{department.UpdaterColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(admin.FieldID, field.TypeInt),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := duo.mutation.UpdaterIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   department.UpdaterTable,
+			Columns: []string{department.UpdaterColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(admin.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
 	if duo.mutation.ParentCleared() {
 		edge := &sqlgraph.EdgeSpec{
@@ -749,12 +828,12 @@ func (duo *DepartmentUpdateOne) sqlSave(ctx context.Context) (_node *Department,
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if duo.mutation.EmployeeDepartmentCleared() {
+	if duo.mutation.EmployeesCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
-			Table:   department.EmployeeDepartmentTable,
-			Columns: []string{department.EmployeeDepartmentColumn},
+			Table:   department.EmployeesTable,
+			Columns: []string{department.EmployeesColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(employee.FieldID, field.TypeInt),
@@ -762,12 +841,12 @@ func (duo *DepartmentUpdateOne) sqlSave(ctx context.Context) (_node *Department,
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := duo.mutation.RemovedEmployeeDepartmentIDs(); len(nodes) > 0 && !duo.mutation.EmployeeDepartmentCleared() {
+	if nodes := duo.mutation.RemovedEmployeesIDs(); len(nodes) > 0 && !duo.mutation.EmployeesCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
-			Table:   department.EmployeeDepartmentTable,
-			Columns: []string{department.EmployeeDepartmentColumn},
+			Table:   department.EmployeesTable,
+			Columns: []string{department.EmployeesColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(employee.FieldID, field.TypeInt),
@@ -778,12 +857,12 @@ func (duo *DepartmentUpdateOne) sqlSave(ctx context.Context) (_node *Department,
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := duo.mutation.EmployeeDepartmentIDs(); len(nodes) > 0 {
+	if nodes := duo.mutation.EmployeesIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
-			Table:   department.EmployeeDepartmentTable,
-			Columns: []string{department.EmployeeDepartmentColumn},
+			Table:   department.EmployeesTable,
+			Columns: []string{department.EmployeesColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(employee.FieldID, field.TypeInt),

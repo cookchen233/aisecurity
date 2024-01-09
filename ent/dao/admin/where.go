@@ -90,9 +90,19 @@ func Password(v string) predicate.Admin {
 	return predicate.Admin(sql.FieldEQ(FieldPassword, v))
 }
 
-// Name applies equality check predicate on the "name" field. It's identical to NameEQ.
-func Name(v string) predicate.Admin {
-	return predicate.Admin(sql.FieldEQ(FieldName, v))
+// Nickname applies equality check predicate on the "nickname" field. It's identical to NicknameEQ.
+func Nickname(v string) predicate.Admin {
+	return predicate.Admin(sql.FieldEQ(FieldNickname, v))
+}
+
+// RealName applies equality check predicate on the "real_name" field. It's identical to RealNameEQ.
+func RealName(v string) predicate.Admin {
+	return predicate.Admin(sql.FieldEQ(FieldRealName, v))
+}
+
+// Avatar applies equality check predicate on the "avatar" field. It's identical to AvatarEQ.
+func Avatar(v string) predicate.Admin {
+	return predicate.Admin(sql.FieldEQ(FieldAvatar, v))
 }
 
 // CreatedAtEQ applies the EQ predicate on the "created_at" field.
@@ -395,79 +405,209 @@ func PasswordContainsFold(v string) predicate.Admin {
 	return predicate.Admin(sql.FieldContainsFold(FieldPassword, v))
 }
 
-// NameEQ applies the EQ predicate on the "name" field.
-func NameEQ(v string) predicate.Admin {
-	return predicate.Admin(sql.FieldEQ(FieldName, v))
+// NicknameEQ applies the EQ predicate on the "nickname" field.
+func NicknameEQ(v string) predicate.Admin {
+	return predicate.Admin(sql.FieldEQ(FieldNickname, v))
 }
 
-// NameNEQ applies the NEQ predicate on the "name" field.
-func NameNEQ(v string) predicate.Admin {
-	return predicate.Admin(sql.FieldNEQ(FieldName, v))
+// NicknameNEQ applies the NEQ predicate on the "nickname" field.
+func NicknameNEQ(v string) predicate.Admin {
+	return predicate.Admin(sql.FieldNEQ(FieldNickname, v))
 }
 
-// NameIn applies the In predicate on the "name" field.
-func NameIn(vs ...string) predicate.Admin {
-	return predicate.Admin(sql.FieldIn(FieldName, vs...))
+// NicknameIn applies the In predicate on the "nickname" field.
+func NicknameIn(vs ...string) predicate.Admin {
+	return predicate.Admin(sql.FieldIn(FieldNickname, vs...))
 }
 
-// NameNotIn applies the NotIn predicate on the "name" field.
-func NameNotIn(vs ...string) predicate.Admin {
-	return predicate.Admin(sql.FieldNotIn(FieldName, vs...))
+// NicknameNotIn applies the NotIn predicate on the "nickname" field.
+func NicknameNotIn(vs ...string) predicate.Admin {
+	return predicate.Admin(sql.FieldNotIn(FieldNickname, vs...))
 }
 
-// NameGT applies the GT predicate on the "name" field.
-func NameGT(v string) predicate.Admin {
-	return predicate.Admin(sql.FieldGT(FieldName, v))
+// NicknameGT applies the GT predicate on the "nickname" field.
+func NicknameGT(v string) predicate.Admin {
+	return predicate.Admin(sql.FieldGT(FieldNickname, v))
 }
 
-// NameGTE applies the GTE predicate on the "name" field.
-func NameGTE(v string) predicate.Admin {
-	return predicate.Admin(sql.FieldGTE(FieldName, v))
+// NicknameGTE applies the GTE predicate on the "nickname" field.
+func NicknameGTE(v string) predicate.Admin {
+	return predicate.Admin(sql.FieldGTE(FieldNickname, v))
 }
 
-// NameLT applies the LT predicate on the "name" field.
-func NameLT(v string) predicate.Admin {
-	return predicate.Admin(sql.FieldLT(FieldName, v))
+// NicknameLT applies the LT predicate on the "nickname" field.
+func NicknameLT(v string) predicate.Admin {
+	return predicate.Admin(sql.FieldLT(FieldNickname, v))
 }
 
-// NameLTE applies the LTE predicate on the "name" field.
-func NameLTE(v string) predicate.Admin {
-	return predicate.Admin(sql.FieldLTE(FieldName, v))
+// NicknameLTE applies the LTE predicate on the "nickname" field.
+func NicknameLTE(v string) predicate.Admin {
+	return predicate.Admin(sql.FieldLTE(FieldNickname, v))
 }
 
-// NameContains applies the Contains predicate on the "name" field.
-func NameContains(v string) predicate.Admin {
-	return predicate.Admin(sql.FieldContains(FieldName, v))
+// NicknameContains applies the Contains predicate on the "nickname" field.
+func NicknameContains(v string) predicate.Admin {
+	return predicate.Admin(sql.FieldContains(FieldNickname, v))
 }
 
-// NameHasPrefix applies the HasPrefix predicate on the "name" field.
-func NameHasPrefix(v string) predicate.Admin {
-	return predicate.Admin(sql.FieldHasPrefix(FieldName, v))
+// NicknameHasPrefix applies the HasPrefix predicate on the "nickname" field.
+func NicknameHasPrefix(v string) predicate.Admin {
+	return predicate.Admin(sql.FieldHasPrefix(FieldNickname, v))
 }
 
-// NameHasSuffix applies the HasSuffix predicate on the "name" field.
-func NameHasSuffix(v string) predicate.Admin {
-	return predicate.Admin(sql.FieldHasSuffix(FieldName, v))
+// NicknameHasSuffix applies the HasSuffix predicate on the "nickname" field.
+func NicknameHasSuffix(v string) predicate.Admin {
+	return predicate.Admin(sql.FieldHasSuffix(FieldNickname, v))
 }
 
-// NameIsNil applies the IsNil predicate on the "name" field.
-func NameIsNil() predicate.Admin {
-	return predicate.Admin(sql.FieldIsNull(FieldName))
+// NicknameEqualFold applies the EqualFold predicate on the "nickname" field.
+func NicknameEqualFold(v string) predicate.Admin {
+	return predicate.Admin(sql.FieldEqualFold(FieldNickname, v))
 }
 
-// NameNotNil applies the NotNil predicate on the "name" field.
-func NameNotNil() predicate.Admin {
-	return predicate.Admin(sql.FieldNotNull(FieldName))
+// NicknameContainsFold applies the ContainsFold predicate on the "nickname" field.
+func NicknameContainsFold(v string) predicate.Admin {
+	return predicate.Admin(sql.FieldContainsFold(FieldNickname, v))
 }
 
-// NameEqualFold applies the EqualFold predicate on the "name" field.
-func NameEqualFold(v string) predicate.Admin {
-	return predicate.Admin(sql.FieldEqualFold(FieldName, v))
+// RealNameEQ applies the EQ predicate on the "real_name" field.
+func RealNameEQ(v string) predicate.Admin {
+	return predicate.Admin(sql.FieldEQ(FieldRealName, v))
 }
 
-// NameContainsFold applies the ContainsFold predicate on the "name" field.
-func NameContainsFold(v string) predicate.Admin {
-	return predicate.Admin(sql.FieldContainsFold(FieldName, v))
+// RealNameNEQ applies the NEQ predicate on the "real_name" field.
+func RealNameNEQ(v string) predicate.Admin {
+	return predicate.Admin(sql.FieldNEQ(FieldRealName, v))
+}
+
+// RealNameIn applies the In predicate on the "real_name" field.
+func RealNameIn(vs ...string) predicate.Admin {
+	return predicate.Admin(sql.FieldIn(FieldRealName, vs...))
+}
+
+// RealNameNotIn applies the NotIn predicate on the "real_name" field.
+func RealNameNotIn(vs ...string) predicate.Admin {
+	return predicate.Admin(sql.FieldNotIn(FieldRealName, vs...))
+}
+
+// RealNameGT applies the GT predicate on the "real_name" field.
+func RealNameGT(v string) predicate.Admin {
+	return predicate.Admin(sql.FieldGT(FieldRealName, v))
+}
+
+// RealNameGTE applies the GTE predicate on the "real_name" field.
+func RealNameGTE(v string) predicate.Admin {
+	return predicate.Admin(sql.FieldGTE(FieldRealName, v))
+}
+
+// RealNameLT applies the LT predicate on the "real_name" field.
+func RealNameLT(v string) predicate.Admin {
+	return predicate.Admin(sql.FieldLT(FieldRealName, v))
+}
+
+// RealNameLTE applies the LTE predicate on the "real_name" field.
+func RealNameLTE(v string) predicate.Admin {
+	return predicate.Admin(sql.FieldLTE(FieldRealName, v))
+}
+
+// RealNameContains applies the Contains predicate on the "real_name" field.
+func RealNameContains(v string) predicate.Admin {
+	return predicate.Admin(sql.FieldContains(FieldRealName, v))
+}
+
+// RealNameHasPrefix applies the HasPrefix predicate on the "real_name" field.
+func RealNameHasPrefix(v string) predicate.Admin {
+	return predicate.Admin(sql.FieldHasPrefix(FieldRealName, v))
+}
+
+// RealNameHasSuffix applies the HasSuffix predicate on the "real_name" field.
+func RealNameHasSuffix(v string) predicate.Admin {
+	return predicate.Admin(sql.FieldHasSuffix(FieldRealName, v))
+}
+
+// RealNameEqualFold applies the EqualFold predicate on the "real_name" field.
+func RealNameEqualFold(v string) predicate.Admin {
+	return predicate.Admin(sql.FieldEqualFold(FieldRealName, v))
+}
+
+// RealNameContainsFold applies the ContainsFold predicate on the "real_name" field.
+func RealNameContainsFold(v string) predicate.Admin {
+	return predicate.Admin(sql.FieldContainsFold(FieldRealName, v))
+}
+
+// AvatarEQ applies the EQ predicate on the "avatar" field.
+func AvatarEQ(v string) predicate.Admin {
+	return predicate.Admin(sql.FieldEQ(FieldAvatar, v))
+}
+
+// AvatarNEQ applies the NEQ predicate on the "avatar" field.
+func AvatarNEQ(v string) predicate.Admin {
+	return predicate.Admin(sql.FieldNEQ(FieldAvatar, v))
+}
+
+// AvatarIn applies the In predicate on the "avatar" field.
+func AvatarIn(vs ...string) predicate.Admin {
+	return predicate.Admin(sql.FieldIn(FieldAvatar, vs...))
+}
+
+// AvatarNotIn applies the NotIn predicate on the "avatar" field.
+func AvatarNotIn(vs ...string) predicate.Admin {
+	return predicate.Admin(sql.FieldNotIn(FieldAvatar, vs...))
+}
+
+// AvatarGT applies the GT predicate on the "avatar" field.
+func AvatarGT(v string) predicate.Admin {
+	return predicate.Admin(sql.FieldGT(FieldAvatar, v))
+}
+
+// AvatarGTE applies the GTE predicate on the "avatar" field.
+func AvatarGTE(v string) predicate.Admin {
+	return predicate.Admin(sql.FieldGTE(FieldAvatar, v))
+}
+
+// AvatarLT applies the LT predicate on the "avatar" field.
+func AvatarLT(v string) predicate.Admin {
+	return predicate.Admin(sql.FieldLT(FieldAvatar, v))
+}
+
+// AvatarLTE applies the LTE predicate on the "avatar" field.
+func AvatarLTE(v string) predicate.Admin {
+	return predicate.Admin(sql.FieldLTE(FieldAvatar, v))
+}
+
+// AvatarContains applies the Contains predicate on the "avatar" field.
+func AvatarContains(v string) predicate.Admin {
+	return predicate.Admin(sql.FieldContains(FieldAvatar, v))
+}
+
+// AvatarHasPrefix applies the HasPrefix predicate on the "avatar" field.
+func AvatarHasPrefix(v string) predicate.Admin {
+	return predicate.Admin(sql.FieldHasPrefix(FieldAvatar, v))
+}
+
+// AvatarHasSuffix applies the HasSuffix predicate on the "avatar" field.
+func AvatarHasSuffix(v string) predicate.Admin {
+	return predicate.Admin(sql.FieldHasSuffix(FieldAvatar, v))
+}
+
+// AvatarIsNil applies the IsNil predicate on the "avatar" field.
+func AvatarIsNil() predicate.Admin {
+	return predicate.Admin(sql.FieldIsNull(FieldAvatar))
+}
+
+// AvatarNotNil applies the NotNil predicate on the "avatar" field.
+func AvatarNotNil() predicate.Admin {
+	return predicate.Admin(sql.FieldNotNull(FieldAvatar))
+}
+
+// AvatarEqualFold applies the EqualFold predicate on the "avatar" field.
+func AvatarEqualFold(v string) predicate.Admin {
+	return predicate.Admin(sql.FieldEqualFold(FieldAvatar, v))
+}
+
+// AvatarContainsFold applies the ContainsFold predicate on the "avatar" field.
+func AvatarContainsFold(v string) predicate.Admin {
+	return predicate.Admin(sql.FieldContainsFold(FieldAvatar, v))
 }
 
 // HasCreator applies the HasEdge predicate on the "creator" edge.
@@ -493,21 +633,21 @@ func HasCreatorWith(preds ...predicate.Admin) predicate.Admin {
 	})
 }
 
-// HasUpdator applies the HasEdge predicate on the "updator" edge.
-func HasUpdator() predicate.Admin {
+// HasUpdater applies the HasEdge predicate on the "updater" edge.
+func HasUpdater() predicate.Admin {
 	return predicate.Admin(func(s *sql.Selector) {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(Table, FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, true, UpdatorTable, UpdatorColumn),
+			sqlgraph.Edge(sqlgraph.M2O, true, UpdaterTable, UpdaterColumn),
 		)
 		sqlgraph.HasNeighbors(s, step)
 	})
 }
 
-// HasUpdatorWith applies the HasEdge predicate on the "updator" edge with a given conditions (other predicates).
-func HasUpdatorWith(preds ...predicate.Admin) predicate.Admin {
+// HasUpdaterWith applies the HasEdge predicate on the "updater" edge with a given conditions (other predicates).
+func HasUpdaterWith(preds ...predicate.Admin) predicate.Admin {
 	return predicate.Admin(func(s *sql.Selector) {
-		step := newUpdatorStep()
+		step := newUpdaterStep()
 		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
 			for _, p := range preds {
 				p(s)
@@ -562,21 +702,21 @@ func HasAdminCreatorWith(preds ...predicate.Admin) predicate.Admin {
 	})
 }
 
-// HasAdminUpdator applies the HasEdge predicate on the "admin_updator" edge.
-func HasAdminUpdator() predicate.Admin {
+// HasAdminUpdater applies the HasEdge predicate on the "admin_updater" edge.
+func HasAdminUpdater() predicate.Admin {
 	return predicate.Admin(func(s *sql.Selector) {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(Table, FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, false, AdminUpdatorTable, AdminUpdatorColumn),
+			sqlgraph.Edge(sqlgraph.O2M, false, AdminUpdaterTable, AdminUpdaterColumn),
 		)
 		sqlgraph.HasNeighbors(s, step)
 	})
 }
 
-// HasAdminUpdatorWith applies the HasEdge predicate on the "admin_updator" edge with a given conditions (other predicates).
-func HasAdminUpdatorWith(preds ...predicate.Admin) predicate.Admin {
+// HasAdminUpdaterWith applies the HasEdge predicate on the "admin_updater" edge with a given conditions (other predicates).
+func HasAdminUpdaterWith(preds ...predicate.Admin) predicate.Admin {
 	return predicate.Admin(func(s *sql.Selector) {
-		step := newAdminUpdatorStep()
+		step := newAdminUpdaterStep()
 		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
 			for _, p := range preds {
 				p(s)
@@ -608,21 +748,21 @@ func HasAdminRoleCreatorWith(preds ...predicate.AdminRole) predicate.Admin {
 	})
 }
 
-// HasAdminRoleUpdator applies the HasEdge predicate on the "admin_role_updator" edge.
-func HasAdminRoleUpdator() predicate.Admin {
+// HasAdminRoleUpdater applies the HasEdge predicate on the "admin_role_updater" edge.
+func HasAdminRoleUpdater() predicate.Admin {
 	return predicate.Admin(func(s *sql.Selector) {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(Table, FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, false, AdminRoleUpdatorTable, AdminRoleUpdatorColumn),
+			sqlgraph.Edge(sqlgraph.O2M, false, AdminRoleUpdaterTable, AdminRoleUpdaterColumn),
 		)
 		sqlgraph.HasNeighbors(s, step)
 	})
 }
 
-// HasAdminRoleUpdatorWith applies the HasEdge predicate on the "admin_role_updator" edge with a given conditions (other predicates).
-func HasAdminRoleUpdatorWith(preds ...predicate.AdminRole) predicate.Admin {
+// HasAdminRoleUpdaterWith applies the HasEdge predicate on the "admin_role_updater" edge with a given conditions (other predicates).
+func HasAdminRoleUpdaterWith(preds ...predicate.AdminRole) predicate.Admin {
 	return predicate.Admin(func(s *sql.Selector) {
-		step := newAdminRoleUpdatorStep()
+		step := newAdminRoleUpdaterStep()
 		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
 			for _, p := range preds {
 				p(s)
@@ -654,44 +794,21 @@ func HasRiskCreatorWith(preds ...predicate.Risk) predicate.Admin {
 	})
 }
 
-// HasRiskUpdator applies the HasEdge predicate on the "risk_updator" edge.
-func HasRiskUpdator() predicate.Admin {
+// HasRiskUpdater applies the HasEdge predicate on the "risk_updater" edge.
+func HasRiskUpdater() predicate.Admin {
 	return predicate.Admin(func(s *sql.Selector) {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(Table, FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, false, RiskUpdatorTable, RiskUpdatorColumn),
+			sqlgraph.Edge(sqlgraph.O2M, false, RiskUpdaterTable, RiskUpdaterColumn),
 		)
 		sqlgraph.HasNeighbors(s, step)
 	})
 }
 
-// HasRiskUpdatorWith applies the HasEdge predicate on the "risk_updator" edge with a given conditions (other predicates).
-func HasRiskUpdatorWith(preds ...predicate.Risk) predicate.Admin {
+// HasRiskUpdaterWith applies the HasEdge predicate on the "risk_updater" edge with a given conditions (other predicates).
+func HasRiskUpdaterWith(preds ...predicate.Risk) predicate.Admin {
 	return predicate.Admin(func(s *sql.Selector) {
-		step := newRiskUpdatorStep()
-		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
-			for _, p := range preds {
-				p(s)
-			}
-		})
-	})
-}
-
-// HasRiskMaintainer applies the HasEdge predicate on the "risk_maintainer" edge.
-func HasRiskMaintainer() predicate.Admin {
-	return predicate.Admin(func(s *sql.Selector) {
-		step := sqlgraph.NewStep(
-			sqlgraph.From(Table, FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, false, RiskMaintainerTable, RiskMaintainerColumn),
-		)
-		sqlgraph.HasNeighbors(s, step)
-	})
-}
-
-// HasRiskMaintainerWith applies the HasEdge predicate on the "risk_maintainer" edge with a given conditions (other predicates).
-func HasRiskMaintainerWith(preds ...predicate.Risk) predicate.Admin {
-	return predicate.Admin(func(s *sql.Selector) {
-		step := newRiskMaintainerStep()
+		step := newRiskUpdaterStep()
 		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
 			for _, p := range preds {
 				p(s)
@@ -723,21 +840,21 @@ func HasRiskLocationCreatorWith(preds ...predicate.RiskLocation) predicate.Admin
 	})
 }
 
-// HasRiskLocationUpdator applies the HasEdge predicate on the "risk_location_updator" edge.
-func HasRiskLocationUpdator() predicate.Admin {
+// HasRiskLocationUpdater applies the HasEdge predicate on the "risk_location_updater" edge.
+func HasRiskLocationUpdater() predicate.Admin {
 	return predicate.Admin(func(s *sql.Selector) {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(Table, FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, false, RiskLocationUpdatorTable, RiskLocationUpdatorColumn),
+			sqlgraph.Edge(sqlgraph.O2M, false, RiskLocationUpdaterTable, RiskLocationUpdaterColumn),
 		)
 		sqlgraph.HasNeighbors(s, step)
 	})
 }
 
-// HasRiskLocationUpdatorWith applies the HasEdge predicate on the "risk_location_updator" edge with a given conditions (other predicates).
-func HasRiskLocationUpdatorWith(preds ...predicate.RiskLocation) predicate.Admin {
+// HasRiskLocationUpdaterWith applies the HasEdge predicate on the "risk_location_updater" edge with a given conditions (other predicates).
+func HasRiskLocationUpdaterWith(preds ...predicate.RiskLocation) predicate.Admin {
 	return predicate.Admin(func(s *sql.Selector) {
-		step := newRiskLocationUpdatorStep()
+		step := newRiskLocationUpdaterStep()
 		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
 			for _, p := range preds {
 				p(s)
@@ -769,21 +886,21 @@ func HasRiskCategoryCreatorWith(preds ...predicate.RiskCategory) predicate.Admin
 	})
 }
 
-// HasRiskCategoryUpdator applies the HasEdge predicate on the "risk_category_updator" edge.
-func HasRiskCategoryUpdator() predicate.Admin {
+// HasRiskCategoryUpdater applies the HasEdge predicate on the "risk_category_updater" edge.
+func HasRiskCategoryUpdater() predicate.Admin {
 	return predicate.Admin(func(s *sql.Selector) {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(Table, FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, false, RiskCategoryUpdatorTable, RiskCategoryUpdatorColumn),
+			sqlgraph.Edge(sqlgraph.O2M, false, RiskCategoryUpdaterTable, RiskCategoryUpdaterColumn),
 		)
 		sqlgraph.HasNeighbors(s, step)
 	})
 }
 
-// HasRiskCategoryUpdatorWith applies the HasEdge predicate on the "risk_category_updator" edge with a given conditions (other predicates).
-func HasRiskCategoryUpdatorWith(preds ...predicate.RiskCategory) predicate.Admin {
+// HasRiskCategoryUpdaterWith applies the HasEdge predicate on the "risk_category_updater" edge with a given conditions (other predicates).
+func HasRiskCategoryUpdaterWith(preds ...predicate.RiskCategory) predicate.Admin {
 	return predicate.Admin(func(s *sql.Selector) {
-		step := newRiskCategoryUpdatorStep()
+		step := newRiskCategoryUpdaterStep()
 		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
 			for _, p := range preds {
 				p(s)
@@ -815,21 +932,21 @@ func HasDepartmentCreatorWith(preds ...predicate.Department) predicate.Admin {
 	})
 }
 
-// HasDepartmentUpdator applies the HasEdge predicate on the "department_updator" edge.
-func HasDepartmentUpdator() predicate.Admin {
+// HasDepartmentUpdater applies the HasEdge predicate on the "department_updater" edge.
+func HasDepartmentUpdater() predicate.Admin {
 	return predicate.Admin(func(s *sql.Selector) {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(Table, FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, false, DepartmentUpdatorTable, DepartmentUpdatorColumn),
+			sqlgraph.Edge(sqlgraph.O2M, false, DepartmentUpdaterTable, DepartmentUpdaterColumn),
 		)
 		sqlgraph.HasNeighbors(s, step)
 	})
 }
 
-// HasDepartmentUpdatorWith applies the HasEdge predicate on the "department_updator" edge with a given conditions (other predicates).
-func HasDepartmentUpdatorWith(preds ...predicate.Department) predicate.Admin {
+// HasDepartmentUpdaterWith applies the HasEdge predicate on the "department_updater" edge with a given conditions (other predicates).
+func HasDepartmentUpdaterWith(preds ...predicate.Department) predicate.Admin {
 	return predicate.Admin(func(s *sql.Selector) {
-		step := newDepartmentUpdatorStep()
+		step := newDepartmentUpdaterStep()
 		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
 			for _, p := range preds {
 				p(s)
@@ -861,21 +978,21 @@ func HasEmployeeCreatorWith(preds ...predicate.Employee) predicate.Admin {
 	})
 }
 
-// HasEmployeeUpdator applies the HasEdge predicate on the "employee_updator" edge.
-func HasEmployeeUpdator() predicate.Admin {
+// HasEmployeeUpdater applies the HasEdge predicate on the "employee_updater" edge.
+func HasEmployeeUpdater() predicate.Admin {
 	return predicate.Admin(func(s *sql.Selector) {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(Table, FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, false, EmployeeUpdatorTable, EmployeeUpdatorColumn),
+			sqlgraph.Edge(sqlgraph.O2M, false, EmployeeUpdaterTable, EmployeeUpdaterColumn),
 		)
 		sqlgraph.HasNeighbors(s, step)
 	})
 }
 
-// HasEmployeeUpdatorWith applies the HasEdge predicate on the "employee_updator" edge with a given conditions (other predicates).
-func HasEmployeeUpdatorWith(preds ...predicate.Employee) predicate.Admin {
+// HasEmployeeUpdaterWith applies the HasEdge predicate on the "employee_updater" edge with a given conditions (other predicates).
+func HasEmployeeUpdaterWith(preds ...predicate.Employee) predicate.Admin {
 	return predicate.Admin(func(s *sql.Selector) {
-		step := newEmployeeUpdatorStep()
+		step := newEmployeeUpdaterStep()
 		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
 			for _, p := range preds {
 				p(s)
@@ -884,21 +1001,67 @@ func HasEmployeeUpdatorWith(preds ...predicate.Employee) predicate.Admin {
 	})
 }
 
-// HasEmployeeAdmin applies the HasEdge predicate on the "employee_admin" edge.
-func HasEmployeeAdmin() predicate.Admin {
+// HasEmployee applies the HasEdge predicate on the "employee" edge.
+func HasEmployee() predicate.Admin {
 	return predicate.Admin(func(s *sql.Selector) {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(Table, FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, false, EmployeeAdminTable, EmployeeAdminColumn),
+			sqlgraph.Edge(sqlgraph.O2M, false, EmployeeTable, EmployeeColumn),
 		)
 		sqlgraph.HasNeighbors(s, step)
 	})
 }
 
-// HasEmployeeAdminWith applies the HasEdge predicate on the "employee_admin" edge with a given conditions (other predicates).
-func HasEmployeeAdminWith(preds ...predicate.Employee) predicate.Admin {
+// HasEmployeeWith applies the HasEdge predicate on the "employee" edge with a given conditions (other predicates).
+func HasEmployeeWith(preds ...predicate.Employee) predicate.Admin {
 	return predicate.Admin(func(s *sql.Selector) {
-		step := newEmployeeAdminStep()
+		step := newEmployeeStep()
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
+}
+
+// HasOccupationCreator applies the HasEdge predicate on the "occupation_creator" edge.
+func HasOccupationCreator() predicate.Admin {
+	return predicate.Admin(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, OccupationCreatorTable, OccupationCreatorColumn),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasOccupationCreatorWith applies the HasEdge predicate on the "occupation_creator" edge with a given conditions (other predicates).
+func HasOccupationCreatorWith(preds ...predicate.Occupation) predicate.Admin {
+	return predicate.Admin(func(s *sql.Selector) {
+		step := newOccupationCreatorStep()
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
+}
+
+// HasOccupationUpdater applies the HasEdge predicate on the "occupation_updater" edge.
+func HasOccupationUpdater() predicate.Admin {
+	return predicate.Admin(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, OccupationUpdaterTable, OccupationUpdaterColumn),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasOccupationUpdaterWith applies the HasEdge predicate on the "occupation_updater" edge with a given conditions (other predicates).
+func HasOccupationUpdaterWith(preds ...predicate.Occupation) predicate.Admin {
+	return predicate.Admin(func(s *sql.Selector) {
+		step := newOccupationUpdaterStep()
 		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
 			for _, p := range preds {
 				p(s)

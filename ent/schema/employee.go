@@ -30,10 +30,13 @@ func (Employee) Fields() []ent.Field {
 func (Employee) Edges() []ent.Edge {
 	return []ent.Edge{
 		edge.From("creator", Admin.Type).Ref("employee_creator").Field("created_by").Immutable().Unique().Required(),
-		edge.From("admin", Admin.Type).Ref("employee_admin").Field("admin_id").Immutable().Unique().Required(),
-		edge.From("department", Department.Type).Field("department_id").Ref("employee_department").Unique().Required(),
+		edge.From("updater", Admin.Type).Ref("employee_updater").Field("updated_by").Required().Unique(),
 
+		edge.From("admin", Admin.Type).Ref("employee").Field("admin_id").Immutable().Unique().Required(),
+		edge.From("department", Department.Type).Field("department_id").Ref("employees").Unique().Required(),
+		edge.From("occupations", Occupation.Type).Ref("employees"),
+
+		edge.To("risk_reporter", Risk.Type),
 		edge.To("risk_maintainer", Risk.Type),
-		edge.To("risk_creator", Risk.Type),
 	}
 }

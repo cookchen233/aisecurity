@@ -15,7 +15,7 @@ import (
 
 // Department is the model entity for the Department schema.
 type Department struct {
-	config `json:"-"`
+	config `json:"-" validate:"-"`
 	// ID of the ent.
 	ID int `json:"id,omitempty"`
 	// 创建时间
@@ -28,30 +28,31 @@ type Department struct {
 	UpdatedBy int `json:"updated_by"`
 	// 最后更新时间
 	UpdatedAt time.Time `json:"updated_at"`
-	// 标题
-	Title string `json:"title"`
+	// 名称
+	Name string `json:"name" validate:"required"`
 	// 上级部门id
 	ParentID int `json:"parent_id"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the DepartmentQuery when eager-loading is set.
-	Edges                    DepartmentEdges `json:"edges"`
-	admin_department_updator *int
-	selectValues             sql.SelectValues
+	Edges        DepartmentEdges `json:"edges"`
+	selectValues sql.SelectValues
 }
 
 // DepartmentEdges holds the relations/edges for other nodes in the graph.
 type DepartmentEdges struct {
 	// Creator holds the value of the creator edge.
 	Creator *Admin `json:"creator,omitempty"`
+	// Updater holds the value of the updater edge.
+	Updater *Admin `json:"updater,omitempty"`
 	// Parent holds the value of the parent edge.
 	Parent *Department `json:"parent,omitempty"`
-	// EmployeeDepartment holds the value of the employee_department edge.
-	EmployeeDepartment []*Employee `json:"employee_department,omitempty"`
+	// Employees holds the value of the employees edge.
+	Employees []*Employee `json:"employees,omitempty"`
 	// Children holds the value of the children edge.
 	Children []*Department `json:"children,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
-	loadedTypes [4]bool
+	loadedTypes [5]bool
 }
 
 // CreatorOrErr returns the Creator value or an error if the edge
@@ -67,10 +68,23 @@ func (e DepartmentEdges) CreatorOrErr() (*Admin, error) {
 	return nil, &NotLoadedError{edge: "creator"}
 }
 
+// UpdaterOrErr returns the Updater value or an error if the edge
+// was not loaded in eager-loading, or loaded but was not found.
+func (e DepartmentEdges) UpdaterOrErr() (*Admin, error) {
+	if e.loadedTypes[1] {
+		if e.Updater == nil {
+			// Edge was loaded but was not found.
+			return nil, &NotFoundError{label: admin.Label}
+		}
+		return e.Updater, nil
+	}
+	return nil, &NotLoadedError{edge: "updater"}
+}
+
 // ParentOrErr returns the Parent value or an error if the edge
 // was not loaded in eager-loading, or loaded but was not found.
 func (e DepartmentEdges) ParentOrErr() (*Department, error) {
-	if e.loadedTypes[1] {
+	if e.loadedTypes[2] {
 		if e.Parent == nil {
 			// Edge was loaded but was not found.
 			return nil, &NotFoundError{label: department.Label}
@@ -80,19 +94,19 @@ func (e DepartmentEdges) ParentOrErr() (*Department, error) {
 	return nil, &NotLoadedError{edge: "parent"}
 }
 
-// EmployeeDepartmentOrErr returns the EmployeeDepartment value or an error if the edge
+// EmployeesOrErr returns the Employees value or an error if the edge
 // was not loaded in eager-loading.
-func (e DepartmentEdges) EmployeeDepartmentOrErr() ([]*Employee, error) {
-	if e.loadedTypes[2] {
-		return e.EmployeeDepartment, nil
+func (e DepartmentEdges) EmployeesOrErr() ([]*Employee, error) {
+	if e.loadedTypes[3] {
+		return e.Employees, nil
 	}
-	return nil, &NotLoadedError{edge: "employee_department"}
+	return nil, &NotLoadedError{edge: "employees"}
 }
 
 // ChildrenOrErr returns the Children value or an error if the edge
 // was not loaded in eager-loading.
 func (e DepartmentEdges) ChildrenOrErr() ([]*Department, error) {
-	if e.loadedTypes[3] {
+	if e.loadedTypes[4] {
 		return e.Children, nil
 	}
 	return nil, &NotLoadedError{edge: "children"}
@@ -105,12 +119,10 @@ func (*Department) scanValues(columns []string) ([]any, error) {
 		switch columns[i] {
 		case department.FieldID, department.FieldCreatedBy, department.FieldUpdatedBy, department.FieldParentID:
 			values[i] = new(sql.NullInt64)
-		case department.FieldTitle:
+		case department.FieldName:
 			values[i] = new(sql.NullString)
 		case department.FieldCreatedAt, department.FieldDeletedAt, department.FieldUpdatedAt:
 			values[i] = new(sql.NullTime)
-		case department.ForeignKeys[0]: // admin_department_updator
-			values[i] = new(sql.NullInt64)
 		default:
 			values[i] = new(sql.UnknownType)
 		}
@@ -163,24 +175,17 @@ func (d *Department) assignValues(columns []string, values []any) error {
 			} else if value.Valid {
 				d.UpdatedAt = value.Time
 			}
-		case department.FieldTitle:
+		case department.FieldName:
 			if value, ok := values[i].(*sql.NullString); !ok {
-				return fmt.Errorf("unexpected type %T for field title", values[i])
+				return fmt.Errorf("unexpected type %T for field name", values[i])
 			} else if value.Valid {
-				d.Title = value.String
+				d.Name = value.String
 			}
 		case department.FieldParentID:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
 				return fmt.Errorf("unexpected type %T for field parent_id", values[i])
 			} else if value.Valid {
 				d.ParentID = int(value.Int64)
-			}
-		case department.ForeignKeys[0]:
-			if value, ok := values[i].(*sql.NullInt64); !ok {
-				return fmt.Errorf("unexpected type %T for edge-field admin_department_updator", value)
-			} else if value.Valid {
-				d.admin_department_updator = new(int)
-				*d.admin_department_updator = int(value.Int64)
 			}
 		default:
 			d.selectValues.Set(columns[i], values[i])
@@ -200,14 +205,19 @@ func (d *Department) QueryCreator() *AdminQuery {
 	return NewDepartmentClient(d.config).QueryCreator(d)
 }
 
+// QueryUpdater queries the "updater" edge of the Department entity.
+func (d *Department) QueryUpdater() *AdminQuery {
+	return NewDepartmentClient(d.config).QueryUpdater(d)
+}
+
 // QueryParent queries the "parent" edge of the Department entity.
 func (d *Department) QueryParent() *DepartmentQuery {
 	return NewDepartmentClient(d.config).QueryParent(d)
 }
 
-// QueryEmployeeDepartment queries the "employee_department" edge of the Department entity.
-func (d *Department) QueryEmployeeDepartment() *EmployeeQuery {
-	return NewDepartmentClient(d.config).QueryEmployeeDepartment(d)
+// QueryEmployees queries the "employees" edge of the Department entity.
+func (d *Department) QueryEmployees() *EmployeeQuery {
+	return NewDepartmentClient(d.config).QueryEmployees(d)
 }
 
 // QueryChildren queries the "children" edge of the Department entity.
@@ -255,8 +265,8 @@ func (d *Department) String() string {
 	builder.WriteString("updated_at=")
 	builder.WriteString(d.UpdatedAt.Format(time.ANSIC))
 	builder.WriteString(", ")
-	builder.WriteString("title=")
-	builder.WriteString(d.Title)
+	builder.WriteString("name=")
+	builder.WriteString(d.Name)
 	builder.WriteString(", ")
 	builder.WriteString("parent_id=")
 	builder.WriteString(fmt.Sprintf("%v", d.ParentID))

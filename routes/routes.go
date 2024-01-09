@@ -2,9 +2,9 @@ package routes
 
 import (
 	"aisecurity/handlers"
-	"aisecurity/handlers/admin/auth"
+	"aisecurity/handlers/dashboard"
 	"aisecurity/middlewares"
-	admin "aisecurity/routes/admin"
+	"github.com/gin-contrib/static"
 	"github.com/gin-gonic/gin"
 )
 
@@ -12,18 +12,15 @@ import (
 func Setup(router *gin.Engine) {
 
 	// 静态文件
-	router.Static("/public", "./public/")
+	router.Use(static.Serve("/", static.LocalFile("./home", false)))
 
 	// Register Toycar handlers
 	NewToycarRoutes(router.Group("/toycar")).Setup()
 
 	// Register admin routes
-	adminHandler := auth.NewAdminHandler()
-	router.POST("/admin/login", handlers.Convert(adminHandler, adminHandler.Login)) // without checking session
-	routes := router.Group("/admin", middlewares.IsAdminAuthorized())
-	{
-		admin.NewAuthRoutes(routes.Group("/auth")).Setup()
-		admin.NewSecurityRoutes(routes.Group("/security")).Setup()
-		admin.NewOrganizationRoutes(routes.Group("/organization")).Setup()
-	}
+	indexHandler := dashboard.NewIndexHandler()
+	// Without checking session
+	router.POST("/api/dashboard/login", handlers.Convert(indexHandler, indexHandler.Login))
+	// Need to check session
+	NewDashboardRoutes(router.Group("/api/dashboard", middlewares.IsAdminAuthorized())).Setup()
 }
