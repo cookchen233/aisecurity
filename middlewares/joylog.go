@@ -1,18 +1,21 @@
 package middlewares
 
 import (
+	"aisecurity/utils"
 	http2 "aisecurity/utils/http"
 	"bytes"
 	"encoding/json"
 	"fmt"
 	"github.com/gin-gonic/gin"
+	"go.uber.org/zap"
 	"io"
 	"log"
 	"os"
+	"strings"
 	"time"
 )
 
-var LOGFILEBASE = "./log/request/"
+var LOGFILEBASE = "./logs/request/"
 var _log *log.Logger
 var _f *os.File
 var _today = time.Now()
@@ -54,17 +57,32 @@ func JoyRequestLog() gin.HandlerFunc {
 			_log.SetOutput(wr)
 		}
 
-		var bs string
-		if c.Request.Method == "POST" || c.Request.Method == "PUT" {
+		var bodyString string
+		if c.ContentType() == "multipart/form-data" {
+			form, err := c.MultipartForm()
+			bodyString = fmt.Sprintf("multipart/form-data: %v", form)
+			if err != nil {
+				bodyString = fmt.Sprintf("multipart/form-data error: %v, form: %v", err, form)
+			}
+		} else if c.Request.Method == "POST" || c.Request.Method == "PUT" {
 			body, _ := io.ReadAll(c.Request.Body)
-			bs = string(body)
+
+			processedData, err := utils.ProcessJSON(body)
+			if err != nil {
+				bodyString = string(body)
+			} else {
+				prettyJSON, _ := json.MarshalIndent(processedData, "", "    ")
+				bodyString = string(prettyJSON)
+			}
 			c.Request.Body = io.NopCloser(bytes.NewReader(body))
 		}
 
 		// better if you have a user in the context
-
-		go _log.Println(c.ClientIP(), c.Request.Method, c.Request.RequestURI, "REQUEST", bs)
-
+		var bs = "non debug mode"
+		if gin.Mode() == "debug" {
+			bs = bodyString
+		}
+		go _log.Printf("JOY REQUEST:\n traceid: %v\n ip: %v\n ip2: %v\n method: %v\n url: %v\n body: %v", c.GetString("traceid"), c.ClientIP(), c.Request.RemoteAddr, c.Request.Method, c.Request.RequestURI, bs)
 		blw := &bodyLogWriter{body: bytes.NewBufferString(""), ResponseWriter: c.Writer}
 		c.Writer = blw
 
@@ -73,18 +91,26 @@ func JoyRequestLog() gin.HandlerFunc {
 		// i standartize responses with a struct called ResponseModel
 		// and unmarshalled to get the response message
 
-		var mdl http2.Payload
-
-		if blw.Status() > 201 {
-			resp, err := io.ReadAll(blw.body)
-			if err == nil {
-				err := json.Unmarshal(resp, &mdl)
-				if err != nil {
-					mdl.Message = fmt.Sprintf("failed to Unmarshal resp, %v", err)
-				}
-			}
+		var mdl = http2.Payload{
+			Code:    0,
+			Message: "non debug mode",
+			Data:    nil,
+			Ref:     "",
+			Traceid: "",
 		}
-		go _log.Println(c.Request.RemoteAddr, c.Request.Method, c.Request.RequestURI, "RESPONSE", blw.Status(), mdl)
+
+		if gin.Mode() == "debug" || blw.Status() >= 500 {
+			resp, err := io.ReadAll(blw.body)
+			if err != nil {
+				utils.Logger.Error("Failed to read response body", zap.Error(err))
+			}
+			if json.Unmarshal(resp, &mdl) != nil {
+				mdl.Message = fmt.Sprintf("failed to Unmarshal resp, %v", err)
+			}
+			bs = bodyString
+		}
+
+		go _log.Printf("JOY RESPONSE:\n traceid: %v\n status: %v\n resp: %v\n body: %v\n%v\n\n\n", c.GetString("traceid"), blw.Status(), mdl, bs, strings.Repeat("=", 128))
 	}
 }
 

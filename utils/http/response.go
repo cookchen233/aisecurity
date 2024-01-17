@@ -1,6 +1,7 @@
 package http
 
 import (
+	"aisecurity/expects"
 	"aisecurity/properties"
 	"aisecurity/utils"
 	"github.com/gin-gonic/gin"
@@ -131,28 +132,35 @@ func Error(c *gin.Context, err error, code properties.ResponseCode) {
 		}
 		c.Status(statusCode)
 	}
-	if len(c.Errors) == 0 || err != c.Errors[len(c.Errors)-1] {
+
+	// add error to context
+	if len(c.Errors) == 0 || !errors.Is(err, c.Errors[len(c.Errors)-1]) {
 		c.Error(utils.ErrorWithStack(err))
 		//c.Error(err)
 	}
-	traceid, ex := c.Get("traceid")
-	if !ex {
-		traceid = ""
-	}
 
+	// if specified code
 	var errMessage = code.Message()
-	//if err, ok := err.(interface{ Cause() error }); ok {
-	//	errMessage = err.Cause().Error()
-	//}
+
+	// if wrapped messages
 	cause := errors.Cause(err)
-	// Convert the full error message and the cause into strings
 	fullErrMsg := err.Error()
 	causeErrMsg := cause.Error()
 	if fullErrMsg != causeErrMsg {
-		// Remove the cause part from the full error message
-		errMessage = strings.TrimSuffix(fullErrMsg, causeErrMsg)
-		// Trim any leading colon or space
-		errMessage = strings.TrimRight(errMessage, ": ")
+		errMessage = strings.TrimRight(strings.TrimSuffix(fullErrMsg, causeErrMsg), ": ")
+	}
+
+	// if err is IExpect type
+	if code == properties.ServerError || code == properties.RequestError {
+		var expect expects.IExpect
+		if errors.As(err, &expect) {
+			errMessage = expect.ExpectedError()
+		}
+	}
+
+	traceid, ex := c.Get("traceid")
+	if !ex {
+		traceid = ""
 	}
 	c.AbortWithStatusJSON(statusCode, Payload{
 		code,

@@ -56,6 +56,18 @@ func (f EmployeeFunc) Mutate(ctx context.Context, m dao.Mutation) (dao.Value, er
 	return nil, fmt.Errorf("unexpected mutation type %T. expect *dao.EmployeeMutation", m)
 }
 
+// The IPCReportEventFunc type is an adapter to allow the use of ordinary
+// function as IPCReportEvent mutator.
+type IPCReportEventFunc func(context.Context, *dao.IPCReportEventMutation) (dao.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f IPCReportEventFunc) Mutate(ctx context.Context, m dao.Mutation) (dao.Value, error) {
+	if mv, ok := m.(*dao.IPCReportEventMutation); ok {
+		return f(ctx, mv)
+	}
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *dao.IPCReportEventMutation", m)
+}
+
 // The OccupationFunc type is an adapter to allow the use of ordinary
 // function as Occupation mutator.
 type OccupationFunc func(context.Context, *dao.OccupationMutation) (dao.Value, error)

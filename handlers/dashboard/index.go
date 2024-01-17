@@ -4,35 +4,39 @@ import (
 	"aisecurity/ent/dao"
 	"aisecurity/handlers"
 	"aisecurity/services"
+	"aisecurity/structs"
 	"aisecurity/structs/entities"
 	"aisecurity/structs/filters"
 	"aisecurity/structs/posts"
+	"aisecurity/structs/types"
+	"aisecurity/utils"
 	"aisecurity/utils/http"
-	"context"
 	"fmt"
 	"github.com/gin-contrib/sessions"
 	"github.com/gin-gonic/gin"
 	"github.com/pkg/errors"
 	"golang.org/x/crypto/bcrypt"
-	"log"
 )
 
 type IndexHandler struct {
-	handlers.Handler
+	handlers.DashboardHandler
 	Service *services.AdminService
 }
 
-func NewIndexHandler() *IndexHandler {
-	h := &IndexHandler{}
-	h.Service = services.NewAdminService()
-	h.Handler.Service = h.Service
-	return h
+func NewIndexHandler() *IndexHandler { return &IndexHandler{} }
+func (h *IndexHandler) GetService(c *gin.Context) services.IService {
+	return h.Service
 }
-func (h *IndexHandler) ResetRequest(ctx context.Context) {
+func (h *IndexHandler) GetFilter(c *gin.Context) structs.IFilter {
+	return h.Filter
+}
+func (h *IndexHandler) GetEntity(c *gin.Context) structs.IEntity { return h.Entity }
+func (h *IndexHandler) SetRequestContext(c *gin.Context, h2 handlers.IHandler) {
+	h.Service = services.NewAdminService()
+	h.Service.Ctx = c
 	h.Filter = &filters.Admin{}
-	h.Handler.Filter = h.Filter
 	h.Entity = &entities.Admin{}
-	h.Handler.Entity = h.Entity
+	h.DashboardHandler.SetRequestContext(c, h)
 }
 
 func (h *IndexHandler) Login(c *gin.Context) {
@@ -80,6 +84,26 @@ func (h *IndexHandler) Login(c *gin.Context) {
 		http.Error(c, err, 900)
 		return
 	}
-	log.Println("admin", admin)
 	http.Success(c, admin)
+}
+
+func (h *IndexHandler) Logout(c *gin.Context) {
+
+}
+
+func (h *IndexHandler) UploadImages(c *gin.Context) {
+	var basePath = "./data/uploads/images"
+	var maxSize int64 = 1024 * 1024 * 1
+	var allowedMimeTypes = types.NewAllowedMimeTypes([]string{
+		"image/jpeg",
+		"image/png",
+	})
+	form, _ := c.MultipartForm()
+	fileHeaders := form.File["files"]
+	uploadedFiles, err, code := h.UploadFile(c, basePath, fileHeaders, maxSize, allowedMimeTypes)
+	if err != nil {
+		http.Error(c, utils.ErrorWithStack(err), code)
+		return
+	}
+	http.Success(c, uploadedFiles)
 }

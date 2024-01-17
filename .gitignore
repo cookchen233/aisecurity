@@ -4,5 +4,6 @@
 .idea
 /logs/
 /log/
+/data/
 gin.log
 .env*.local

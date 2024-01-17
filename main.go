@@ -52,8 +52,8 @@ func main() {
 	r.Use(
 		middlewares.Recovery(),
 		middlewares.RequestLog(),
-		middlewares.JoyRequestLog(),
-		middlewares.DatabaseAudit(),
+		//middlewares.JoyRequestLog(),
+		middlewares.CORSMiddleware(),
 	)
 
 	// Open the database connection
@@ -64,8 +64,10 @@ func main() {
 			log.Fatalf("failed closing connection to postgres: %v", err)
 		}
 	}()
-	db.Gen()
-	db.Migrate()
+	if os.Getenv("GIN_MODE") != "release" {
+		db.Gen()
+		db.Migrate()
+	}
 
 	// Register routes
 	routes.Setup(r)

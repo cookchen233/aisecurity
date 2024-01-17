@@ -12,7 +12,6 @@ import (
 	"hash/crc32"
 	"io"
 	"net"
-	"net/http"
 	"net/http/httputil"
 	"os"
 	"strings"
@@ -30,7 +29,6 @@ func RequestLog() gin.HandlerFunc {
 
 		// record trace information
 		s := sessions.Default(c)
-		fmt.Println("s.id", s.ID())
 		sessid := s.Get("anonymous")
 		if sessid == nil || sessid == "" {
 			sessid = fmt.Sprintf("%08x", crc32.ChecksumIEEE([]byte(uuid.NewString())))
@@ -45,21 +43,27 @@ func RequestLog() gin.HandlerFunc {
 		// set the context information
 		c.Set("traceid", traceid)
 		var oriLoggerL = utils.Logger.L
-		utils.Logger.L = utils.Logger.With(zap.String("traceid", traceid))
-
+		utils.Logger.L = utils.Logger.With(
+			zap.String("traceid", traceid),
+			zap.String("url", c.Request.URL.String()))
 		zfs := []zap.Field{
 			zap.String("start", start.Format(time.StampMicro)),
 			zap.String("method", c.Request.Method),
 			zap.String("content_type", c.ContentType()),
-			zap.String("path", c.Request.URL.Path),
-			zap.String("raw_query", c.Request.URL.RawQuery),
 			zap.String("client_ip", c.ClientIP()),
 			zap.String("remote_ip", c.RemoteIP()),
 			zap.String("user_agent", c.Request.UserAgent()),
 		}
 		var bodyBytes []byte
 		var err error
-		if c.Request.Method == http.MethodPost {
+		if c.ContentType() == "multipart/form-data" {
+			form, err := c.MultipartForm()
+			var bs = fmt.Sprintf("multipart/form-data: %v", form)
+			if err != nil {
+				bs = fmt.Sprintf("multipart/form-data error: %v, form: %v", err, form)
+			}
+			bodyBytes = []byte(bs)
+		} else if c.Request.Method == "POST" || c.Request.Method == "PUT" {
 			// Create a buffer to hold the body data
 			var buf bytes.Buffer
 			tee := io.TeeReader(c.Request.Body, &buf)
@@ -107,10 +111,14 @@ func RequestLog() gin.HandlerFunc {
 				zfs = append(zfs, zap.Any("stack", stackTraces))
 				utils.Logger.Error("Request", zfs...)
 			} else {
-				utils.Logger.Warn("Request", zfs...)
+				if gin.Mode() == "debug" {
+					utils.Logger.Warn("Request", zfs...)
+				}
 			}
 		} else {
-			utils.Logger.Info("Request", zfs...)
+			if gin.Mode() == "debug" {
+				utils.Logger.Info("Request", zfs...)
+			}
 		}
 
 		// clear the with fields
@@ -124,8 +132,6 @@ func Recovery() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		defer func() {
 			if err := recover(); err != nil {
-				fmt.Println("==============================================================================================================================")
-
 				// Check for a broken connection, as it is not really a
 				// condition that warrants a panic stack trace.
 				var brokenPipe bool
@@ -155,16 +161,31 @@ func Recovery() gin.HandlerFunc {
 					panicErr = fmt.Errorf("panic: %v", err)
 				}
 				c.Error(panicErr)
+				traceid := c.GetString("traceid")
 				if brokenPipe {
-					utils.Logger.Fatal(c.Request.URL.String(),
-						zap.Any("err", err),
+					utils.Logger.Fatal("Panic",
+						zap.String("traceid", traceid),
+						zap.String("url", c.Request.URL.String()),
+						zap.String("method", c.Request.Method),
+						zap.String("content_type", c.ContentType()),
+						zap.String("client_ip", c.ClientIP()),
+						zap.String("remote_ip", c.RemoteIP()),
+						zap.String("user_agent", c.Request.UserAgent()),
 						zap.String("headers", headersToStr),
+						zap.Any("err", err),
 						zap.Stack("stack"),
 					)
 				} else {
-					utils.Logger.Fatal(c.Request.URL.String(),
-						zap.Any("err", err),
+					utils.Logger.Fatal("Panic",
+						zap.String("traceid", traceid),
+						zap.String("url", c.Request.URL.String()),
+						zap.String("method", c.Request.Method),
+						zap.String("content_type", c.ContentType()),
+						zap.String("client_ip", c.ClientIP()),
+						zap.String("remote_ip", c.RemoteIP()),
+						zap.String("user_agent", c.Request.UserAgent()),
 						zap.String("headers", headersToStr),
+						zap.Any("err", err),
 						zap.Stack("stack"),
 						zap.String("panicRecoveredTime", time.Now().Format(time.RFC3339)),
 					)

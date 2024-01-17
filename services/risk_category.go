@@ -32,6 +32,17 @@ func (s *RiskCategoryService) Create(ent structs.IEntity) (structs.IEntity, erro
 	return save, nil
 }
 
+func (s *RiskCategoryService) Update(ent structs.IEntity) (structs.IEntity, error) {
+	e := ent.(*entities.RiskCategory)
+	save, err := db.EntClient.RiskCategory.UpdateOneID(e.ID).
+		SetName(e.Name).
+		Save(s.Ctx)
+	if err != nil {
+		return nil, utils.ErrorWrap(err, "failed updating RiskCategory")
+	}
+	return save, nil
+}
+
 func (s *RiskCategoryService) query(fit structs.IFilter) *dao.RiskCategoryQuery {
 	f := fit.(*filters.RiskCategory)
 	q := db.EntClient.RiskCategory.Query()
@@ -53,16 +64,13 @@ func (s *RiskCategoryService) GetTotal(fit structs.IFilter) (int, error) {
 	return total, nil
 }
 
-func (s *RiskCategoryService) GetList(filter structs.IFilter) ([]structs.IEntity, error) {
-	// list
-	page := min(1000, max(1, filter.GetOffset()))
-	limit := min(10000, max(1, filter.GetOffset()))
-	offset := (page - 1) * limit
-	list, err := s.query(filter).
+func (s *RiskCategoryService) GetList(fit structs.IFilter) ([]structs.IEntity, error) {
+	list, err := s.query(fit).
 		WithCreator().
 		WithUpdater().
-		Limit(limit). // Set the number of items to return
-		Offset(offset).
+		Limit(fit.GetLimit()).
+		Offset(fit.GetOffset()).
+		Order(dao.Desc(riskcategory.FieldID)).
 		All(s.Ctx)
 	if err != nil {
 		return nil, utils.ErrorWithStack(err)
@@ -72,4 +80,14 @@ func (s *RiskCategoryService) GetList(filter structs.IFilter) ([]structs.IEntity
 		ents[i] = v
 	}
 	return ents, nil
+}
+
+func (s *RiskCategoryService) Delete(ent structs.IEntity) error {
+	e := ent.(*entities.ID)
+	err := s.entClient.DeleteOneID(e.ID).
+		Exec(s.Ctx)
+	if err != nil {
+		return utils.ErrorWrap(err, "failed deleting RiskCategory")
+	}
+	return nil
 }

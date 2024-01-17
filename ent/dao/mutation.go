@@ -7,12 +7,15 @@ import (
 	"aisecurity/ent/dao/adminrole"
 	"aisecurity/ent/dao/department"
 	"aisecurity/ent/dao/employee"
+	"aisecurity/ent/dao/ipcreportevent"
 	"aisecurity/ent/dao/occupation"
 	"aisecurity/ent/dao/predicate"
 	"aisecurity/ent/dao/risk"
 	"aisecurity/ent/dao/riskcategory"
 	"aisecurity/ent/dao/risklocation"
-	"aisecurity/properties"
+	"aisecurity/enums"
+	"aisecurity/properties/maintain_status"
+	"aisecurity/structs/types"
 	"context"
 	"errors"
 	"fmt"
@@ -32,92 +35,99 @@ const (
 	OpUpdateOne = ent.OpUpdateOne
 
 	// Node types.
-	TypeAdmin        = "Admin"
-	TypeAdminRole    = "AdminRole"
-	TypeDepartment   = "Department"
-	TypeEmployee     = "Employee"
-	TypeOccupation   = "Occupation"
-	TypeRisk         = "Risk"
-	TypeRiskCategory = "RiskCategory"
-	TypeRiskLocation = "RiskLocation"
+	TypeAdmin          = "Admin"
+	TypeAdminRole      = "AdminRole"
+	TypeDepartment     = "Department"
+	TypeEmployee       = "Employee"
+	TypeIPCReportEvent = "IPCReportEvent"
+	TypeOccupation     = "Occupation"
+	TypeRisk           = "Risk"
+	TypeRiskCategory   = "RiskCategory"
+	TypeRiskLocation   = "RiskLocation"
 )
 
 // AdminMutation represents an operation that mutates the Admin nodes in the graph.
 type AdminMutation struct {
 	config
-	op                           Op
-	typ                          string
-	id                           *int
-	created_at                   *time.Time
-	deleted_at                   *time.Time
-	updated_at                   *time.Time
-	username                     *string
-	password                     *string
-	nickname                     *string
-	real_name                    *string
-	avatar                       *string
-	clearedFields                map[string]struct{}
-	creator                      *int
-	clearedcreator               bool
-	updater                      *int
-	clearedupdater               bool
-	admin_roles                  map[int]struct{}
-	removedadmin_roles           map[int]struct{}
-	clearedadmin_roles           bool
-	admin_creator                map[int]struct{}
-	removedadmin_creator         map[int]struct{}
-	clearedadmin_creator         bool
-	admin_updater                map[int]struct{}
-	removedadmin_updater         map[int]struct{}
-	clearedadmin_updater         bool
-	admin_role_creator           map[int]struct{}
-	removedadmin_role_creator    map[int]struct{}
-	clearedadmin_role_creator    bool
-	admin_role_updater           map[int]struct{}
-	removedadmin_role_updater    map[int]struct{}
-	clearedadmin_role_updater    bool
-	risk_creator                 map[int]struct{}
-	removedrisk_creator          map[int]struct{}
-	clearedrisk_creator          bool
-	risk_updater                 map[int]struct{}
-	removedrisk_updater          map[int]struct{}
-	clearedrisk_updater          bool
-	risk_location_creator        map[int]struct{}
-	removedrisk_location_creator map[int]struct{}
-	clearedrisk_location_creator bool
-	risk_location_updater        map[int]struct{}
-	removedrisk_location_updater map[int]struct{}
-	clearedrisk_location_updater bool
-	risk_category_creator        map[int]struct{}
-	removedrisk_category_creator map[int]struct{}
-	clearedrisk_category_creator bool
-	risk_category_updater        map[int]struct{}
-	removedrisk_category_updater map[int]struct{}
-	clearedrisk_category_updater bool
-	department_creator           map[int]struct{}
-	removeddepartment_creator    map[int]struct{}
-	cleareddepartment_creator    bool
-	department_updater           map[int]struct{}
-	removeddepartment_updater    map[int]struct{}
-	cleareddepartment_updater    bool
-	employee_creator             map[int]struct{}
-	removedemployee_creator      map[int]struct{}
-	clearedemployee_creator      bool
-	employee_updater             map[int]struct{}
-	removedemployee_updater      map[int]struct{}
-	clearedemployee_updater      bool
-	employee                     map[int]struct{}
-	removedemployee              map[int]struct{}
-	clearedemployee              bool
-	occupation_creator           map[int]struct{}
-	removedoccupation_creator    map[int]struct{}
-	clearedoccupation_creator    bool
-	occupation_updater           map[int]struct{}
-	removedoccupation_updater    map[int]struct{}
-	clearedoccupation_updater    bool
-	done                         bool
-	oldValue                     func(context.Context) (*Admin, error)
-	predicates                   []predicate.Admin
+	op                              Op
+	typ                             string
+	id                              *int
+	created_at                      *time.Time
+	deleted_at                      *time.Time
+	updated_at                      *time.Time
+	username                        *string
+	password                        *string
+	nickname                        *string
+	real_name                       *string
+	avatar                          *string
+	clearedFields                   map[string]struct{}
+	creator                         *int
+	clearedcreator                  bool
+	updater                         *int
+	clearedupdater                  bool
+	admin_roles                     map[int]struct{}
+	removedadmin_roles              map[int]struct{}
+	clearedadmin_roles              bool
+	admin_creator                   map[int]struct{}
+	removedadmin_creator            map[int]struct{}
+	clearedadmin_creator            bool
+	admin_updater                   map[int]struct{}
+	removedadmin_updater            map[int]struct{}
+	clearedadmin_updater            bool
+	admin_role_creator              map[int]struct{}
+	removedadmin_role_creator       map[int]struct{}
+	clearedadmin_role_creator       bool
+	admin_role_updater              map[int]struct{}
+	removedadmin_role_updater       map[int]struct{}
+	clearedadmin_role_updater       bool
+	risk_creator                    map[int]struct{}
+	removedrisk_creator             map[int]struct{}
+	clearedrisk_creator             bool
+	risk_updater                    map[int]struct{}
+	removedrisk_updater             map[int]struct{}
+	clearedrisk_updater             bool
+	risk_location_creator           map[int]struct{}
+	removedrisk_location_creator    map[int]struct{}
+	clearedrisk_location_creator    bool
+	risk_location_updater           map[int]struct{}
+	removedrisk_location_updater    map[int]struct{}
+	clearedrisk_location_updater    bool
+	risk_category_creator           map[int]struct{}
+	removedrisk_category_creator    map[int]struct{}
+	clearedrisk_category_creator    bool
+	risk_category_updater           map[int]struct{}
+	removedrisk_category_updater    map[int]struct{}
+	clearedrisk_category_updater    bool
+	department_creator              map[int]struct{}
+	removeddepartment_creator       map[int]struct{}
+	cleareddepartment_creator       bool
+	department_updater              map[int]struct{}
+	removeddepartment_updater       map[int]struct{}
+	cleareddepartment_updater       bool
+	employee_creator                map[int]struct{}
+	removedemployee_creator         map[int]struct{}
+	clearedemployee_creator         bool
+	employee_updater                map[int]struct{}
+	removedemployee_updater         map[int]struct{}
+	clearedemployee_updater         bool
+	employee                        map[int]struct{}
+	removedemployee                 map[int]struct{}
+	clearedemployee                 bool
+	occupation_creator              map[int]struct{}
+	removedoccupation_creator       map[int]struct{}
+	clearedoccupation_creator       bool
+	occupation_updater              map[int]struct{}
+	removedoccupation_updater       map[int]struct{}
+	clearedoccupation_updater       bool
+	ipc_report_event_creator        map[int]struct{}
+	removedipc_report_event_creator map[int]struct{}
+	clearedipc_report_event_creator bool
+	ipc_report_event_updater        map[int]struct{}
+	removedipc_report_event_updater map[int]struct{}
+	clearedipc_report_event_updater bool
+	done                            bool
+	oldValue                        func(context.Context) (*Admin, error)
+	predicates                      []predicate.Admin
 }
 
 var _ ent.Mutation = (*AdminMutation)(nil)
@@ -1656,6 +1666,114 @@ func (m *AdminMutation) ResetOccupationUpdater() {
 	m.removedoccupation_updater = nil
 }
 
+// AddIpcReportEventCreatorIDs adds the "ipc_report_event_creator" edge to the IPCReportEvent entity by ids.
+func (m *AdminMutation) AddIpcReportEventCreatorIDs(ids ...int) {
+	if m.ipc_report_event_creator == nil {
+		m.ipc_report_event_creator = make(map[int]struct{})
+	}
+	for i := range ids {
+		m.ipc_report_event_creator[ids[i]] = struct{}{}
+	}
+}
+
+// ClearIpcReportEventCreator clears the "ipc_report_event_creator" edge to the IPCReportEvent entity.
+func (m *AdminMutation) ClearIpcReportEventCreator() {
+	m.clearedipc_report_event_creator = true
+}
+
+// IpcReportEventCreatorCleared reports if the "ipc_report_event_creator" edge to the IPCReportEvent entity was cleared.
+func (m *AdminMutation) IpcReportEventCreatorCleared() bool {
+	return m.clearedipc_report_event_creator
+}
+
+// RemoveIpcReportEventCreatorIDs removes the "ipc_report_event_creator" edge to the IPCReportEvent entity by IDs.
+func (m *AdminMutation) RemoveIpcReportEventCreatorIDs(ids ...int) {
+	if m.removedipc_report_event_creator == nil {
+		m.removedipc_report_event_creator = make(map[int]struct{})
+	}
+	for i := range ids {
+		delete(m.ipc_report_event_creator, ids[i])
+		m.removedipc_report_event_creator[ids[i]] = struct{}{}
+	}
+}
+
+// RemovedIpcReportEventCreator returns the removed IDs of the "ipc_report_event_creator" edge to the IPCReportEvent entity.
+func (m *AdminMutation) RemovedIpcReportEventCreatorIDs() (ids []int) {
+	for id := range m.removedipc_report_event_creator {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// IpcReportEventCreatorIDs returns the "ipc_report_event_creator" edge IDs in the mutation.
+func (m *AdminMutation) IpcReportEventCreatorIDs() (ids []int) {
+	for id := range m.ipc_report_event_creator {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// ResetIpcReportEventCreator resets all changes to the "ipc_report_event_creator" edge.
+func (m *AdminMutation) ResetIpcReportEventCreator() {
+	m.ipc_report_event_creator = nil
+	m.clearedipc_report_event_creator = false
+	m.removedipc_report_event_creator = nil
+}
+
+// AddIpcReportEventUpdaterIDs adds the "ipc_report_event_updater" edge to the IPCReportEvent entity by ids.
+func (m *AdminMutation) AddIpcReportEventUpdaterIDs(ids ...int) {
+	if m.ipc_report_event_updater == nil {
+		m.ipc_report_event_updater = make(map[int]struct{})
+	}
+	for i := range ids {
+		m.ipc_report_event_updater[ids[i]] = struct{}{}
+	}
+}
+
+// ClearIpcReportEventUpdater clears the "ipc_report_event_updater" edge to the IPCReportEvent entity.
+func (m *AdminMutation) ClearIpcReportEventUpdater() {
+	m.clearedipc_report_event_updater = true
+}
+
+// IpcReportEventUpdaterCleared reports if the "ipc_report_event_updater" edge to the IPCReportEvent entity was cleared.
+func (m *AdminMutation) IpcReportEventUpdaterCleared() bool {
+	return m.clearedipc_report_event_updater
+}
+
+// RemoveIpcReportEventUpdaterIDs removes the "ipc_report_event_updater" edge to the IPCReportEvent entity by IDs.
+func (m *AdminMutation) RemoveIpcReportEventUpdaterIDs(ids ...int) {
+	if m.removedipc_report_event_updater == nil {
+		m.removedipc_report_event_updater = make(map[int]struct{})
+	}
+	for i := range ids {
+		delete(m.ipc_report_event_updater, ids[i])
+		m.removedipc_report_event_updater[ids[i]] = struct{}{}
+	}
+}
+
+// RemovedIpcReportEventUpdater returns the removed IDs of the "ipc_report_event_updater" edge to the IPCReportEvent entity.
+func (m *AdminMutation) RemovedIpcReportEventUpdaterIDs() (ids []int) {
+	for id := range m.removedipc_report_event_updater {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// IpcReportEventUpdaterIDs returns the "ipc_report_event_updater" edge IDs in the mutation.
+func (m *AdminMutation) IpcReportEventUpdaterIDs() (ids []int) {
+	for id := range m.ipc_report_event_updater {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// ResetIpcReportEventUpdater resets all changes to the "ipc_report_event_updater" edge.
+func (m *AdminMutation) ResetIpcReportEventUpdater() {
+	m.ipc_report_event_updater = nil
+	m.clearedipc_report_event_updater = false
+	m.removedipc_report_event_updater = nil
+}
+
 // Where appends a list predicates to the AdminMutation builder.
 func (m *AdminMutation) Where(ps ...predicate.Admin) {
 	m.predicates = append(m.predicates, ps...)
@@ -1960,7 +2078,7 @@ func (m *AdminMutation) ResetField(name string) error {
 
 // AddedEdges returns all edge names that were set/added in this mutation.
 func (m *AdminMutation) AddedEdges() []string {
-	edges := make([]string, 0, 20)
+	edges := make([]string, 0, 22)
 	if m.creator != nil {
 		edges = append(edges, admin.EdgeCreator)
 	}
@@ -2020,6 +2138,12 @@ func (m *AdminMutation) AddedEdges() []string {
 	}
 	if m.occupation_updater != nil {
 		edges = append(edges, admin.EdgeOccupationUpdater)
+	}
+	if m.ipc_report_event_creator != nil {
+		edges = append(edges, admin.EdgeIpcReportEventCreator)
+	}
+	if m.ipc_report_event_updater != nil {
+		edges = append(edges, admin.EdgeIpcReportEventUpdater)
 	}
 	return edges
 }
@@ -2144,13 +2268,25 @@ func (m *AdminMutation) AddedIDs(name string) []ent.Value {
 			ids = append(ids, id)
 		}
 		return ids
+	case admin.EdgeIpcReportEventCreator:
+		ids := make([]ent.Value, 0, len(m.ipc_report_event_creator))
+		for id := range m.ipc_report_event_creator {
+			ids = append(ids, id)
+		}
+		return ids
+	case admin.EdgeIpcReportEventUpdater:
+		ids := make([]ent.Value, 0, len(m.ipc_report_event_updater))
+		for id := range m.ipc_report_event_updater {
+			ids = append(ids, id)
+		}
+		return ids
 	}
 	return nil
 }
 
 // RemovedEdges returns all edge names that were removed in this mutation.
 func (m *AdminMutation) RemovedEdges() []string {
-	edges := make([]string, 0, 20)
+	edges := make([]string, 0, 22)
 	if m.removedadmin_roles != nil {
 		edges = append(edges, admin.EdgeAdminRoles)
 	}
@@ -2204,6 +2340,12 @@ func (m *AdminMutation) RemovedEdges() []string {
 	}
 	if m.removedoccupation_updater != nil {
 		edges = append(edges, admin.EdgeOccupationUpdater)
+	}
+	if m.removedipc_report_event_creator != nil {
+		edges = append(edges, admin.EdgeIpcReportEventCreator)
+	}
+	if m.removedipc_report_event_updater != nil {
+		edges = append(edges, admin.EdgeIpcReportEventUpdater)
 	}
 	return edges
 }
@@ -2320,13 +2462,25 @@ func (m *AdminMutation) RemovedIDs(name string) []ent.Value {
 			ids = append(ids, id)
 		}
 		return ids
+	case admin.EdgeIpcReportEventCreator:
+		ids := make([]ent.Value, 0, len(m.removedipc_report_event_creator))
+		for id := range m.removedipc_report_event_creator {
+			ids = append(ids, id)
+		}
+		return ids
+	case admin.EdgeIpcReportEventUpdater:
+		ids := make([]ent.Value, 0, len(m.removedipc_report_event_updater))
+		for id := range m.removedipc_report_event_updater {
+			ids = append(ids, id)
+		}
+		return ids
 	}
 	return nil
 }
 
 // ClearedEdges returns all edge names that were cleared in this mutation.
 func (m *AdminMutation) ClearedEdges() []string {
-	edges := make([]string, 0, 20)
+	edges := make([]string, 0, 22)
 	if m.clearedcreator {
 		edges = append(edges, admin.EdgeCreator)
 	}
@@ -2387,6 +2541,12 @@ func (m *AdminMutation) ClearedEdges() []string {
 	if m.clearedoccupation_updater {
 		edges = append(edges, admin.EdgeOccupationUpdater)
 	}
+	if m.clearedipc_report_event_creator {
+		edges = append(edges, admin.EdgeIpcReportEventCreator)
+	}
+	if m.clearedipc_report_event_updater {
+		edges = append(edges, admin.EdgeIpcReportEventUpdater)
+	}
 	return edges
 }
 
@@ -2434,6 +2594,10 @@ func (m *AdminMutation) EdgeCleared(name string) bool {
 		return m.clearedoccupation_creator
 	case admin.EdgeOccupationUpdater:
 		return m.clearedoccupation_updater
+	case admin.EdgeIpcReportEventCreator:
+		return m.clearedipc_report_event_creator
+	case admin.EdgeIpcReportEventUpdater:
+		return m.clearedipc_report_event_updater
 	}
 	return false
 }
@@ -2515,6 +2679,12 @@ func (m *AdminMutation) ResetEdge(name string) error {
 		return nil
 	case admin.EdgeOccupationUpdater:
 		m.ResetOccupationUpdater()
+		return nil
+	case admin.EdgeIpcReportEventCreator:
+		m.ResetIpcReportEventCreator()
+		return nil
+	case admin.EdgeIpcReportEventUpdater:
+		m.ResetIpcReportEventUpdater()
 		return nil
 	}
 	return fmt.Errorf("unknown Admin edge %s", name)
@@ -5568,6 +5738,1451 @@ func (m *EmployeeMutation) ResetEdge(name string) error {
 	return fmt.Errorf("unknown Employee edge %s", name)
 }
 
+// IPCReportEventMutation represents an operation that mutates the IPCReportEvent nodes in the graph.
+type IPCReportEventMutation struct {
+	config
+	op                   Op
+	typ                  string
+	id                   *int
+	created_at           *time.Time
+	deleted_at           *time.Time
+	updated_at           *time.Time
+	device_id            *string
+	event_id             *string
+	event_time           *time.Time
+	event_type           *enums.IPCReportEventType
+	addevent_type        *enums.IPCReportEventType
+	event_status         *enums.IPCReportEventStatus
+	addevent_status      *enums.IPCReportEventStatus
+	images               *[]types.UploadedImage
+	appendimages         []types.UploadedImage
+	labeled_images       *[]types.UploadedImage
+	appendlabeled_images []types.UploadedImage
+	videos               *[]types.UploadedVideo
+	appendvideos         []types.UploadedVideo
+	description          *string
+	raw_data             *string
+	clearedFields        map[string]struct{}
+	creator              *int
+	clearedcreator       bool
+	updater              *int
+	clearedupdater       bool
+	done                 bool
+	oldValue             func(context.Context) (*IPCReportEvent, error)
+	predicates           []predicate.IPCReportEvent
+}
+
+var _ ent.Mutation = (*IPCReportEventMutation)(nil)
+
+// ipcreporteventOption allows management of the mutation configuration using functional options.
+type ipcreporteventOption func(*IPCReportEventMutation)
+
+// newIPCReportEventMutation creates new mutation for the IPCReportEvent entity.
+func newIPCReportEventMutation(c config, op Op, opts ...ipcreporteventOption) *IPCReportEventMutation {
+	m := &IPCReportEventMutation{
+		config:        c,
+		op:            op,
+		typ:           TypeIPCReportEvent,
+		clearedFields: make(map[string]struct{}),
+	}
+	for _, opt := range opts {
+		opt(m)
+	}
+	return m
+}
+
+// withIPCReportEventID sets the ID field of the mutation.
+func withIPCReportEventID(id int) ipcreporteventOption {
+	return func(m *IPCReportEventMutation) {
+		var (
+			err   error
+			once  sync.Once
+			value *IPCReportEvent
+		)
+		m.oldValue = func(ctx context.Context) (*IPCReportEvent, error) {
+			once.Do(func() {
+				if m.done {
+					err = errors.New("querying old values post mutation is not allowed")
+				} else {
+					value, err = m.Client().IPCReportEvent.Get(ctx, id)
+				}
+			})
+			return value, err
+		}
+		m.id = &id
+	}
+}
+
+// withIPCReportEvent sets the old IPCReportEvent of the mutation.
+func withIPCReportEvent(node *IPCReportEvent) ipcreporteventOption {
+	return func(m *IPCReportEventMutation) {
+		m.oldValue = func(context.Context) (*IPCReportEvent, error) {
+			return node, nil
+		}
+		m.id = &node.ID
+	}
+}
+
+// Client returns a new `ent.Client` from the mutation. If the mutation was
+// executed in a transaction (ent.Tx), a transactional client is returned.
+func (m IPCReportEventMutation) Client() *Client {
+	client := &Client{config: m.config}
+	client.init()
+	return client
+}
+
+// Tx returns an `ent.Tx` for mutations that were executed in transactions;
+// it returns an error otherwise.
+func (m IPCReportEventMutation) Tx() (*Tx, error) {
+	if _, ok := m.driver.(*txDriver); !ok {
+		return nil, errors.New("dao: mutation is not running in a transaction")
+	}
+	tx := &Tx{config: m.config}
+	tx.init()
+	return tx, nil
+}
+
+// ID returns the ID value in the mutation. Note that the ID is only available
+// if it was provided to the builder or after it was returned from the database.
+func (m *IPCReportEventMutation) ID() (id int, exists bool) {
+	if m.id == nil {
+		return
+	}
+	return *m.id, true
+}
+
+// IDs queries the database and returns the entity ids that match the mutation's predicate.
+// That means, if the mutation is applied within a transaction with an isolation level such
+// as sql.LevelSerializable, the returned ids match the ids of the rows that will be updated
+// or updated by the mutation.
+func (m *IPCReportEventMutation) IDs(ctx context.Context) ([]int, error) {
+	switch {
+	case m.op.Is(OpUpdateOne | OpDeleteOne):
+		id, exists := m.ID()
+		if exists {
+			return []int{id}, nil
+		}
+		fallthrough
+	case m.op.Is(OpUpdate | OpDelete):
+		return m.Client().IPCReportEvent.Query().Where(m.predicates...).IDs(ctx)
+	default:
+		return nil, fmt.Errorf("IDs is not allowed on %s operations", m.op)
+	}
+}
+
+// SetCreatedAt sets the "created_at" field.
+func (m *IPCReportEventMutation) SetCreatedAt(t time.Time) {
+	m.created_at = &t
+}
+
+// CreatedAt returns the value of the "created_at" field in the mutation.
+func (m *IPCReportEventMutation) CreatedAt() (r time.Time, exists bool) {
+	v := m.created_at
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldCreatedAt returns the old "created_at" field's value of the IPCReportEvent entity.
+// If the IPCReportEvent object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *IPCReportEventMutation) OldCreatedAt(ctx context.Context) (v time.Time, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldCreatedAt is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldCreatedAt requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldCreatedAt: %w", err)
+	}
+	return oldValue.CreatedAt, nil
+}
+
+// ResetCreatedAt resets all changes to the "created_at" field.
+func (m *IPCReportEventMutation) ResetCreatedAt() {
+	m.created_at = nil
+}
+
+// SetCreatedBy sets the "created_by" field.
+func (m *IPCReportEventMutation) SetCreatedBy(i int) {
+	m.creator = &i
+}
+
+// CreatedBy returns the value of the "created_by" field in the mutation.
+func (m *IPCReportEventMutation) CreatedBy() (r int, exists bool) {
+	v := m.creator
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldCreatedBy returns the old "created_by" field's value of the IPCReportEvent entity.
+// If the IPCReportEvent object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *IPCReportEventMutation) OldCreatedBy(ctx context.Context) (v int, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldCreatedBy is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldCreatedBy requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldCreatedBy: %w", err)
+	}
+	return oldValue.CreatedBy, nil
+}
+
+// ResetCreatedBy resets all changes to the "created_by" field.
+func (m *IPCReportEventMutation) ResetCreatedBy() {
+	m.creator = nil
+}
+
+// SetDeletedAt sets the "deleted_at" field.
+func (m *IPCReportEventMutation) SetDeletedAt(t time.Time) {
+	m.deleted_at = &t
+}
+
+// DeletedAt returns the value of the "deleted_at" field in the mutation.
+func (m *IPCReportEventMutation) DeletedAt() (r time.Time, exists bool) {
+	v := m.deleted_at
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldDeletedAt returns the old "deleted_at" field's value of the IPCReportEvent entity.
+// If the IPCReportEvent object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *IPCReportEventMutation) OldDeletedAt(ctx context.Context) (v *time.Time, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldDeletedAt is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldDeletedAt requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldDeletedAt: %w", err)
+	}
+	return oldValue.DeletedAt, nil
+}
+
+// ClearDeletedAt clears the value of the "deleted_at" field.
+func (m *IPCReportEventMutation) ClearDeletedAt() {
+	m.deleted_at = nil
+	m.clearedFields[ipcreportevent.FieldDeletedAt] = struct{}{}
+}
+
+// DeletedAtCleared returns if the "deleted_at" field was cleared in this mutation.
+func (m *IPCReportEventMutation) DeletedAtCleared() bool {
+	_, ok := m.clearedFields[ipcreportevent.FieldDeletedAt]
+	return ok
+}
+
+// ResetDeletedAt resets all changes to the "deleted_at" field.
+func (m *IPCReportEventMutation) ResetDeletedAt() {
+	m.deleted_at = nil
+	delete(m.clearedFields, ipcreportevent.FieldDeletedAt)
+}
+
+// SetUpdatedBy sets the "updated_by" field.
+func (m *IPCReportEventMutation) SetUpdatedBy(i int) {
+	m.updater = &i
+}
+
+// UpdatedBy returns the value of the "updated_by" field in the mutation.
+func (m *IPCReportEventMutation) UpdatedBy() (r int, exists bool) {
+	v := m.updater
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldUpdatedBy returns the old "updated_by" field's value of the IPCReportEvent entity.
+// If the IPCReportEvent object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *IPCReportEventMutation) OldUpdatedBy(ctx context.Context) (v int, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldUpdatedBy is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldUpdatedBy requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldUpdatedBy: %w", err)
+	}
+	return oldValue.UpdatedBy, nil
+}
+
+// ResetUpdatedBy resets all changes to the "updated_by" field.
+func (m *IPCReportEventMutation) ResetUpdatedBy() {
+	m.updater = nil
+}
+
+// SetUpdatedAt sets the "updated_at" field.
+func (m *IPCReportEventMutation) SetUpdatedAt(t time.Time) {
+	m.updated_at = &t
+}
+
+// UpdatedAt returns the value of the "updated_at" field in the mutation.
+func (m *IPCReportEventMutation) UpdatedAt() (r time.Time, exists bool) {
+	v := m.updated_at
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldUpdatedAt returns the old "updated_at" field's value of the IPCReportEvent entity.
+// If the IPCReportEvent object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *IPCReportEventMutation) OldUpdatedAt(ctx context.Context) (v time.Time, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldUpdatedAt is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldUpdatedAt requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldUpdatedAt: %w", err)
+	}
+	return oldValue.UpdatedAt, nil
+}
+
+// ResetUpdatedAt resets all changes to the "updated_at" field.
+func (m *IPCReportEventMutation) ResetUpdatedAt() {
+	m.updated_at = nil
+}
+
+// SetDeviceID sets the "device_id" field.
+func (m *IPCReportEventMutation) SetDeviceID(s string) {
+	m.device_id = &s
+}
+
+// DeviceID returns the value of the "device_id" field in the mutation.
+func (m *IPCReportEventMutation) DeviceID() (r string, exists bool) {
+	v := m.device_id
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldDeviceID returns the old "device_id" field's value of the IPCReportEvent entity.
+// If the IPCReportEvent object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *IPCReportEventMutation) OldDeviceID(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldDeviceID is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldDeviceID requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldDeviceID: %w", err)
+	}
+	return oldValue.DeviceID, nil
+}
+
+// ResetDeviceID resets all changes to the "device_id" field.
+func (m *IPCReportEventMutation) ResetDeviceID() {
+	m.device_id = nil
+}
+
+// SetEventID sets the "event_id" field.
+func (m *IPCReportEventMutation) SetEventID(s string) {
+	m.event_id = &s
+}
+
+// EventID returns the value of the "event_id" field in the mutation.
+func (m *IPCReportEventMutation) EventID() (r string, exists bool) {
+	v := m.event_id
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldEventID returns the old "event_id" field's value of the IPCReportEvent entity.
+// If the IPCReportEvent object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *IPCReportEventMutation) OldEventID(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldEventID is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldEventID requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldEventID: %w", err)
+	}
+	return oldValue.EventID, nil
+}
+
+// ResetEventID resets all changes to the "event_id" field.
+func (m *IPCReportEventMutation) ResetEventID() {
+	m.event_id = nil
+}
+
+// SetEventTime sets the "event_time" field.
+func (m *IPCReportEventMutation) SetEventTime(t time.Time) {
+	m.event_time = &t
+}
+
+// EventTime returns the value of the "event_time" field in the mutation.
+func (m *IPCReportEventMutation) EventTime() (r time.Time, exists bool) {
+	v := m.event_time
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldEventTime returns the old "event_time" field's value of the IPCReportEvent entity.
+// If the IPCReportEvent object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *IPCReportEventMutation) OldEventTime(ctx context.Context) (v time.Time, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldEventTime is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldEventTime requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldEventTime: %w", err)
+	}
+	return oldValue.EventTime, nil
+}
+
+// ResetEventTime resets all changes to the "event_time" field.
+func (m *IPCReportEventMutation) ResetEventTime() {
+	m.event_time = nil
+}
+
+// SetEventType sets the "event_type" field.
+func (m *IPCReportEventMutation) SetEventType(eret enums.IPCReportEventType) {
+	m.event_type = &eret
+	m.addevent_type = nil
+}
+
+// EventType returns the value of the "event_type" field in the mutation.
+func (m *IPCReportEventMutation) EventType() (r enums.IPCReportEventType, exists bool) {
+	v := m.event_type
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldEventType returns the old "event_type" field's value of the IPCReportEvent entity.
+// If the IPCReportEvent object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *IPCReportEventMutation) OldEventType(ctx context.Context) (v enums.IPCReportEventType, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldEventType is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldEventType requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldEventType: %w", err)
+	}
+	return oldValue.EventType, nil
+}
+
+// AddEventType adds eret to the "event_type" field.
+func (m *IPCReportEventMutation) AddEventType(eret enums.IPCReportEventType) {
+	if m.addevent_type != nil {
+		*m.addevent_type += eret
+	} else {
+		m.addevent_type = &eret
+	}
+}
+
+// AddedEventType returns the value that was added to the "event_type" field in this mutation.
+func (m *IPCReportEventMutation) AddedEventType() (r enums.IPCReportEventType, exists bool) {
+	v := m.addevent_type
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ResetEventType resets all changes to the "event_type" field.
+func (m *IPCReportEventMutation) ResetEventType() {
+	m.event_type = nil
+	m.addevent_type = nil
+}
+
+// SetEventStatus sets the "event_status" field.
+func (m *IPCReportEventMutation) SetEventStatus(eres enums.IPCReportEventStatus) {
+	m.event_status = &eres
+	m.addevent_status = nil
+}
+
+// EventStatus returns the value of the "event_status" field in the mutation.
+func (m *IPCReportEventMutation) EventStatus() (r enums.IPCReportEventStatus, exists bool) {
+	v := m.event_status
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldEventStatus returns the old "event_status" field's value of the IPCReportEvent entity.
+// If the IPCReportEvent object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *IPCReportEventMutation) OldEventStatus(ctx context.Context) (v enums.IPCReportEventStatus, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldEventStatus is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldEventStatus requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldEventStatus: %w", err)
+	}
+	return oldValue.EventStatus, nil
+}
+
+// AddEventStatus adds eres to the "event_status" field.
+func (m *IPCReportEventMutation) AddEventStatus(eres enums.IPCReportEventStatus) {
+	if m.addevent_status != nil {
+		*m.addevent_status += eres
+	} else {
+		m.addevent_status = &eres
+	}
+}
+
+// AddedEventStatus returns the value that was added to the "event_status" field in this mutation.
+func (m *IPCReportEventMutation) AddedEventStatus() (r enums.IPCReportEventStatus, exists bool) {
+	v := m.addevent_status
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ResetEventStatus resets all changes to the "event_status" field.
+func (m *IPCReportEventMutation) ResetEventStatus() {
+	m.event_status = nil
+	m.addevent_status = nil
+}
+
+// SetImages sets the "images" field.
+func (m *IPCReportEventMutation) SetImages(ti []types.UploadedImage) {
+	m.images = &ti
+	m.appendimages = nil
+}
+
+// Images returns the value of the "images" field in the mutation.
+func (m *IPCReportEventMutation) Images() (r []types.UploadedImage, exists bool) {
+	v := m.images
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldImages returns the old "images" field's value of the IPCReportEvent entity.
+// If the IPCReportEvent object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *IPCReportEventMutation) OldImages(ctx context.Context) (v []types.UploadedImage, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldImages is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldImages requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldImages: %w", err)
+	}
+	return oldValue.Images, nil
+}
+
+// AppendImages adds ti to the "images" field.
+func (m *IPCReportEventMutation) AppendImages(ti []types.UploadedImage) {
+	m.appendimages = append(m.appendimages, ti...)
+}
+
+// AppendedImages returns the list of values that were appended to the "images" field in this mutation.
+func (m *IPCReportEventMutation) AppendedImages() ([]types.UploadedImage, bool) {
+	if len(m.appendimages) == 0 {
+		return nil, false
+	}
+	return m.appendimages, true
+}
+
+// ClearImages clears the value of the "images" field.
+func (m *IPCReportEventMutation) ClearImages() {
+	m.images = nil
+	m.appendimages = nil
+	m.clearedFields[ipcreportevent.FieldImages] = struct{}{}
+}
+
+// ImagesCleared returns if the "images" field was cleared in this mutation.
+func (m *IPCReportEventMutation) ImagesCleared() bool {
+	_, ok := m.clearedFields[ipcreportevent.FieldImages]
+	return ok
+}
+
+// ResetImages resets all changes to the "images" field.
+func (m *IPCReportEventMutation) ResetImages() {
+	m.images = nil
+	m.appendimages = nil
+	delete(m.clearedFields, ipcreportevent.FieldImages)
+}
+
+// SetLabeledImages sets the "labeled_images" field.
+func (m *IPCReportEventMutation) SetLabeledImages(ti []types.UploadedImage) {
+	m.labeled_images = &ti
+	m.appendlabeled_images = nil
+}
+
+// LabeledImages returns the value of the "labeled_images" field in the mutation.
+func (m *IPCReportEventMutation) LabeledImages() (r []types.UploadedImage, exists bool) {
+	v := m.labeled_images
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldLabeledImages returns the old "labeled_images" field's value of the IPCReportEvent entity.
+// If the IPCReportEvent object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *IPCReportEventMutation) OldLabeledImages(ctx context.Context) (v []types.UploadedImage, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldLabeledImages is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldLabeledImages requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldLabeledImages: %w", err)
+	}
+	return oldValue.LabeledImages, nil
+}
+
+// AppendLabeledImages adds ti to the "labeled_images" field.
+func (m *IPCReportEventMutation) AppendLabeledImages(ti []types.UploadedImage) {
+	m.appendlabeled_images = append(m.appendlabeled_images, ti...)
+}
+
+// AppendedLabeledImages returns the list of values that were appended to the "labeled_images" field in this mutation.
+func (m *IPCReportEventMutation) AppendedLabeledImages() ([]types.UploadedImage, bool) {
+	if len(m.appendlabeled_images) == 0 {
+		return nil, false
+	}
+	return m.appendlabeled_images, true
+}
+
+// ClearLabeledImages clears the value of the "labeled_images" field.
+func (m *IPCReportEventMutation) ClearLabeledImages() {
+	m.labeled_images = nil
+	m.appendlabeled_images = nil
+	m.clearedFields[ipcreportevent.FieldLabeledImages] = struct{}{}
+}
+
+// LabeledImagesCleared returns if the "labeled_images" field was cleared in this mutation.
+func (m *IPCReportEventMutation) LabeledImagesCleared() bool {
+	_, ok := m.clearedFields[ipcreportevent.FieldLabeledImages]
+	return ok
+}
+
+// ResetLabeledImages resets all changes to the "labeled_images" field.
+func (m *IPCReportEventMutation) ResetLabeledImages() {
+	m.labeled_images = nil
+	m.appendlabeled_images = nil
+	delete(m.clearedFields, ipcreportevent.FieldLabeledImages)
+}
+
+// SetVideos sets the "videos" field.
+func (m *IPCReportEventMutation) SetVideos(tv []types.UploadedVideo) {
+	m.videos = &tv
+	m.appendvideos = nil
+}
+
+// Videos returns the value of the "videos" field in the mutation.
+func (m *IPCReportEventMutation) Videos() (r []types.UploadedVideo, exists bool) {
+	v := m.videos
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldVideos returns the old "videos" field's value of the IPCReportEvent entity.
+// If the IPCReportEvent object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *IPCReportEventMutation) OldVideos(ctx context.Context) (v []types.UploadedVideo, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldVideos is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldVideos requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldVideos: %w", err)
+	}
+	return oldValue.Videos, nil
+}
+
+// AppendVideos adds tv to the "videos" field.
+func (m *IPCReportEventMutation) AppendVideos(tv []types.UploadedVideo) {
+	m.appendvideos = append(m.appendvideos, tv...)
+}
+
+// AppendedVideos returns the list of values that were appended to the "videos" field in this mutation.
+func (m *IPCReportEventMutation) AppendedVideos() ([]types.UploadedVideo, bool) {
+	if len(m.appendvideos) == 0 {
+		return nil, false
+	}
+	return m.appendvideos, true
+}
+
+// ClearVideos clears the value of the "videos" field.
+func (m *IPCReportEventMutation) ClearVideos() {
+	m.videos = nil
+	m.appendvideos = nil
+	m.clearedFields[ipcreportevent.FieldVideos] = struct{}{}
+}
+
+// VideosCleared returns if the "videos" field was cleared in this mutation.
+func (m *IPCReportEventMutation) VideosCleared() bool {
+	_, ok := m.clearedFields[ipcreportevent.FieldVideos]
+	return ok
+}
+
+// ResetVideos resets all changes to the "videos" field.
+func (m *IPCReportEventMutation) ResetVideos() {
+	m.videos = nil
+	m.appendvideos = nil
+	delete(m.clearedFields, ipcreportevent.FieldVideos)
+}
+
+// SetDescription sets the "description" field.
+func (m *IPCReportEventMutation) SetDescription(s string) {
+	m.description = &s
+}
+
+// Description returns the value of the "description" field in the mutation.
+func (m *IPCReportEventMutation) Description() (r string, exists bool) {
+	v := m.description
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldDescription returns the old "description" field's value of the IPCReportEvent entity.
+// If the IPCReportEvent object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *IPCReportEventMutation) OldDescription(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldDescription is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldDescription requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldDescription: %w", err)
+	}
+	return oldValue.Description, nil
+}
+
+// ClearDescription clears the value of the "description" field.
+func (m *IPCReportEventMutation) ClearDescription() {
+	m.description = nil
+	m.clearedFields[ipcreportevent.FieldDescription] = struct{}{}
+}
+
+// DescriptionCleared returns if the "description" field was cleared in this mutation.
+func (m *IPCReportEventMutation) DescriptionCleared() bool {
+	_, ok := m.clearedFields[ipcreportevent.FieldDescription]
+	return ok
+}
+
+// ResetDescription resets all changes to the "description" field.
+func (m *IPCReportEventMutation) ResetDescription() {
+	m.description = nil
+	delete(m.clearedFields, ipcreportevent.FieldDescription)
+}
+
+// SetRawData sets the "raw_data" field.
+func (m *IPCReportEventMutation) SetRawData(s string) {
+	m.raw_data = &s
+}
+
+// RawData returns the value of the "raw_data" field in the mutation.
+func (m *IPCReportEventMutation) RawData() (r string, exists bool) {
+	v := m.raw_data
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldRawData returns the old "raw_data" field's value of the IPCReportEvent entity.
+// If the IPCReportEvent object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *IPCReportEventMutation) OldRawData(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldRawData is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldRawData requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldRawData: %w", err)
+	}
+	return oldValue.RawData, nil
+}
+
+// ClearRawData clears the value of the "raw_data" field.
+func (m *IPCReportEventMutation) ClearRawData() {
+	m.raw_data = nil
+	m.clearedFields[ipcreportevent.FieldRawData] = struct{}{}
+}
+
+// RawDataCleared returns if the "raw_data" field was cleared in this mutation.
+func (m *IPCReportEventMutation) RawDataCleared() bool {
+	_, ok := m.clearedFields[ipcreportevent.FieldRawData]
+	return ok
+}
+
+// ResetRawData resets all changes to the "raw_data" field.
+func (m *IPCReportEventMutation) ResetRawData() {
+	m.raw_data = nil
+	delete(m.clearedFields, ipcreportevent.FieldRawData)
+}
+
+// SetCreatorID sets the "creator" edge to the Admin entity by id.
+func (m *IPCReportEventMutation) SetCreatorID(id int) {
+	m.creator = &id
+}
+
+// ClearCreator clears the "creator" edge to the Admin entity.
+func (m *IPCReportEventMutation) ClearCreator() {
+	m.clearedcreator = true
+	m.clearedFields[ipcreportevent.FieldCreatedBy] = struct{}{}
+}
+
+// CreatorCleared reports if the "creator" edge to the Admin entity was cleared.
+func (m *IPCReportEventMutation) CreatorCleared() bool {
+	return m.clearedcreator
+}
+
+// CreatorID returns the "creator" edge ID in the mutation.
+func (m *IPCReportEventMutation) CreatorID() (id int, exists bool) {
+	if m.creator != nil {
+		return *m.creator, true
+	}
+	return
+}
+
+// CreatorIDs returns the "creator" edge IDs in the mutation.
+// Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
+// CreatorID instead. It exists only for internal usage by the builders.
+func (m *IPCReportEventMutation) CreatorIDs() (ids []int) {
+	if id := m.creator; id != nil {
+		ids = append(ids, *id)
+	}
+	return
+}
+
+// ResetCreator resets all changes to the "creator" edge.
+func (m *IPCReportEventMutation) ResetCreator() {
+	m.creator = nil
+	m.clearedcreator = false
+}
+
+// SetUpdaterID sets the "updater" edge to the Admin entity by id.
+func (m *IPCReportEventMutation) SetUpdaterID(id int) {
+	m.updater = &id
+}
+
+// ClearUpdater clears the "updater" edge to the Admin entity.
+func (m *IPCReportEventMutation) ClearUpdater() {
+	m.clearedupdater = true
+	m.clearedFields[ipcreportevent.FieldUpdatedBy] = struct{}{}
+}
+
+// UpdaterCleared reports if the "updater" edge to the Admin entity was cleared.
+func (m *IPCReportEventMutation) UpdaterCleared() bool {
+	return m.clearedupdater
+}
+
+// UpdaterID returns the "updater" edge ID in the mutation.
+func (m *IPCReportEventMutation) UpdaterID() (id int, exists bool) {
+	if m.updater != nil {
+		return *m.updater, true
+	}
+	return
+}
+
+// UpdaterIDs returns the "updater" edge IDs in the mutation.
+// Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
+// UpdaterID instead. It exists only for internal usage by the builders.
+func (m *IPCReportEventMutation) UpdaterIDs() (ids []int) {
+	if id := m.updater; id != nil {
+		ids = append(ids, *id)
+	}
+	return
+}
+
+// ResetUpdater resets all changes to the "updater" edge.
+func (m *IPCReportEventMutation) ResetUpdater() {
+	m.updater = nil
+	m.clearedupdater = false
+}
+
+// Where appends a list predicates to the IPCReportEventMutation builder.
+func (m *IPCReportEventMutation) Where(ps ...predicate.IPCReportEvent) {
+	m.predicates = append(m.predicates, ps...)
+}
+
+// WhereP appends storage-level predicates to the IPCReportEventMutation builder. Using this method,
+// users can use type-assertion to append predicates that do not depend on any generated package.
+func (m *IPCReportEventMutation) WhereP(ps ...func(*sql.Selector)) {
+	p := make([]predicate.IPCReportEvent, len(ps))
+	for i := range ps {
+		p[i] = ps[i]
+	}
+	m.Where(p...)
+}
+
+// Op returns the operation name.
+func (m *IPCReportEventMutation) Op() Op {
+	return m.op
+}
+
+// SetOp allows setting the mutation operation.
+func (m *IPCReportEventMutation) SetOp(op Op) {
+	m.op = op
+}
+
+// Type returns the node type of this mutation (IPCReportEvent).
+func (m *IPCReportEventMutation) Type() string {
+	return m.typ
+}
+
+// Fields returns all fields that were changed during this mutation. Note that in
+// order to get all numeric fields that were incremented/decremented, call
+// AddedFields().
+func (m *IPCReportEventMutation) Fields() []string {
+	fields := make([]string, 0, 15)
+	if m.created_at != nil {
+		fields = append(fields, ipcreportevent.FieldCreatedAt)
+	}
+	if m.creator != nil {
+		fields = append(fields, ipcreportevent.FieldCreatedBy)
+	}
+	if m.deleted_at != nil {
+		fields = append(fields, ipcreportevent.FieldDeletedAt)
+	}
+	if m.updater != nil {
+		fields = append(fields, ipcreportevent.FieldUpdatedBy)
+	}
+	if m.updated_at != nil {
+		fields = append(fields, ipcreportevent.FieldUpdatedAt)
+	}
+	if m.device_id != nil {
+		fields = append(fields, ipcreportevent.FieldDeviceID)
+	}
+	if m.event_id != nil {
+		fields = append(fields, ipcreportevent.FieldEventID)
+	}
+	if m.event_time != nil {
+		fields = append(fields, ipcreportevent.FieldEventTime)
+	}
+	if m.event_type != nil {
+		fields = append(fields, ipcreportevent.FieldEventType)
+	}
+	if m.event_status != nil {
+		fields = append(fields, ipcreportevent.FieldEventStatus)
+	}
+	if m.images != nil {
+		fields = append(fields, ipcreportevent.FieldImages)
+	}
+	if m.labeled_images != nil {
+		fields = append(fields, ipcreportevent.FieldLabeledImages)
+	}
+	if m.videos != nil {
+		fields = append(fields, ipcreportevent.FieldVideos)
+	}
+	if m.description != nil {
+		fields = append(fields, ipcreportevent.FieldDescription)
+	}
+	if m.raw_data != nil {
+		fields = append(fields, ipcreportevent.FieldRawData)
+	}
+	return fields
+}
+
+// Field returns the value of a field with the given name. The second boolean
+// return value indicates that this field was not set, or was not defined in the
+// schema.
+func (m *IPCReportEventMutation) Field(name string) (ent.Value, bool) {
+	switch name {
+	case ipcreportevent.FieldCreatedAt:
+		return m.CreatedAt()
+	case ipcreportevent.FieldCreatedBy:
+		return m.CreatedBy()
+	case ipcreportevent.FieldDeletedAt:
+		return m.DeletedAt()
+	case ipcreportevent.FieldUpdatedBy:
+		return m.UpdatedBy()
+	case ipcreportevent.FieldUpdatedAt:
+		return m.UpdatedAt()
+	case ipcreportevent.FieldDeviceID:
+		return m.DeviceID()
+	case ipcreportevent.FieldEventID:
+		return m.EventID()
+	case ipcreportevent.FieldEventTime:
+		return m.EventTime()
+	case ipcreportevent.FieldEventType:
+		return m.EventType()
+	case ipcreportevent.FieldEventStatus:
+		return m.EventStatus()
+	case ipcreportevent.FieldImages:
+		return m.Images()
+	case ipcreportevent.FieldLabeledImages:
+		return m.LabeledImages()
+	case ipcreportevent.FieldVideos:
+		return m.Videos()
+	case ipcreportevent.FieldDescription:
+		return m.Description()
+	case ipcreportevent.FieldRawData:
+		return m.RawData()
+	}
+	return nil, false
+}
+
+// OldField returns the old value of the field from the database. An error is
+// returned if the mutation operation is not UpdateOne, or the query to the
+// database failed.
+func (m *IPCReportEventMutation) OldField(ctx context.Context, name string) (ent.Value, error) {
+	switch name {
+	case ipcreportevent.FieldCreatedAt:
+		return m.OldCreatedAt(ctx)
+	case ipcreportevent.FieldCreatedBy:
+		return m.OldCreatedBy(ctx)
+	case ipcreportevent.FieldDeletedAt:
+		return m.OldDeletedAt(ctx)
+	case ipcreportevent.FieldUpdatedBy:
+		return m.OldUpdatedBy(ctx)
+	case ipcreportevent.FieldUpdatedAt:
+		return m.OldUpdatedAt(ctx)
+	case ipcreportevent.FieldDeviceID:
+		return m.OldDeviceID(ctx)
+	case ipcreportevent.FieldEventID:
+		return m.OldEventID(ctx)
+	case ipcreportevent.FieldEventTime:
+		return m.OldEventTime(ctx)
+	case ipcreportevent.FieldEventType:
+		return m.OldEventType(ctx)
+	case ipcreportevent.FieldEventStatus:
+		return m.OldEventStatus(ctx)
+	case ipcreportevent.FieldImages:
+		return m.OldImages(ctx)
+	case ipcreportevent.FieldLabeledImages:
+		return m.OldLabeledImages(ctx)
+	case ipcreportevent.FieldVideos:
+		return m.OldVideos(ctx)
+	case ipcreportevent.FieldDescription:
+		return m.OldDescription(ctx)
+	case ipcreportevent.FieldRawData:
+		return m.OldRawData(ctx)
+	}
+	return nil, fmt.Errorf("unknown IPCReportEvent field %s", name)
+}
+
+// SetField sets the value of a field with the given name. It returns an error if
+// the field is not defined in the schema, or if the type mismatched the field
+// type.
+func (m *IPCReportEventMutation) SetField(name string, value ent.Value) error {
+	switch name {
+	case ipcreportevent.FieldCreatedAt:
+		v, ok := value.(time.Time)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetCreatedAt(v)
+		return nil
+	case ipcreportevent.FieldCreatedBy:
+		v, ok := value.(int)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetCreatedBy(v)
+		return nil
+	case ipcreportevent.FieldDeletedAt:
+		v, ok := value.(time.Time)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetDeletedAt(v)
+		return nil
+	case ipcreportevent.FieldUpdatedBy:
+		v, ok := value.(int)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetUpdatedBy(v)
+		return nil
+	case ipcreportevent.FieldUpdatedAt:
+		v, ok := value.(time.Time)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetUpdatedAt(v)
+		return nil
+	case ipcreportevent.FieldDeviceID:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetDeviceID(v)
+		return nil
+	case ipcreportevent.FieldEventID:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetEventID(v)
+		return nil
+	case ipcreportevent.FieldEventTime:
+		v, ok := value.(time.Time)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetEventTime(v)
+		return nil
+	case ipcreportevent.FieldEventType:
+		v, ok := value.(enums.IPCReportEventType)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetEventType(v)
+		return nil
+	case ipcreportevent.FieldEventStatus:
+		v, ok := value.(enums.IPCReportEventStatus)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetEventStatus(v)
+		return nil
+	case ipcreportevent.FieldImages:
+		v, ok := value.([]types.UploadedImage)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetImages(v)
+		return nil
+	case ipcreportevent.FieldLabeledImages:
+		v, ok := value.([]types.UploadedImage)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetLabeledImages(v)
+		return nil
+	case ipcreportevent.FieldVideos:
+		v, ok := value.([]types.UploadedVideo)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetVideos(v)
+		return nil
+	case ipcreportevent.FieldDescription:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetDescription(v)
+		return nil
+	case ipcreportevent.FieldRawData:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetRawData(v)
+		return nil
+	}
+	return fmt.Errorf("unknown IPCReportEvent field %s", name)
+}
+
+// AddedFields returns all numeric fields that were incremented/decremented during
+// this mutation.
+func (m *IPCReportEventMutation) AddedFields() []string {
+	var fields []string
+	if m.addevent_type != nil {
+		fields = append(fields, ipcreportevent.FieldEventType)
+	}
+	if m.addevent_status != nil {
+		fields = append(fields, ipcreportevent.FieldEventStatus)
+	}
+	return fields
+}
+
+// AddedField returns the numeric value that was incremented/decremented on a field
+// with the given name. The second boolean return value indicates that this field
+// was not set, or was not defined in the schema.
+func (m *IPCReportEventMutation) AddedField(name string) (ent.Value, bool) {
+	switch name {
+	case ipcreportevent.FieldEventType:
+		return m.AddedEventType()
+	case ipcreportevent.FieldEventStatus:
+		return m.AddedEventStatus()
+	}
+	return nil, false
+}
+
+// AddField adds the value to the field with the given name. It returns an error if
+// the field is not defined in the schema, or if the type mismatched the field
+// type.
+func (m *IPCReportEventMutation) AddField(name string, value ent.Value) error {
+	switch name {
+	case ipcreportevent.FieldEventType:
+		v, ok := value.(enums.IPCReportEventType)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddEventType(v)
+		return nil
+	case ipcreportevent.FieldEventStatus:
+		v, ok := value.(enums.IPCReportEventStatus)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddEventStatus(v)
+		return nil
+	}
+	return fmt.Errorf("unknown IPCReportEvent numeric field %s", name)
+}
+
+// ClearedFields returns all nullable fields that were cleared during this
+// mutation.
+func (m *IPCReportEventMutation) ClearedFields() []string {
+	var fields []string
+	if m.FieldCleared(ipcreportevent.FieldDeletedAt) {
+		fields = append(fields, ipcreportevent.FieldDeletedAt)
+	}
+	if m.FieldCleared(ipcreportevent.FieldImages) {
+		fields = append(fields, ipcreportevent.FieldImages)
+	}
+	if m.FieldCleared(ipcreportevent.FieldLabeledImages) {
+		fields = append(fields, ipcreportevent.FieldLabeledImages)
+	}
+	if m.FieldCleared(ipcreportevent.FieldVideos) {
+		fields = append(fields, ipcreportevent.FieldVideos)
+	}
+	if m.FieldCleared(ipcreportevent.FieldDescription) {
+		fields = append(fields, ipcreportevent.FieldDescription)
+	}
+	if m.FieldCleared(ipcreportevent.FieldRawData) {
+		fields = append(fields, ipcreportevent.FieldRawData)
+	}
+	return fields
+}
+
+// FieldCleared returns a boolean indicating if a field with the given name was
+// cleared in this mutation.
+func (m *IPCReportEventMutation) FieldCleared(name string) bool {
+	_, ok := m.clearedFields[name]
+	return ok
+}
+
+// ClearField clears the value of the field with the given name. It returns an
+// error if the field is not defined in the schema.
+func (m *IPCReportEventMutation) ClearField(name string) error {
+	switch name {
+	case ipcreportevent.FieldDeletedAt:
+		m.ClearDeletedAt()
+		return nil
+	case ipcreportevent.FieldImages:
+		m.ClearImages()
+		return nil
+	case ipcreportevent.FieldLabeledImages:
+		m.ClearLabeledImages()
+		return nil
+	case ipcreportevent.FieldVideos:
+		m.ClearVideos()
+		return nil
+	case ipcreportevent.FieldDescription:
+		m.ClearDescription()
+		return nil
+	case ipcreportevent.FieldRawData:
+		m.ClearRawData()
+		return nil
+	}
+	return fmt.Errorf("unknown IPCReportEvent nullable field %s", name)
+}
+
+// ResetField resets all changes in the mutation for the field with the given name.
+// It returns an error if the field is not defined in the schema.
+func (m *IPCReportEventMutation) ResetField(name string) error {
+	switch name {
+	case ipcreportevent.FieldCreatedAt:
+		m.ResetCreatedAt()
+		return nil
+	case ipcreportevent.FieldCreatedBy:
+		m.ResetCreatedBy()
+		return nil
+	case ipcreportevent.FieldDeletedAt:
+		m.ResetDeletedAt()
+		return nil
+	case ipcreportevent.FieldUpdatedBy:
+		m.ResetUpdatedBy()
+		return nil
+	case ipcreportevent.FieldUpdatedAt:
+		m.ResetUpdatedAt()
+		return nil
+	case ipcreportevent.FieldDeviceID:
+		m.ResetDeviceID()
+		return nil
+	case ipcreportevent.FieldEventID:
+		m.ResetEventID()
+		return nil
+	case ipcreportevent.FieldEventTime:
+		m.ResetEventTime()
+		return nil
+	case ipcreportevent.FieldEventType:
+		m.ResetEventType()
+		return nil
+	case ipcreportevent.FieldEventStatus:
+		m.ResetEventStatus()
+		return nil
+	case ipcreportevent.FieldImages:
+		m.ResetImages()
+		return nil
+	case ipcreportevent.FieldLabeledImages:
+		m.ResetLabeledImages()
+		return nil
+	case ipcreportevent.FieldVideos:
+		m.ResetVideos()
+		return nil
+	case ipcreportevent.FieldDescription:
+		m.ResetDescription()
+		return nil
+	case ipcreportevent.FieldRawData:
+		m.ResetRawData()
+		return nil
+	}
+	return fmt.Errorf("unknown IPCReportEvent field %s", name)
+}
+
+// AddedEdges returns all edge names that were set/added in this mutation.
+func (m *IPCReportEventMutation) AddedEdges() []string {
+	edges := make([]string, 0, 2)
+	if m.creator != nil {
+		edges = append(edges, ipcreportevent.EdgeCreator)
+	}
+	if m.updater != nil {
+		edges = append(edges, ipcreportevent.EdgeUpdater)
+	}
+	return edges
+}
+
+// AddedIDs returns all IDs (to other nodes) that were added for the given edge
+// name in this mutation.
+func (m *IPCReportEventMutation) AddedIDs(name string) []ent.Value {
+	switch name {
+	case ipcreportevent.EdgeCreator:
+		if id := m.creator; id != nil {
+			return []ent.Value{*id}
+		}
+	case ipcreportevent.EdgeUpdater:
+		if id := m.updater; id != nil {
+			return []ent.Value{*id}
+		}
+	}
+	return nil
+}
+
+// RemovedEdges returns all edge names that were removed in this mutation.
+func (m *IPCReportEventMutation) RemovedEdges() []string {
+	edges := make([]string, 0, 2)
+	return edges
+}
+
+// RemovedIDs returns all IDs (to other nodes) that were removed for the edge with
+// the given name in this mutation.
+func (m *IPCReportEventMutation) RemovedIDs(name string) []ent.Value {
+	return nil
+}
+
+// ClearedEdges returns all edge names that were cleared in this mutation.
+func (m *IPCReportEventMutation) ClearedEdges() []string {
+	edges := make([]string, 0, 2)
+	if m.clearedcreator {
+		edges = append(edges, ipcreportevent.EdgeCreator)
+	}
+	if m.clearedupdater {
+		edges = append(edges, ipcreportevent.EdgeUpdater)
+	}
+	return edges
+}
+
+// EdgeCleared returns a boolean which indicates if the edge with the given name
+// was cleared in this mutation.
+func (m *IPCReportEventMutation) EdgeCleared(name string) bool {
+	switch name {
+	case ipcreportevent.EdgeCreator:
+		return m.clearedcreator
+	case ipcreportevent.EdgeUpdater:
+		return m.clearedupdater
+	}
+	return false
+}
+
+// ClearEdge clears the value of the edge with the given name. It returns an error
+// if that edge is not defined in the schema.
+func (m *IPCReportEventMutation) ClearEdge(name string) error {
+	switch name {
+	case ipcreportevent.EdgeCreator:
+		m.ClearCreator()
+		return nil
+	case ipcreportevent.EdgeUpdater:
+		m.ClearUpdater()
+		return nil
+	}
+	return fmt.Errorf("unknown IPCReportEvent unique edge %s", name)
+}
+
+// ResetEdge resets all changes to the edge with the given name in this mutation.
+// It returns an error if the edge is not defined in the schema.
+func (m *IPCReportEventMutation) ResetEdge(name string) error {
+	switch name {
+	case ipcreportevent.EdgeCreator:
+		m.ResetCreator()
+		return nil
+	case ipcreportevent.EdgeUpdater:
+		m.ResetUpdater()
+		return nil
+	}
+	return fmt.Errorf("unknown IPCReportEvent edge %s", name)
+}
+
 // OccupationMutation represents an operation that mutates the Occupation nodes in the graph.
 type OccupationMutation struct {
 	config
@@ -6476,25 +8091,19 @@ func (m *OccupationMutation) ResetEdge(name string) error {
 // RiskMutation represents an operation that mutates the Risk nodes in the graph.
 type RiskMutation struct {
 	config
-	op         Op
-	typ        string
-	id         *int
-	created_at *time.Time
-	deleted_at *time.Time
-	updated_at *time.Time
-	title      *string
-	content    *string
-	images     *[]struct {
-		Title string "json:\"title\""
-		URL   string "json:\"url\""
-	}
-	appendimages []struct {
-		Title string "json:\"title\""
-		URL   string "json:\"url\""
-	}
+	op                   Op
+	typ                  string
+	id                   *int
+	created_at           *time.Time
+	deleted_at           *time.Time
+	updated_at           *time.Time
+	title                *string
+	content              *string
+	images               *[]types.UploadedImage
+	appendimages         []types.UploadedImage
 	measures             *string
-	maintain_status      *properties.MaintainStatus
-	addmaintain_status   *properties.MaintainStatus
+	maintain_status      *maintain_status.MaintainStatus
+	addmaintain_status   *maintain_status.MaintainStatus
 	due_time             *time.Time
 	clearedFields        map[string]struct{}
 	creator              *int
@@ -6891,19 +8500,13 @@ func (m *RiskMutation) ResetContent() {
 }
 
 // SetImages sets the "images" field.
-func (m *RiskMutation) SetImages(s []struct {
-	Title string "json:\"title\""
-	URL   string "json:\"url\""
-}) {
-	m.images = &s
+func (m *RiskMutation) SetImages(ti []types.UploadedImage) {
+	m.images = &ti
 	m.appendimages = nil
 }
 
 // Images returns the value of the "images" field in the mutation.
-func (m *RiskMutation) Images() (r []struct {
-	Title string "json:\"title\""
-	URL   string "json:\"url\""
-}, exists bool) {
+func (m *RiskMutation) Images() (r []types.UploadedImage, exists bool) {
 	v := m.images
 	if v == nil {
 		return
@@ -6914,10 +8517,7 @@ func (m *RiskMutation) Images() (r []struct {
 // OldImages returns the old "images" field's value of the Risk entity.
 // If the Risk object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *RiskMutation) OldImages(ctx context.Context) (v []struct {
-	Title string "json:\"title\""
-	URL   string "json:\"url\""
-}, err error) {
+func (m *RiskMutation) OldImages(ctx context.Context) (v []types.UploadedImage, err error) {
 	if !m.op.Is(OpUpdateOne) {
 		return v, errors.New("OldImages is only allowed on UpdateOne operations")
 	}
@@ -6931,19 +8531,13 @@ func (m *RiskMutation) OldImages(ctx context.Context) (v []struct {
 	return oldValue.Images, nil
 }
 
-// AppendImages adds s to the "images" field.
-func (m *RiskMutation) AppendImages(s []struct {
-	Title string "json:\"title\""
-	URL   string "json:\"url\""
-}) {
-	m.appendimages = append(m.appendimages, s...)
+// AppendImages adds ti to the "images" field.
+func (m *RiskMutation) AppendImages(ti []types.UploadedImage) {
+	m.appendimages = append(m.appendimages, ti...)
 }
 
 // AppendedImages returns the list of values that were appended to the "images" field in this mutation.
-func (m *RiskMutation) AppendedImages() ([]struct {
-	Title string "json:\"title\""
-	URL   string "json:\"url\""
-}, bool) {
+func (m *RiskMutation) AppendedImages() ([]types.UploadedImage, bool) {
 	if len(m.appendimages) == 0 {
 		return nil, false
 	}
@@ -7164,13 +8758,13 @@ func (m *RiskMutation) ResetMeasures() {
 }
 
 // SetMaintainStatus sets the "maintain_status" field.
-func (m *RiskMutation) SetMaintainStatus(ps properties.MaintainStatus) {
-	m.maintain_status = &ps
+func (m *RiskMutation) SetMaintainStatus(mss maintain_status.MaintainStatus) {
+	m.maintain_status = &mss
 	m.addmaintain_status = nil
 }
 
 // MaintainStatus returns the value of the "maintain_status" field in the mutation.
-func (m *RiskMutation) MaintainStatus() (r properties.MaintainStatus, exists bool) {
+func (m *RiskMutation) MaintainStatus() (r maintain_status.MaintainStatus, exists bool) {
 	v := m.maintain_status
 	if v == nil {
 		return
@@ -7181,7 +8775,7 @@ func (m *RiskMutation) MaintainStatus() (r properties.MaintainStatus, exists boo
 // OldMaintainStatus returns the old "maintain_status" field's value of the Risk entity.
 // If the Risk object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *RiskMutation) OldMaintainStatus(ctx context.Context) (v properties.MaintainStatus, err error) {
+func (m *RiskMutation) OldMaintainStatus(ctx context.Context) (v maintain_status.MaintainStatus, err error) {
 	if !m.op.Is(OpUpdateOne) {
 		return v, errors.New("OldMaintainStatus is only allowed on UpdateOne operations")
 	}
@@ -7195,17 +8789,17 @@ func (m *RiskMutation) OldMaintainStatus(ctx context.Context) (v properties.Main
 	return oldValue.MaintainStatus, nil
 }
 
-// AddMaintainStatus adds ps to the "maintain_status" field.
-func (m *RiskMutation) AddMaintainStatus(ps properties.MaintainStatus) {
+// AddMaintainStatus adds mss to the "maintain_status" field.
+func (m *RiskMutation) AddMaintainStatus(mss maintain_status.MaintainStatus) {
 	if m.addmaintain_status != nil {
-		*m.addmaintain_status += ps
+		*m.addmaintain_status += mss
 	} else {
-		m.addmaintain_status = &ps
+		m.addmaintain_status = &mss
 	}
 }
 
 // AddedMaintainStatus returns the value that was added to the "maintain_status" field in this mutation.
-func (m *RiskMutation) AddedMaintainStatus() (r properties.MaintainStatus, exists bool) {
+func (m *RiskMutation) AddedMaintainStatus() (r maintain_status.MaintainStatus, exists bool) {
 	v := m.addmaintain_status
 	if v == nil {
 		return
@@ -7659,10 +9253,7 @@ func (m *RiskMutation) SetField(name string, value ent.Value) error {
 		m.SetContent(v)
 		return nil
 	case risk.FieldImages:
-		v, ok := value.([]struct {
-			Title string "json:\"title\""
-			URL   string "json:\"url\""
-		})
+		v, ok := value.([]types.UploadedImage)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
@@ -7704,7 +9295,7 @@ func (m *RiskMutation) SetField(name string, value ent.Value) error {
 		m.SetMeasures(v)
 		return nil
 	case risk.FieldMaintainStatus:
-		v, ok := value.(properties.MaintainStatus)
+		v, ok := value.(maintain_status.MaintainStatus)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
@@ -7748,7 +9339,7 @@ func (m *RiskMutation) AddedField(name string) (ent.Value, bool) {
 func (m *RiskMutation) AddField(name string, value ent.Value) error {
 	switch name {
 	case risk.FieldMaintainStatus:
-		v, ok := value.(properties.MaintainStatus)
+		v, ok := value.(maintain_status.MaintainStatus)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}

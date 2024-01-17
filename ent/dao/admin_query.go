@@ -7,6 +7,7 @@ import (
 	"aisecurity/ent/dao/adminrole"
 	"aisecurity/ent/dao/department"
 	"aisecurity/ent/dao/employee"
+	"aisecurity/ent/dao/ipcreportevent"
 	"aisecurity/ent/dao/occupation"
 	"aisecurity/ent/dao/predicate"
 	"aisecurity/ent/dao/risk"
@@ -25,30 +26,32 @@ import (
 // AdminQuery is the builder for querying Admin entities.
 type AdminQuery struct {
 	config
-	ctx                     *QueryContext
-	order                   []admin.OrderOption
-	inters                  []Interceptor
-	predicates              []predicate.Admin
-	withCreator             *AdminQuery
-	withUpdater             *AdminQuery
-	withAdminRoles          *AdminRoleQuery
-	withAdminCreator        *AdminQuery
-	withAdminUpdater        *AdminQuery
-	withAdminRoleCreator    *AdminRoleQuery
-	withAdminRoleUpdater    *AdminRoleQuery
-	withRiskCreator         *RiskQuery
-	withRiskUpdater         *RiskQuery
-	withRiskLocationCreator *RiskLocationQuery
-	withRiskLocationUpdater *RiskLocationQuery
-	withRiskCategoryCreator *RiskCategoryQuery
-	withRiskCategoryUpdater *RiskCategoryQuery
-	withDepartmentCreator   *DepartmentQuery
-	withDepartmentUpdater   *DepartmentQuery
-	withEmployeeCreator     *EmployeeQuery
-	withEmployeeUpdater     *EmployeeQuery
-	withEmployee            *EmployeeQuery
-	withOccupationCreator   *OccupationQuery
-	withOccupationUpdater   *OccupationQuery
+	ctx                       *QueryContext
+	order                     []admin.OrderOption
+	inters                    []Interceptor
+	predicates                []predicate.Admin
+	withCreator               *AdminQuery
+	withUpdater               *AdminQuery
+	withAdminRoles            *AdminRoleQuery
+	withAdminCreator          *AdminQuery
+	withAdminUpdater          *AdminQuery
+	withAdminRoleCreator      *AdminRoleQuery
+	withAdminRoleUpdater      *AdminRoleQuery
+	withRiskCreator           *RiskQuery
+	withRiskUpdater           *RiskQuery
+	withRiskLocationCreator   *RiskLocationQuery
+	withRiskLocationUpdater   *RiskLocationQuery
+	withRiskCategoryCreator   *RiskCategoryQuery
+	withRiskCategoryUpdater   *RiskCategoryQuery
+	withDepartmentCreator     *DepartmentQuery
+	withDepartmentUpdater     *DepartmentQuery
+	withEmployeeCreator       *EmployeeQuery
+	withEmployeeUpdater       *EmployeeQuery
+	withEmployee              *EmployeeQuery
+	withOccupationCreator     *OccupationQuery
+	withOccupationUpdater     *OccupationQuery
+	withIpcReportEventCreator *IPCReportEventQuery
+	withIpcReportEventUpdater *IPCReportEventQuery
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
 	path func(context.Context) (*sql.Selector, error)
@@ -525,6 +528,50 @@ func (aq *AdminQuery) QueryOccupationUpdater() *OccupationQuery {
 	return query
 }
 
+// QueryIpcReportEventCreator chains the current query on the "ipc_report_event_creator" edge.
+func (aq *AdminQuery) QueryIpcReportEventCreator() *IPCReportEventQuery {
+	query := (&IPCReportEventClient{config: aq.config}).Query()
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := aq.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := aq.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(admin.Table, admin.FieldID, selector),
+			sqlgraph.To(ipcreportevent.Table, ipcreportevent.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, admin.IpcReportEventCreatorTable, admin.IpcReportEventCreatorColumn),
+		)
+		fromU = sqlgraph.SetNeighbors(aq.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
+}
+
+// QueryIpcReportEventUpdater chains the current query on the "ipc_report_event_updater" edge.
+func (aq *AdminQuery) QueryIpcReportEventUpdater() *IPCReportEventQuery {
+	query := (&IPCReportEventClient{config: aq.config}).Query()
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := aq.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := aq.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(admin.Table, admin.FieldID, selector),
+			sqlgraph.To(ipcreportevent.Table, ipcreportevent.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, admin.IpcReportEventUpdaterTable, admin.IpcReportEventUpdaterColumn),
+		)
+		fromU = sqlgraph.SetNeighbors(aq.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
+}
+
 // First returns the first Admin entity from the query.
 // Returns a *NotFoundError when no Admin was found.
 func (aq *AdminQuery) First(ctx context.Context) (*Admin, error) {
@@ -712,31 +759,33 @@ func (aq *AdminQuery) Clone() *AdminQuery {
 		return nil
 	}
 	return &AdminQuery{
-		config:                  aq.config,
-		ctx:                     aq.ctx.Clone(),
-		order:                   append([]admin.OrderOption{}, aq.order...),
-		inters:                  append([]Interceptor{}, aq.inters...),
-		predicates:              append([]predicate.Admin{}, aq.predicates...),
-		withCreator:             aq.withCreator.Clone(),
-		withUpdater:             aq.withUpdater.Clone(),
-		withAdminRoles:          aq.withAdminRoles.Clone(),
-		withAdminCreator:        aq.withAdminCreator.Clone(),
-		withAdminUpdater:        aq.withAdminUpdater.Clone(),
-		withAdminRoleCreator:    aq.withAdminRoleCreator.Clone(),
-		withAdminRoleUpdater:    aq.withAdminRoleUpdater.Clone(),
-		withRiskCreator:         aq.withRiskCreator.Clone(),
-		withRiskUpdater:         aq.withRiskUpdater.Clone(),
-		withRiskLocationCreator: aq.withRiskLocationCreator.Clone(),
-		withRiskLocationUpdater: aq.withRiskLocationUpdater.Clone(),
-		withRiskCategoryCreator: aq.withRiskCategoryCreator.Clone(),
-		withRiskCategoryUpdater: aq.withRiskCategoryUpdater.Clone(),
-		withDepartmentCreator:   aq.withDepartmentCreator.Clone(),
-		withDepartmentUpdater:   aq.withDepartmentUpdater.Clone(),
-		withEmployeeCreator:     aq.withEmployeeCreator.Clone(),
-		withEmployeeUpdater:     aq.withEmployeeUpdater.Clone(),
-		withEmployee:            aq.withEmployee.Clone(),
-		withOccupationCreator:   aq.withOccupationCreator.Clone(),
-		withOccupationUpdater:   aq.withOccupationUpdater.Clone(),
+		config:                    aq.config,
+		ctx:                       aq.ctx.Clone(),
+		order:                     append([]admin.OrderOption{}, aq.order...),
+		inters:                    append([]Interceptor{}, aq.inters...),
+		predicates:                append([]predicate.Admin{}, aq.predicates...),
+		withCreator:               aq.withCreator.Clone(),
+		withUpdater:               aq.withUpdater.Clone(),
+		withAdminRoles:            aq.withAdminRoles.Clone(),
+		withAdminCreator:          aq.withAdminCreator.Clone(),
+		withAdminUpdater:          aq.withAdminUpdater.Clone(),
+		withAdminRoleCreator:      aq.withAdminRoleCreator.Clone(),
+		withAdminRoleUpdater:      aq.withAdminRoleUpdater.Clone(),
+		withRiskCreator:           aq.withRiskCreator.Clone(),
+		withRiskUpdater:           aq.withRiskUpdater.Clone(),
+		withRiskLocationCreator:   aq.withRiskLocationCreator.Clone(),
+		withRiskLocationUpdater:   aq.withRiskLocationUpdater.Clone(),
+		withRiskCategoryCreator:   aq.withRiskCategoryCreator.Clone(),
+		withRiskCategoryUpdater:   aq.withRiskCategoryUpdater.Clone(),
+		withDepartmentCreator:     aq.withDepartmentCreator.Clone(),
+		withDepartmentUpdater:     aq.withDepartmentUpdater.Clone(),
+		withEmployeeCreator:       aq.withEmployeeCreator.Clone(),
+		withEmployeeUpdater:       aq.withEmployeeUpdater.Clone(),
+		withEmployee:              aq.withEmployee.Clone(),
+		withOccupationCreator:     aq.withOccupationCreator.Clone(),
+		withOccupationUpdater:     aq.withOccupationUpdater.Clone(),
+		withIpcReportEventCreator: aq.withIpcReportEventCreator.Clone(),
+		withIpcReportEventUpdater: aq.withIpcReportEventUpdater.Clone(),
 		// clone intermediate query.
 		sql:  aq.sql.Clone(),
 		path: aq.path,
@@ -963,6 +1012,28 @@ func (aq *AdminQuery) WithOccupationUpdater(opts ...func(*OccupationQuery)) *Adm
 	return aq
 }
 
+// WithIpcReportEventCreator tells the query-builder to eager-load the nodes that are connected to
+// the "ipc_report_event_creator" edge. The optional arguments are used to configure the query builder of the edge.
+func (aq *AdminQuery) WithIpcReportEventCreator(opts ...func(*IPCReportEventQuery)) *AdminQuery {
+	query := (&IPCReportEventClient{config: aq.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	aq.withIpcReportEventCreator = query
+	return aq
+}
+
+// WithIpcReportEventUpdater tells the query-builder to eager-load the nodes that are connected to
+// the "ipc_report_event_updater" edge. The optional arguments are used to configure the query builder of the edge.
+func (aq *AdminQuery) WithIpcReportEventUpdater(opts ...func(*IPCReportEventQuery)) *AdminQuery {
+	query := (&IPCReportEventClient{config: aq.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	aq.withIpcReportEventUpdater = query
+	return aq
+}
+
 // GroupBy is used to group vertices by one or more fields/columns.
 // It is often used with aggregate functions, like: count, max, mean, min, sum.
 //
@@ -1041,7 +1112,7 @@ func (aq *AdminQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Admin,
 	var (
 		nodes       = []*Admin{}
 		_spec       = aq.querySpec()
-		loadedTypes = [20]bool{
+		loadedTypes = [22]bool{
 			aq.withCreator != nil,
 			aq.withUpdater != nil,
 			aq.withAdminRoles != nil,
@@ -1062,6 +1133,8 @@ func (aq *AdminQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Admin,
 			aq.withEmployee != nil,
 			aq.withOccupationCreator != nil,
 			aq.withOccupationUpdater != nil,
+			aq.withIpcReportEventCreator != nil,
+			aq.withIpcReportEventUpdater != nil,
 		}
 	)
 	_spec.ScanValues = func(columns []string) ([]any, error) {
@@ -1217,6 +1290,24 @@ func (aq *AdminQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Admin,
 		if err := aq.loadOccupationUpdater(ctx, query, nodes,
 			func(n *Admin) { n.Edges.OccupationUpdater = []*Occupation{} },
 			func(n *Admin, e *Occupation) { n.Edges.OccupationUpdater = append(n.Edges.OccupationUpdater, e) }); err != nil {
+			return nil, err
+		}
+	}
+	if query := aq.withIpcReportEventCreator; query != nil {
+		if err := aq.loadIpcReportEventCreator(ctx, query, nodes,
+			func(n *Admin) { n.Edges.IpcReportEventCreator = []*IPCReportEvent{} },
+			func(n *Admin, e *IPCReportEvent) {
+				n.Edges.IpcReportEventCreator = append(n.Edges.IpcReportEventCreator, e)
+			}); err != nil {
+			return nil, err
+		}
+	}
+	if query := aq.withIpcReportEventUpdater; query != nil {
+		if err := aq.loadIpcReportEventUpdater(ctx, query, nodes,
+			func(n *Admin) { n.Edges.IpcReportEventUpdater = []*IPCReportEvent{} },
+			func(n *Admin, e *IPCReportEvent) {
+				n.Edges.IpcReportEventUpdater = append(n.Edges.IpcReportEventUpdater, e)
+			}); err != nil {
 			return nil, err
 		}
 	}
@@ -1837,6 +1928,66 @@ func (aq *AdminQuery) loadOccupationUpdater(ctx context.Context, query *Occupati
 	}
 	query.Where(predicate.Occupation(func(s *sql.Selector) {
 		s.Where(sql.InValues(s.C(admin.OccupationUpdaterColumn), fks...))
+	}))
+	neighbors, err := query.All(ctx)
+	if err != nil {
+		return err
+	}
+	for _, n := range neighbors {
+		fk := n.UpdatedBy
+		node, ok := nodeids[fk]
+		if !ok {
+			return fmt.Errorf(`unexpected referenced foreign-key "updated_by" returned %v for node %v`, fk, n.ID)
+		}
+		assign(node, n)
+	}
+	return nil
+}
+func (aq *AdminQuery) loadIpcReportEventCreator(ctx context.Context, query *IPCReportEventQuery, nodes []*Admin, init func(*Admin), assign func(*Admin, *IPCReportEvent)) error {
+	fks := make([]driver.Value, 0, len(nodes))
+	nodeids := make(map[int]*Admin)
+	for i := range nodes {
+		fks = append(fks, nodes[i].ID)
+		nodeids[nodes[i].ID] = nodes[i]
+		if init != nil {
+			init(nodes[i])
+		}
+	}
+	if len(query.ctx.Fields) > 0 {
+		query.ctx.AppendFieldOnce(ipcreportevent.FieldCreatedBy)
+	}
+	query.Where(predicate.IPCReportEvent(func(s *sql.Selector) {
+		s.Where(sql.InValues(s.C(admin.IpcReportEventCreatorColumn), fks...))
+	}))
+	neighbors, err := query.All(ctx)
+	if err != nil {
+		return err
+	}
+	for _, n := range neighbors {
+		fk := n.CreatedBy
+		node, ok := nodeids[fk]
+		if !ok {
+			return fmt.Errorf(`unexpected referenced foreign-key "created_by" returned %v for node %v`, fk, n.ID)
+		}
+		assign(node, n)
+	}
+	return nil
+}
+func (aq *AdminQuery) loadIpcReportEventUpdater(ctx context.Context, query *IPCReportEventQuery, nodes []*Admin, init func(*Admin), assign func(*Admin, *IPCReportEvent)) error {
+	fks := make([]driver.Value, 0, len(nodes))
+	nodeids := make(map[int]*Admin)
+	for i := range nodes {
+		fks = append(fks, nodes[i].ID)
+		nodeids[nodes[i].ID] = nodes[i]
+		if init != nil {
+			init(nodes[i])
+		}
+	}
+	if len(query.ctx.Fields) > 0 {
+		query.ctx.AppendFieldOnce(ipcreportevent.FieldUpdatedBy)
+	}
+	query.Where(predicate.IPCReportEvent(func(s *sql.Selector) {
+		s.Where(sql.InValues(s.C(admin.IpcReportEventUpdaterColumn), fks...))
 	}))
 	neighbors, err := query.All(ctx)
 	if err != nil {

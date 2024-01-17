@@ -93,14 +93,16 @@ func AuditHook(next ent.Mutator) ent.Mutator {
 				k, v,
 			})
 		}
-		utils.Logger.Info("audit log",
-			zap.Int("admin_id", adminID),
-			zap.String("action", m.Op().String()),
-			zap.String("entity", m.Type()),
-			zap.String("path", ginCtx.FullPath()),
-			zap.String("ip", ginCtx.ClientIP()),
-			zap.Any("fields", fields),
-		)
+		if ginCtx.GetBool("is_audit") {
+			utils.Logger.Info("audit log",
+				zap.Int("admin_id", adminID),
+				zap.String("action", m.Op().String()),
+				zap.String("entity", m.Type()),
+				zap.String("path", ginCtx.FullPath()),
+				zap.String("ip", ginCtx.ClientIP()),
+				zap.Any("fields", fields),
+			)
+		}
 		return next.Mutate(ctx, m)
 	})
 }

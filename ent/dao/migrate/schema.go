@@ -152,6 +152,45 @@ var (
 			},
 		},
 	}
+	// IpcReportEventsColumns holds the columns for the "ipc_report_events" table.
+	IpcReportEventsColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeInt, Increment: true},
+		{Name: "created_at", Type: field.TypeTime},
+		{Name: "deleted_at", Type: field.TypeTime, Nullable: true},
+		{Name: "updated_at", Type: field.TypeTime},
+		{Name: "device_id", Type: field.TypeString, Size: 255},
+		{Name: "event_id", Type: field.TypeString, Size: 255},
+		{Name: "event_time", Type: field.TypeTime},
+		{Name: "event_type", Type: field.TypeInt, Default: 0},
+		{Name: "event_status", Type: field.TypeInt, Default: 1},
+		{Name: "images", Type: field.TypeJSON, Nullable: true},
+		{Name: "labeled_images", Type: field.TypeJSON, Nullable: true},
+		{Name: "videos", Type: field.TypeJSON, Nullable: true},
+		{Name: "description", Type: field.TypeString, Nullable: true},
+		{Name: "raw_data", Type: field.TypeString, Nullable: true},
+		{Name: "created_by", Type: field.TypeInt},
+		{Name: "updated_by", Type: field.TypeInt},
+	}
+	// IpcReportEventsTable holds the schema information for the "ipc_report_events" table.
+	IpcReportEventsTable = &schema.Table{
+		Name:       "ipc_report_events",
+		Columns:    IpcReportEventsColumns,
+		PrimaryKey: []*schema.Column{IpcReportEventsColumns[0]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:     "ipc_report_events_admins_ipc_report_event_creator",
+				Columns:    []*schema.Column{IpcReportEventsColumns[14]},
+				RefColumns: []*schema.Column{AdminsColumns[0]},
+				OnDelete:   schema.NoAction,
+			},
+			{
+				Symbol:     "ipc_report_events_admins_ipc_report_event_updater",
+				Columns:    []*schema.Column{IpcReportEventsColumns[15]},
+				RefColumns: []*schema.Column{AdminsColumns[0]},
+				OnDelete:   schema.NoAction,
+			},
+		},
+	}
 	// OccupationsColumns holds the columns for the "occupations" table.
 	OccupationsColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt, Increment: true},
@@ -362,6 +401,7 @@ var (
 		AdminRolesTable,
 		DepartmentsTable,
 		EmployeesTable,
+		IpcReportEventsTable,
 		OccupationsTable,
 		RisksTable,
 		RiskCategoriesTable,
@@ -383,6 +423,8 @@ func init() {
 	EmployeesTable.ForeignKeys[1].RefTable = AdminsTable
 	EmployeesTable.ForeignKeys[2].RefTable = AdminsTable
 	EmployeesTable.ForeignKeys[3].RefTable = DepartmentsTable
+	IpcReportEventsTable.ForeignKeys[0].RefTable = AdminsTable
+	IpcReportEventsTable.ForeignKeys[1].RefTable = AdminsTable
 	OccupationsTable.ForeignKeys[0].RefTable = AdminsTable
 	OccupationsTable.ForeignKeys[1].RefTable = AdminsTable
 	RisksTable.ForeignKeys[0].RefTable = AdminsTable

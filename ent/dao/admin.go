@@ -85,9 +85,13 @@ type AdminEdges struct {
 	OccupationCreator []*Occupation `json:"occupation_creator,omitempty"`
 	// OccupationUpdater holds the value of the occupation_updater edge.
 	OccupationUpdater []*Occupation `json:"occupation_updater,omitempty"`
+	// IpcReportEventCreator holds the value of the ipc_report_event_creator edge.
+	IpcReportEventCreator []*IPCReportEvent `json:"ipc_report_event_creator,omitempty"`
+	// IpcReportEventUpdater holds the value of the ipc_report_event_updater edge.
+	IpcReportEventUpdater []*IPCReportEvent `json:"ipc_report_event_updater,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
-	loadedTypes [20]bool
+	loadedTypes [22]bool
 }
 
 // CreatorOrErr returns the Creator value or an error if the edge
@@ -276,6 +280,24 @@ func (e AdminEdges) OccupationUpdaterOrErr() ([]*Occupation, error) {
 		return e.OccupationUpdater, nil
 	}
 	return nil, &NotLoadedError{edge: "occupation_updater"}
+}
+
+// IpcReportEventCreatorOrErr returns the IpcReportEventCreator value or an error if the edge
+// was not loaded in eager-loading.
+func (e AdminEdges) IpcReportEventCreatorOrErr() ([]*IPCReportEvent, error) {
+	if e.loadedTypes[20] {
+		return e.IpcReportEventCreator, nil
+	}
+	return nil, &NotLoadedError{edge: "ipc_report_event_creator"}
+}
+
+// IpcReportEventUpdaterOrErr returns the IpcReportEventUpdater value or an error if the edge
+// was not loaded in eager-loading.
+func (e AdminEdges) IpcReportEventUpdaterOrErr() ([]*IPCReportEvent, error) {
+	if e.loadedTypes[21] {
+		return e.IpcReportEventUpdater, nil
+	}
+	return nil, &NotLoadedError{edge: "ipc_report_event_updater"}
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
@@ -482,6 +504,16 @@ func (a *Admin) QueryOccupationCreator() *OccupationQuery {
 // QueryOccupationUpdater queries the "occupation_updater" edge of the Admin entity.
 func (a *Admin) QueryOccupationUpdater() *OccupationQuery {
 	return NewAdminClient(a.config).QueryOccupationUpdater(a)
+}
+
+// QueryIpcReportEventCreator queries the "ipc_report_event_creator" edge of the Admin entity.
+func (a *Admin) QueryIpcReportEventCreator() *IPCReportEventQuery {
+	return NewAdminClient(a.config).QueryIpcReportEventCreator(a)
+}
+
+// QueryIpcReportEventUpdater queries the "ipc_report_event_updater" edge of the Admin entity.
+func (a *Admin) QueryIpcReportEventUpdater() *IPCReportEventQuery {
+	return NewAdminClient(a.config).QueryIpcReportEventUpdater(a)
 }
 
 // Update returns a builder for updating this Admin.

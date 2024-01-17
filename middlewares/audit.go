@@ -10,6 +10,7 @@ func DatabaseAudit() gin.HandlerFunc {
 		// Start timer
 		session := sessions.Default(c)
 		// Store request-related information
+		c.Set("is_audit", true)
 		c.Set("user_agent", c.Request.UserAgent())
 		c.Set("referrer_url", c.Request.Referer())
 		c.Set("resource_accessed", c.Request.URL.Path)

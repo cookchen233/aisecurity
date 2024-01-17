@@ -32,6 +32,17 @@ func (s *RiskLocationService) Create(ent structs.IEntity) (structs.IEntity, erro
 	return save, nil
 }
 
+func (s *RiskLocationService) Update(ent structs.IEntity) (structs.IEntity, error) {
+	e := ent.(*entities.RiskLocation)
+	save, err := db.EntClient.RiskLocation.UpdateOneID(e.ID).
+		SetName(e.Name).
+		Save(s.Ctx)
+	if err != nil {
+		return nil, utils.ErrorWrap(err, "failed updating RiskLocation")
+	}
+	return save, nil
+}
+
 func (s *RiskLocationService) query(fit structs.IFilter) *dao.RiskLocationQuery {
 	f := fit.(*filters.RiskLocation)
 	q := db.EntClient.RiskLocation.Query()
@@ -53,16 +64,13 @@ func (s *RiskLocationService) GetTotal(fit structs.IFilter) (int, error) {
 	return total, nil
 }
 
-func (s *RiskLocationService) GetList(filter structs.IFilter) ([]structs.IEntity, error) {
-	// list
-	page := min(1000, max(1, filter.GetOffset()))
-	limit := min(10000, max(1, filter.GetOffset()))
-	offset := (page - 1) * limit
-	list, err := s.query(filter).
+func (s *RiskLocationService) GetList(fit structs.IFilter) ([]structs.IEntity, error) {
+	list, err := s.query(fit).
 		WithCreator().
 		WithUpdater().
-		Limit(limit). // Set the number of items to return
-		Offset(offset).
+		Limit(fit.GetLimit()).
+		Offset(fit.GetOffset()).
+		Order(dao.Desc(risklocation.FieldID)).
 		All(s.Ctx)
 	if err != nil {
 		return nil, utils.ErrorWithStack(err)
@@ -72,4 +80,14 @@ func (s *RiskLocationService) GetList(filter structs.IFilter) ([]structs.IEntity
 		ents[i] = v
 	}
 	return ents, nil
+}
+
+func (s *RiskLocationService) Delete(ent structs.IEntity) error {
+	e := ent.(*entities.ID)
+	err := s.entClient.DeleteOneID(e.ID).
+		Exec(s.Ctx)
+	if err != nil {
+		return utils.ErrorWrap(err, "failed deleting RiskLocation")
+	}
+	return nil
 }

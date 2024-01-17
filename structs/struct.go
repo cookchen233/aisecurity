@@ -56,7 +56,9 @@ func ConvertTo[T any](from interface{}) T {
 // IFilter represents qeury parameters
 type IFilter interface {
 	GetPage() int
+	SetPage(page int)
 	GetLimit() int
+	SetLimit(limit int)
 	GetOffset() int
 	GetID() int
 }
@@ -72,9 +74,11 @@ type StandardFilter struct {
 	Title string `form:"title"`
 }
 
-func (f *StandardFilter) GetPage() int { return min(1000, max(1, f.Page)) }
+func (f *StandardFilter) GetPage() int     { return min(1000, max(1, f.Page)) }
+func (f *StandardFilter) SetPage(page int) { f.Page = page }
 
-func (f *StandardFilter) GetLimit() int { return min(10000, max(1, f.Limit)) }
+func (f *StandardFilter) GetLimit() int      { return min(10000, max(1, f.Limit)) }
+func (f *StandardFilter) SetLimit(limit int) { f.Limit = limit }
 
 func (f *StandardFilter) GetOffset() int { return (f.GetPage() - 1) * f.GetLimit() }
 

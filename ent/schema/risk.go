@@ -2,7 +2,8 @@ package schema
 
 import (
 	"aisecurity/ent/mixin"
-	"aisecurity/properties"
+	"aisecurity/properties/maintain_status"
+	"aisecurity/structs/types"
 	"entgo.io/ent"
 	"entgo.io/ent/schema"
 	"entgo.io/ent/schema/edge"
@@ -25,16 +26,13 @@ func (Risk) Fields() []ent.Field {
 	return []ent.Field{
 		field.String("title").Comment("标题").NotEmpty().MaxLen(255).StructTag(`validate:"required"`),
 		field.String("content").Comment("内容").Optional(),
-		field.JSON("images", []struct {
-			Title string `json:"title"`
-			URL   string `json:"url"`
-		}{}).Optional().Comment("图片"),
+		field.JSON("images", []types.UploadedImage{}).Optional().Default([]types.UploadedImage{}).Comment("图片"),
 		field.Int("risk_category_id").Comment("风险类别").Positive(),
 		field.Int("risk_location_id").Comment("地点").Positive(),
 		field.Int("reporter_id").Comment("汇报人").Positive(),
 		field.Int("maintainer_id").Comment("整改人").Positive(),
 		field.String("measures").Comment("整改措施").Optional(),
-		field.Int("maintain_status").Comment("整改状态").Positive().Default(int(properties.Unknown)).GoType(properties.MaintainStatus(0)),
+		field.Int("maintain_status").Comment("整改状态").NonNegative().Default(int(maintain_status.Unknown)).GoType(maintain_status.MaintainStatus(0)),
 		field.Time("due_time").Comment("计划完成日期"),
 	}
 }

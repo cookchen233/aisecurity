@@ -3,25 +3,31 @@ package dashboard
 import (
 	"aisecurity/handlers"
 	"aisecurity/services"
+	"aisecurity/structs"
 	"aisecurity/structs/entities"
 	"aisecurity/structs/filters"
-	"context"
+	"github.com/gin-gonic/gin"
 )
 
 type DepartmentHandler struct {
-	handlers.Handler
+	handlers.DashboardHandler
 	Service *services.DepartmentService
 }
 
 func NewDepartmentHandler() *DepartmentHandler {
-	h := &DepartmentHandler{}
-	h.Service = services.NewDepartmentService()
-	h.Handler.Service = h.Service
-	return h
+	return &DepartmentHandler{}
 }
-func (h *DepartmentHandler) ResetRequest(ctx context.Context) {
+func (h *DepartmentHandler) GetService(c *gin.Context) services.IService { return h.Service }
+func (h *DepartmentHandler) GetFilter(c *gin.Context) structs.IFilter {
+	return h.Filter
+}
+func (h *DepartmentHandler) GetEntity(c *gin.Context) structs.IEntity {
+	return h.Entity
+}
+func (h *DepartmentHandler) SetRequestContext(c *gin.Context, h2 handlers.IHandler) {
+	h.Service = services.NewDepartmentService()
+	h.Service.Ctx = c
 	h.Filter = &filters.Department{}
-	h.Handler.Filter = h.Filter
 	h.Entity = &entities.Department{}
-	h.Handler.Entity = h.Entity
+	h.DashboardHandler.SetRequestContext(c, h)
 }

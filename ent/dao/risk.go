@@ -8,7 +8,8 @@ import (
 	"aisecurity/ent/dao/risk"
 	"aisecurity/ent/dao/riskcategory"
 	"aisecurity/ent/dao/risklocation"
-	"aisecurity/properties"
+	"aisecurity/properties/maintain_status"
+	"aisecurity/structs/types"
 	"encoding/json"
 	"fmt"
 	"strings"
@@ -38,10 +39,7 @@ type Risk struct {
 	// 内容
 	Content string `json:"content"`
 	// 图片
-	Images []struct {
-		Title string "json:\"title\""
-		URL   string "json:\"url\""
-	} `json:"images"`
+	Images []types.UploadedImage `json:"images"`
 	// 风险类别
 	RiskCategoryID int `json:"risk_category_id"`
 	// 地点
@@ -53,7 +51,7 @@ type Risk struct {
 	// 整改措施
 	Measures string `json:"measures"`
 	// 整改状态
-	MaintainStatus properties.MaintainStatus `json:"maintain_status"`
+	MaintainStatus maintain_status.MaintainStatus `json:"maintain_status"`
 	// 计划完成日期
 	DueTime time.Time `json:"due_time"`
 	// Edges holds the relations/edges for other nodes in the graph.
@@ -278,7 +276,7 @@ func (r *Risk) assignValues(columns []string, values []any) error {
 			if value, ok := values[i].(*sql.NullInt64); !ok {
 				return fmt.Errorf("unexpected type %T for field maintain_status", values[i])
 			} else if value.Valid {
-				r.MaintainStatus = properties.MaintainStatus(value.Int64)
+				r.MaintainStatus = maintain_status.MaintainStatus(value.Int64)
 			}
 		case risk.FieldDueTime:
 			if value, ok := values[i].(*sql.NullTime); !ok {

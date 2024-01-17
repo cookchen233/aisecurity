@@ -9,7 +9,8 @@ import (
 	"aisecurity/ent/dao/risk"
 	"aisecurity/ent/dao/riskcategory"
 	"aisecurity/ent/dao/risklocation"
-	"aisecurity/properties"
+	"aisecurity/properties/maintain_status"
+	"aisecurity/structs/types"
 	"context"
 	"errors"
 	"fmt"
@@ -109,20 +110,14 @@ func (ru *RiskUpdate) ClearContent() *RiskUpdate {
 }
 
 // SetImages sets the "images" field.
-func (ru *RiskUpdate) SetImages(s []struct {
-	Title string "json:\"title\""
-	URL   string "json:\"url\""
-}) *RiskUpdate {
-	ru.mutation.SetImages(s)
+func (ru *RiskUpdate) SetImages(ti []types.UploadedImage) *RiskUpdate {
+	ru.mutation.SetImages(ti)
 	return ru
 }
 
-// AppendImages appends s to the "images" field.
-func (ru *RiskUpdate) AppendImages(s []struct {
-	Title string "json:\"title\""
-	URL   string "json:\"url\""
-}) *RiskUpdate {
-	ru.mutation.AppendImages(s)
+// AppendImages appends ti to the "images" field.
+func (ru *RiskUpdate) AppendImages(ti []types.UploadedImage) *RiskUpdate {
+	ru.mutation.AppendImages(ti)
 	return ru
 }
 
@@ -209,23 +204,23 @@ func (ru *RiskUpdate) ClearMeasures() *RiskUpdate {
 }
 
 // SetMaintainStatus sets the "maintain_status" field.
-func (ru *RiskUpdate) SetMaintainStatus(ps properties.MaintainStatus) *RiskUpdate {
+func (ru *RiskUpdate) SetMaintainStatus(mss maintain_status.MaintainStatus) *RiskUpdate {
 	ru.mutation.ResetMaintainStatus()
-	ru.mutation.SetMaintainStatus(ps)
+	ru.mutation.SetMaintainStatus(mss)
 	return ru
 }
 
 // SetNillableMaintainStatus sets the "maintain_status" field if the given value is not nil.
-func (ru *RiskUpdate) SetNillableMaintainStatus(ps *properties.MaintainStatus) *RiskUpdate {
-	if ps != nil {
-		ru.SetMaintainStatus(*ps)
+func (ru *RiskUpdate) SetNillableMaintainStatus(mss *maintain_status.MaintainStatus) *RiskUpdate {
+	if mss != nil {
+		ru.SetMaintainStatus(*mss)
 	}
 	return ru
 }
 
-// AddMaintainStatus adds ps to the "maintain_status" field.
-func (ru *RiskUpdate) AddMaintainStatus(ps properties.MaintainStatus) *RiskUpdate {
-	ru.mutation.AddMaintainStatus(ps)
+// AddMaintainStatus adds mss to the "maintain_status" field.
+func (ru *RiskUpdate) AddMaintainStatus(mss maintain_status.MaintainStatus) *RiskUpdate {
+	ru.mutation.AddMaintainStatus(mss)
 	return ru
 }
 
@@ -705,20 +700,14 @@ func (ruo *RiskUpdateOne) ClearContent() *RiskUpdateOne {
 }
 
 // SetImages sets the "images" field.
-func (ruo *RiskUpdateOne) SetImages(s []struct {
-	Title string "json:\"title\""
-	URL   string "json:\"url\""
-}) *RiskUpdateOne {
-	ruo.mutation.SetImages(s)
+func (ruo *RiskUpdateOne) SetImages(ti []types.UploadedImage) *RiskUpdateOne {
+	ruo.mutation.SetImages(ti)
 	return ruo
 }
 
-// AppendImages appends s to the "images" field.
-func (ruo *RiskUpdateOne) AppendImages(s []struct {
-	Title string "json:\"title\""
-	URL   string "json:\"url\""
-}) *RiskUpdateOne {
-	ruo.mutation.AppendImages(s)
+// AppendImages appends ti to the "images" field.
+func (ruo *RiskUpdateOne) AppendImages(ti []types.UploadedImage) *RiskUpdateOne {
+	ruo.mutation.AppendImages(ti)
 	return ruo
 }
 
@@ -805,23 +794,23 @@ func (ruo *RiskUpdateOne) ClearMeasures() *RiskUpdateOne {
 }
 
 // SetMaintainStatus sets the "maintain_status" field.
-func (ruo *RiskUpdateOne) SetMaintainStatus(ps properties.MaintainStatus) *RiskUpdateOne {
+func (ruo *RiskUpdateOne) SetMaintainStatus(mss maintain_status.MaintainStatus) *RiskUpdateOne {
 	ruo.mutation.ResetMaintainStatus()
-	ruo.mutation.SetMaintainStatus(ps)
+	ruo.mutation.SetMaintainStatus(mss)
 	return ruo
 }
 
 // SetNillableMaintainStatus sets the "maintain_status" field if the given value is not nil.
-func (ruo *RiskUpdateOne) SetNillableMaintainStatus(ps *properties.MaintainStatus) *RiskUpdateOne {
-	if ps != nil {
-		ruo.SetMaintainStatus(*ps)
+func (ruo *RiskUpdateOne) SetNillableMaintainStatus(mss *maintain_status.MaintainStatus) *RiskUpdateOne {
+	if mss != nil {
+		ruo.SetMaintainStatus(*mss)
 	}
 	return ruo
 }
 
-// AddMaintainStatus adds ps to the "maintain_status" field.
-func (ruo *RiskUpdateOne) AddMaintainStatus(ps properties.MaintainStatus) *RiskUpdateOne {
-	ruo.mutation.AddMaintainStatus(ps)
+// AddMaintainStatus adds mss to the "maintain_status" field.
+func (ruo *RiskUpdateOne) AddMaintainStatus(mss maintain_status.MaintainStatus) *RiskUpdateOne {
+	ruo.mutation.AddMaintainStatus(mss)
 	return ruo
 }
 

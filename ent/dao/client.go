@@ -15,6 +15,7 @@ import (
 	"aisecurity/ent/dao/adminrole"
 	"aisecurity/ent/dao/department"
 	"aisecurity/ent/dao/employee"
+	"aisecurity/ent/dao/ipcreportevent"
 	"aisecurity/ent/dao/occupation"
 	"aisecurity/ent/dao/risk"
 	"aisecurity/ent/dao/riskcategory"
@@ -24,6 +25,8 @@ import (
 	"entgo.io/ent/dialect"
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
+
+	stdsql "database/sql"
 )
 
 // Client is the client that holds all ent builders.
@@ -39,6 +42,8 @@ type Client struct {
 	Department *DepartmentClient
 	// Employee is the client for interacting with the Employee builders.
 	Employee *EmployeeClient
+	// IPCReportEvent is the client for interacting with the IPCReportEvent builders.
+	IPCReportEvent *IPCReportEventClient
 	// Occupation is the client for interacting with the Occupation builders.
 	Occupation *OccupationClient
 	// Risk is the client for interacting with the Risk builders.
@@ -62,6 +67,7 @@ func (c *Client) init() {
 	c.AdminRole = NewAdminRoleClient(c.config)
 	c.Department = NewDepartmentClient(c.config)
 	c.Employee = NewEmployeeClient(c.config)
+	c.IPCReportEvent = NewIPCReportEventClient(c.config)
 	c.Occupation = NewOccupationClient(c.config)
 	c.Risk = NewRiskClient(c.config)
 	c.RiskCategory = NewRiskCategoryClient(c.config)
@@ -156,16 +162,17 @@ func (c *Client) Tx(ctx context.Context) (*Tx, error) {
 	cfg := c.config
 	cfg.driver = tx
 	return &Tx{
-		ctx:          ctx,
-		config:       cfg,
-		Admin:        NewAdminClient(cfg),
-		AdminRole:    NewAdminRoleClient(cfg),
-		Department:   NewDepartmentClient(cfg),
-		Employee:     NewEmployeeClient(cfg),
-		Occupation:   NewOccupationClient(cfg),
-		Risk:         NewRiskClient(cfg),
-		RiskCategory: NewRiskCategoryClient(cfg),
-		RiskLocation: NewRiskLocationClient(cfg),
+		ctx:            ctx,
+		config:         cfg,
+		Admin:          NewAdminClient(cfg),
+		AdminRole:      NewAdminRoleClient(cfg),
+		Department:     NewDepartmentClient(cfg),
+		Employee:       NewEmployeeClient(cfg),
+		IPCReportEvent: NewIPCReportEventClient(cfg),
+		Occupation:     NewOccupationClient(cfg),
+		Risk:           NewRiskClient(cfg),
+		RiskCategory:   NewRiskCategoryClient(cfg),
+		RiskLocation:   NewRiskLocationClient(cfg),
 	}, nil
 }
 
@@ -183,16 +190,17 @@ func (c *Client) BeginTx(ctx context.Context, opts *sql.TxOptions) (*Tx, error) 
 	cfg := c.config
 	cfg.driver = &txDriver{tx: tx, drv: c.driver}
 	return &Tx{
-		ctx:          ctx,
-		config:       cfg,
-		Admin:        NewAdminClient(cfg),
-		AdminRole:    NewAdminRoleClient(cfg),
-		Department:   NewDepartmentClient(cfg),
-		Employee:     NewEmployeeClient(cfg),
-		Occupation:   NewOccupationClient(cfg),
-		Risk:         NewRiskClient(cfg),
-		RiskCategory: NewRiskCategoryClient(cfg),
-		RiskLocation: NewRiskLocationClient(cfg),
+		ctx:            ctx,
+		config:         cfg,
+		Admin:          NewAdminClient(cfg),
+		AdminRole:      NewAdminRoleClient(cfg),
+		Department:     NewDepartmentClient(cfg),
+		Employee:       NewEmployeeClient(cfg),
+		IPCReportEvent: NewIPCReportEventClient(cfg),
+		Occupation:     NewOccupationClient(cfg),
+		Risk:           NewRiskClient(cfg),
+		RiskCategory:   NewRiskCategoryClient(cfg),
+		RiskLocation:   NewRiskLocationClient(cfg),
 	}, nil
 }
 
@@ -222,8 +230,8 @@ func (c *Client) Close() error {
 // In order to add hooks to a specific client, call: `client.Node.Use(...)`.
 func (c *Client) Use(hooks ...Hook) {
 	for _, n := range []interface{ Use(...Hook) }{
-		c.Admin, c.AdminRole, c.Department, c.Employee, c.Occupation, c.Risk,
-		c.RiskCategory, c.RiskLocation,
+		c.Admin, c.AdminRole, c.Department, c.Employee, c.IPCReportEvent, c.Occupation,
+		c.Risk, c.RiskCategory, c.RiskLocation,
 	} {
 		n.Use(hooks...)
 	}
@@ -233,8 +241,8 @@ func (c *Client) Use(hooks ...Hook) {
 // In order to add interceptors to a specific client, call: `client.Node.Intercept(...)`.
 func (c *Client) Intercept(interceptors ...Interceptor) {
 	for _, n := range []interface{ Intercept(...Interceptor) }{
-		c.Admin, c.AdminRole, c.Department, c.Employee, c.Occupation, c.Risk,
-		c.RiskCategory, c.RiskLocation,
+		c.Admin, c.AdminRole, c.Department, c.Employee, c.IPCReportEvent, c.Occupation,
+		c.Risk, c.RiskCategory, c.RiskLocation,
 	} {
 		n.Intercept(interceptors...)
 	}
@@ -251,6 +259,8 @@ func (c *Client) Mutate(ctx context.Context, m Mutation) (Value, error) {
 		return c.Department.mutate(ctx, m)
 	case *EmployeeMutation:
 		return c.Employee.mutate(ctx, m)
+	case *IPCReportEventMutation:
+		return c.IPCReportEvent.mutate(ctx, m)
 	case *OccupationMutation:
 		return c.Occupation.mutate(ctx, m)
 	case *RiskMutation:
@@ -685,6 +695,38 @@ func (c *AdminClient) QueryOccupationUpdater(a *Admin) *OccupationQuery {
 			sqlgraph.From(admin.Table, admin.FieldID, id),
 			sqlgraph.To(occupation.Table, occupation.FieldID),
 			sqlgraph.Edge(sqlgraph.O2M, false, admin.OccupationUpdaterTable, admin.OccupationUpdaterColumn),
+		)
+		fromV = sqlgraph.Neighbors(a.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryIpcReportEventCreator queries the ipc_report_event_creator edge of a Admin.
+func (c *AdminClient) QueryIpcReportEventCreator(a *Admin) *IPCReportEventQuery {
+	query := (&IPCReportEventClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := a.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(admin.Table, admin.FieldID, id),
+			sqlgraph.To(ipcreportevent.Table, ipcreportevent.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, admin.IpcReportEventCreatorTable, admin.IpcReportEventCreatorColumn),
+		)
+		fromV = sqlgraph.Neighbors(a.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryIpcReportEventUpdater queries the ipc_report_event_updater edge of a Admin.
+func (c *AdminClient) QueryIpcReportEventUpdater(a *Admin) *IPCReportEventQuery {
+	query := (&IPCReportEventClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := a.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(admin.Table, admin.FieldID, id),
+			sqlgraph.To(ipcreportevent.Table, ipcreportevent.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, admin.IpcReportEventUpdaterTable, admin.IpcReportEventUpdaterColumn),
 		)
 		fromV = sqlgraph.Neighbors(a.driver.Dialect(), step)
 		return fromV, nil
@@ -1356,6 +1398,172 @@ func (c *EmployeeClient) mutate(ctx context.Context, m *EmployeeMutation) (Value
 		return (&EmployeeDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
 	default:
 		return nil, fmt.Errorf("dao: unknown Employee mutation op: %q", m.Op())
+	}
+}
+
+// IPCReportEventClient is a client for the IPCReportEvent schema.
+type IPCReportEventClient struct {
+	config
+}
+
+// NewIPCReportEventClient returns a client for the IPCReportEvent from the given config.
+func NewIPCReportEventClient(c config) *IPCReportEventClient {
+	return &IPCReportEventClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `ipcreportevent.Hooks(f(g(h())))`.
+func (c *IPCReportEventClient) Use(hooks ...Hook) {
+	c.hooks.IPCReportEvent = append(c.hooks.IPCReportEvent, hooks...)
+}
+
+// Intercept adds a list of query interceptors to the interceptors stack.
+// A call to `Intercept(f, g, h)` equals to `ipcreportevent.Intercept(f(g(h())))`.
+func (c *IPCReportEventClient) Intercept(interceptors ...Interceptor) {
+	c.inters.IPCReportEvent = append(c.inters.IPCReportEvent, interceptors...)
+}
+
+// Create returns a builder for creating a IPCReportEvent entity.
+func (c *IPCReportEventClient) Create() *IPCReportEventCreate {
+	mutation := newIPCReportEventMutation(c.config, OpCreate)
+	return &IPCReportEventCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of IPCReportEvent entities.
+func (c *IPCReportEventClient) CreateBulk(builders ...*IPCReportEventCreate) *IPCReportEventCreateBulk {
+	return &IPCReportEventCreateBulk{config: c.config, builders: builders}
+}
+
+// MapCreateBulk creates a bulk creation builder from the given slice. For each item in the slice, the function creates
+// a builder and applies setFunc on it.
+func (c *IPCReportEventClient) MapCreateBulk(slice any, setFunc func(*IPCReportEventCreate, int)) *IPCReportEventCreateBulk {
+	rv := reflect.ValueOf(slice)
+	if rv.Kind() != reflect.Slice {
+		return &IPCReportEventCreateBulk{err: fmt.Errorf("calling to IPCReportEventClient.MapCreateBulk with wrong type %T, need slice", slice)}
+	}
+	builders := make([]*IPCReportEventCreate, rv.Len())
+	for i := 0; i < rv.Len(); i++ {
+		builders[i] = c.Create()
+		setFunc(builders[i], i)
+	}
+	return &IPCReportEventCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for IPCReportEvent.
+func (c *IPCReportEventClient) Update() *IPCReportEventUpdate {
+	mutation := newIPCReportEventMutation(c.config, OpUpdate)
+	return &IPCReportEventUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *IPCReportEventClient) UpdateOne(ire *IPCReportEvent) *IPCReportEventUpdateOne {
+	mutation := newIPCReportEventMutation(c.config, OpUpdateOne, withIPCReportEvent(ire))
+	return &IPCReportEventUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *IPCReportEventClient) UpdateOneID(id int) *IPCReportEventUpdateOne {
+	mutation := newIPCReportEventMutation(c.config, OpUpdateOne, withIPCReportEventID(id))
+	return &IPCReportEventUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for IPCReportEvent.
+func (c *IPCReportEventClient) Delete() *IPCReportEventDelete {
+	mutation := newIPCReportEventMutation(c.config, OpDelete)
+	return &IPCReportEventDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a builder for deleting the given entity.
+func (c *IPCReportEventClient) DeleteOne(ire *IPCReportEvent) *IPCReportEventDeleteOne {
+	return c.DeleteOneID(ire.ID)
+}
+
+// DeleteOneID returns a builder for deleting the given entity by its id.
+func (c *IPCReportEventClient) DeleteOneID(id int) *IPCReportEventDeleteOne {
+	builder := c.Delete().Where(ipcreportevent.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &IPCReportEventDeleteOne{builder}
+}
+
+// Query returns a query builder for IPCReportEvent.
+func (c *IPCReportEventClient) Query() *IPCReportEventQuery {
+	return &IPCReportEventQuery{
+		config: c.config,
+		ctx:    &QueryContext{Type: TypeIPCReportEvent},
+		inters: c.Interceptors(),
+	}
+}
+
+// Get returns a IPCReportEvent entity by its id.
+func (c *IPCReportEventClient) Get(ctx context.Context, id int) (*IPCReportEvent, error) {
+	return c.Query().Where(ipcreportevent.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *IPCReportEventClient) GetX(ctx context.Context, id int) *IPCReportEvent {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// QueryCreator queries the creator edge of a IPCReportEvent.
+func (c *IPCReportEventClient) QueryCreator(ire *IPCReportEvent) *AdminQuery {
+	query := (&AdminClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := ire.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(ipcreportevent.Table, ipcreportevent.FieldID, id),
+			sqlgraph.To(admin.Table, admin.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, ipcreportevent.CreatorTable, ipcreportevent.CreatorColumn),
+		)
+		fromV = sqlgraph.Neighbors(ire.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryUpdater queries the updater edge of a IPCReportEvent.
+func (c *IPCReportEventClient) QueryUpdater(ire *IPCReportEvent) *AdminQuery {
+	query := (&AdminClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := ire.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(ipcreportevent.Table, ipcreportevent.FieldID, id),
+			sqlgraph.To(admin.Table, admin.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, ipcreportevent.UpdaterTable, ipcreportevent.UpdaterColumn),
+		)
+		fromV = sqlgraph.Neighbors(ire.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// Hooks returns the client hooks.
+func (c *IPCReportEventClient) Hooks() []Hook {
+	hooks := c.hooks.IPCReportEvent
+	return append(hooks[:len(hooks):len(hooks)], ipcreportevent.Hooks[:]...)
+}
+
+// Interceptors returns the client interceptors.
+func (c *IPCReportEventClient) Interceptors() []Interceptor {
+	return c.inters.IPCReportEvent
+}
+
+func (c *IPCReportEventClient) mutate(ctx context.Context, m *IPCReportEventMutation) (Value, error) {
+	switch m.Op() {
+	case OpCreate:
+		return (&IPCReportEventCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdate:
+		return (&IPCReportEventUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdateOne:
+		return (&IPCReportEventUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpDelete, OpDeleteOne:
+		return (&IPCReportEventDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+	default:
+		return nil, fmt.Errorf("dao: unknown IPCReportEvent mutation op: %q", m.Op())
 	}
 }
 
@@ -2138,11 +2346,35 @@ func (c *RiskLocationClient) mutate(ctx context.Context, m *RiskLocationMutation
 // hooks and interceptors per client, for fast access.
 type (
 	hooks struct {
-		Admin, AdminRole, Department, Employee, Occupation, Risk, RiskCategory,
-		RiskLocation []ent.Hook
+		Admin, AdminRole, Department, Employee, IPCReportEvent, Occupation, Risk,
+		RiskCategory, RiskLocation []ent.Hook
 	}
 	inters struct {
-		Admin, AdminRole, Department, Employee, Occupation, Risk, RiskCategory,
-		RiskLocation []ent.Interceptor
+		Admin, AdminRole, Department, Employee, IPCReportEvent, Occupation, Risk,
+		RiskCategory, RiskLocation []ent.Interceptor
 	}
 )
+
+// ExecContext allows calling the underlying ExecContext method of the driver if it is supported by it.
+// See, database/sql#DB.ExecContext for more information.
+func (c *config) ExecContext(ctx context.Context, query string, args ...any) (stdsql.Result, error) {
+	ex, ok := c.driver.(interface {
+		ExecContext(context.Context, string, ...any) (stdsql.Result, error)
+	})
+	if !ok {
+		return nil, fmt.Errorf("Driver.ExecContext is not supported")
+	}
+	return ex.ExecContext(ctx, query, args...)
+}
+
+// QueryContext allows calling the underlying QueryContext method of the driver if it is supported by it.
+// See, database/sql#DB.QueryContext for more information.
+func (c *config) QueryContext(ctx context.Context, query string, args ...any) (*stdsql.Rows, error) {
+	q, ok := c.driver.(interface {
+		QueryContext(context.Context, string, ...any) (*stdsql.Rows, error)
+	})
+	if !ok {
+		return nil, fmt.Errorf("Driver.QueryContext is not supported")
+	}
+	return q.QueryContext(ctx, query, args...)
+}

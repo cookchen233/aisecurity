@@ -1,6 +1,7 @@
 package services
 
 import (
+	"aisecurity/expects"
 	"aisecurity/structs"
 	"aisecurity/utils"
 	"context"
@@ -27,15 +28,15 @@ func (s *Service) SetContext(ctx context.Context) {
 
 func (s *Service) Create(structs.IEntity) (structs.IEntity, error) {
 	utils.Logger.Error("called empty service method", zap.String("method", utils.GetMethodName()))
-	return nil, nil
+	return nil, utils.ErrorWithStack(expects.NewNotImplementedMethod())
 }
 func (s *Service) Update(structs.IEntity) (structs.IEntity, error) {
 	utils.Logger.Error("called empty service method", zap.String("method", utils.GetMethodName()))
-	return nil, nil
+	return nil, utils.ErrorWithStack(expects.NewNotImplementedMethod())
 }
 func (s *Service) GetList(structs.IFilter) ([]structs.IEntity, error) {
 	utils.Logger.Error("called empty service method", zap.String("method", utils.GetMethodName()))
-	return nil, nil
+	return nil, utils.ErrorWithStack(expects.NewNotImplementedMethod())
 }
 func (s *Service) GetTotal(structs.IFilter) (int, error) {
 	utils.Logger.Error("called empty service method", zap.String("method", utils.GetMethodName()))
@@ -43,9 +44,9 @@ func (s *Service) GetTotal(structs.IFilter) (int, error) {
 }
 func (s *Service) GetDetails(structs.IFilter) (structs.IEntity, error) {
 	utils.Logger.Error("called empty service method", zap.String("method", utils.GetMethodName()))
-	return nil, nil
+	return nil, utils.ErrorWithStack(expects.NewNotImplementedMethod())
 }
 func (s *Service) Delete(structs.IEntity) error {
 	utils.Logger.Error("called empty service method", zap.String("method", utils.GetMethodName()))
-	return nil
+	return utils.ErrorWithStack(expects.NewNotImplementedMethod())
 }

@@ -75,6 +75,10 @@ const (
 	EdgeOccupationCreator = "occupation_creator"
 	// EdgeOccupationUpdater holds the string denoting the occupation_updater edge name in mutations.
 	EdgeOccupationUpdater = "occupation_updater"
+	// EdgeIpcReportEventCreator holds the string denoting the ipc_report_event_creator edge name in mutations.
+	EdgeIpcReportEventCreator = "ipc_report_event_creator"
+	// EdgeIpcReportEventUpdater holds the string denoting the ipc_report_event_updater edge name in mutations.
+	EdgeIpcReportEventUpdater = "ipc_report_event_updater"
 	// Table holds the table name of the admin in the database.
 	Table = "admins"
 	// CreatorTable is the table that holds the creator relation/edge.
@@ -203,6 +207,20 @@ const (
 	OccupationUpdaterInverseTable = "occupations"
 	// OccupationUpdaterColumn is the table column denoting the occupation_updater relation/edge.
 	OccupationUpdaterColumn = "updated_by"
+	// IpcReportEventCreatorTable is the table that holds the ipc_report_event_creator relation/edge.
+	IpcReportEventCreatorTable = "ipc_report_events"
+	// IpcReportEventCreatorInverseTable is the table name for the IPCReportEvent entity.
+	// It exists in this package in order to avoid circular dependency with the "ipcreportevent" package.
+	IpcReportEventCreatorInverseTable = "ipc_report_events"
+	// IpcReportEventCreatorColumn is the table column denoting the ipc_report_event_creator relation/edge.
+	IpcReportEventCreatorColumn = "created_by"
+	// IpcReportEventUpdaterTable is the table that holds the ipc_report_event_updater relation/edge.
+	IpcReportEventUpdaterTable = "ipc_report_events"
+	// IpcReportEventUpdaterInverseTable is the table name for the IPCReportEvent entity.
+	// It exists in this package in order to avoid circular dependency with the "ipcreportevent" package.
+	IpcReportEventUpdaterInverseTable = "ipc_report_events"
+	// IpcReportEventUpdaterColumn is the table column denoting the ipc_report_event_updater relation/edge.
+	IpcReportEventUpdaterColumn = "updated_by"
 )
 
 // Columns holds all SQL columns for admin fields.
@@ -588,6 +606,34 @@ func ByOccupationUpdater(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption
 		sqlgraph.OrderByNeighborTerms(s, newOccupationUpdaterStep(), append([]sql.OrderTerm{term}, terms...)...)
 	}
 }
+
+// ByIpcReportEventCreatorCount orders the results by ipc_report_event_creator count.
+func ByIpcReportEventCreatorCount(opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborsCount(s, newIpcReportEventCreatorStep(), opts...)
+	}
+}
+
+// ByIpcReportEventCreator orders the results by ipc_report_event_creator terms.
+func ByIpcReportEventCreator(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newIpcReportEventCreatorStep(), append([]sql.OrderTerm{term}, terms...)...)
+	}
+}
+
+// ByIpcReportEventUpdaterCount orders the results by ipc_report_event_updater count.
+func ByIpcReportEventUpdaterCount(opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborsCount(s, newIpcReportEventUpdaterStep(), opts...)
+	}
+}
+
+// ByIpcReportEventUpdater orders the results by ipc_report_event_updater terms.
+func ByIpcReportEventUpdater(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newIpcReportEventUpdaterStep(), append([]sql.OrderTerm{term}, terms...)...)
+	}
+}
 func newCreatorStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
@@ -726,5 +772,19 @@ func newOccupationUpdaterStep() *sqlgraph.Step {
 		sqlgraph.From(Table, FieldID),
 		sqlgraph.To(OccupationUpdaterInverseTable, FieldID),
 		sqlgraph.Edge(sqlgraph.O2M, false, OccupationUpdaterTable, OccupationUpdaterColumn),
+	)
+}
+func newIpcReportEventCreatorStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(IpcReportEventCreatorInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.O2M, false, IpcReportEventCreatorTable, IpcReportEventCreatorColumn),
+	)
+}
+func newIpcReportEventUpdaterStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(IpcReportEventUpdaterInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.O2M, false, IpcReportEventUpdaterTable, IpcReportEventUpdaterColumn),
 	)
 }

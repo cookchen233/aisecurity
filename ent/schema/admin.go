@@ -60,5 +60,8 @@ func (Admin) Edges() []ent.Edge {
 
 		edge.To("occupation_creator", Occupation.Type),
 		edge.To("occupation_updater", Occupation.Type),
+
+		edge.To("ipc_report_event_creator", IPCReportEvent.Type),
+		edge.To("ipc_report_event_updater", IPCReportEvent.Type),
 	}
 }

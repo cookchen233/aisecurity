@@ -1,8 +1,11 @@
 package types
 
-import "aisecurity/properties"
+import (
+	"aisecurity/properties/maintain_status"
+)
 
 type MaintainStatusCounts struct {
-	MaintainStatus properties.MaintainStatus `json:"maintain_status"`
-	Count          int                       `json:"count"`
+	MaintainStatus maintain_status.MaintainStatus `json:"maintain_status"`
+	Label          string                         `json:"label"`
+	Count          int                            `json:"count"`
 }

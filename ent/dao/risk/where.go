@@ -4,7 +4,7 @@ package risk
 
 import (
 	"aisecurity/ent/dao/predicate"
-	"aisecurity/properties"
+	"aisecurity/properties/maintain_status"
 	"time"
 
 	"entgo.io/ent/dialect/sql"
@@ -117,7 +117,7 @@ func Measures(v string) predicate.Risk {
 }
 
 // MaintainStatus applies equality check predicate on the "maintain_status" field. It's identical to MaintainStatusEQ.
-func MaintainStatus(v properties.MaintainStatus) predicate.Risk {
+func MaintainStatus(v maintain_status.MaintainStatus) predicate.Risk {
 	vc := int(v)
 	return predicate.Risk(sql.FieldEQ(FieldMaintainStatus, vc))
 }
@@ -603,19 +603,19 @@ func MeasuresContainsFold(v string) predicate.Risk {
 }
 
 // MaintainStatusEQ applies the EQ predicate on the "maintain_status" field.
-func MaintainStatusEQ(v properties.MaintainStatus) predicate.Risk {
+func MaintainStatusEQ(v maintain_status.MaintainStatus) predicate.Risk {
 	vc := int(v)
 	return predicate.Risk(sql.FieldEQ(FieldMaintainStatus, vc))
 }
 
 // MaintainStatusNEQ applies the NEQ predicate on the "maintain_status" field.
-func MaintainStatusNEQ(v properties.MaintainStatus) predicate.Risk {
+func MaintainStatusNEQ(v maintain_status.MaintainStatus) predicate.Risk {
 	vc := int(v)
 	return predicate.Risk(sql.FieldNEQ(FieldMaintainStatus, vc))
 }
 
 // MaintainStatusIn applies the In predicate on the "maintain_status" field.
-func MaintainStatusIn(vs ...properties.MaintainStatus) predicate.Risk {
+func MaintainStatusIn(vs ...maintain_status.MaintainStatus) predicate.Risk {
 	v := make([]any, len(vs))
 	for i := range v {
 		v[i] = int(vs[i])
@@ -624,7 +624,7 @@ func MaintainStatusIn(vs ...properties.MaintainStatus) predicate.Risk {
 }
 
 // MaintainStatusNotIn applies the NotIn predicate on the "maintain_status" field.
-func MaintainStatusNotIn(vs ...properties.MaintainStatus) predicate.Risk {
+func MaintainStatusNotIn(vs ...maintain_status.MaintainStatus) predicate.Risk {
 	v := make([]any, len(vs))
 	for i := range v {
 		v[i] = int(vs[i])
@@ -633,25 +633,25 @@ func MaintainStatusNotIn(vs ...properties.MaintainStatus) predicate.Risk {
 }
 
 // MaintainStatusGT applies the GT predicate on the "maintain_status" field.
-func MaintainStatusGT(v properties.MaintainStatus) predicate.Risk {
+func MaintainStatusGT(v maintain_status.MaintainStatus) predicate.Risk {
 	vc := int(v)
 	return predicate.Risk(sql.FieldGT(FieldMaintainStatus, vc))
 }
 
 // MaintainStatusGTE applies the GTE predicate on the "maintain_status" field.
-func MaintainStatusGTE(v properties.MaintainStatus) predicate.Risk {
+func MaintainStatusGTE(v maintain_status.MaintainStatus) predicate.Risk {
 	vc := int(v)
 	return predicate.Risk(sql.FieldGTE(FieldMaintainStatus, vc))
 }
 
 // MaintainStatusLT applies the LT predicate on the "maintain_status" field.
-func MaintainStatusLT(v properties.MaintainStatus) predicate.Risk {
+func MaintainStatusLT(v maintain_status.MaintainStatus) predicate.Risk {
 	vc := int(v)
 	return predicate.Risk(sql.FieldLT(FieldMaintainStatus, vc))
 }
 
 // MaintainStatusLTE applies the LTE predicate on the "maintain_status" field.
-func MaintainStatusLTE(v properties.MaintainStatus) predicate.Risk {
+func MaintainStatusLTE(v maintain_status.MaintainStatus) predicate.Risk {
 	vc := int(v)
 	return predicate.Risk(sql.FieldLTE(FieldMaintainStatus, vc))
 }

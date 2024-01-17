@@ -3,6 +3,8 @@ package services
 import (
 	"aisecurity/ent/dao"
 	"aisecurity/ent/dao/risk"
+	"aisecurity/expects"
+	"aisecurity/properties/maintain_status"
 	"aisecurity/structs"
 	"aisecurity/structs/entities"
 	"aisecurity/structs/filters"
@@ -28,16 +30,18 @@ func NewRiskService() *RiskService {
 
 func (s *RiskService) Create(ent structs.IEntity) (structs.IEntity, error) {
 	e := ent.(*entities.Risk)
-	save, err := db.EntClient.Risk.Create().
+	c := s.entClient.Create().
 		SetReporterID(max(1, s.Ctx.(*gin.Context).GetInt("admin_id"))).
 		SetTitle(e.Title).
-		SetContent(e.Content).
-		SetImages(e.Images).
-		SetRiskCategoryID(e.RiskCategoryID).
+		SetContent(e.Content)
+	if e.Images != nil {
+		c.SetImages(e.Images)
+	}
+	save, err := c.SetRiskCategoryID(e.RiskCategoryID).
 		SetRiskLocationID(e.RiskLocationID).
 		SetMaintainerID(e.MaintainerID).
 		SetMeasures(e.Measures).
-		SetMaintainStatus(e.MaintainStatus).
+		SetMaintainStatus(maintain_status.Ready).
 		SetDueTime(e.DueTime).
 		Save(s.Ctx)
 	if err != nil {
@@ -46,12 +50,36 @@ func (s *RiskService) Create(ent structs.IEntity) (structs.IEntity, error) {
 	return save, nil
 }
 
-func (s *RiskService) Get(id int) (*dao.Risk, error) {
-	one, err := s.entClient.Query().Where(risk.IDEQ(id)).WithCreator().Only(s.Ctx)
+func (s *RiskService) Update(ent structs.IEntity) (structs.IEntity, error) {
+	e := ent.(*entities.Risk)
+	save, err := s.entClient.UpdateOneID(e.ID).
+		SetTitle(e.Title).
+		SetContent(e.Content).
+		SetImages(e.Images).
+		SetRiskCategoryID(e.RiskCategoryID).
+		SetRiskLocationID(e.RiskLocationID).
+		SetMaintainerID(e.MaintainerID).
+		SetMeasures(e.Measures).
+		//SetMaintainStatus(e.MaintainStatus).
+		SetDueTime(e.DueTime).
+		Save(s.Ctx)
 	if err != nil {
-		return nil, err
+		return nil, utils.ErrorWrap(err, "failed updating RiskLocation")
 	}
-	return one, nil
+	return save, nil
+}
+
+func (s *RiskService) GetDetails(fit structs.IFilter) (structs.IEntity, error) {
+	fit.SetPage(1)
+	fit.SetLimit(1)
+	list, err := s.GetList(fit)
+	if err != nil {
+		return nil, utils.ErrorWithStack(err)
+	}
+	if len(list) == 0 {
+		return nil, utils.ErrorWithStack(expects.NewDataNotFound())
+	}
+	return list[0], nil
 }
 
 func (s *RiskService) query(fit structs.IFilter) *dao.RiskQuery {
@@ -99,14 +127,34 @@ func (s *RiskService) GetTotal(fit structs.IFilter) (int, error) {
 	return total, nil
 }
 
-func (s *RiskService) GetMaintainStatusCounts(fit structs.IFilter) ([]types.MaintainStatusCounts, error) {
+func (s *RiskService) GetMaintainStatusCounts(fit structs.IFilter) ([]*types.MaintainStatusCounts, error) {
 	// status counts
-	var counts []types.MaintainStatusCounts
+	var counts []*types.MaintainStatusCounts
 	err := s.query(fit).GroupBy(risk.FieldMaintainStatus).
 		Aggregate(dao.Count()).
 		Scan(s.Ctx, &counts)
 	if err != nil {
 		return counts, utils.ErrorWithStack(err)
+	}
+	for _, status := range maintain_status.Unknown.GetAll() {
+		if status == maintain_status.Unknown {
+			continue
+		}
+		var ex bool
+		for _, count := range counts {
+			if count.MaintainStatus == status {
+				count.Label = status.Label()
+				ex = true
+				break
+			}
+		}
+		if !ex {
+			counts = append(counts, &types.MaintainStatusCounts{
+				MaintainStatus: status,
+				Count:          0,
+				Label:          status.Label(),
+			})
+		}
 	}
 	return counts, nil
 }
@@ -126,7 +174,7 @@ func (s *RiskService) GetList(fit structs.IFilter) ([]structs.IEntity, error) {
 				q.WithAdminRoles()
 			})
 		}).
-		Limit(fit.GetLimit()). // Set the number of items to return
+		Limit(fit.GetLimit()).
 		Offset(fit.GetOffset()).
 		All(s.Ctx)
 	if err != nil {

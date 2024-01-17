@@ -1070,6 +1070,52 @@ func HasOccupationUpdaterWith(preds ...predicate.Occupation) predicate.Admin {
 	})
 }
 
+// HasIpcReportEventCreator applies the HasEdge predicate on the "ipc_report_event_creator" edge.
+func HasIpcReportEventCreator() predicate.Admin {
+	return predicate.Admin(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, IpcReportEventCreatorTable, IpcReportEventCreatorColumn),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasIpcReportEventCreatorWith applies the HasEdge predicate on the "ipc_report_event_creator" edge with a given conditions (other predicates).
+func HasIpcReportEventCreatorWith(preds ...predicate.IPCReportEvent) predicate.Admin {
+	return predicate.Admin(func(s *sql.Selector) {
+		step := newIpcReportEventCreatorStep()
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
+}
+
+// HasIpcReportEventUpdater applies the HasEdge predicate on the "ipc_report_event_updater" edge.
+func HasIpcReportEventUpdater() predicate.Admin {
+	return predicate.Admin(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, IpcReportEventUpdaterTable, IpcReportEventUpdaterColumn),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasIpcReportEventUpdaterWith applies the HasEdge predicate on the "ipc_report_event_updater" edge with a given conditions (other predicates).
+func HasIpcReportEventUpdaterWith(preds ...predicate.IPCReportEvent) predicate.Admin {
+	return predicate.Admin(func(s *sql.Selector) {
+		step := newIpcReportEventUpdaterStep()
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
+}
+
 // And groups predicates with the AND operator between them.
 func And(predicates ...predicate.Admin) predicate.Admin {
 	return predicate.Admin(sql.AndPredicates(predicates...))

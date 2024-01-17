@@ -18,6 +18,9 @@ type Department func(*sql.Selector)
 // Employee is the predicate function for employee builders.
 type Employee func(*sql.Selector)
 
+// IPCReportEvent is the predicate function for ipcreportevent builders.
+type IPCReportEvent func(*sql.Selector)
+
 // Occupation is the predicate function for occupation builders.
 type Occupation func(*sql.Selector)
 

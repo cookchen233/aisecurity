@@ -8,27 +8,33 @@ import (
 	"aisecurity/structs/filters"
 	"aisecurity/structs/types"
 	"aisecurity/utils/http"
-	"context"
 	"fmt"
 	"github.com/gin-gonic/gin"
 )
 
 type RiskHandler struct {
-	handlers.Handler
+	handlers.DashboardHandler
 	Service *services.RiskService
 }
 
 func NewRiskHandler() *RiskHandler {
-	h := &RiskHandler{}
-	h.Service = services.NewRiskService()
-	h.Handler.Service = h.Service
-	return h
+	return &RiskHandler{}
 }
-func (h *RiskHandler) ResetRequest(ctx context.Context) {
+func (h *RiskHandler) GetService(c *gin.Context) services.IService {
+	return h.Service
+}
+func (h *RiskHandler) GetFilter(c *gin.Context) structs.IFilter {
+	return h.Filter
+}
+func (h *RiskHandler) GetEntity(c *gin.Context) structs.IEntity {
+	return h.Entity
+}
+func (h *RiskHandler) SetRequestContext(c *gin.Context, h2 handlers.IHandler) {
+	h.Service = services.NewRiskService()
+	h.Service.Ctx = c
 	h.Filter = &filters.Risk{}
-	h.Handler.Filter = h.Filter
 	h.Entity = &entities.Risk{}
-	h.Handler.Entity = h.Entity
+	h.DashboardHandler.SetRequestContext(c, h)
 }
 
 func (h *RiskHandler) GetList(c *gin.Context) {
@@ -38,9 +44,9 @@ func (h *RiskHandler) GetList(c *gin.Context) {
 		return
 	}
 	var resp = struct {
-		Total                int                          `json:"total"`
-		List                 []structs.IEntity            `json:"list"`
-		MaintainStatusCounts []types.MaintainStatusCounts `json:"maintain_status_counts"`
+		Total                int                           `json:"total"`
+		List                 []structs.IEntity             `json:"list"`
+		MaintainStatusCounts []*types.MaintainStatusCounts `json:"maintain_status_counts"`
 	}{}
 
 	var f2 *filters.Risk // copy a filter

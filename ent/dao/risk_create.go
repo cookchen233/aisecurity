@@ -8,7 +8,8 @@ import (
 	"aisecurity/ent/dao/risk"
 	"aisecurity/ent/dao/riskcategory"
 	"aisecurity/ent/dao/risklocation"
-	"aisecurity/properties"
+	"aisecurity/properties/maintain_status"
+	"aisecurity/structs/types"
 	"context"
 	"errors"
 	"fmt"
@@ -100,11 +101,8 @@ func (rc *RiskCreate) SetNillableContent(s *string) *RiskCreate {
 }
 
 // SetImages sets the "images" field.
-func (rc *RiskCreate) SetImages(s []struct {
-	Title string "json:\"title\""
-	URL   string "json:\"url\""
-}) *RiskCreate {
-	rc.mutation.SetImages(s)
+func (rc *RiskCreate) SetImages(ti []types.UploadedImage) *RiskCreate {
+	rc.mutation.SetImages(ti)
 	return rc
 }
 
@@ -147,15 +145,15 @@ func (rc *RiskCreate) SetNillableMeasures(s *string) *RiskCreate {
 }
 
 // SetMaintainStatus sets the "maintain_status" field.
-func (rc *RiskCreate) SetMaintainStatus(ps properties.MaintainStatus) *RiskCreate {
-	rc.mutation.SetMaintainStatus(ps)
+func (rc *RiskCreate) SetMaintainStatus(mss maintain_status.MaintainStatus) *RiskCreate {
+	rc.mutation.SetMaintainStatus(mss)
 	return rc
 }
 
 // SetNillableMaintainStatus sets the "maintain_status" field if the given value is not nil.
-func (rc *RiskCreate) SetNillableMaintainStatus(ps *properties.MaintainStatus) *RiskCreate {
-	if ps != nil {
-		rc.SetMaintainStatus(*ps)
+func (rc *RiskCreate) SetNillableMaintainStatus(mss *maintain_status.MaintainStatus) *RiskCreate {
+	if mss != nil {
+		rc.SetMaintainStatus(*mss)
 	}
 	return rc
 }
@@ -258,6 +256,10 @@ func (rc *RiskCreate) defaults() error {
 		}
 		v := risk.DefaultUpdatedAt()
 		rc.mutation.SetUpdatedAt(v)
+	}
+	if _, ok := rc.mutation.Images(); !ok {
+		v := risk.DefaultImages
+		rc.mutation.SetImages(v)
 	}
 	if _, ok := rc.mutation.MaintainStatus(); !ok {
 		v := risk.DefaultMaintainStatus

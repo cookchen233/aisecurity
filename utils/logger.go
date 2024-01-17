@@ -158,14 +158,14 @@ func InitLogger() {
 func InitLogger2() {
 	tees := []zap2.TeeOption{
 		{
-			Out: zap2.NewProductionRotateBySize("log/pile.log"),
+			Out: zap2.NewProductionRotateBySize("logs/pile.log"),
 			LevelEnablerFunc: zap2.LevelEnablerFunc(func(level zap2.Level) bool {
 				//return level < zap2.WarnLevel
 				return true
 			}),
 		},
 		{
-			Out: zap2.NewProductionRotateByTime("log/date/date.log"),
+			Out: zap2.NewProductionRotateByTime("logs/date/date.log"),
 			LevelEnablerFunc: zap2.LevelEnablerFunc(func(level zap2.Level) bool {
 				//return level >= zap2.WarnLevel
 				return true

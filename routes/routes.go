@@ -1,7 +1,7 @@
 package routes
 
 import (
-	"aisecurity/handlers"
+	dashboard2 "aisecurity/handlers"
 	"aisecurity/handlers/dashboard"
 	"aisecurity/middlewares"
 	"github.com/gin-contrib/static"
@@ -17,10 +17,19 @@ func Setup(router *gin.Engine) {
 	// Register Toycar handlers
 	NewToycarRoutes(router.Group("/toycar")).Setup()
 
-	// Register admin routes
+	// Register dashboard handlers
 	indexHandler := dashboard.NewIndexHandler()
 	// Without checking session
-	router.POST("/api/dashboard/login", handlers.Convert(indexHandler, indexHandler.Login))
+	router.POST("/api/dashboard/login", dashboard2.Convert(indexHandler, indexHandler.Login))
 	// Need to check session
-	NewDashboardRoutes(router.Group("/api/dashboard", middlewares.IsAdminAuthorized())).Setup()
+	NewDashboardRoutes(router.Group("/api/dashboard",
+		middlewares.IsAdminAuthorized(),
+		middlewares.DatabaseAudit(),
+		middlewares.JoyRequestLog(),
+	)).Setup()
+
+	// IPC
+	NewIPCRoutes(router.Group("/api/ipc",
+		middlewares.JoyRequestLog(),
+	)).Setup()
 }

@@ -7,6 +7,7 @@ import (
 	"aisecurity/ent/dao/adminrole"
 	"aisecurity/ent/dao/department"
 	"aisecurity/ent/dao/employee"
+	"aisecurity/ent/dao/ipcreportevent"
 	"aisecurity/ent/dao/occupation"
 	"aisecurity/ent/dao/risk"
 	"aisecurity/ent/dao/riskcategory"
@@ -409,6 +410,36 @@ func (ac *AdminCreate) AddOccupationUpdater(o ...*Occupation) *AdminCreate {
 		ids[i] = o[i].ID
 	}
 	return ac.AddOccupationUpdaterIDs(ids...)
+}
+
+// AddIpcReportEventCreatorIDs adds the "ipc_report_event_creator" edge to the IPCReportEvent entity by IDs.
+func (ac *AdminCreate) AddIpcReportEventCreatorIDs(ids ...int) *AdminCreate {
+	ac.mutation.AddIpcReportEventCreatorIDs(ids...)
+	return ac
+}
+
+// AddIpcReportEventCreator adds the "ipc_report_event_creator" edges to the IPCReportEvent entity.
+func (ac *AdminCreate) AddIpcReportEventCreator(i ...*IPCReportEvent) *AdminCreate {
+	ids := make([]int, len(i))
+	for j := range i {
+		ids[j] = i[j].ID
+	}
+	return ac.AddIpcReportEventCreatorIDs(ids...)
+}
+
+// AddIpcReportEventUpdaterIDs adds the "ipc_report_event_updater" edge to the IPCReportEvent entity by IDs.
+func (ac *AdminCreate) AddIpcReportEventUpdaterIDs(ids ...int) *AdminCreate {
+	ac.mutation.AddIpcReportEventUpdaterIDs(ids...)
+	return ac
+}
+
+// AddIpcReportEventUpdater adds the "ipc_report_event_updater" edges to the IPCReportEvent entity.
+func (ac *AdminCreate) AddIpcReportEventUpdater(i ...*IPCReportEvent) *AdminCreate {
+	ids := make([]int, len(i))
+	for j := range i {
+		ids[j] = i[j].ID
+	}
+	return ac.AddIpcReportEventUpdaterIDs(ids...)
 }
 
 // Mutation returns the AdminMutation object of the builder.
@@ -905,6 +936,38 @@ func (ac *AdminCreate) createSpec() (*Admin, *sqlgraph.CreateSpec) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(occupation.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := ac.mutation.IpcReportEventCreatorIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   admin.IpcReportEventCreatorTable,
+			Columns: []string{admin.IpcReportEventCreatorColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(ipcreportevent.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := ac.mutation.IpcReportEventUpdaterIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   admin.IpcReportEventUpdaterTable,
+			Columns: []string{admin.IpcReportEventUpdaterColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(ipcreportevent.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {

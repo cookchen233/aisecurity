@@ -3,7 +3,8 @@
 package risk
 
 import (
-	"aisecurity/properties"
+	"aisecurity/properties/maintain_status"
+	"aisecurity/structs/types"
 	"time"
 
 	"entgo.io/ent"
@@ -153,6 +154,8 @@ var (
 	UpdateDefaultUpdatedAt func() time.Time
 	// TitleValidator is a validator for the "title" field. It is called by the builders before save.
 	TitleValidator func(string) error
+	// DefaultImages holds the default value on creation for the "images" field.
+	DefaultImages []types.UploadedImage
 	// RiskCategoryIDValidator is a validator for the "risk_category_id" field. It is called by the builders before save.
 	RiskCategoryIDValidator func(int) error
 	// RiskLocationIDValidator is a validator for the "risk_location_id" field. It is called by the builders before save.
@@ -162,7 +165,7 @@ var (
 	// MaintainerIDValidator is a validator for the "maintainer_id" field. It is called by the builders before save.
 	MaintainerIDValidator func(int) error
 	// DefaultMaintainStatus holds the default value on creation for the "maintain_status" field.
-	DefaultMaintainStatus properties.MaintainStatus
+	DefaultMaintainStatus maintain_status.MaintainStatus
 	// MaintainStatusValidator is a validator for the "maintain_status" field. It is called by the builders before save.
 	MaintainStatusValidator func(int) error
 )
