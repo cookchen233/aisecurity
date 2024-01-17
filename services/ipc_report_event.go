@@ -3,6 +3,7 @@ package services
 import (
 	"aisecurity/ent/dao"
 	"aisecurity/ent/dao/ipcreportevent"
+	"aisecurity/ent/dao/video"
 	"aisecurity/enums"
 	"aisecurity/expects"
 	"aisecurity/structs"
@@ -11,6 +12,8 @@ import (
 	"aisecurity/structs/types"
 	"aisecurity/utils"
 	"aisecurity/utils/db"
+	stdsql "database/sql"
+	"encoding/json"
 	"fmt"
 	"github.com/gogf/gf/v2/util/gconv"
 	"go.uber.org/zap"
@@ -30,6 +33,8 @@ func NewIPCReportEventService() *IPCReportEventService {
 func (s *IPCReportEventService) Create(ent structs.IEntity) (structs.IEntity, error) {
 	e := ent.(*entities.IPCReportEvent)
 	c := s.entClient.Create().
+		SetDeviceBrand(e.DeviceBrand).
+		SetDeviceModel(e.DeviceModel).
 		SetDeviceID(e.DeviceID).
 		SetEventID(e.EventID).
 		SetEventTime(e.EventTime).
@@ -39,14 +44,17 @@ func (s *IPCReportEventService) Create(ent structs.IEntity) (structs.IEntity, er
 	if e.Images != nil {
 		c.SetImages(e.Images)
 	}
-	if e.Videos != nil {
-		c.SetVideos(e.Videos)
+	if e.LabeledImages != nil {
+		c.SetLabeledImages(e.LabeledImages)
 	}
-	save, err := c.Save(s.Ctx)
+	if e.VideoID != 0 {
+		c.SetVideoID(e.VideoID)
+	}
+	saved, err := c.Save(s.Ctx)
 	if err != nil {
 		return nil, utils.ErrorWrap(err, "failed creating IPCReportEvent")
 	}
-	return save, nil
+	return structs.ConvertTo[*dao.IPCReportEvent, entities.IPCReportEvent](saved), nil
 }
 
 func (s *IPCReportEventService) GetDetails(fit structs.IFilter) (structs.IEntity, error) {
@@ -147,29 +155,52 @@ func (s *IPCReportEventService) GetList(fit structs.IFilter) ([]structs.IEntity,
 	return ents, nil
 }
 
-func (s *IPCReportEventService) GetByVideoName(name string) (*dao.IPCReportEvent, error) {
-	result, err := s.entClient.QueryContext(s.Ctx, "SELECT id,videos FROM ipc_report_events WHERE videos->0->>'name' = $1", name)
+func (s *IPCReportEventService) GetListByImageName(name string) ([]structs.IEntity, error) {
+	result, err := s.entClient.QueryContext(s.Ctx, "SELECT id, images FROM ipc_report_events WHERE images->0->>'name' = $1", name)
 	if err != nil {
 		return nil, utils.ErrorWithStack(err)
 	}
+	defer func(result *stdsql.Rows) {
+		err := result.Close()
+		if err != nil {
+			utils.Logger.Error("failed closing rows", zap.Error(err))
+		}
+	}(result)
+
+	var rows []structs.IEntity
 	for result.Next() {
-		var row dao.IPCReportEvent
-		err = result.Scan(&row.ID, &row.Videos)
+		var id int
+		var imagesData []byte
+		err = result.Scan(&id, &imagesData)
 		if err != nil {
 			return nil, utils.ErrorWithStack(err)
 		}
-		return &row, nil
+
+		var images []*types.UploadedImage
+		if len(imagesData) > 0 {
+			err = json.Unmarshal(imagesData, &images)
+			if err != nil {
+				return nil, utils.ErrorWithStack(err)
+			}
+		}
+		rows = append(rows, &entities.IPCReportEvent{
+			IPCReportEvent: dao.IPCReportEvent{
+				ID:     id,
+				Images: images,
+			},
+		})
 	}
-	return nil, &dao.NotFoundError{}
+
+	return rows, nil
 }
 
-func (s *IPCReportEventService) UpdateVideos(ent structs.IEntity) (*dao.IPCReportEvent, error) {
-	e := ent.(*entities.IPCReportEvent)
-	save, err := s.entClient.UpdateOneID(e.ID).
-		SetVideos(e.Videos).
-		Save(s.Ctx)
+func (s *IPCReportEventService) GetByVideoName(name string) (structs.IEntity, error) {
+	first, err := s.entClient.Query().
+		Where(ipcreportevent.HasVideoWith(video.NameEQ(name))).
+		WithVideo().
+		First(s.Ctx)
 	if err != nil {
-		return nil, utils.ErrorWrap(err, "failed updating IPCReportEvent")
+		return nil, utils.ErrorWithStack(err)
 	}
-	return save, nil
+	return structs.ConvertTo[*dao.IPCReportEvent, entities.IPCReportEvent](first), nil
 }

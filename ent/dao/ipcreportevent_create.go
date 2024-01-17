@@ -5,6 +5,7 @@ package dao
 import (
 	"aisecurity/ent/dao/admin"
 	"aisecurity/ent/dao/ipcreportevent"
+	"aisecurity/ent/dao/video"
 	"aisecurity/enums"
 	"aisecurity/structs/types"
 	"context"
@@ -77,6 +78,34 @@ func (irec *IPCReportEventCreate) SetNillableUpdatedAt(t *time.Time) *IPCReportE
 	return irec
 }
 
+// SetDeviceBrand sets the "device_brand" field.
+func (irec *IPCReportEventCreate) SetDeviceBrand(eredb enums.IPCReportEventDeviceBrand) *IPCReportEventCreate {
+	irec.mutation.SetDeviceBrand(eredb)
+	return irec
+}
+
+// SetNillableDeviceBrand sets the "device_brand" field if the given value is not nil.
+func (irec *IPCReportEventCreate) SetNillableDeviceBrand(eredb *enums.IPCReportEventDeviceBrand) *IPCReportEventCreate {
+	if eredb != nil {
+		irec.SetDeviceBrand(*eredb)
+	}
+	return irec
+}
+
+// SetDeviceModel sets the "device_model" field.
+func (irec *IPCReportEventCreate) SetDeviceModel(eredm enums.IPCReportEventDeviceModel) *IPCReportEventCreate {
+	irec.mutation.SetDeviceModel(eredm)
+	return irec
+}
+
+// SetNillableDeviceModel sets the "device_model" field if the given value is not nil.
+func (irec *IPCReportEventCreate) SetNillableDeviceModel(eredm *enums.IPCReportEventDeviceModel) *IPCReportEventCreate {
+	if eredm != nil {
+		irec.SetDeviceModel(*eredm)
+	}
+	return irec
+}
+
 // SetDeviceID sets the "device_id" field.
 func (irec *IPCReportEventCreate) SetDeviceID(s string) *IPCReportEventCreate {
 	irec.mutation.SetDeviceID(s)
@@ -132,20 +161,28 @@ func (irec *IPCReportEventCreate) SetNillableEventStatus(eres *enums.IPCReportEv
 }
 
 // SetImages sets the "images" field.
-func (irec *IPCReportEventCreate) SetImages(ti []types.UploadedImage) *IPCReportEventCreate {
+func (irec *IPCReportEventCreate) SetImages(ti []*types.UploadedImage) *IPCReportEventCreate {
 	irec.mutation.SetImages(ti)
 	return irec
 }
 
 // SetLabeledImages sets the "labeled_images" field.
-func (irec *IPCReportEventCreate) SetLabeledImages(ti []types.UploadedImage) *IPCReportEventCreate {
+func (irec *IPCReportEventCreate) SetLabeledImages(ti []*types.UploadedImage) *IPCReportEventCreate {
 	irec.mutation.SetLabeledImages(ti)
 	return irec
 }
 
-// SetVideos sets the "videos" field.
-func (irec *IPCReportEventCreate) SetVideos(tv []types.UploadedVideo) *IPCReportEventCreate {
-	irec.mutation.SetVideos(tv)
+// SetVideoID sets the "video_id" field.
+func (irec *IPCReportEventCreate) SetVideoID(i int) *IPCReportEventCreate {
+	irec.mutation.SetVideoID(i)
+	return irec
+}
+
+// SetNillableVideoID sets the "video_id" field if the given value is not nil.
+func (irec *IPCReportEventCreate) SetNillableVideoID(i *int) *IPCReportEventCreate {
+	if i != nil {
+		irec.SetVideoID(*i)
+	}
 	return irec
 }
 
@@ -199,6 +236,11 @@ func (irec *IPCReportEventCreate) SetUpdater(a *Admin) *IPCReportEventCreate {
 	return irec.SetUpdaterID(a.ID)
 }
 
+// SetVideo sets the "video" edge to the Video entity.
+func (irec *IPCReportEventCreate) SetVideo(v *Video) *IPCReportEventCreate {
+	return irec.SetVideoID(v.ID)
+}
+
 // Mutation returns the IPCReportEventMutation object of the builder.
 func (irec *IPCReportEventCreate) Mutation() *IPCReportEventMutation {
 	return irec.mutation
@@ -250,6 +292,14 @@ func (irec *IPCReportEventCreate) defaults() error {
 		v := ipcreportevent.DefaultUpdatedAt()
 		irec.mutation.SetUpdatedAt(v)
 	}
+	if _, ok := irec.mutation.DeviceBrand(); !ok {
+		v := ipcreportevent.DefaultDeviceBrand
+		irec.mutation.SetDeviceBrand(v)
+	}
+	if _, ok := irec.mutation.DeviceModel(); !ok {
+		v := ipcreportevent.DefaultDeviceModel
+		irec.mutation.SetDeviceModel(v)
+	}
 	if _, ok := irec.mutation.EventTime(); !ok {
 		if ipcreportevent.DefaultEventTime == nil {
 			return fmt.Errorf("dao: uninitialized ipcreportevent.DefaultEventTime (forgotten import dao/runtime?)")
@@ -272,10 +322,6 @@ func (irec *IPCReportEventCreate) defaults() error {
 	if _, ok := irec.mutation.LabeledImages(); !ok {
 		v := ipcreportevent.DefaultLabeledImages
 		irec.mutation.SetLabeledImages(v)
-	}
-	if _, ok := irec.mutation.Videos(); !ok {
-		v := ipcreportevent.DefaultVideos
-		irec.mutation.SetVideos(v)
 	}
 	return nil
 }
@@ -303,6 +349,22 @@ func (irec *IPCReportEventCreate) check() error {
 	}
 	if _, ok := irec.mutation.UpdatedAt(); !ok {
 		return &ValidationError{Name: "updated_at", err: errors.New(`dao: missing required field "IPCReportEvent.updated_at"`)}
+	}
+	if _, ok := irec.mutation.DeviceBrand(); !ok {
+		return &ValidationError{Name: "device_brand", err: errors.New(`dao: missing required field "IPCReportEvent.device_brand"`)}
+	}
+	if v, ok := irec.mutation.DeviceBrand(); ok {
+		if err := ipcreportevent.DeviceBrandValidator(int(v)); err != nil {
+			return &ValidationError{Name: "device_brand", err: fmt.Errorf(`dao: validator failed for field "IPCReportEvent.device_brand": %w`, err)}
+		}
+	}
+	if _, ok := irec.mutation.DeviceModel(); !ok {
+		return &ValidationError{Name: "device_model", err: errors.New(`dao: missing required field "IPCReportEvent.device_model"`)}
+	}
+	if v, ok := irec.mutation.DeviceModel(); ok {
+		if err := ipcreportevent.DeviceModelValidator(int(v)); err != nil {
+			return &ValidationError{Name: "device_model", err: fmt.Errorf(`dao: validator failed for field "IPCReportEvent.device_model": %w`, err)}
+		}
 	}
 	if _, ok := irec.mutation.DeviceID(); !ok {
 		return &ValidationError{Name: "device_id", err: errors.New(`dao: missing required field "IPCReportEvent.device_id"`)}
@@ -337,6 +399,11 @@ func (irec *IPCReportEventCreate) check() error {
 	if v, ok := irec.mutation.EventStatus(); ok {
 		if err := ipcreportevent.EventStatusValidator(int(v)); err != nil {
 			return &ValidationError{Name: "event_status", err: fmt.Errorf(`dao: validator failed for field "IPCReportEvent.event_status": %w`, err)}
+		}
+	}
+	if v, ok := irec.mutation.VideoID(); ok {
+		if err := ipcreportevent.VideoIDValidator(v); err != nil {
+			return &ValidationError{Name: "video_id", err: fmt.Errorf(`dao: validator failed for field "IPCReportEvent.video_id": %w`, err)}
 		}
 	}
 	if _, ok := irec.mutation.CreatorID(); !ok {
@@ -383,6 +450,14 @@ func (irec *IPCReportEventCreate) createSpec() (*IPCReportEvent, *sqlgraph.Creat
 		_spec.SetField(ipcreportevent.FieldUpdatedAt, field.TypeTime, value)
 		_node.UpdatedAt = value
 	}
+	if value, ok := irec.mutation.DeviceBrand(); ok {
+		_spec.SetField(ipcreportevent.FieldDeviceBrand, field.TypeInt, value)
+		_node.DeviceBrand = value
+	}
+	if value, ok := irec.mutation.DeviceModel(); ok {
+		_spec.SetField(ipcreportevent.FieldDeviceModel, field.TypeInt, value)
+		_node.DeviceModel = value
+	}
 	if value, ok := irec.mutation.DeviceID(); ok {
 		_spec.SetField(ipcreportevent.FieldDeviceID, field.TypeString, value)
 		_node.DeviceID = value
@@ -410,10 +485,6 @@ func (irec *IPCReportEventCreate) createSpec() (*IPCReportEvent, *sqlgraph.Creat
 	if value, ok := irec.mutation.LabeledImages(); ok {
 		_spec.SetField(ipcreportevent.FieldLabeledImages, field.TypeJSON, value)
 		_node.LabeledImages = value
-	}
-	if value, ok := irec.mutation.Videos(); ok {
-		_spec.SetField(ipcreportevent.FieldVideos, field.TypeJSON, value)
-		_node.Videos = value
 	}
 	if value, ok := irec.mutation.Description(); ok {
 		_spec.SetField(ipcreportevent.FieldDescription, field.TypeString, value)
@@ -455,6 +526,23 @@ func (irec *IPCReportEventCreate) createSpec() (*IPCReportEvent, *sqlgraph.Creat
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
 		_node.UpdatedBy = nodes[0]
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := irec.mutation.VideoIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   ipcreportevent.VideoTable,
+			Columns: []string{ipcreportevent.VideoColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(video.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_node.VideoID = nodes[0]
 		_spec.Edges = append(_spec.Edges, edge)
 	}
 	return _node, _spec

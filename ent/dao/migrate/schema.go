@@ -158,6 +158,8 @@ var (
 		{Name: "created_at", Type: field.TypeTime},
 		{Name: "deleted_at", Type: field.TypeTime, Nullable: true},
 		{Name: "updated_at", Type: field.TypeTime},
+		{Name: "device_brand", Type: field.TypeInt, Default: 0},
+		{Name: "device_model", Type: field.TypeInt, Default: 0},
 		{Name: "device_id", Type: field.TypeString, Size: 255},
 		{Name: "event_id", Type: field.TypeString, Size: 255},
 		{Name: "event_time", Type: field.TypeTime},
@@ -165,11 +167,11 @@ var (
 		{Name: "event_status", Type: field.TypeInt, Default: 1},
 		{Name: "images", Type: field.TypeJSON, Nullable: true},
 		{Name: "labeled_images", Type: field.TypeJSON, Nullable: true},
-		{Name: "videos", Type: field.TypeJSON, Nullable: true},
 		{Name: "description", Type: field.TypeString, Nullable: true},
 		{Name: "raw_data", Type: field.TypeString, Nullable: true},
 		{Name: "created_by", Type: field.TypeInt},
 		{Name: "updated_by", Type: field.TypeInt},
+		{Name: "video_id", Type: field.TypeInt, Nullable: true},
 	}
 	// IpcReportEventsTable holds the schema information for the "ipc_report_events" table.
 	IpcReportEventsTable = &schema.Table{
@@ -179,15 +181,21 @@ var (
 		ForeignKeys: []*schema.ForeignKey{
 			{
 				Symbol:     "ipc_report_events_admins_ipc_report_event_creator",
-				Columns:    []*schema.Column{IpcReportEventsColumns[14]},
+				Columns:    []*schema.Column{IpcReportEventsColumns[15]},
 				RefColumns: []*schema.Column{AdminsColumns[0]},
 				OnDelete:   schema.NoAction,
 			},
 			{
 				Symbol:     "ipc_report_events_admins_ipc_report_event_updater",
-				Columns:    []*schema.Column{IpcReportEventsColumns[15]},
+				Columns:    []*schema.Column{IpcReportEventsColumns[16]},
 				RefColumns: []*schema.Column{AdminsColumns[0]},
 				OnDelete:   schema.NoAction,
+			},
+			{
+				Symbol:     "ipc_report_events_videos_ipc_report_event_video",
+				Columns:    []*schema.Column{IpcReportEventsColumns[17]},
+				RefColumns: []*schema.Column{VideosColumns[0]},
+				OnDelete:   schema.SetNull,
 			},
 		},
 	}
@@ -345,6 +353,40 @@ var (
 			},
 		},
 	}
+	// VideosColumns holds the columns for the "videos" table.
+	VideosColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeInt, Increment: true},
+		{Name: "created_at", Type: field.TypeTime},
+		{Name: "deleted_at", Type: field.TypeTime, Nullable: true},
+		{Name: "updated_at", Type: field.TypeTime},
+		{Name: "name", Type: field.TypeString, Nullable: true},
+		{Name: "url", Type: field.TypeString, Nullable: true},
+		{Name: "size", Type: field.TypeInt64, Default: 0},
+		{Name: "duration", Type: field.TypeString, Nullable: true},
+		{Name: "uploaded_at", Type: field.TypeTime, Nullable: true},
+		{Name: "created_by", Type: field.TypeInt},
+		{Name: "updated_by", Type: field.TypeInt},
+	}
+	// VideosTable holds the schema information for the "videos" table.
+	VideosTable = &schema.Table{
+		Name:       "videos",
+		Columns:    VideosColumns,
+		PrimaryKey: []*schema.Column{VideosColumns[0]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:     "videos_admins_video_creator",
+				Columns:    []*schema.Column{VideosColumns[9]},
+				RefColumns: []*schema.Column{AdminsColumns[0]},
+				OnDelete:   schema.NoAction,
+			},
+			{
+				Symbol:     "videos_admins_video_updater",
+				Columns:    []*schema.Column{VideosColumns[10]},
+				RefColumns: []*schema.Column{AdminsColumns[0]},
+				OnDelete:   schema.NoAction,
+			},
+		},
+	}
 	// AdminRoleAdminsColumns holds the columns for the "admin_role_admins" table.
 	AdminRoleAdminsColumns = []*schema.Column{
 		{Name: "admin_role_id", Type: field.TypeInt},
@@ -406,6 +448,7 @@ var (
 		RisksTable,
 		RiskCategoriesTable,
 		RiskLocationsTable,
+		VideosTable,
 		AdminRoleAdminsTable,
 		OccupationEmployeesTable,
 	}
@@ -425,6 +468,7 @@ func init() {
 	EmployeesTable.ForeignKeys[3].RefTable = DepartmentsTable
 	IpcReportEventsTable.ForeignKeys[0].RefTable = AdminsTable
 	IpcReportEventsTable.ForeignKeys[1].RefTable = AdminsTable
+	IpcReportEventsTable.ForeignKeys[2].RefTable = VideosTable
 	OccupationsTable.ForeignKeys[0].RefTable = AdminsTable
 	OccupationsTable.ForeignKeys[1].RefTable = AdminsTable
 	RisksTable.ForeignKeys[0].RefTable = AdminsTable
@@ -437,6 +481,8 @@ func init() {
 	RiskCategoriesTable.ForeignKeys[1].RefTable = AdminsTable
 	RiskLocationsTable.ForeignKeys[0].RefTable = AdminsTable
 	RiskLocationsTable.ForeignKeys[1].RefTable = AdminsTable
+	VideosTable.ForeignKeys[0].RefTable = AdminsTable
+	VideosTable.ForeignKeys[1].RefTable = AdminsTable
 	AdminRoleAdminsTable.ForeignKeys[0].RefTable = AdminRolesTable
 	AdminRoleAdminsTable.ForeignKeys[1].RefTable = AdminsTable
 	OccupationEmployeesTable.ForeignKeys[0].RefTable = OccupationsTable

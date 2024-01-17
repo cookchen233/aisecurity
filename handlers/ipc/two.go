@@ -69,6 +69,8 @@ func (h *TwoHandler) ReportEvent(c *gin.Context) {
 
 	ent := entities.IPCReportEvent{
 		IPCReportEvent: dao.IPCReportEvent{
+			DeviceBrand: enums.IREDB1,
+			DeviceModel: enums.IREDM1,
 			DeviceID:    p.BoardID,
 			EventID:     p.AlarmID,
 			EventTime:   eventTime,
@@ -92,7 +94,7 @@ func (h *TwoHandler) ReportEvent(c *gin.Context) {
 		http.Error(c, err, 1000)
 		return
 	}
-	ent.Images = append(ent.Images, types.UploadedImage{UploadedFile: types.UploadedFile{
+	ent.Images = append(ent.Images, &types.UploadedImage{UploadedFile: types.UploadedFile{
 		Name:      p.LocalRawPath,
 		URL:       image,
 		Size:      imageInfo.Size(),
@@ -113,7 +115,7 @@ func (h *TwoHandler) ReportEvent(c *gin.Context) {
 			http.Error(c, err, 1000)
 			return
 		}
-		ent.LabeledImages = append(ent.LabeledImages, types.UploadedImage{UploadedFile: types.UploadedFile{
+		ent.LabeledImages = append(ent.LabeledImages, &types.UploadedImage{UploadedFile: types.UploadedFile{
 			Name:      p.LocalLabeledPath,
 			URL:       labeledImage,
 			Size:      labeledImageInfo.Size(),
@@ -122,9 +124,18 @@ func (h *TwoHandler) ReportEvent(c *gin.Context) {
 	}
 
 	// after the videos being uploaded, the event will be updated.
-	ent.Videos = append(ent.Videos, types.UploadedVideo{UploadedFile: types.UploadedFile{
-		Name: p.VideoFile,
-	}})
+	videoService := services.NewVideo(c)
+	video, err := videoService.CreateOrUpdateByName(&entities.Video{
+		Video: dao.Video{
+			Name: p.VideoFile,
+		},
+	})
+	if err != nil {
+		utils.Logger.Error("failed to create or update video", zap.Error(err))
+	}
+	if video != nil {
+		ent.VideoID = video.(*entities.Video).ID
+	}
 
 	saved, err := h.Service.Create(&ent)
 	if err != nil {
@@ -150,30 +161,24 @@ func (h *TwoHandler) UploadVideos(c *gin.Context) {
 		return
 	}
 	var saveds []structs.IEntity
+	var failures []string
+	videoService := services.NewVideo(c)
 	for _, file := range uploadedFiles {
-		event, err := h.Service.GetByVideoName(file.Name)
+		saved, err := videoService.CreateOrUpdateByName(&entities.Video{
+			Video: dao.Video{
+				Name: file.Name,
+				Size: file.Size,
+				URL:  file.URL,
+			},
+		})
 		if err != nil {
-			if dao.IsNotFound(err) {
-				http.Error(c, utils.ErrorWithStack(fmt.Errorf("根据视频文件名未找到事件记录")), 900)
-				return
-			}
-			http.Error(c, utils.ErrorWithStack(err), 1000)
-			return
-		}
-		for _, v := range event.Videos {
-			if v.Name == file.Name {
-				v.UploadedFile = file
-				break
-			}
-		}
-		saved, err := h.Service.UpdateVideos(event)
-		if err != nil {
-			http.Error(c, err, 1000)
-			return
+			failures = append(failures, fmt.Sprintf("创建或更新视频记录时发生错误, file.Name: %s, %v", file.Name, err))
+			continue
 		}
 		saveds = append(saveds, saved)
+
 	}
-	http.Success(c, saveds)
+	http.Success(c, map[string]any{"saveds": saveds, "failures": failures})
 }
 
 func (h *TwoHandler) ExtraMessages(c *gin.Context) {

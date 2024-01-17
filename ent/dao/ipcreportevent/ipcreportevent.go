@@ -27,6 +27,10 @@ const (
 	FieldUpdatedBy = "updated_by"
 	// FieldUpdatedAt holds the string denoting the updated_at field in the database.
 	FieldUpdatedAt = "updated_at"
+	// FieldDeviceBrand holds the string denoting the device_brand field in the database.
+	FieldDeviceBrand = "device_brand"
+	// FieldDeviceModel holds the string denoting the device_model field in the database.
+	FieldDeviceModel = "device_model"
 	// FieldDeviceID holds the string denoting the device_id field in the database.
 	FieldDeviceID = "device_id"
 	// FieldEventID holds the string denoting the event_id field in the database.
@@ -41,8 +45,8 @@ const (
 	FieldImages = "images"
 	// FieldLabeledImages holds the string denoting the labeled_images field in the database.
 	FieldLabeledImages = "labeled_images"
-	// FieldVideos holds the string denoting the videos field in the database.
-	FieldVideos = "videos"
+	// FieldVideoID holds the string denoting the video_id field in the database.
+	FieldVideoID = "video_id"
 	// FieldDescription holds the string denoting the description field in the database.
 	FieldDescription = "description"
 	// FieldRawData holds the string denoting the raw_data field in the database.
@@ -51,6 +55,8 @@ const (
 	EdgeCreator = "creator"
 	// EdgeUpdater holds the string denoting the updater edge name in mutations.
 	EdgeUpdater = "updater"
+	// EdgeVideo holds the string denoting the video edge name in mutations.
+	EdgeVideo = "video"
 	// Table holds the table name of the ipcreportevent in the database.
 	Table = "ipc_report_events"
 	// CreatorTable is the table that holds the creator relation/edge.
@@ -67,6 +73,13 @@ const (
 	UpdaterInverseTable = "admins"
 	// UpdaterColumn is the table column denoting the updater relation/edge.
 	UpdaterColumn = "updated_by"
+	// VideoTable is the table that holds the video relation/edge.
+	VideoTable = "ipc_report_events"
+	// VideoInverseTable is the table name for the Video entity.
+	// It exists in this package in order to avoid circular dependency with the "video" package.
+	VideoInverseTable = "videos"
+	// VideoColumn is the table column denoting the video relation/edge.
+	VideoColumn = "video_id"
 )
 
 // Columns holds all SQL columns for ipcreportevent fields.
@@ -77,6 +90,8 @@ var Columns = []string{
 	FieldDeletedAt,
 	FieldUpdatedBy,
 	FieldUpdatedAt,
+	FieldDeviceBrand,
+	FieldDeviceModel,
 	FieldDeviceID,
 	FieldEventID,
 	FieldEventTime,
@@ -84,7 +99,7 @@ var Columns = []string{
 	FieldEventStatus,
 	FieldImages,
 	FieldLabeledImages,
-	FieldVideos,
+	FieldVideoID,
 	FieldDescription,
 	FieldRawData,
 }
@@ -116,6 +131,14 @@ var (
 	DefaultUpdatedAt func() time.Time
 	// UpdateDefaultUpdatedAt holds the default value on update for the "updated_at" field.
 	UpdateDefaultUpdatedAt func() time.Time
+	// DefaultDeviceBrand holds the default value on creation for the "device_brand" field.
+	DefaultDeviceBrand enums.IPCReportEventDeviceBrand
+	// DeviceBrandValidator is a validator for the "device_brand" field. It is called by the builders before save.
+	DeviceBrandValidator func(int) error
+	// DefaultDeviceModel holds the default value on creation for the "device_model" field.
+	DefaultDeviceModel enums.IPCReportEventDeviceModel
+	// DeviceModelValidator is a validator for the "device_model" field. It is called by the builders before save.
+	DeviceModelValidator func(int) error
 	// DeviceIDValidator is a validator for the "device_id" field. It is called by the builders before save.
 	DeviceIDValidator func(string) error
 	// EventIDValidator is a validator for the "event_id" field. It is called by the builders before save.
@@ -131,11 +154,11 @@ var (
 	// EventStatusValidator is a validator for the "event_status" field. It is called by the builders before save.
 	EventStatusValidator func(int) error
 	// DefaultImages holds the default value on creation for the "images" field.
-	DefaultImages []types.UploadedImage
+	DefaultImages []*types.UploadedImage
 	// DefaultLabeledImages holds the default value on creation for the "labeled_images" field.
-	DefaultLabeledImages []types.UploadedImage
-	// DefaultVideos holds the default value on creation for the "videos" field.
-	DefaultVideos []types.UploadedVideo
+	DefaultLabeledImages []*types.UploadedImage
+	// VideoIDValidator is a validator for the "video_id" field. It is called by the builders before save.
+	VideoIDValidator func(int) error
 )
 
 // OrderOption defines the ordering options for the IPCReportEvent queries.
@@ -171,6 +194,16 @@ func ByUpdatedAt(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldUpdatedAt, opts...).ToFunc()
 }
 
+// ByDeviceBrand orders the results by the device_brand field.
+func ByDeviceBrand(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldDeviceBrand, opts...).ToFunc()
+}
+
+// ByDeviceModel orders the results by the device_model field.
+func ByDeviceModel(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldDeviceModel, opts...).ToFunc()
+}
+
 // ByDeviceID orders the results by the device_id field.
 func ByDeviceID(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldDeviceID, opts...).ToFunc()
@@ -196,6 +229,11 @@ func ByEventStatus(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldEventStatus, opts...).ToFunc()
 }
 
+// ByVideoID orders the results by the video_id field.
+func ByVideoID(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldVideoID, opts...).ToFunc()
+}
+
 // ByDescription orders the results by the description field.
 func ByDescription(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldDescription, opts...).ToFunc()
@@ -219,6 +257,13 @@ func ByUpdaterField(field string, opts ...sql.OrderTermOption) OrderOption {
 		sqlgraph.OrderByNeighborTerms(s, newUpdaterStep(), sql.OrderByField(field, opts...))
 	}
 }
+
+// ByVideoField orders the results by video field.
+func ByVideoField(field string, opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newVideoStep(), sql.OrderByField(field, opts...))
+	}
+}
 func newCreatorStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
@@ -231,5 +276,12 @@ func newUpdaterStep() *sqlgraph.Step {
 		sqlgraph.From(Table, FieldID),
 		sqlgraph.To(UpdaterInverseTable, FieldID),
 		sqlgraph.Edge(sqlgraph.M2O, true, UpdaterTable, UpdaterColumn),
+	)
+}
+func newVideoStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(VideoInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.M2O, true, VideoTable, VideoColumn),
 	)
 }

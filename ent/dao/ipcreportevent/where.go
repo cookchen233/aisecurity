@@ -81,6 +81,18 @@ func UpdatedAt(v time.Time) predicate.IPCReportEvent {
 	return predicate.IPCReportEvent(sql.FieldEQ(FieldUpdatedAt, v))
 }
 
+// DeviceBrand applies equality check predicate on the "device_brand" field. It's identical to DeviceBrandEQ.
+func DeviceBrand(v enums.IPCReportEventDeviceBrand) predicate.IPCReportEvent {
+	vc := int(v)
+	return predicate.IPCReportEvent(sql.FieldEQ(FieldDeviceBrand, vc))
+}
+
+// DeviceModel applies equality check predicate on the "device_model" field. It's identical to DeviceModelEQ.
+func DeviceModel(v enums.IPCReportEventDeviceModel) predicate.IPCReportEvent {
+	vc := int(v)
+	return predicate.IPCReportEvent(sql.FieldEQ(FieldDeviceModel, vc))
+}
+
 // DeviceID applies equality check predicate on the "device_id" field. It's identical to DeviceIDEQ.
 func DeviceID(v string) predicate.IPCReportEvent {
 	return predicate.IPCReportEvent(sql.FieldEQ(FieldDeviceID, v))
@@ -106,6 +118,11 @@ func EventType(v enums.IPCReportEventType) predicate.IPCReportEvent {
 func EventStatus(v enums.IPCReportEventStatus) predicate.IPCReportEvent {
 	vc := int(v)
 	return predicate.IPCReportEvent(sql.FieldEQ(FieldEventStatus, vc))
+}
+
+// VideoID applies equality check predicate on the "video_id" field. It's identical to VideoIDEQ.
+func VideoID(v int) predicate.IPCReportEvent {
+	return predicate.IPCReportEvent(sql.FieldEQ(FieldVideoID, v))
 }
 
 // Description applies equality check predicate on the "description" field. It's identical to DescriptionEQ.
@@ -286,6 +303,114 @@ func UpdatedAtLT(v time.Time) predicate.IPCReportEvent {
 // UpdatedAtLTE applies the LTE predicate on the "updated_at" field.
 func UpdatedAtLTE(v time.Time) predicate.IPCReportEvent {
 	return predicate.IPCReportEvent(sql.FieldLTE(FieldUpdatedAt, v))
+}
+
+// DeviceBrandEQ applies the EQ predicate on the "device_brand" field.
+func DeviceBrandEQ(v enums.IPCReportEventDeviceBrand) predicate.IPCReportEvent {
+	vc := int(v)
+	return predicate.IPCReportEvent(sql.FieldEQ(FieldDeviceBrand, vc))
+}
+
+// DeviceBrandNEQ applies the NEQ predicate on the "device_brand" field.
+func DeviceBrandNEQ(v enums.IPCReportEventDeviceBrand) predicate.IPCReportEvent {
+	vc := int(v)
+	return predicate.IPCReportEvent(sql.FieldNEQ(FieldDeviceBrand, vc))
+}
+
+// DeviceBrandIn applies the In predicate on the "device_brand" field.
+func DeviceBrandIn(vs ...enums.IPCReportEventDeviceBrand) predicate.IPCReportEvent {
+	v := make([]any, len(vs))
+	for i := range v {
+		v[i] = int(vs[i])
+	}
+	return predicate.IPCReportEvent(sql.FieldIn(FieldDeviceBrand, v...))
+}
+
+// DeviceBrandNotIn applies the NotIn predicate on the "device_brand" field.
+func DeviceBrandNotIn(vs ...enums.IPCReportEventDeviceBrand) predicate.IPCReportEvent {
+	v := make([]any, len(vs))
+	for i := range v {
+		v[i] = int(vs[i])
+	}
+	return predicate.IPCReportEvent(sql.FieldNotIn(FieldDeviceBrand, v...))
+}
+
+// DeviceBrandGT applies the GT predicate on the "device_brand" field.
+func DeviceBrandGT(v enums.IPCReportEventDeviceBrand) predicate.IPCReportEvent {
+	vc := int(v)
+	return predicate.IPCReportEvent(sql.FieldGT(FieldDeviceBrand, vc))
+}
+
+// DeviceBrandGTE applies the GTE predicate on the "device_brand" field.
+func DeviceBrandGTE(v enums.IPCReportEventDeviceBrand) predicate.IPCReportEvent {
+	vc := int(v)
+	return predicate.IPCReportEvent(sql.FieldGTE(FieldDeviceBrand, vc))
+}
+
+// DeviceBrandLT applies the LT predicate on the "device_brand" field.
+func DeviceBrandLT(v enums.IPCReportEventDeviceBrand) predicate.IPCReportEvent {
+	vc := int(v)
+	return predicate.IPCReportEvent(sql.FieldLT(FieldDeviceBrand, vc))
+}
+
+// DeviceBrandLTE applies the LTE predicate on the "device_brand" field.
+func DeviceBrandLTE(v enums.IPCReportEventDeviceBrand) predicate.IPCReportEvent {
+	vc := int(v)
+	return predicate.IPCReportEvent(sql.FieldLTE(FieldDeviceBrand, vc))
+}
+
+// DeviceModelEQ applies the EQ predicate on the "device_model" field.
+func DeviceModelEQ(v enums.IPCReportEventDeviceModel) predicate.IPCReportEvent {
+	vc := int(v)
+	return predicate.IPCReportEvent(sql.FieldEQ(FieldDeviceModel, vc))
+}
+
+// DeviceModelNEQ applies the NEQ predicate on the "device_model" field.
+func DeviceModelNEQ(v enums.IPCReportEventDeviceModel) predicate.IPCReportEvent {
+	vc := int(v)
+	return predicate.IPCReportEvent(sql.FieldNEQ(FieldDeviceModel, vc))
+}
+
+// DeviceModelIn applies the In predicate on the "device_model" field.
+func DeviceModelIn(vs ...enums.IPCReportEventDeviceModel) predicate.IPCReportEvent {
+	v := make([]any, len(vs))
+	for i := range v {
+		v[i] = int(vs[i])
+	}
+	return predicate.IPCReportEvent(sql.FieldIn(FieldDeviceModel, v...))
+}
+
+// DeviceModelNotIn applies the NotIn predicate on the "device_model" field.
+func DeviceModelNotIn(vs ...enums.IPCReportEventDeviceModel) predicate.IPCReportEvent {
+	v := make([]any, len(vs))
+	for i := range v {
+		v[i] = int(vs[i])
+	}
+	return predicate.IPCReportEvent(sql.FieldNotIn(FieldDeviceModel, v...))
+}
+
+// DeviceModelGT applies the GT predicate on the "device_model" field.
+func DeviceModelGT(v enums.IPCReportEventDeviceModel) predicate.IPCReportEvent {
+	vc := int(v)
+	return predicate.IPCReportEvent(sql.FieldGT(FieldDeviceModel, vc))
+}
+
+// DeviceModelGTE applies the GTE predicate on the "device_model" field.
+func DeviceModelGTE(v enums.IPCReportEventDeviceModel) predicate.IPCReportEvent {
+	vc := int(v)
+	return predicate.IPCReportEvent(sql.FieldGTE(FieldDeviceModel, vc))
+}
+
+// DeviceModelLT applies the LT predicate on the "device_model" field.
+func DeviceModelLT(v enums.IPCReportEventDeviceModel) predicate.IPCReportEvent {
+	vc := int(v)
+	return predicate.IPCReportEvent(sql.FieldLT(FieldDeviceModel, vc))
+}
+
+// DeviceModelLTE applies the LTE predicate on the "device_model" field.
+func DeviceModelLTE(v enums.IPCReportEventDeviceModel) predicate.IPCReportEvent {
+	vc := int(v)
+	return predicate.IPCReportEvent(sql.FieldLTE(FieldDeviceModel, vc))
 }
 
 // DeviceIDEQ applies the EQ predicate on the "device_id" field.
@@ -586,14 +711,34 @@ func LabeledImagesNotNil() predicate.IPCReportEvent {
 	return predicate.IPCReportEvent(sql.FieldNotNull(FieldLabeledImages))
 }
 
-// VideosIsNil applies the IsNil predicate on the "videos" field.
-func VideosIsNil() predicate.IPCReportEvent {
-	return predicate.IPCReportEvent(sql.FieldIsNull(FieldVideos))
+// VideoIDEQ applies the EQ predicate on the "video_id" field.
+func VideoIDEQ(v int) predicate.IPCReportEvent {
+	return predicate.IPCReportEvent(sql.FieldEQ(FieldVideoID, v))
 }
 
-// VideosNotNil applies the NotNil predicate on the "videos" field.
-func VideosNotNil() predicate.IPCReportEvent {
-	return predicate.IPCReportEvent(sql.FieldNotNull(FieldVideos))
+// VideoIDNEQ applies the NEQ predicate on the "video_id" field.
+func VideoIDNEQ(v int) predicate.IPCReportEvent {
+	return predicate.IPCReportEvent(sql.FieldNEQ(FieldVideoID, v))
+}
+
+// VideoIDIn applies the In predicate on the "video_id" field.
+func VideoIDIn(vs ...int) predicate.IPCReportEvent {
+	return predicate.IPCReportEvent(sql.FieldIn(FieldVideoID, vs...))
+}
+
+// VideoIDNotIn applies the NotIn predicate on the "video_id" field.
+func VideoIDNotIn(vs ...int) predicate.IPCReportEvent {
+	return predicate.IPCReportEvent(sql.FieldNotIn(FieldVideoID, vs...))
+}
+
+// VideoIDIsNil applies the IsNil predicate on the "video_id" field.
+func VideoIDIsNil() predicate.IPCReportEvent {
+	return predicate.IPCReportEvent(sql.FieldIsNull(FieldVideoID))
+}
+
+// VideoIDNotNil applies the NotNil predicate on the "video_id" field.
+func VideoIDNotNil() predicate.IPCReportEvent {
+	return predicate.IPCReportEvent(sql.FieldNotNull(FieldVideoID))
 }
 
 // DescriptionEQ applies the EQ predicate on the "description" field.
@@ -784,6 +929,29 @@ func HasUpdater() predicate.IPCReportEvent {
 func HasUpdaterWith(preds ...predicate.Admin) predicate.IPCReportEvent {
 	return predicate.IPCReportEvent(func(s *sql.Selector) {
 		step := newUpdaterStep()
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
+}
+
+// HasVideo applies the HasEdge predicate on the "video" edge.
+func HasVideo() predicate.IPCReportEvent {
+	return predicate.IPCReportEvent(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, VideoTable, VideoColumn),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasVideoWith applies the HasEdge predicate on the "video" edge with a given conditions (other predicates).
+func HasVideoWith(preds ...predicate.Video) predicate.IPCReportEvent {
+	return predicate.IPCReportEvent(func(s *sql.Selector) {
+		step := newVideoStep()
 		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
 			for _, p := range preds {
 				p(s)

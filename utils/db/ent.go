@@ -98,17 +98,36 @@ func TagFields(name string) gen.Hook {
 
 func Migrate() {
 	ctx := context.Background()
-	// Dump migration changes to an SQL script.
-	f, err := os.Create("migrate.sql")
-	if err != nil {
-		log.Printf("create migrate file: %v", err)
+	fileName := fmt.Sprintf("migration/%s.sql", time.Now().Format("2006-01-02"))
+
+	// Check if file exists
+	_, err := os.Stat(fileName)
+	fileExists := !os.IsNotExist(err)
+
+	var f *os.File
+	if fileExists {
+		// Open in append mode if file exists
+		f, err = os.OpenFile(fileName, os.O_APPEND|os.O_WRONLY, 0644)
+		if err != nil {
+			log.Printf("error opening existing migrate file: %v", err)
+			return
+		}
+	} else {
+		// Create file if it does not exist
+		f, err = os.Create(fileName)
+		if err != nil {
+			log.Printf("create migrate file: %v", err)
+			return
+		}
 	}
-	defer func(f *os.File) {
+
+	defer func() {
 		err := f.Close()
 		if err != nil {
 			log.Printf("failed closing migrate file: %v", err)
 		}
-	}(f)
+	}()
+
 	if err := EntClient.Schema.WriteTo(ctx, f); err != nil {
 		log.Printf("failed printing schema changes: %v", err)
 	} else {

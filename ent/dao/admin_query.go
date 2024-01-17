@@ -13,6 +13,7 @@ import (
 	"aisecurity/ent/dao/risk"
 	"aisecurity/ent/dao/riskcategory"
 	"aisecurity/ent/dao/risklocation"
+	"aisecurity/ent/dao/video"
 	"context"
 	"database/sql/driver"
 	"fmt"
@@ -52,6 +53,8 @@ type AdminQuery struct {
 	withOccupationUpdater     *OccupationQuery
 	withIpcReportEventCreator *IPCReportEventQuery
 	withIpcReportEventUpdater *IPCReportEventQuery
+	withVideoCreator          *VideoQuery
+	withVideoUpdater          *VideoQuery
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
 	path func(context.Context) (*sql.Selector, error)
@@ -572,6 +575,50 @@ func (aq *AdminQuery) QueryIpcReportEventUpdater() *IPCReportEventQuery {
 	return query
 }
 
+// QueryVideoCreator chains the current query on the "video_creator" edge.
+func (aq *AdminQuery) QueryVideoCreator() *VideoQuery {
+	query := (&VideoClient{config: aq.config}).Query()
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := aq.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := aq.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(admin.Table, admin.FieldID, selector),
+			sqlgraph.To(video.Table, video.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, admin.VideoCreatorTable, admin.VideoCreatorColumn),
+		)
+		fromU = sqlgraph.SetNeighbors(aq.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
+}
+
+// QueryVideoUpdater chains the current query on the "video_updater" edge.
+func (aq *AdminQuery) QueryVideoUpdater() *VideoQuery {
+	query := (&VideoClient{config: aq.config}).Query()
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := aq.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := aq.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(admin.Table, admin.FieldID, selector),
+			sqlgraph.To(video.Table, video.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, admin.VideoUpdaterTable, admin.VideoUpdaterColumn),
+		)
+		fromU = sqlgraph.SetNeighbors(aq.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
+}
+
 // First returns the first Admin entity from the query.
 // Returns a *NotFoundError when no Admin was found.
 func (aq *AdminQuery) First(ctx context.Context) (*Admin, error) {
@@ -786,6 +833,8 @@ func (aq *AdminQuery) Clone() *AdminQuery {
 		withOccupationUpdater:     aq.withOccupationUpdater.Clone(),
 		withIpcReportEventCreator: aq.withIpcReportEventCreator.Clone(),
 		withIpcReportEventUpdater: aq.withIpcReportEventUpdater.Clone(),
+		withVideoCreator:          aq.withVideoCreator.Clone(),
+		withVideoUpdater:          aq.withVideoUpdater.Clone(),
 		// clone intermediate query.
 		sql:  aq.sql.Clone(),
 		path: aq.path,
@@ -1034,6 +1083,28 @@ func (aq *AdminQuery) WithIpcReportEventUpdater(opts ...func(*IPCReportEventQuer
 	return aq
 }
 
+// WithVideoCreator tells the query-builder to eager-load the nodes that are connected to
+// the "video_creator" edge. The optional arguments are used to configure the query builder of the edge.
+func (aq *AdminQuery) WithVideoCreator(opts ...func(*VideoQuery)) *AdminQuery {
+	query := (&VideoClient{config: aq.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	aq.withVideoCreator = query
+	return aq
+}
+
+// WithVideoUpdater tells the query-builder to eager-load the nodes that are connected to
+// the "video_updater" edge. The optional arguments are used to configure the query builder of the edge.
+func (aq *AdminQuery) WithVideoUpdater(opts ...func(*VideoQuery)) *AdminQuery {
+	query := (&VideoClient{config: aq.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	aq.withVideoUpdater = query
+	return aq
+}
+
 // GroupBy is used to group vertices by one or more fields/columns.
 // It is often used with aggregate functions, like: count, max, mean, min, sum.
 //
@@ -1112,7 +1183,7 @@ func (aq *AdminQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Admin,
 	var (
 		nodes       = []*Admin{}
 		_spec       = aq.querySpec()
-		loadedTypes = [22]bool{
+		loadedTypes = [24]bool{
 			aq.withCreator != nil,
 			aq.withUpdater != nil,
 			aq.withAdminRoles != nil,
@@ -1135,6 +1206,8 @@ func (aq *AdminQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Admin,
 			aq.withOccupationUpdater != nil,
 			aq.withIpcReportEventCreator != nil,
 			aq.withIpcReportEventUpdater != nil,
+			aq.withVideoCreator != nil,
+			aq.withVideoUpdater != nil,
 		}
 	)
 	_spec.ScanValues = func(columns []string) ([]any, error) {
@@ -1308,6 +1381,20 @@ func (aq *AdminQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Admin,
 			func(n *Admin, e *IPCReportEvent) {
 				n.Edges.IpcReportEventUpdater = append(n.Edges.IpcReportEventUpdater, e)
 			}); err != nil {
+			return nil, err
+		}
+	}
+	if query := aq.withVideoCreator; query != nil {
+		if err := aq.loadVideoCreator(ctx, query, nodes,
+			func(n *Admin) { n.Edges.VideoCreator = []*Video{} },
+			func(n *Admin, e *Video) { n.Edges.VideoCreator = append(n.Edges.VideoCreator, e) }); err != nil {
+			return nil, err
+		}
+	}
+	if query := aq.withVideoUpdater; query != nil {
+		if err := aq.loadVideoUpdater(ctx, query, nodes,
+			func(n *Admin) { n.Edges.VideoUpdater = []*Video{} },
+			func(n *Admin, e *Video) { n.Edges.VideoUpdater = append(n.Edges.VideoUpdater, e) }); err != nil {
 			return nil, err
 		}
 	}
@@ -1988,6 +2075,66 @@ func (aq *AdminQuery) loadIpcReportEventUpdater(ctx context.Context, query *IPCR
 	}
 	query.Where(predicate.IPCReportEvent(func(s *sql.Selector) {
 		s.Where(sql.InValues(s.C(admin.IpcReportEventUpdaterColumn), fks...))
+	}))
+	neighbors, err := query.All(ctx)
+	if err != nil {
+		return err
+	}
+	for _, n := range neighbors {
+		fk := n.UpdatedBy
+		node, ok := nodeids[fk]
+		if !ok {
+			return fmt.Errorf(`unexpected referenced foreign-key "updated_by" returned %v for node %v`, fk, n.ID)
+		}
+		assign(node, n)
+	}
+	return nil
+}
+func (aq *AdminQuery) loadVideoCreator(ctx context.Context, query *VideoQuery, nodes []*Admin, init func(*Admin), assign func(*Admin, *Video)) error {
+	fks := make([]driver.Value, 0, len(nodes))
+	nodeids := make(map[int]*Admin)
+	for i := range nodes {
+		fks = append(fks, nodes[i].ID)
+		nodeids[nodes[i].ID] = nodes[i]
+		if init != nil {
+			init(nodes[i])
+		}
+	}
+	if len(query.ctx.Fields) > 0 {
+		query.ctx.AppendFieldOnce(video.FieldCreatedBy)
+	}
+	query.Where(predicate.Video(func(s *sql.Selector) {
+		s.Where(sql.InValues(s.C(admin.VideoCreatorColumn), fks...))
+	}))
+	neighbors, err := query.All(ctx)
+	if err != nil {
+		return err
+	}
+	for _, n := range neighbors {
+		fk := n.CreatedBy
+		node, ok := nodeids[fk]
+		if !ok {
+			return fmt.Errorf(`unexpected referenced foreign-key "created_by" returned %v for node %v`, fk, n.ID)
+		}
+		assign(node, n)
+	}
+	return nil
+}
+func (aq *AdminQuery) loadVideoUpdater(ctx context.Context, query *VideoQuery, nodes []*Admin, init func(*Admin), assign func(*Admin, *Video)) error {
+	fks := make([]driver.Value, 0, len(nodes))
+	nodeids := make(map[int]*Admin)
+	for i := range nodes {
+		fks = append(fks, nodes[i].ID)
+		nodeids[nodes[i].ID] = nodes[i]
+		if init != nil {
+			init(nodes[i])
+		}
+	}
+	if len(query.ctx.Fields) > 0 {
+		query.ctx.AppendFieldOnce(video.FieldUpdatedBy)
+	}
+	query.Where(predicate.Video(func(s *sql.Selector) {
+		s.Where(sql.InValues(s.C(admin.VideoUpdaterColumn), fks...))
 	}))
 	neighbors, err := query.All(ctx)
 	if err != nil {

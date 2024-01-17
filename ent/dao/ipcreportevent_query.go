@@ -6,6 +6,7 @@ import (
 	"aisecurity/ent/dao/admin"
 	"aisecurity/ent/dao/ipcreportevent"
 	"aisecurity/ent/dao/predicate"
+	"aisecurity/ent/dao/video"
 	"context"
 	"fmt"
 	"math"
@@ -24,6 +25,7 @@ type IPCReportEventQuery struct {
 	predicates  []predicate.IPCReportEvent
 	withCreator *AdminQuery
 	withUpdater *AdminQuery
+	withVideo   *VideoQuery
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
 	path func(context.Context) (*sql.Selector, error)
@@ -97,6 +99,28 @@ func (ireq *IPCReportEventQuery) QueryUpdater() *AdminQuery {
 			sqlgraph.From(ipcreportevent.Table, ipcreportevent.FieldID, selector),
 			sqlgraph.To(admin.Table, admin.FieldID),
 			sqlgraph.Edge(sqlgraph.M2O, true, ipcreportevent.UpdaterTable, ipcreportevent.UpdaterColumn),
+		)
+		fromU = sqlgraph.SetNeighbors(ireq.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
+}
+
+// QueryVideo chains the current query on the "video" edge.
+func (ireq *IPCReportEventQuery) QueryVideo() *VideoQuery {
+	query := (&VideoClient{config: ireq.config}).Query()
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := ireq.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := ireq.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(ipcreportevent.Table, ipcreportevent.FieldID, selector),
+			sqlgraph.To(video.Table, video.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, ipcreportevent.VideoTable, ipcreportevent.VideoColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(ireq.driver.Dialect(), step)
 		return fromU, nil
@@ -298,6 +322,7 @@ func (ireq *IPCReportEventQuery) Clone() *IPCReportEventQuery {
 		predicates:  append([]predicate.IPCReportEvent{}, ireq.predicates...),
 		withCreator: ireq.withCreator.Clone(),
 		withUpdater: ireq.withUpdater.Clone(),
+		withVideo:   ireq.withVideo.Clone(),
 		// clone intermediate query.
 		sql:  ireq.sql.Clone(),
 		path: ireq.path,
@@ -323,6 +348,17 @@ func (ireq *IPCReportEventQuery) WithUpdater(opts ...func(*AdminQuery)) *IPCRepo
 		opt(query)
 	}
 	ireq.withUpdater = query
+	return ireq
+}
+
+// WithVideo tells the query-builder to eager-load the nodes that are connected to
+// the "video" edge. The optional arguments are used to configure the query builder of the edge.
+func (ireq *IPCReportEventQuery) WithVideo(opts ...func(*VideoQuery)) *IPCReportEventQuery {
+	query := (&VideoClient{config: ireq.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	ireq.withVideo = query
 	return ireq
 }
 
@@ -404,9 +440,10 @@ func (ireq *IPCReportEventQuery) sqlAll(ctx context.Context, hooks ...queryHook)
 	var (
 		nodes       = []*IPCReportEvent{}
 		_spec       = ireq.querySpec()
-		loadedTypes = [2]bool{
+		loadedTypes = [3]bool{
 			ireq.withCreator != nil,
 			ireq.withUpdater != nil,
+			ireq.withVideo != nil,
 		}
 	)
 	_spec.ScanValues = func(columns []string) ([]any, error) {
@@ -436,6 +473,12 @@ func (ireq *IPCReportEventQuery) sqlAll(ctx context.Context, hooks ...queryHook)
 	if query := ireq.withUpdater; query != nil {
 		if err := ireq.loadUpdater(ctx, query, nodes, nil,
 			func(n *IPCReportEvent, e *Admin) { n.Edges.Updater = e }); err != nil {
+			return nil, err
+		}
+	}
+	if query := ireq.withVideo; query != nil {
+		if err := ireq.loadVideo(ctx, query, nodes, nil,
+			func(n *IPCReportEvent, e *Video) { n.Edges.Video = e }); err != nil {
 			return nil, err
 		}
 	}
@@ -500,6 +543,35 @@ func (ireq *IPCReportEventQuery) loadUpdater(ctx context.Context, query *AdminQu
 	}
 	return nil
 }
+func (ireq *IPCReportEventQuery) loadVideo(ctx context.Context, query *VideoQuery, nodes []*IPCReportEvent, init func(*IPCReportEvent), assign func(*IPCReportEvent, *Video)) error {
+	ids := make([]int, 0, len(nodes))
+	nodeids := make(map[int][]*IPCReportEvent)
+	for i := range nodes {
+		fk := nodes[i].VideoID
+		if _, ok := nodeids[fk]; !ok {
+			ids = append(ids, fk)
+		}
+		nodeids[fk] = append(nodeids[fk], nodes[i])
+	}
+	if len(ids) == 0 {
+		return nil
+	}
+	query.Where(video.IDIn(ids...))
+	neighbors, err := query.All(ctx)
+	if err != nil {
+		return err
+	}
+	for _, n := range neighbors {
+		nodes, ok := nodeids[n.ID]
+		if !ok {
+			return fmt.Errorf(`unexpected foreign-key "video_id" returned %v`, n.ID)
+		}
+		for i := range nodes {
+			assign(nodes[i], n)
+		}
+	}
+	return nil
+}
 
 func (ireq *IPCReportEventQuery) sqlCount(ctx context.Context) (int, error) {
 	_spec := ireq.querySpec()
@@ -531,6 +603,9 @@ func (ireq *IPCReportEventQuery) querySpec() *sqlgraph.QuerySpec {
 		}
 		if ireq.withUpdater != nil {
 			_spec.Node.AddColumnOnce(ipcreportevent.FieldUpdatedBy)
+		}
+		if ireq.withVideo != nil {
+			_spec.Node.AddColumnOnce(ipcreportevent.FieldVideoID)
 		}
 	}
 	if ps := ireq.predicates; len(ps) > 0 {

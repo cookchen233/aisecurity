@@ -12,6 +12,7 @@ import (
 	"aisecurity/ent/dao/risk"
 	"aisecurity/ent/dao/riskcategory"
 	"aisecurity/ent/dao/risklocation"
+	"aisecurity/ent/dao/video"
 	"aisecurity/ent/schema"
 	"aisecurity/enums"
 	"aisecurity/properties/maintain_status"
@@ -253,42 +254,54 @@ func init() {
 	ipcreportevent.DefaultUpdatedAt = ipcreporteventDescUpdatedAt.Default.(func() time.Time)
 	// ipcreportevent.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
 	ipcreportevent.UpdateDefaultUpdatedAt = ipcreporteventDescUpdatedAt.UpdateDefault.(func() time.Time)
+	// ipcreporteventDescDeviceBrand is the schema descriptor for device_brand field.
+	ipcreporteventDescDeviceBrand := ipcreporteventFields[0].Descriptor()
+	// ipcreportevent.DefaultDeviceBrand holds the default value on creation for the device_brand field.
+	ipcreportevent.DefaultDeviceBrand = enums.IPCReportEventDeviceBrand(ipcreporteventDescDeviceBrand.Default.(int))
+	// ipcreportevent.DeviceBrandValidator is a validator for the "device_brand" field. It is called by the builders before save.
+	ipcreportevent.DeviceBrandValidator = ipcreporteventDescDeviceBrand.Validators[0].(func(int) error)
+	// ipcreporteventDescDeviceModel is the schema descriptor for device_model field.
+	ipcreporteventDescDeviceModel := ipcreporteventFields[1].Descriptor()
+	// ipcreportevent.DefaultDeviceModel holds the default value on creation for the device_model field.
+	ipcreportevent.DefaultDeviceModel = enums.IPCReportEventDeviceModel(ipcreporteventDescDeviceModel.Default.(int))
+	// ipcreportevent.DeviceModelValidator is a validator for the "device_model" field. It is called by the builders before save.
+	ipcreportevent.DeviceModelValidator = ipcreporteventDescDeviceModel.Validators[0].(func(int) error)
 	// ipcreporteventDescDeviceID is the schema descriptor for device_id field.
-	ipcreporteventDescDeviceID := ipcreporteventFields[0].Descriptor()
+	ipcreporteventDescDeviceID := ipcreporteventFields[2].Descriptor()
 	// ipcreportevent.DeviceIDValidator is a validator for the "device_id" field. It is called by the builders before save.
 	ipcreportevent.DeviceIDValidator = ipcreporteventDescDeviceID.Validators[0].(func(string) error)
 	// ipcreporteventDescEventID is the schema descriptor for event_id field.
-	ipcreporteventDescEventID := ipcreporteventFields[1].Descriptor()
+	ipcreporteventDescEventID := ipcreporteventFields[3].Descriptor()
 	// ipcreportevent.EventIDValidator is a validator for the "event_id" field. It is called by the builders before save.
 	ipcreportevent.EventIDValidator = ipcreporteventDescEventID.Validators[0].(func(string) error)
 	// ipcreporteventDescEventTime is the schema descriptor for event_time field.
-	ipcreporteventDescEventTime := ipcreporteventFields[2].Descriptor()
+	ipcreporteventDescEventTime := ipcreporteventFields[4].Descriptor()
 	// ipcreportevent.DefaultEventTime holds the default value on creation for the event_time field.
 	ipcreportevent.DefaultEventTime = ipcreporteventDescEventTime.Default.(func() time.Time)
 	// ipcreporteventDescEventType is the schema descriptor for event_type field.
-	ipcreporteventDescEventType := ipcreporteventFields[3].Descriptor()
+	ipcreporteventDescEventType := ipcreporteventFields[5].Descriptor()
 	// ipcreportevent.DefaultEventType holds the default value on creation for the event_type field.
 	ipcreportevent.DefaultEventType = enums.IPCReportEventType(ipcreporteventDescEventType.Default.(int))
 	// ipcreportevent.EventTypeValidator is a validator for the "event_type" field. It is called by the builders before save.
 	ipcreportevent.EventTypeValidator = ipcreporteventDescEventType.Validators[0].(func(int) error)
 	// ipcreporteventDescEventStatus is the schema descriptor for event_status field.
-	ipcreporteventDescEventStatus := ipcreporteventFields[4].Descriptor()
+	ipcreporteventDescEventStatus := ipcreporteventFields[6].Descriptor()
 	// ipcreportevent.DefaultEventStatus holds the default value on creation for the event_status field.
 	ipcreportevent.DefaultEventStatus = enums.IPCReportEventStatus(ipcreporteventDescEventStatus.Default.(int))
 	// ipcreportevent.EventStatusValidator is a validator for the "event_status" field. It is called by the builders before save.
 	ipcreportevent.EventStatusValidator = ipcreporteventDescEventStatus.Validators[0].(func(int) error)
 	// ipcreporteventDescImages is the schema descriptor for images field.
-	ipcreporteventDescImages := ipcreporteventFields[5].Descriptor()
+	ipcreporteventDescImages := ipcreporteventFields[7].Descriptor()
 	// ipcreportevent.DefaultImages holds the default value on creation for the images field.
-	ipcreportevent.DefaultImages = ipcreporteventDescImages.Default.([]types.UploadedImage)
+	ipcreportevent.DefaultImages = ipcreporteventDescImages.Default.([]*types.UploadedImage)
 	// ipcreporteventDescLabeledImages is the schema descriptor for labeled_images field.
-	ipcreporteventDescLabeledImages := ipcreporteventFields[6].Descriptor()
+	ipcreporteventDescLabeledImages := ipcreporteventFields[8].Descriptor()
 	// ipcreportevent.DefaultLabeledImages holds the default value on creation for the labeled_images field.
-	ipcreportevent.DefaultLabeledImages = ipcreporteventDescLabeledImages.Default.([]types.UploadedImage)
-	// ipcreporteventDescVideos is the schema descriptor for videos field.
-	ipcreporteventDescVideos := ipcreporteventFields[7].Descriptor()
-	// ipcreportevent.DefaultVideos holds the default value on creation for the videos field.
-	ipcreportevent.DefaultVideos = ipcreporteventDescVideos.Default.([]types.UploadedVideo)
+	ipcreportevent.DefaultLabeledImages = ipcreporteventDescLabeledImages.Default.([]*types.UploadedImage)
+	// ipcreporteventDescVideoID is the schema descriptor for video_id field.
+	ipcreporteventDescVideoID := ipcreporteventFields[9].Descriptor()
+	// ipcreportevent.VideoIDValidator is a validator for the "video_id" field. It is called by the builders before save.
+	ipcreportevent.VideoIDValidator = ipcreporteventDescVideoID.Validators[0].(func(int) error)
 	occupationMixin := schema.Occupation{}.Mixin()
 	occupationMixinHooks0 := occupationMixin[0].Hooks()
 	occupation.Hooks[0] = occupationMixinHooks0[0]
@@ -487,6 +500,35 @@ func init() {
 			return nil
 		}
 	}()
+	videoMixin := schema.Video{}.Mixin()
+	videoMixinHooks0 := videoMixin[0].Hooks()
+	video.Hooks[0] = videoMixinHooks0[0]
+	videoMixinFields0 := videoMixin[0].Fields()
+	_ = videoMixinFields0
+	videoFields := schema.Video{}.Fields()
+	_ = videoFields
+	// videoDescCreatedAt is the schema descriptor for created_at field.
+	videoDescCreatedAt := videoMixinFields0[0].Descriptor()
+	// video.DefaultCreatedAt holds the default value on creation for the created_at field.
+	video.DefaultCreatedAt = videoDescCreatedAt.Default.(func() time.Time)
+	// videoDescCreatedBy is the schema descriptor for created_by field.
+	videoDescCreatedBy := videoMixinFields0[1].Descriptor()
+	// video.CreatedByValidator is a validator for the "created_by" field. It is called by the builders before save.
+	video.CreatedByValidator = videoDescCreatedBy.Validators[0].(func(int) error)
+	// videoDescUpdatedBy is the schema descriptor for updated_by field.
+	videoDescUpdatedBy := videoMixinFields0[3].Descriptor()
+	// video.UpdatedByValidator is a validator for the "updated_by" field. It is called by the builders before save.
+	video.UpdatedByValidator = videoDescUpdatedBy.Validators[0].(func(int) error)
+	// videoDescUpdatedAt is the schema descriptor for updated_at field.
+	videoDescUpdatedAt := videoMixinFields0[4].Descriptor()
+	// video.DefaultUpdatedAt holds the default value on creation for the updated_at field.
+	video.DefaultUpdatedAt = videoDescUpdatedAt.Default.(func() time.Time)
+	// video.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
+	video.UpdateDefaultUpdatedAt = videoDescUpdatedAt.UpdateDefault.(func() time.Time)
+	// videoDescSize is the schema descriptor for size field.
+	videoDescSize := videoFields[2].Descriptor()
+	// video.DefaultSize holds the default value on creation for the size field.
+	video.DefaultSize = videoDescSize.Default.(int64)
 }
 
 const (

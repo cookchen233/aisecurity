@@ -13,6 +13,7 @@ import (
 	"aisecurity/ent/dao/risk"
 	"aisecurity/ent/dao/riskcategory"
 	"aisecurity/ent/dao/risklocation"
+	"aisecurity/ent/dao/video"
 	"context"
 	"errors"
 	"fmt"
@@ -463,6 +464,36 @@ func (au *AdminUpdate) AddIpcReportEventUpdater(i ...*IPCReportEvent) *AdminUpda
 	return au.AddIpcReportEventUpdaterIDs(ids...)
 }
 
+// AddVideoCreatorIDs adds the "video_creator" edge to the Video entity by IDs.
+func (au *AdminUpdate) AddVideoCreatorIDs(ids ...int) *AdminUpdate {
+	au.mutation.AddVideoCreatorIDs(ids...)
+	return au
+}
+
+// AddVideoCreator adds the "video_creator" edges to the Video entity.
+func (au *AdminUpdate) AddVideoCreator(v ...*Video) *AdminUpdate {
+	ids := make([]int, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
+	}
+	return au.AddVideoCreatorIDs(ids...)
+}
+
+// AddVideoUpdaterIDs adds the "video_updater" edge to the Video entity by IDs.
+func (au *AdminUpdate) AddVideoUpdaterIDs(ids ...int) *AdminUpdate {
+	au.mutation.AddVideoUpdaterIDs(ids...)
+	return au
+}
+
+// AddVideoUpdater adds the "video_updater" edges to the Video entity.
+func (au *AdminUpdate) AddVideoUpdater(v ...*Video) *AdminUpdate {
+	ids := make([]int, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
+	}
+	return au.AddVideoUpdaterIDs(ids...)
+}
+
 // Mutation returns the AdminMutation object of the builder.
 func (au *AdminUpdate) Mutation() *AdminMutation {
 	return au.mutation
@@ -892,6 +923,48 @@ func (au *AdminUpdate) RemoveIpcReportEventUpdater(i ...*IPCReportEvent) *AdminU
 		ids[j] = i[j].ID
 	}
 	return au.RemoveIpcReportEventUpdaterIDs(ids...)
+}
+
+// ClearVideoCreator clears all "video_creator" edges to the Video entity.
+func (au *AdminUpdate) ClearVideoCreator() *AdminUpdate {
+	au.mutation.ClearVideoCreator()
+	return au
+}
+
+// RemoveVideoCreatorIDs removes the "video_creator" edge to Video entities by IDs.
+func (au *AdminUpdate) RemoveVideoCreatorIDs(ids ...int) *AdminUpdate {
+	au.mutation.RemoveVideoCreatorIDs(ids...)
+	return au
+}
+
+// RemoveVideoCreator removes "video_creator" edges to Video entities.
+func (au *AdminUpdate) RemoveVideoCreator(v ...*Video) *AdminUpdate {
+	ids := make([]int, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
+	}
+	return au.RemoveVideoCreatorIDs(ids...)
+}
+
+// ClearVideoUpdater clears all "video_updater" edges to the Video entity.
+func (au *AdminUpdate) ClearVideoUpdater() *AdminUpdate {
+	au.mutation.ClearVideoUpdater()
+	return au
+}
+
+// RemoveVideoUpdaterIDs removes the "video_updater" edge to Video entities by IDs.
+func (au *AdminUpdate) RemoveVideoUpdaterIDs(ids ...int) *AdminUpdate {
+	au.mutation.RemoveVideoUpdaterIDs(ids...)
+	return au
+}
+
+// RemoveVideoUpdater removes "video_updater" edges to Video entities.
+func (au *AdminUpdate) RemoveVideoUpdater(v ...*Video) *AdminUpdate {
+	ids := make([]int, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
+	}
+	return au.RemoveVideoUpdaterIDs(ids...)
 }
 
 // Save executes the query and returns the number of nodes affected by the update operation.
@@ -1945,6 +2018,96 @@ func (au *AdminUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
+	if au.mutation.VideoCreatorCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   admin.VideoCreatorTable,
+			Columns: []string{admin.VideoCreatorColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(video.FieldID, field.TypeInt),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := au.mutation.RemovedVideoCreatorIDs(); len(nodes) > 0 && !au.mutation.VideoCreatorCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   admin.VideoCreatorTable,
+			Columns: []string{admin.VideoCreatorColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(video.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := au.mutation.VideoCreatorIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   admin.VideoCreatorTable,
+			Columns: []string{admin.VideoCreatorColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(video.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if au.mutation.VideoUpdaterCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   admin.VideoUpdaterTable,
+			Columns: []string{admin.VideoUpdaterColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(video.FieldID, field.TypeInt),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := au.mutation.RemovedVideoUpdaterIDs(); len(nodes) > 0 && !au.mutation.VideoUpdaterCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   admin.VideoUpdaterTable,
+			Columns: []string{admin.VideoUpdaterColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(video.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := au.mutation.VideoUpdaterIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   admin.VideoUpdaterTable,
+			Columns: []string{admin.VideoUpdaterColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(video.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
 	if n, err = sqlgraph.UpdateNodes(ctx, au.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
 			err = &NotFoundError{admin.Label}
@@ -2392,6 +2555,36 @@ func (auo *AdminUpdateOne) AddIpcReportEventUpdater(i ...*IPCReportEvent) *Admin
 	return auo.AddIpcReportEventUpdaterIDs(ids...)
 }
 
+// AddVideoCreatorIDs adds the "video_creator" edge to the Video entity by IDs.
+func (auo *AdminUpdateOne) AddVideoCreatorIDs(ids ...int) *AdminUpdateOne {
+	auo.mutation.AddVideoCreatorIDs(ids...)
+	return auo
+}
+
+// AddVideoCreator adds the "video_creator" edges to the Video entity.
+func (auo *AdminUpdateOne) AddVideoCreator(v ...*Video) *AdminUpdateOne {
+	ids := make([]int, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
+	}
+	return auo.AddVideoCreatorIDs(ids...)
+}
+
+// AddVideoUpdaterIDs adds the "video_updater" edge to the Video entity by IDs.
+func (auo *AdminUpdateOne) AddVideoUpdaterIDs(ids ...int) *AdminUpdateOne {
+	auo.mutation.AddVideoUpdaterIDs(ids...)
+	return auo
+}
+
+// AddVideoUpdater adds the "video_updater" edges to the Video entity.
+func (auo *AdminUpdateOne) AddVideoUpdater(v ...*Video) *AdminUpdateOne {
+	ids := make([]int, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
+	}
+	return auo.AddVideoUpdaterIDs(ids...)
+}
+
 // Mutation returns the AdminMutation object of the builder.
 func (auo *AdminUpdateOne) Mutation() *AdminMutation {
 	return auo.mutation
@@ -2821,6 +3014,48 @@ func (auo *AdminUpdateOne) RemoveIpcReportEventUpdater(i ...*IPCReportEvent) *Ad
 		ids[j] = i[j].ID
 	}
 	return auo.RemoveIpcReportEventUpdaterIDs(ids...)
+}
+
+// ClearVideoCreator clears all "video_creator" edges to the Video entity.
+func (auo *AdminUpdateOne) ClearVideoCreator() *AdminUpdateOne {
+	auo.mutation.ClearVideoCreator()
+	return auo
+}
+
+// RemoveVideoCreatorIDs removes the "video_creator" edge to Video entities by IDs.
+func (auo *AdminUpdateOne) RemoveVideoCreatorIDs(ids ...int) *AdminUpdateOne {
+	auo.mutation.RemoveVideoCreatorIDs(ids...)
+	return auo
+}
+
+// RemoveVideoCreator removes "video_creator" edges to Video entities.
+func (auo *AdminUpdateOne) RemoveVideoCreator(v ...*Video) *AdminUpdateOne {
+	ids := make([]int, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
+	}
+	return auo.RemoveVideoCreatorIDs(ids...)
+}
+
+// ClearVideoUpdater clears all "video_updater" edges to the Video entity.
+func (auo *AdminUpdateOne) ClearVideoUpdater() *AdminUpdateOne {
+	auo.mutation.ClearVideoUpdater()
+	return auo
+}
+
+// RemoveVideoUpdaterIDs removes the "video_updater" edge to Video entities by IDs.
+func (auo *AdminUpdateOne) RemoveVideoUpdaterIDs(ids ...int) *AdminUpdateOne {
+	auo.mutation.RemoveVideoUpdaterIDs(ids...)
+	return auo
+}
+
+// RemoveVideoUpdater removes "video_updater" edges to Video entities.
+func (auo *AdminUpdateOne) RemoveVideoUpdater(v ...*Video) *AdminUpdateOne {
+	ids := make([]int, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
+	}
+	return auo.RemoveVideoUpdaterIDs(ids...)
 }
 
 // Where appends a list predicates to the AdminUpdate builder.
@@ -3897,6 +4132,96 @@ func (auo *AdminUpdateOne) sqlSave(ctx context.Context) (_node *Admin, err error
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(ipcreportevent.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if auo.mutation.VideoCreatorCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   admin.VideoCreatorTable,
+			Columns: []string{admin.VideoCreatorColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(video.FieldID, field.TypeInt),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := auo.mutation.RemovedVideoCreatorIDs(); len(nodes) > 0 && !auo.mutation.VideoCreatorCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   admin.VideoCreatorTable,
+			Columns: []string{admin.VideoCreatorColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(video.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := auo.mutation.VideoCreatorIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   admin.VideoCreatorTable,
+			Columns: []string{admin.VideoCreatorColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(video.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if auo.mutation.VideoUpdaterCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   admin.VideoUpdaterTable,
+			Columns: []string{admin.VideoUpdaterColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(video.FieldID, field.TypeInt),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := auo.mutation.RemovedVideoUpdaterIDs(); len(nodes) > 0 && !auo.mutation.VideoUpdaterCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   admin.VideoUpdaterTable,
+			Columns: []string{admin.VideoUpdaterColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(video.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := auo.mutation.VideoUpdaterIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   admin.VideoUpdaterTable,
+			Columns: []string{admin.VideoUpdaterColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(video.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {

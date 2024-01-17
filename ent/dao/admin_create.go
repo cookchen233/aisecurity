@@ -12,6 +12,7 @@ import (
 	"aisecurity/ent/dao/risk"
 	"aisecurity/ent/dao/riskcategory"
 	"aisecurity/ent/dao/risklocation"
+	"aisecurity/ent/dao/video"
 	"context"
 	"errors"
 	"fmt"
@@ -440,6 +441,36 @@ func (ac *AdminCreate) AddIpcReportEventUpdater(i ...*IPCReportEvent) *AdminCrea
 		ids[j] = i[j].ID
 	}
 	return ac.AddIpcReportEventUpdaterIDs(ids...)
+}
+
+// AddVideoCreatorIDs adds the "video_creator" edge to the Video entity by IDs.
+func (ac *AdminCreate) AddVideoCreatorIDs(ids ...int) *AdminCreate {
+	ac.mutation.AddVideoCreatorIDs(ids...)
+	return ac
+}
+
+// AddVideoCreator adds the "video_creator" edges to the Video entity.
+func (ac *AdminCreate) AddVideoCreator(v ...*Video) *AdminCreate {
+	ids := make([]int, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
+	}
+	return ac.AddVideoCreatorIDs(ids...)
+}
+
+// AddVideoUpdaterIDs adds the "video_updater" edge to the Video entity by IDs.
+func (ac *AdminCreate) AddVideoUpdaterIDs(ids ...int) *AdminCreate {
+	ac.mutation.AddVideoUpdaterIDs(ids...)
+	return ac
+}
+
+// AddVideoUpdater adds the "video_updater" edges to the Video entity.
+func (ac *AdminCreate) AddVideoUpdater(v ...*Video) *AdminCreate {
+	ids := make([]int, len(v))
+	for i := range v {
+		ids[i] = v[i].ID
+	}
+	return ac.AddVideoUpdaterIDs(ids...)
 }
 
 // Mutation returns the AdminMutation object of the builder.
@@ -968,6 +999,38 @@ func (ac *AdminCreate) createSpec() (*Admin, *sqlgraph.CreateSpec) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(ipcreportevent.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := ac.mutation.VideoCreatorIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   admin.VideoCreatorTable,
+			Columns: []string{admin.VideoCreatorColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(video.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := ac.mutation.VideoUpdaterIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   admin.VideoUpdaterTable,
+			Columns: []string{admin.VideoUpdaterColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(video.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {

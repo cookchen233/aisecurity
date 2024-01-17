@@ -32,3 +32,6 @@ type RiskCategory func(*sql.Selector)
 
 // RiskLocation is the predicate function for risklocation builders.
 type RiskLocation func(*sql.Selector)
+
+// Video is the predicate function for video builders.
+type Video func(*sql.Selector)

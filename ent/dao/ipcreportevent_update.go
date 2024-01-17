@@ -6,6 +6,7 @@ import (
 	"aisecurity/ent/dao/admin"
 	"aisecurity/ent/dao/ipcreportevent"
 	"aisecurity/ent/dao/predicate"
+	"aisecurity/ent/dao/video"
 	"aisecurity/enums"
 	"aisecurity/structs/types"
 	"context"
@@ -115,13 +116,13 @@ func (ireu *IPCReportEventUpdate) AddEventStatus(eres enums.IPCReportEventStatus
 }
 
 // SetImages sets the "images" field.
-func (ireu *IPCReportEventUpdate) SetImages(ti []types.UploadedImage) *IPCReportEventUpdate {
+func (ireu *IPCReportEventUpdate) SetImages(ti []*types.UploadedImage) *IPCReportEventUpdate {
 	ireu.mutation.SetImages(ti)
 	return ireu
 }
 
 // AppendImages appends ti to the "images" field.
-func (ireu *IPCReportEventUpdate) AppendImages(ti []types.UploadedImage) *IPCReportEventUpdate {
+func (ireu *IPCReportEventUpdate) AppendImages(ti []*types.UploadedImage) *IPCReportEventUpdate {
 	ireu.mutation.AppendImages(ti)
 	return ireu
 }
@@ -133,13 +134,13 @@ func (ireu *IPCReportEventUpdate) ClearImages() *IPCReportEventUpdate {
 }
 
 // SetLabeledImages sets the "labeled_images" field.
-func (ireu *IPCReportEventUpdate) SetLabeledImages(ti []types.UploadedImage) *IPCReportEventUpdate {
+func (ireu *IPCReportEventUpdate) SetLabeledImages(ti []*types.UploadedImage) *IPCReportEventUpdate {
 	ireu.mutation.SetLabeledImages(ti)
 	return ireu
 }
 
 // AppendLabeledImages appends ti to the "labeled_images" field.
-func (ireu *IPCReportEventUpdate) AppendLabeledImages(ti []types.UploadedImage) *IPCReportEventUpdate {
+func (ireu *IPCReportEventUpdate) AppendLabeledImages(ti []*types.UploadedImage) *IPCReportEventUpdate {
 	ireu.mutation.AppendLabeledImages(ti)
 	return ireu
 }
@@ -150,21 +151,23 @@ func (ireu *IPCReportEventUpdate) ClearLabeledImages() *IPCReportEventUpdate {
 	return ireu
 }
 
-// SetVideos sets the "videos" field.
-func (ireu *IPCReportEventUpdate) SetVideos(tv []types.UploadedVideo) *IPCReportEventUpdate {
-	ireu.mutation.SetVideos(tv)
+// SetVideoID sets the "video_id" field.
+func (ireu *IPCReportEventUpdate) SetVideoID(i int) *IPCReportEventUpdate {
+	ireu.mutation.SetVideoID(i)
 	return ireu
 }
 
-// AppendVideos appends tv to the "videos" field.
-func (ireu *IPCReportEventUpdate) AppendVideos(tv []types.UploadedVideo) *IPCReportEventUpdate {
-	ireu.mutation.AppendVideos(tv)
+// SetNillableVideoID sets the "video_id" field if the given value is not nil.
+func (ireu *IPCReportEventUpdate) SetNillableVideoID(i *int) *IPCReportEventUpdate {
+	if i != nil {
+		ireu.SetVideoID(*i)
+	}
 	return ireu
 }
 
-// ClearVideos clears the value of the "videos" field.
-func (ireu *IPCReportEventUpdate) ClearVideos() *IPCReportEventUpdate {
-	ireu.mutation.ClearVideos()
+// ClearVideoID clears the value of the "video_id" field.
+func (ireu *IPCReportEventUpdate) ClearVideoID() *IPCReportEventUpdate {
+	ireu.mutation.ClearVideoID()
 	return ireu
 }
 
@@ -219,6 +222,11 @@ func (ireu *IPCReportEventUpdate) SetUpdater(a *Admin) *IPCReportEventUpdate {
 	return ireu.SetUpdaterID(a.ID)
 }
 
+// SetVideo sets the "video" edge to the Video entity.
+func (ireu *IPCReportEventUpdate) SetVideo(v *Video) *IPCReportEventUpdate {
+	return ireu.SetVideoID(v.ID)
+}
+
 // Mutation returns the IPCReportEventMutation object of the builder.
 func (ireu *IPCReportEventUpdate) Mutation() *IPCReportEventMutation {
 	return ireu.mutation
@@ -227,6 +235,12 @@ func (ireu *IPCReportEventUpdate) Mutation() *IPCReportEventMutation {
 // ClearUpdater clears the "updater" edge to the Admin entity.
 func (ireu *IPCReportEventUpdate) ClearUpdater() *IPCReportEventUpdate {
 	ireu.mutation.ClearUpdater()
+	return ireu
+}
+
+// ClearVideo clears the "video" edge to the Video entity.
+func (ireu *IPCReportEventUpdate) ClearVideo() *IPCReportEventUpdate {
+	ireu.mutation.ClearVideo()
 	return ireu
 }
 
@@ -287,6 +301,11 @@ func (ireu *IPCReportEventUpdate) check() error {
 	if v, ok := ireu.mutation.EventStatus(); ok {
 		if err := ipcreportevent.EventStatusValidator(int(v)); err != nil {
 			return &ValidationError{Name: "event_status", err: fmt.Errorf(`dao: validator failed for field "IPCReportEvent.event_status": %w`, err)}
+		}
+	}
+	if v, ok := ireu.mutation.VideoID(); ok {
+		if err := ipcreportevent.VideoIDValidator(v); err != nil {
+			return &ValidationError{Name: "video_id", err: fmt.Errorf(`dao: validator failed for field "IPCReportEvent.video_id": %w`, err)}
 		}
 	}
 	if _, ok := ireu.mutation.CreatorID(); ireu.mutation.CreatorCleared() && !ok {
@@ -353,17 +372,6 @@ func (ireu *IPCReportEventUpdate) sqlSave(ctx context.Context) (n int, err error
 	if ireu.mutation.LabeledImagesCleared() {
 		_spec.ClearField(ipcreportevent.FieldLabeledImages, field.TypeJSON)
 	}
-	if value, ok := ireu.mutation.Videos(); ok {
-		_spec.SetField(ipcreportevent.FieldVideos, field.TypeJSON, value)
-	}
-	if value, ok := ireu.mutation.AppendedVideos(); ok {
-		_spec.AddModifier(func(u *sql.UpdateBuilder) {
-			sqljson.Append(u, ipcreportevent.FieldVideos, value)
-		})
-	}
-	if ireu.mutation.VideosCleared() {
-		_spec.ClearField(ipcreportevent.FieldVideos, field.TypeJSON)
-	}
 	if value, ok := ireu.mutation.Description(); ok {
 		_spec.SetField(ipcreportevent.FieldDescription, field.TypeString, value)
 	}
@@ -398,6 +406,35 @@ func (ireu *IPCReportEventUpdate) sqlSave(ctx context.Context) (n int, err error
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(admin.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if ireu.mutation.VideoCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   ipcreportevent.VideoTable,
+			Columns: []string{ipcreportevent.VideoColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(video.FieldID, field.TypeInt),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := ireu.mutation.VideoIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   ipcreportevent.VideoTable,
+			Columns: []string{ipcreportevent.VideoColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(video.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {
@@ -508,13 +545,13 @@ func (ireuo *IPCReportEventUpdateOne) AddEventStatus(eres enums.IPCReportEventSt
 }
 
 // SetImages sets the "images" field.
-func (ireuo *IPCReportEventUpdateOne) SetImages(ti []types.UploadedImage) *IPCReportEventUpdateOne {
+func (ireuo *IPCReportEventUpdateOne) SetImages(ti []*types.UploadedImage) *IPCReportEventUpdateOne {
 	ireuo.mutation.SetImages(ti)
 	return ireuo
 }
 
 // AppendImages appends ti to the "images" field.
-func (ireuo *IPCReportEventUpdateOne) AppendImages(ti []types.UploadedImage) *IPCReportEventUpdateOne {
+func (ireuo *IPCReportEventUpdateOne) AppendImages(ti []*types.UploadedImage) *IPCReportEventUpdateOne {
 	ireuo.mutation.AppendImages(ti)
 	return ireuo
 }
@@ -526,13 +563,13 @@ func (ireuo *IPCReportEventUpdateOne) ClearImages() *IPCReportEventUpdateOne {
 }
 
 // SetLabeledImages sets the "labeled_images" field.
-func (ireuo *IPCReportEventUpdateOne) SetLabeledImages(ti []types.UploadedImage) *IPCReportEventUpdateOne {
+func (ireuo *IPCReportEventUpdateOne) SetLabeledImages(ti []*types.UploadedImage) *IPCReportEventUpdateOne {
 	ireuo.mutation.SetLabeledImages(ti)
 	return ireuo
 }
 
 // AppendLabeledImages appends ti to the "labeled_images" field.
-func (ireuo *IPCReportEventUpdateOne) AppendLabeledImages(ti []types.UploadedImage) *IPCReportEventUpdateOne {
+func (ireuo *IPCReportEventUpdateOne) AppendLabeledImages(ti []*types.UploadedImage) *IPCReportEventUpdateOne {
 	ireuo.mutation.AppendLabeledImages(ti)
 	return ireuo
 }
@@ -543,21 +580,23 @@ func (ireuo *IPCReportEventUpdateOne) ClearLabeledImages() *IPCReportEventUpdate
 	return ireuo
 }
 
-// SetVideos sets the "videos" field.
-func (ireuo *IPCReportEventUpdateOne) SetVideos(tv []types.UploadedVideo) *IPCReportEventUpdateOne {
-	ireuo.mutation.SetVideos(tv)
+// SetVideoID sets the "video_id" field.
+func (ireuo *IPCReportEventUpdateOne) SetVideoID(i int) *IPCReportEventUpdateOne {
+	ireuo.mutation.SetVideoID(i)
 	return ireuo
 }
 
-// AppendVideos appends tv to the "videos" field.
-func (ireuo *IPCReportEventUpdateOne) AppendVideos(tv []types.UploadedVideo) *IPCReportEventUpdateOne {
-	ireuo.mutation.AppendVideos(tv)
+// SetNillableVideoID sets the "video_id" field if the given value is not nil.
+func (ireuo *IPCReportEventUpdateOne) SetNillableVideoID(i *int) *IPCReportEventUpdateOne {
+	if i != nil {
+		ireuo.SetVideoID(*i)
+	}
 	return ireuo
 }
 
-// ClearVideos clears the value of the "videos" field.
-func (ireuo *IPCReportEventUpdateOne) ClearVideos() *IPCReportEventUpdateOne {
-	ireuo.mutation.ClearVideos()
+// ClearVideoID clears the value of the "video_id" field.
+func (ireuo *IPCReportEventUpdateOne) ClearVideoID() *IPCReportEventUpdateOne {
+	ireuo.mutation.ClearVideoID()
 	return ireuo
 }
 
@@ -612,6 +651,11 @@ func (ireuo *IPCReportEventUpdateOne) SetUpdater(a *Admin) *IPCReportEventUpdate
 	return ireuo.SetUpdaterID(a.ID)
 }
 
+// SetVideo sets the "video" edge to the Video entity.
+func (ireuo *IPCReportEventUpdateOne) SetVideo(v *Video) *IPCReportEventUpdateOne {
+	return ireuo.SetVideoID(v.ID)
+}
+
 // Mutation returns the IPCReportEventMutation object of the builder.
 func (ireuo *IPCReportEventUpdateOne) Mutation() *IPCReportEventMutation {
 	return ireuo.mutation
@@ -620,6 +664,12 @@ func (ireuo *IPCReportEventUpdateOne) Mutation() *IPCReportEventMutation {
 // ClearUpdater clears the "updater" edge to the Admin entity.
 func (ireuo *IPCReportEventUpdateOne) ClearUpdater() *IPCReportEventUpdateOne {
 	ireuo.mutation.ClearUpdater()
+	return ireuo
+}
+
+// ClearVideo clears the "video" edge to the Video entity.
+func (ireuo *IPCReportEventUpdateOne) ClearVideo() *IPCReportEventUpdateOne {
+	ireuo.mutation.ClearVideo()
 	return ireuo
 }
 
@@ -693,6 +743,11 @@ func (ireuo *IPCReportEventUpdateOne) check() error {
 	if v, ok := ireuo.mutation.EventStatus(); ok {
 		if err := ipcreportevent.EventStatusValidator(int(v)); err != nil {
 			return &ValidationError{Name: "event_status", err: fmt.Errorf(`dao: validator failed for field "IPCReportEvent.event_status": %w`, err)}
+		}
+	}
+	if v, ok := ireuo.mutation.VideoID(); ok {
+		if err := ipcreportevent.VideoIDValidator(v); err != nil {
+			return &ValidationError{Name: "video_id", err: fmt.Errorf(`dao: validator failed for field "IPCReportEvent.video_id": %w`, err)}
 		}
 	}
 	if _, ok := ireuo.mutation.CreatorID(); ireuo.mutation.CreatorCleared() && !ok {
@@ -776,17 +831,6 @@ func (ireuo *IPCReportEventUpdateOne) sqlSave(ctx context.Context) (_node *IPCRe
 	if ireuo.mutation.LabeledImagesCleared() {
 		_spec.ClearField(ipcreportevent.FieldLabeledImages, field.TypeJSON)
 	}
-	if value, ok := ireuo.mutation.Videos(); ok {
-		_spec.SetField(ipcreportevent.FieldVideos, field.TypeJSON, value)
-	}
-	if value, ok := ireuo.mutation.AppendedVideos(); ok {
-		_spec.AddModifier(func(u *sql.UpdateBuilder) {
-			sqljson.Append(u, ipcreportevent.FieldVideos, value)
-		})
-	}
-	if ireuo.mutation.VideosCleared() {
-		_spec.ClearField(ipcreportevent.FieldVideos, field.TypeJSON)
-	}
 	if value, ok := ireuo.mutation.Description(); ok {
 		_spec.SetField(ipcreportevent.FieldDescription, field.TypeString, value)
 	}
@@ -821,6 +865,35 @@ func (ireuo *IPCReportEventUpdateOne) sqlSave(ctx context.Context) (_node *IPCRe
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(admin.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if ireuo.mutation.VideoCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   ipcreportevent.VideoTable,
+			Columns: []string{ipcreportevent.VideoColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(video.FieldID, field.TypeInt),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := ireuo.mutation.VideoIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   ipcreportevent.VideoTable,
+			Columns: []string{ipcreportevent.VideoColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(video.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {

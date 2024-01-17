@@ -79,6 +79,10 @@ const (
 	EdgeIpcReportEventCreator = "ipc_report_event_creator"
 	// EdgeIpcReportEventUpdater holds the string denoting the ipc_report_event_updater edge name in mutations.
 	EdgeIpcReportEventUpdater = "ipc_report_event_updater"
+	// EdgeVideoCreator holds the string denoting the video_creator edge name in mutations.
+	EdgeVideoCreator = "video_creator"
+	// EdgeVideoUpdater holds the string denoting the video_updater edge name in mutations.
+	EdgeVideoUpdater = "video_updater"
 	// Table holds the table name of the admin in the database.
 	Table = "admins"
 	// CreatorTable is the table that holds the creator relation/edge.
@@ -221,6 +225,20 @@ const (
 	IpcReportEventUpdaterInverseTable = "ipc_report_events"
 	// IpcReportEventUpdaterColumn is the table column denoting the ipc_report_event_updater relation/edge.
 	IpcReportEventUpdaterColumn = "updated_by"
+	// VideoCreatorTable is the table that holds the video_creator relation/edge.
+	VideoCreatorTable = "videos"
+	// VideoCreatorInverseTable is the table name for the Video entity.
+	// It exists in this package in order to avoid circular dependency with the "video" package.
+	VideoCreatorInverseTable = "videos"
+	// VideoCreatorColumn is the table column denoting the video_creator relation/edge.
+	VideoCreatorColumn = "created_by"
+	// VideoUpdaterTable is the table that holds the video_updater relation/edge.
+	VideoUpdaterTable = "videos"
+	// VideoUpdaterInverseTable is the table name for the Video entity.
+	// It exists in this package in order to avoid circular dependency with the "video" package.
+	VideoUpdaterInverseTable = "videos"
+	// VideoUpdaterColumn is the table column denoting the video_updater relation/edge.
+	VideoUpdaterColumn = "updated_by"
 )
 
 // Columns holds all SQL columns for admin fields.
@@ -634,6 +652,34 @@ func ByIpcReportEventUpdater(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOp
 		sqlgraph.OrderByNeighborTerms(s, newIpcReportEventUpdaterStep(), append([]sql.OrderTerm{term}, terms...)...)
 	}
 }
+
+// ByVideoCreatorCount orders the results by video_creator count.
+func ByVideoCreatorCount(opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborsCount(s, newVideoCreatorStep(), opts...)
+	}
+}
+
+// ByVideoCreator orders the results by video_creator terms.
+func ByVideoCreator(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newVideoCreatorStep(), append([]sql.OrderTerm{term}, terms...)...)
+	}
+}
+
+// ByVideoUpdaterCount orders the results by video_updater count.
+func ByVideoUpdaterCount(opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborsCount(s, newVideoUpdaterStep(), opts...)
+	}
+}
+
+// ByVideoUpdater orders the results by video_updater terms.
+func ByVideoUpdater(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newVideoUpdaterStep(), append([]sql.OrderTerm{term}, terms...)...)
+	}
+}
 func newCreatorStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
@@ -786,5 +832,19 @@ func newIpcReportEventUpdaterStep() *sqlgraph.Step {
 		sqlgraph.From(Table, FieldID),
 		sqlgraph.To(IpcReportEventUpdaterInverseTable, FieldID),
 		sqlgraph.Edge(sqlgraph.O2M, false, IpcReportEventUpdaterTable, IpcReportEventUpdaterColumn),
+	)
+}
+func newVideoCreatorStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(VideoCreatorInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.O2M, false, VideoCreatorTable, VideoCreatorColumn),
+	)
+}
+func newVideoUpdaterStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(VideoUpdaterInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.O2M, false, VideoUpdaterTable, VideoUpdaterColumn),
 	)
 }

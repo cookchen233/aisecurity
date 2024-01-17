@@ -5,6 +5,7 @@ package dao
 import (
 	"aisecurity/ent/dao/admin"
 	"aisecurity/ent/dao/ipcreportevent"
+	"aisecurity/ent/dao/video"
 	"aisecurity/enums"
 	"aisecurity/structs/types"
 	"encoding/json"
@@ -31,6 +32,10 @@ type IPCReportEvent struct {
 	UpdatedBy int `json:"updated_by"`
 	// 最后更新时间
 	UpdatedAt time.Time `json:"updated_at"`
+	// 设备品牌
+	DeviceBrand enums.IPCReportEventDeviceBrand `json:"device_brand" validate:"required"`
+	// 设备型号
+	DeviceModel enums.IPCReportEventDeviceModel `json:"device_model" validate:"required"`
 	// 设备ID
 	DeviceID string `json:"device_id" validate:"required"`
 	// 事件ID
@@ -42,11 +47,11 @@ type IPCReportEvent struct {
 	// 事件状态
 	EventStatus enums.IPCReportEventStatus `json:"event_status" validate:"required"`
 	// 图片
-	Images []types.UploadedImage `json:"images" validate:"required"`
+	Images []*types.UploadedImage `json:"images" validate:"required"`
 	// 标记的图片
-	LabeledImages []types.UploadedImage `json:"labeled_images" validate:"required"`
-	// 视频
-	Videos []types.UploadedVideo `json:"videos" validate:"required"`
+	LabeledImages []*types.UploadedImage `json:"labeled_images" validate:"required"`
+	// 视频ID
+	VideoID int `json:"video_id"`
 	// 描述
 	Description string `json:"description"`
 	// 设备商原始上报数据
@@ -63,9 +68,11 @@ type IPCReportEventEdges struct {
 	Creator *Admin `json:"creator,omitempty"`
 	// Updater holds the value of the updater edge.
 	Updater *Admin `json:"updater,omitempty"`
+	// Video holds the value of the video edge.
+	Video *Video `json:"video,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
-	loadedTypes [2]bool
+	loadedTypes [3]bool
 }
 
 // CreatorOrErr returns the Creator value or an error if the edge
@@ -94,14 +101,27 @@ func (e IPCReportEventEdges) UpdaterOrErr() (*Admin, error) {
 	return nil, &NotLoadedError{edge: "updater"}
 }
 
+// VideoOrErr returns the Video value or an error if the edge
+// was not loaded in eager-loading, or loaded but was not found.
+func (e IPCReportEventEdges) VideoOrErr() (*Video, error) {
+	if e.loadedTypes[2] {
+		if e.Video == nil {
+			// Edge was loaded but was not found.
+			return nil, &NotFoundError{label: video.Label}
+		}
+		return e.Video, nil
+	}
+	return nil, &NotLoadedError{edge: "video"}
+}
+
 // scanValues returns the types for scanning values from sql.Rows.
 func (*IPCReportEvent) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
 	for i := range columns {
 		switch columns[i] {
-		case ipcreportevent.FieldImages, ipcreportevent.FieldLabeledImages, ipcreportevent.FieldVideos:
+		case ipcreportevent.FieldImages, ipcreportevent.FieldLabeledImages:
 			values[i] = new([]byte)
-		case ipcreportevent.FieldID, ipcreportevent.FieldCreatedBy, ipcreportevent.FieldUpdatedBy, ipcreportevent.FieldEventType, ipcreportevent.FieldEventStatus:
+		case ipcreportevent.FieldID, ipcreportevent.FieldCreatedBy, ipcreportevent.FieldUpdatedBy, ipcreportevent.FieldDeviceBrand, ipcreportevent.FieldDeviceModel, ipcreportevent.FieldEventType, ipcreportevent.FieldEventStatus, ipcreportevent.FieldVideoID:
 			values[i] = new(sql.NullInt64)
 		case ipcreportevent.FieldDeviceID, ipcreportevent.FieldEventID, ipcreportevent.FieldDescription, ipcreportevent.FieldRawData:
 			values[i] = new(sql.NullString)
@@ -159,6 +179,18 @@ func (ire *IPCReportEvent) assignValues(columns []string, values []any) error {
 			} else if value.Valid {
 				ire.UpdatedAt = value.Time
 			}
+		case ipcreportevent.FieldDeviceBrand:
+			if value, ok := values[i].(*sql.NullInt64); !ok {
+				return fmt.Errorf("unexpected type %T for field device_brand", values[i])
+			} else if value.Valid {
+				ire.DeviceBrand = enums.IPCReportEventDeviceBrand(value.Int64)
+			}
+		case ipcreportevent.FieldDeviceModel:
+			if value, ok := values[i].(*sql.NullInt64); !ok {
+				return fmt.Errorf("unexpected type %T for field device_model", values[i])
+			} else if value.Valid {
+				ire.DeviceModel = enums.IPCReportEventDeviceModel(value.Int64)
+			}
 		case ipcreportevent.FieldDeviceID:
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field device_id", values[i])
@@ -205,13 +237,11 @@ func (ire *IPCReportEvent) assignValues(columns []string, values []any) error {
 					return fmt.Errorf("unmarshal field labeled_images: %w", err)
 				}
 			}
-		case ipcreportevent.FieldVideos:
-			if value, ok := values[i].(*[]byte); !ok {
-				return fmt.Errorf("unexpected type %T for field videos", values[i])
-			} else if value != nil && len(*value) > 0 {
-				if err := json.Unmarshal(*value, &ire.Videos); err != nil {
-					return fmt.Errorf("unmarshal field videos: %w", err)
-				}
+		case ipcreportevent.FieldVideoID:
+			if value, ok := values[i].(*sql.NullInt64); !ok {
+				return fmt.Errorf("unexpected type %T for field video_id", values[i])
+			} else if value.Valid {
+				ire.VideoID = int(value.Int64)
 			}
 		case ipcreportevent.FieldDescription:
 			if value, ok := values[i].(*sql.NullString); !ok {
@@ -246,6 +276,11 @@ func (ire *IPCReportEvent) QueryCreator() *AdminQuery {
 // QueryUpdater queries the "updater" edge of the IPCReportEvent entity.
 func (ire *IPCReportEvent) QueryUpdater() *AdminQuery {
 	return NewIPCReportEventClient(ire.config).QueryUpdater(ire)
+}
+
+// QueryVideo queries the "video" edge of the IPCReportEvent entity.
+func (ire *IPCReportEvent) QueryVideo() *VideoQuery {
+	return NewIPCReportEventClient(ire.config).QueryVideo(ire)
 }
 
 // Update returns a builder for updating this IPCReportEvent.
@@ -288,6 +323,12 @@ func (ire *IPCReportEvent) String() string {
 	builder.WriteString("updated_at=")
 	builder.WriteString(ire.UpdatedAt.Format(time.ANSIC))
 	builder.WriteString(", ")
+	builder.WriteString("device_brand=")
+	builder.WriteString(fmt.Sprintf("%v", ire.DeviceBrand))
+	builder.WriteString(", ")
+	builder.WriteString("device_model=")
+	builder.WriteString(fmt.Sprintf("%v", ire.DeviceModel))
+	builder.WriteString(", ")
 	builder.WriteString("device_id=")
 	builder.WriteString(ire.DeviceID)
 	builder.WriteString(", ")
@@ -309,8 +350,8 @@ func (ire *IPCReportEvent) String() string {
 	builder.WriteString("labeled_images=")
 	builder.WriteString(fmt.Sprintf("%v", ire.LabeledImages))
 	builder.WriteString(", ")
-	builder.WriteString("videos=")
-	builder.WriteString(fmt.Sprintf("%v", ire.Videos))
+	builder.WriteString("video_id=")
+	builder.WriteString(fmt.Sprintf("%v", ire.VideoID))
 	builder.WriteString(", ")
 	builder.WriteString("description=")
 	builder.WriteString(ire.Description)

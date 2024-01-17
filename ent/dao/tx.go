@@ -32,6 +32,8 @@ type Tx struct {
 	RiskCategory *RiskCategoryClient
 	// RiskLocation is the client for interacting with the RiskLocation builders.
 	RiskLocation *RiskLocationClient
+	// Video is the client for interacting with the Video builders.
+	Video *VideoClient
 
 	// lazily loaded.
 	client     *Client
@@ -172,6 +174,7 @@ func (tx *Tx) init() {
 	tx.Risk = NewRiskClient(tx.config)
 	tx.RiskCategory = NewRiskCategoryClient(tx.config)
 	tx.RiskLocation = NewRiskLocationClient(tx.config)
+	tx.Video = NewVideoClient(tx.config)
 }
 
 // txDriver wraps the given dialect.Tx with a nop dialect.Driver implementation.

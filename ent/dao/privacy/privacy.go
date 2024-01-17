@@ -326,6 +326,30 @@ func (f RiskLocationMutationRuleFunc) EvalMutation(ctx context.Context, m dao.Mu
 	return Denyf("dao/privacy: unexpected mutation type %T, expect *dao.RiskLocationMutation", m)
 }
 
+// The VideoQueryRuleFunc type is an adapter to allow the use of ordinary
+// functions as a query rule.
+type VideoQueryRuleFunc func(context.Context, *dao.VideoQuery) error
+
+// EvalQuery return f(ctx, q).
+func (f VideoQueryRuleFunc) EvalQuery(ctx context.Context, q dao.Query) error {
+	if q, ok := q.(*dao.VideoQuery); ok {
+		return f(ctx, q)
+	}
+	return Denyf("dao/privacy: unexpected query type %T, expect *dao.VideoQuery", q)
+}
+
+// The VideoMutationRuleFunc type is an adapter to allow the use of ordinary
+// functions as a mutation rule.
+type VideoMutationRuleFunc func(context.Context, *dao.VideoMutation) error
+
+// EvalMutation calls f(ctx, m).
+func (f VideoMutationRuleFunc) EvalMutation(ctx context.Context, m dao.Mutation) error {
+	if m, ok := m.(*dao.VideoMutation); ok {
+		return f(ctx, m)
+	}
+	return Denyf("dao/privacy: unexpected mutation type %T, expect *dao.VideoMutation", m)
+}
+
 type (
 	// Filter is the interface that wraps the Where function
 	// for filtering nodes in queries and mutations.
@@ -379,6 +403,8 @@ func queryFilter(q dao.Query) (Filter, error) {
 		return q.Filter(), nil
 	case *dao.RiskLocationQuery:
 		return q.Filter(), nil
+	case *dao.VideoQuery:
+		return q.Filter(), nil
 	default:
 		return nil, Denyf("dao/privacy: unexpected query type %T for query filter", q)
 	}
@@ -403,6 +429,8 @@ func mutationFilter(m dao.Mutation) (Filter, error) {
 	case *dao.RiskCategoryMutation:
 		return m.Filter(), nil
 	case *dao.RiskLocationMutation:
+		return m.Filter(), nil
+	case *dao.VideoMutation:
 		return m.Filter(), nil
 	default:
 		return nil, Denyf("dao/privacy: unexpected mutation type %T for mutation filter", m)

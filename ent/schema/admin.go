@@ -63,5 +63,8 @@ func (Admin) Edges() []ent.Edge {
 
 		edge.To("ipc_report_event_creator", IPCReportEvent.Type),
 		edge.To("ipc_report_event_updater", IPCReportEvent.Type),
+
+		edge.To("video_creator", Video.Type),
+		edge.To("video_updater", Video.Type),
 	}
 }

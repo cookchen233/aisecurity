@@ -20,6 +20,7 @@ import (
 	"aisecurity/ent/dao/risk"
 	"aisecurity/ent/dao/riskcategory"
 	"aisecurity/ent/dao/risklocation"
+	"aisecurity/ent/dao/video"
 
 	"entgo.io/ent"
 	"entgo.io/ent/dialect"
@@ -52,6 +53,8 @@ type Client struct {
 	RiskCategory *RiskCategoryClient
 	// RiskLocation is the client for interacting with the RiskLocation builders.
 	RiskLocation *RiskLocationClient
+	// Video is the client for interacting with the Video builders.
+	Video *VideoClient
 }
 
 // NewClient creates a new client configured with the given options.
@@ -72,6 +75,7 @@ func (c *Client) init() {
 	c.Risk = NewRiskClient(c.config)
 	c.RiskCategory = NewRiskCategoryClient(c.config)
 	c.RiskLocation = NewRiskLocationClient(c.config)
+	c.Video = NewVideoClient(c.config)
 }
 
 type (
@@ -173,6 +177,7 @@ func (c *Client) Tx(ctx context.Context) (*Tx, error) {
 		Risk:           NewRiskClient(cfg),
 		RiskCategory:   NewRiskCategoryClient(cfg),
 		RiskLocation:   NewRiskLocationClient(cfg),
+		Video:          NewVideoClient(cfg),
 	}, nil
 }
 
@@ -201,6 +206,7 @@ func (c *Client) BeginTx(ctx context.Context, opts *sql.TxOptions) (*Tx, error) 
 		Risk:           NewRiskClient(cfg),
 		RiskCategory:   NewRiskCategoryClient(cfg),
 		RiskLocation:   NewRiskLocationClient(cfg),
+		Video:          NewVideoClient(cfg),
 	}, nil
 }
 
@@ -231,7 +237,7 @@ func (c *Client) Close() error {
 func (c *Client) Use(hooks ...Hook) {
 	for _, n := range []interface{ Use(...Hook) }{
 		c.Admin, c.AdminRole, c.Department, c.Employee, c.IPCReportEvent, c.Occupation,
-		c.Risk, c.RiskCategory, c.RiskLocation,
+		c.Risk, c.RiskCategory, c.RiskLocation, c.Video,
 	} {
 		n.Use(hooks...)
 	}
@@ -242,7 +248,7 @@ func (c *Client) Use(hooks ...Hook) {
 func (c *Client) Intercept(interceptors ...Interceptor) {
 	for _, n := range []interface{ Intercept(...Interceptor) }{
 		c.Admin, c.AdminRole, c.Department, c.Employee, c.IPCReportEvent, c.Occupation,
-		c.Risk, c.RiskCategory, c.RiskLocation,
+		c.Risk, c.RiskCategory, c.RiskLocation, c.Video,
 	} {
 		n.Intercept(interceptors...)
 	}
@@ -269,6 +275,8 @@ func (c *Client) Mutate(ctx context.Context, m Mutation) (Value, error) {
 		return c.RiskCategory.mutate(ctx, m)
 	case *RiskLocationMutation:
 		return c.RiskLocation.mutate(ctx, m)
+	case *VideoMutation:
+		return c.Video.mutate(ctx, m)
 	default:
 		return nil, fmt.Errorf("dao: unknown mutation type %T", m)
 	}
@@ -727,6 +735,38 @@ func (c *AdminClient) QueryIpcReportEventUpdater(a *Admin) *IPCReportEventQuery 
 			sqlgraph.From(admin.Table, admin.FieldID, id),
 			sqlgraph.To(ipcreportevent.Table, ipcreportevent.FieldID),
 			sqlgraph.Edge(sqlgraph.O2M, false, admin.IpcReportEventUpdaterTable, admin.IpcReportEventUpdaterColumn),
+		)
+		fromV = sqlgraph.Neighbors(a.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryVideoCreator queries the video_creator edge of a Admin.
+func (c *AdminClient) QueryVideoCreator(a *Admin) *VideoQuery {
+	query := (&VideoClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := a.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(admin.Table, admin.FieldID, id),
+			sqlgraph.To(video.Table, video.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, admin.VideoCreatorTable, admin.VideoCreatorColumn),
+		)
+		fromV = sqlgraph.Neighbors(a.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryVideoUpdater queries the video_updater edge of a Admin.
+func (c *AdminClient) QueryVideoUpdater(a *Admin) *VideoQuery {
+	query := (&VideoClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := a.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(admin.Table, admin.FieldID, id),
+			sqlgraph.To(video.Table, video.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, admin.VideoUpdaterTable, admin.VideoUpdaterColumn),
 		)
 		fromV = sqlgraph.Neighbors(a.driver.Dialect(), step)
 		return fromV, nil
@@ -1541,6 +1581,22 @@ func (c *IPCReportEventClient) QueryUpdater(ire *IPCReportEvent) *AdminQuery {
 	return query
 }
 
+// QueryVideo queries the video edge of a IPCReportEvent.
+func (c *IPCReportEventClient) QueryVideo(ire *IPCReportEvent) *VideoQuery {
+	query := (&VideoClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := ire.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(ipcreportevent.Table, ipcreportevent.FieldID, id),
+			sqlgraph.To(video.Table, video.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, ipcreportevent.VideoTable, ipcreportevent.VideoColumn),
+		)
+		fromV = sqlgraph.Neighbors(ire.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
 // Hooks returns the client hooks.
 func (c *IPCReportEventClient) Hooks() []Hook {
 	hooks := c.hooks.IPCReportEvent
@@ -2343,15 +2399,197 @@ func (c *RiskLocationClient) mutate(ctx context.Context, m *RiskLocationMutation
 	}
 }
 
+// VideoClient is a client for the Video schema.
+type VideoClient struct {
+	config
+}
+
+// NewVideoClient returns a client for the Video from the given config.
+func NewVideoClient(c config) *VideoClient {
+	return &VideoClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `video.Hooks(f(g(h())))`.
+func (c *VideoClient) Use(hooks ...Hook) {
+	c.hooks.Video = append(c.hooks.Video, hooks...)
+}
+
+// Intercept adds a list of query interceptors to the interceptors stack.
+// A call to `Intercept(f, g, h)` equals to `video.Intercept(f(g(h())))`.
+func (c *VideoClient) Intercept(interceptors ...Interceptor) {
+	c.inters.Video = append(c.inters.Video, interceptors...)
+}
+
+// Create returns a builder for creating a Video entity.
+func (c *VideoClient) Create() *VideoCreate {
+	mutation := newVideoMutation(c.config, OpCreate)
+	return &VideoCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of Video entities.
+func (c *VideoClient) CreateBulk(builders ...*VideoCreate) *VideoCreateBulk {
+	return &VideoCreateBulk{config: c.config, builders: builders}
+}
+
+// MapCreateBulk creates a bulk creation builder from the given slice. For each item in the slice, the function creates
+// a builder and applies setFunc on it.
+func (c *VideoClient) MapCreateBulk(slice any, setFunc func(*VideoCreate, int)) *VideoCreateBulk {
+	rv := reflect.ValueOf(slice)
+	if rv.Kind() != reflect.Slice {
+		return &VideoCreateBulk{err: fmt.Errorf("calling to VideoClient.MapCreateBulk with wrong type %T, need slice", slice)}
+	}
+	builders := make([]*VideoCreate, rv.Len())
+	for i := 0; i < rv.Len(); i++ {
+		builders[i] = c.Create()
+		setFunc(builders[i], i)
+	}
+	return &VideoCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for Video.
+func (c *VideoClient) Update() *VideoUpdate {
+	mutation := newVideoMutation(c.config, OpUpdate)
+	return &VideoUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *VideoClient) UpdateOne(v *Video) *VideoUpdateOne {
+	mutation := newVideoMutation(c.config, OpUpdateOne, withVideo(v))
+	return &VideoUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *VideoClient) UpdateOneID(id int) *VideoUpdateOne {
+	mutation := newVideoMutation(c.config, OpUpdateOne, withVideoID(id))
+	return &VideoUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for Video.
+func (c *VideoClient) Delete() *VideoDelete {
+	mutation := newVideoMutation(c.config, OpDelete)
+	return &VideoDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a builder for deleting the given entity.
+func (c *VideoClient) DeleteOne(v *Video) *VideoDeleteOne {
+	return c.DeleteOneID(v.ID)
+}
+
+// DeleteOneID returns a builder for deleting the given entity by its id.
+func (c *VideoClient) DeleteOneID(id int) *VideoDeleteOne {
+	builder := c.Delete().Where(video.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &VideoDeleteOne{builder}
+}
+
+// Query returns a query builder for Video.
+func (c *VideoClient) Query() *VideoQuery {
+	return &VideoQuery{
+		config: c.config,
+		ctx:    &QueryContext{Type: TypeVideo},
+		inters: c.Interceptors(),
+	}
+}
+
+// Get returns a Video entity by its id.
+func (c *VideoClient) Get(ctx context.Context, id int) (*Video, error) {
+	return c.Query().Where(video.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *VideoClient) GetX(ctx context.Context, id int) *Video {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// QueryCreator queries the creator edge of a Video.
+func (c *VideoClient) QueryCreator(v *Video) *AdminQuery {
+	query := (&AdminClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := v.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(video.Table, video.FieldID, id),
+			sqlgraph.To(admin.Table, admin.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, video.CreatorTable, video.CreatorColumn),
+		)
+		fromV = sqlgraph.Neighbors(v.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryUpdater queries the updater edge of a Video.
+func (c *VideoClient) QueryUpdater(v *Video) *AdminQuery {
+	query := (&AdminClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := v.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(video.Table, video.FieldID, id),
+			sqlgraph.To(admin.Table, admin.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, video.UpdaterTable, video.UpdaterColumn),
+		)
+		fromV = sqlgraph.Neighbors(v.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryIpcReportEventVideo queries the ipc_report_event_video edge of a Video.
+func (c *VideoClient) QueryIpcReportEventVideo(v *Video) *IPCReportEventQuery {
+	query := (&IPCReportEventClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := v.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(video.Table, video.FieldID, id),
+			sqlgraph.To(ipcreportevent.Table, ipcreportevent.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, video.IpcReportEventVideoTable, video.IpcReportEventVideoColumn),
+		)
+		fromV = sqlgraph.Neighbors(v.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// Hooks returns the client hooks.
+func (c *VideoClient) Hooks() []Hook {
+	hooks := c.hooks.Video
+	return append(hooks[:len(hooks):len(hooks)], video.Hooks[:]...)
+}
+
+// Interceptors returns the client interceptors.
+func (c *VideoClient) Interceptors() []Interceptor {
+	return c.inters.Video
+}
+
+func (c *VideoClient) mutate(ctx context.Context, m *VideoMutation) (Value, error) {
+	switch m.Op() {
+	case OpCreate:
+		return (&VideoCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdate:
+		return (&VideoUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdateOne:
+		return (&VideoUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpDelete, OpDeleteOne:
+		return (&VideoDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+	default:
+		return nil, fmt.Errorf("dao: unknown Video mutation op: %q", m.Op())
+	}
+}
+
 // hooks and interceptors per client, for fast access.
 type (
 	hooks struct {
 		Admin, AdminRole, Department, Employee, IPCReportEvent, Occupation, Risk,
-		RiskCategory, RiskLocation []ent.Hook
+		RiskCategory, RiskLocation, Video []ent.Hook
 	}
 	inters struct {
 		Admin, AdminRole, Department, Employee, IPCReportEvent, Occupation, Risk,
-		RiskCategory, RiskLocation []ent.Interceptor
+		RiskCategory, RiskLocation, Video []ent.Interceptor
 	}
 )
 

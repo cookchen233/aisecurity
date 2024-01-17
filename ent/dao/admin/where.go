@@ -1116,6 +1116,52 @@ func HasIpcReportEventUpdaterWith(preds ...predicate.IPCReportEvent) predicate.A
 	})
 }
 
+// HasVideoCreator applies the HasEdge predicate on the "video_creator" edge.
+func HasVideoCreator() predicate.Admin {
+	return predicate.Admin(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, VideoCreatorTable, VideoCreatorColumn),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasVideoCreatorWith applies the HasEdge predicate on the "video_creator" edge with a given conditions (other predicates).
+func HasVideoCreatorWith(preds ...predicate.Video) predicate.Admin {
+	return predicate.Admin(func(s *sql.Selector) {
+		step := newVideoCreatorStep()
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
+}
+
+// HasVideoUpdater applies the HasEdge predicate on the "video_updater" edge.
+func HasVideoUpdater() predicate.Admin {
+	return predicate.Admin(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, VideoUpdaterTable, VideoUpdaterColumn),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasVideoUpdaterWith applies the HasEdge predicate on the "video_updater" edge with a given conditions (other predicates).
+func HasVideoUpdaterWith(preds ...predicate.Video) predicate.Admin {
+	return predicate.Admin(func(s *sql.Selector) {
+		step := newVideoUpdaterStep()
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
+}
+
 // And groups predicates with the AND operator between them.
 func And(predicates ...predicate.Admin) predicate.Admin {
 	return predicate.Admin(sql.AndPredicates(predicates...))

@@ -89,9 +89,13 @@ type AdminEdges struct {
 	IpcReportEventCreator []*IPCReportEvent `json:"ipc_report_event_creator,omitempty"`
 	// IpcReportEventUpdater holds the value of the ipc_report_event_updater edge.
 	IpcReportEventUpdater []*IPCReportEvent `json:"ipc_report_event_updater,omitempty"`
+	// VideoCreator holds the value of the video_creator edge.
+	VideoCreator []*Video `json:"video_creator,omitempty"`
+	// VideoUpdater holds the value of the video_updater edge.
+	VideoUpdater []*Video `json:"video_updater,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
-	loadedTypes [22]bool
+	loadedTypes [24]bool
 }
 
 // CreatorOrErr returns the Creator value or an error if the edge
@@ -298,6 +302,24 @@ func (e AdminEdges) IpcReportEventUpdaterOrErr() ([]*IPCReportEvent, error) {
 		return e.IpcReportEventUpdater, nil
 	}
 	return nil, &NotLoadedError{edge: "ipc_report_event_updater"}
+}
+
+// VideoCreatorOrErr returns the VideoCreator value or an error if the edge
+// was not loaded in eager-loading.
+func (e AdminEdges) VideoCreatorOrErr() ([]*Video, error) {
+	if e.loadedTypes[22] {
+		return e.VideoCreator, nil
+	}
+	return nil, &NotLoadedError{edge: "video_creator"}
+}
+
+// VideoUpdaterOrErr returns the VideoUpdater value or an error if the edge
+// was not loaded in eager-loading.
+func (e AdminEdges) VideoUpdaterOrErr() ([]*Video, error) {
+	if e.loadedTypes[23] {
+		return e.VideoUpdater, nil
+	}
+	return nil, &NotLoadedError{edge: "video_updater"}
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
@@ -514,6 +536,16 @@ func (a *Admin) QueryIpcReportEventCreator() *IPCReportEventQuery {
 // QueryIpcReportEventUpdater queries the "ipc_report_event_updater" edge of the Admin entity.
 func (a *Admin) QueryIpcReportEventUpdater() *IPCReportEventQuery {
 	return NewAdminClient(a.config).QueryIpcReportEventUpdater(a)
+}
+
+// QueryVideoCreator queries the "video_creator" edge of the Admin entity.
+func (a *Admin) QueryVideoCreator() *VideoQuery {
+	return NewAdminClient(a.config).QueryVideoCreator(a)
+}
+
+// QueryVideoUpdater queries the "video_updater" edge of the Admin entity.
+func (a *Admin) QueryVideoUpdater() *VideoQuery {
+	return NewAdminClient(a.config).QueryVideoUpdater(a)
 }
 
 // Update returns a builder for updating this Admin.

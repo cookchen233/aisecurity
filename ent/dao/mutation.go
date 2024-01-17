@@ -13,6 +13,7 @@ import (
 	"aisecurity/ent/dao/risk"
 	"aisecurity/ent/dao/riskcategory"
 	"aisecurity/ent/dao/risklocation"
+	"aisecurity/ent/dao/video"
 	"aisecurity/enums"
 	"aisecurity/properties/maintain_status"
 	"aisecurity/structs/types"
@@ -44,6 +45,7 @@ const (
 	TypeRisk           = "Risk"
 	TypeRiskCategory   = "RiskCategory"
 	TypeRiskLocation   = "RiskLocation"
+	TypeVideo          = "Video"
 )
 
 // AdminMutation represents an operation that mutates the Admin nodes in the graph.
@@ -125,6 +127,12 @@ type AdminMutation struct {
 	ipc_report_event_updater        map[int]struct{}
 	removedipc_report_event_updater map[int]struct{}
 	clearedipc_report_event_updater bool
+	video_creator                   map[int]struct{}
+	removedvideo_creator            map[int]struct{}
+	clearedvideo_creator            bool
+	video_updater                   map[int]struct{}
+	removedvideo_updater            map[int]struct{}
+	clearedvideo_updater            bool
 	done                            bool
 	oldValue                        func(context.Context) (*Admin, error)
 	predicates                      []predicate.Admin
@@ -1774,6 +1782,114 @@ func (m *AdminMutation) ResetIpcReportEventUpdater() {
 	m.removedipc_report_event_updater = nil
 }
 
+// AddVideoCreatorIDs adds the "video_creator" edge to the Video entity by ids.
+func (m *AdminMutation) AddVideoCreatorIDs(ids ...int) {
+	if m.video_creator == nil {
+		m.video_creator = make(map[int]struct{})
+	}
+	for i := range ids {
+		m.video_creator[ids[i]] = struct{}{}
+	}
+}
+
+// ClearVideoCreator clears the "video_creator" edge to the Video entity.
+func (m *AdminMutation) ClearVideoCreator() {
+	m.clearedvideo_creator = true
+}
+
+// VideoCreatorCleared reports if the "video_creator" edge to the Video entity was cleared.
+func (m *AdminMutation) VideoCreatorCleared() bool {
+	return m.clearedvideo_creator
+}
+
+// RemoveVideoCreatorIDs removes the "video_creator" edge to the Video entity by IDs.
+func (m *AdminMutation) RemoveVideoCreatorIDs(ids ...int) {
+	if m.removedvideo_creator == nil {
+		m.removedvideo_creator = make(map[int]struct{})
+	}
+	for i := range ids {
+		delete(m.video_creator, ids[i])
+		m.removedvideo_creator[ids[i]] = struct{}{}
+	}
+}
+
+// RemovedVideoCreator returns the removed IDs of the "video_creator" edge to the Video entity.
+func (m *AdminMutation) RemovedVideoCreatorIDs() (ids []int) {
+	for id := range m.removedvideo_creator {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// VideoCreatorIDs returns the "video_creator" edge IDs in the mutation.
+func (m *AdminMutation) VideoCreatorIDs() (ids []int) {
+	for id := range m.video_creator {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// ResetVideoCreator resets all changes to the "video_creator" edge.
+func (m *AdminMutation) ResetVideoCreator() {
+	m.video_creator = nil
+	m.clearedvideo_creator = false
+	m.removedvideo_creator = nil
+}
+
+// AddVideoUpdaterIDs adds the "video_updater" edge to the Video entity by ids.
+func (m *AdminMutation) AddVideoUpdaterIDs(ids ...int) {
+	if m.video_updater == nil {
+		m.video_updater = make(map[int]struct{})
+	}
+	for i := range ids {
+		m.video_updater[ids[i]] = struct{}{}
+	}
+}
+
+// ClearVideoUpdater clears the "video_updater" edge to the Video entity.
+func (m *AdminMutation) ClearVideoUpdater() {
+	m.clearedvideo_updater = true
+}
+
+// VideoUpdaterCleared reports if the "video_updater" edge to the Video entity was cleared.
+func (m *AdminMutation) VideoUpdaterCleared() bool {
+	return m.clearedvideo_updater
+}
+
+// RemoveVideoUpdaterIDs removes the "video_updater" edge to the Video entity by IDs.
+func (m *AdminMutation) RemoveVideoUpdaterIDs(ids ...int) {
+	if m.removedvideo_updater == nil {
+		m.removedvideo_updater = make(map[int]struct{})
+	}
+	for i := range ids {
+		delete(m.video_updater, ids[i])
+		m.removedvideo_updater[ids[i]] = struct{}{}
+	}
+}
+
+// RemovedVideoUpdater returns the removed IDs of the "video_updater" edge to the Video entity.
+func (m *AdminMutation) RemovedVideoUpdaterIDs() (ids []int) {
+	for id := range m.removedvideo_updater {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// VideoUpdaterIDs returns the "video_updater" edge IDs in the mutation.
+func (m *AdminMutation) VideoUpdaterIDs() (ids []int) {
+	for id := range m.video_updater {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// ResetVideoUpdater resets all changes to the "video_updater" edge.
+func (m *AdminMutation) ResetVideoUpdater() {
+	m.video_updater = nil
+	m.clearedvideo_updater = false
+	m.removedvideo_updater = nil
+}
+
 // Where appends a list predicates to the AdminMutation builder.
 func (m *AdminMutation) Where(ps ...predicate.Admin) {
 	m.predicates = append(m.predicates, ps...)
@@ -2078,7 +2194,7 @@ func (m *AdminMutation) ResetField(name string) error {
 
 // AddedEdges returns all edge names that were set/added in this mutation.
 func (m *AdminMutation) AddedEdges() []string {
-	edges := make([]string, 0, 22)
+	edges := make([]string, 0, 24)
 	if m.creator != nil {
 		edges = append(edges, admin.EdgeCreator)
 	}
@@ -2144,6 +2260,12 @@ func (m *AdminMutation) AddedEdges() []string {
 	}
 	if m.ipc_report_event_updater != nil {
 		edges = append(edges, admin.EdgeIpcReportEventUpdater)
+	}
+	if m.video_creator != nil {
+		edges = append(edges, admin.EdgeVideoCreator)
+	}
+	if m.video_updater != nil {
+		edges = append(edges, admin.EdgeVideoUpdater)
 	}
 	return edges
 }
@@ -2280,13 +2402,25 @@ func (m *AdminMutation) AddedIDs(name string) []ent.Value {
 			ids = append(ids, id)
 		}
 		return ids
+	case admin.EdgeVideoCreator:
+		ids := make([]ent.Value, 0, len(m.video_creator))
+		for id := range m.video_creator {
+			ids = append(ids, id)
+		}
+		return ids
+	case admin.EdgeVideoUpdater:
+		ids := make([]ent.Value, 0, len(m.video_updater))
+		for id := range m.video_updater {
+			ids = append(ids, id)
+		}
+		return ids
 	}
 	return nil
 }
 
 // RemovedEdges returns all edge names that were removed in this mutation.
 func (m *AdminMutation) RemovedEdges() []string {
-	edges := make([]string, 0, 22)
+	edges := make([]string, 0, 24)
 	if m.removedadmin_roles != nil {
 		edges = append(edges, admin.EdgeAdminRoles)
 	}
@@ -2346,6 +2480,12 @@ func (m *AdminMutation) RemovedEdges() []string {
 	}
 	if m.removedipc_report_event_updater != nil {
 		edges = append(edges, admin.EdgeIpcReportEventUpdater)
+	}
+	if m.removedvideo_creator != nil {
+		edges = append(edges, admin.EdgeVideoCreator)
+	}
+	if m.removedvideo_updater != nil {
+		edges = append(edges, admin.EdgeVideoUpdater)
 	}
 	return edges
 }
@@ -2474,13 +2614,25 @@ func (m *AdminMutation) RemovedIDs(name string) []ent.Value {
 			ids = append(ids, id)
 		}
 		return ids
+	case admin.EdgeVideoCreator:
+		ids := make([]ent.Value, 0, len(m.removedvideo_creator))
+		for id := range m.removedvideo_creator {
+			ids = append(ids, id)
+		}
+		return ids
+	case admin.EdgeVideoUpdater:
+		ids := make([]ent.Value, 0, len(m.removedvideo_updater))
+		for id := range m.removedvideo_updater {
+			ids = append(ids, id)
+		}
+		return ids
 	}
 	return nil
 }
 
 // ClearedEdges returns all edge names that were cleared in this mutation.
 func (m *AdminMutation) ClearedEdges() []string {
-	edges := make([]string, 0, 22)
+	edges := make([]string, 0, 24)
 	if m.clearedcreator {
 		edges = append(edges, admin.EdgeCreator)
 	}
@@ -2547,6 +2699,12 @@ func (m *AdminMutation) ClearedEdges() []string {
 	if m.clearedipc_report_event_updater {
 		edges = append(edges, admin.EdgeIpcReportEventUpdater)
 	}
+	if m.clearedvideo_creator {
+		edges = append(edges, admin.EdgeVideoCreator)
+	}
+	if m.clearedvideo_updater {
+		edges = append(edges, admin.EdgeVideoUpdater)
+	}
 	return edges
 }
 
@@ -2598,6 +2756,10 @@ func (m *AdminMutation) EdgeCleared(name string) bool {
 		return m.clearedipc_report_event_creator
 	case admin.EdgeIpcReportEventUpdater:
 		return m.clearedipc_report_event_updater
+	case admin.EdgeVideoCreator:
+		return m.clearedvideo_creator
+	case admin.EdgeVideoUpdater:
+		return m.clearedvideo_updater
 	}
 	return false
 }
@@ -2685,6 +2847,12 @@ func (m *AdminMutation) ResetEdge(name string) error {
 		return nil
 	case admin.EdgeIpcReportEventUpdater:
 		m.ResetIpcReportEventUpdater()
+		return nil
+	case admin.EdgeVideoCreator:
+		m.ResetVideoCreator()
+		return nil
+	case admin.EdgeVideoUpdater:
+		m.ResetVideoUpdater()
 		return nil
 	}
 	return fmt.Errorf("unknown Admin edge %s", name)
@@ -5747,6 +5915,10 @@ type IPCReportEventMutation struct {
 	created_at           *time.Time
 	deleted_at           *time.Time
 	updated_at           *time.Time
+	device_brand         *enums.IPCReportEventDeviceBrand
+	adddevice_brand      *enums.IPCReportEventDeviceBrand
+	device_model         *enums.IPCReportEventDeviceModel
+	adddevice_model      *enums.IPCReportEventDeviceModel
 	device_id            *string
 	event_id             *string
 	event_time           *time.Time
@@ -5754,12 +5926,10 @@ type IPCReportEventMutation struct {
 	addevent_type        *enums.IPCReportEventType
 	event_status         *enums.IPCReportEventStatus
 	addevent_status      *enums.IPCReportEventStatus
-	images               *[]types.UploadedImage
-	appendimages         []types.UploadedImage
-	labeled_images       *[]types.UploadedImage
-	appendlabeled_images []types.UploadedImage
-	videos               *[]types.UploadedVideo
-	appendvideos         []types.UploadedVideo
+	images               *[]*types.UploadedImage
+	appendimages         []*types.UploadedImage
+	labeled_images       *[]*types.UploadedImage
+	appendlabeled_images []*types.UploadedImage
 	description          *string
 	raw_data             *string
 	clearedFields        map[string]struct{}
@@ -5767,6 +5937,8 @@ type IPCReportEventMutation struct {
 	clearedcreator       bool
 	updater              *int
 	clearedupdater       bool
+	video                *int
+	clearedvideo         bool
 	done                 bool
 	oldValue             func(context.Context) (*IPCReportEvent, error)
 	predicates           []predicate.IPCReportEvent
@@ -6063,6 +6235,118 @@ func (m *IPCReportEventMutation) ResetUpdatedAt() {
 	m.updated_at = nil
 }
 
+// SetDeviceBrand sets the "device_brand" field.
+func (m *IPCReportEventMutation) SetDeviceBrand(eredb enums.IPCReportEventDeviceBrand) {
+	m.device_brand = &eredb
+	m.adddevice_brand = nil
+}
+
+// DeviceBrand returns the value of the "device_brand" field in the mutation.
+func (m *IPCReportEventMutation) DeviceBrand() (r enums.IPCReportEventDeviceBrand, exists bool) {
+	v := m.device_brand
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldDeviceBrand returns the old "device_brand" field's value of the IPCReportEvent entity.
+// If the IPCReportEvent object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *IPCReportEventMutation) OldDeviceBrand(ctx context.Context) (v enums.IPCReportEventDeviceBrand, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldDeviceBrand is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldDeviceBrand requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldDeviceBrand: %w", err)
+	}
+	return oldValue.DeviceBrand, nil
+}
+
+// AddDeviceBrand adds eredb to the "device_brand" field.
+func (m *IPCReportEventMutation) AddDeviceBrand(eredb enums.IPCReportEventDeviceBrand) {
+	if m.adddevice_brand != nil {
+		*m.adddevice_brand += eredb
+	} else {
+		m.adddevice_brand = &eredb
+	}
+}
+
+// AddedDeviceBrand returns the value that was added to the "device_brand" field in this mutation.
+func (m *IPCReportEventMutation) AddedDeviceBrand() (r enums.IPCReportEventDeviceBrand, exists bool) {
+	v := m.adddevice_brand
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ResetDeviceBrand resets all changes to the "device_brand" field.
+func (m *IPCReportEventMutation) ResetDeviceBrand() {
+	m.device_brand = nil
+	m.adddevice_brand = nil
+}
+
+// SetDeviceModel sets the "device_model" field.
+func (m *IPCReportEventMutation) SetDeviceModel(eredm enums.IPCReportEventDeviceModel) {
+	m.device_model = &eredm
+	m.adddevice_model = nil
+}
+
+// DeviceModel returns the value of the "device_model" field in the mutation.
+func (m *IPCReportEventMutation) DeviceModel() (r enums.IPCReportEventDeviceModel, exists bool) {
+	v := m.device_model
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldDeviceModel returns the old "device_model" field's value of the IPCReportEvent entity.
+// If the IPCReportEvent object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *IPCReportEventMutation) OldDeviceModel(ctx context.Context) (v enums.IPCReportEventDeviceModel, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldDeviceModel is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldDeviceModel requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldDeviceModel: %w", err)
+	}
+	return oldValue.DeviceModel, nil
+}
+
+// AddDeviceModel adds eredm to the "device_model" field.
+func (m *IPCReportEventMutation) AddDeviceModel(eredm enums.IPCReportEventDeviceModel) {
+	if m.adddevice_model != nil {
+		*m.adddevice_model += eredm
+	} else {
+		m.adddevice_model = &eredm
+	}
+}
+
+// AddedDeviceModel returns the value that was added to the "device_model" field in this mutation.
+func (m *IPCReportEventMutation) AddedDeviceModel() (r enums.IPCReportEventDeviceModel, exists bool) {
+	v := m.adddevice_model
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ResetDeviceModel resets all changes to the "device_model" field.
+func (m *IPCReportEventMutation) ResetDeviceModel() {
+	m.device_model = nil
+	m.adddevice_model = nil
+}
+
 // SetDeviceID sets the "device_id" field.
 func (m *IPCReportEventMutation) SetDeviceID(s string) {
 	m.device_id = &s
@@ -6284,13 +6568,13 @@ func (m *IPCReportEventMutation) ResetEventStatus() {
 }
 
 // SetImages sets the "images" field.
-func (m *IPCReportEventMutation) SetImages(ti []types.UploadedImage) {
+func (m *IPCReportEventMutation) SetImages(ti []*types.UploadedImage) {
 	m.images = &ti
 	m.appendimages = nil
 }
 
 // Images returns the value of the "images" field in the mutation.
-func (m *IPCReportEventMutation) Images() (r []types.UploadedImage, exists bool) {
+func (m *IPCReportEventMutation) Images() (r []*types.UploadedImage, exists bool) {
 	v := m.images
 	if v == nil {
 		return
@@ -6301,7 +6585,7 @@ func (m *IPCReportEventMutation) Images() (r []types.UploadedImage, exists bool)
 // OldImages returns the old "images" field's value of the IPCReportEvent entity.
 // If the IPCReportEvent object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *IPCReportEventMutation) OldImages(ctx context.Context) (v []types.UploadedImage, err error) {
+func (m *IPCReportEventMutation) OldImages(ctx context.Context) (v []*types.UploadedImage, err error) {
 	if !m.op.Is(OpUpdateOne) {
 		return v, errors.New("OldImages is only allowed on UpdateOne operations")
 	}
@@ -6316,12 +6600,12 @@ func (m *IPCReportEventMutation) OldImages(ctx context.Context) (v []types.Uploa
 }
 
 // AppendImages adds ti to the "images" field.
-func (m *IPCReportEventMutation) AppendImages(ti []types.UploadedImage) {
+func (m *IPCReportEventMutation) AppendImages(ti []*types.UploadedImage) {
 	m.appendimages = append(m.appendimages, ti...)
 }
 
 // AppendedImages returns the list of values that were appended to the "images" field in this mutation.
-func (m *IPCReportEventMutation) AppendedImages() ([]types.UploadedImage, bool) {
+func (m *IPCReportEventMutation) AppendedImages() ([]*types.UploadedImage, bool) {
 	if len(m.appendimages) == 0 {
 		return nil, false
 	}
@@ -6349,13 +6633,13 @@ func (m *IPCReportEventMutation) ResetImages() {
 }
 
 // SetLabeledImages sets the "labeled_images" field.
-func (m *IPCReportEventMutation) SetLabeledImages(ti []types.UploadedImage) {
+func (m *IPCReportEventMutation) SetLabeledImages(ti []*types.UploadedImage) {
 	m.labeled_images = &ti
 	m.appendlabeled_images = nil
 }
 
 // LabeledImages returns the value of the "labeled_images" field in the mutation.
-func (m *IPCReportEventMutation) LabeledImages() (r []types.UploadedImage, exists bool) {
+func (m *IPCReportEventMutation) LabeledImages() (r []*types.UploadedImage, exists bool) {
 	v := m.labeled_images
 	if v == nil {
 		return
@@ -6366,7 +6650,7 @@ func (m *IPCReportEventMutation) LabeledImages() (r []types.UploadedImage, exist
 // OldLabeledImages returns the old "labeled_images" field's value of the IPCReportEvent entity.
 // If the IPCReportEvent object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *IPCReportEventMutation) OldLabeledImages(ctx context.Context) (v []types.UploadedImage, err error) {
+func (m *IPCReportEventMutation) OldLabeledImages(ctx context.Context) (v []*types.UploadedImage, err error) {
 	if !m.op.Is(OpUpdateOne) {
 		return v, errors.New("OldLabeledImages is only allowed on UpdateOne operations")
 	}
@@ -6381,12 +6665,12 @@ func (m *IPCReportEventMutation) OldLabeledImages(ctx context.Context) (v []type
 }
 
 // AppendLabeledImages adds ti to the "labeled_images" field.
-func (m *IPCReportEventMutation) AppendLabeledImages(ti []types.UploadedImage) {
+func (m *IPCReportEventMutation) AppendLabeledImages(ti []*types.UploadedImage) {
 	m.appendlabeled_images = append(m.appendlabeled_images, ti...)
 }
 
 // AppendedLabeledImages returns the list of values that were appended to the "labeled_images" field in this mutation.
-func (m *IPCReportEventMutation) AppendedLabeledImages() ([]types.UploadedImage, bool) {
+func (m *IPCReportEventMutation) AppendedLabeledImages() ([]*types.UploadedImage, bool) {
 	if len(m.appendlabeled_images) == 0 {
 		return nil, false
 	}
@@ -6413,69 +6697,53 @@ func (m *IPCReportEventMutation) ResetLabeledImages() {
 	delete(m.clearedFields, ipcreportevent.FieldLabeledImages)
 }
 
-// SetVideos sets the "videos" field.
-func (m *IPCReportEventMutation) SetVideos(tv []types.UploadedVideo) {
-	m.videos = &tv
-	m.appendvideos = nil
+// SetVideoID sets the "video_id" field.
+func (m *IPCReportEventMutation) SetVideoID(i int) {
+	m.video = &i
 }
 
-// Videos returns the value of the "videos" field in the mutation.
-func (m *IPCReportEventMutation) Videos() (r []types.UploadedVideo, exists bool) {
-	v := m.videos
+// VideoID returns the value of the "video_id" field in the mutation.
+func (m *IPCReportEventMutation) VideoID() (r int, exists bool) {
+	v := m.video
 	if v == nil {
 		return
 	}
 	return *v, true
 }
 
-// OldVideos returns the old "videos" field's value of the IPCReportEvent entity.
+// OldVideoID returns the old "video_id" field's value of the IPCReportEvent entity.
 // If the IPCReportEvent object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *IPCReportEventMutation) OldVideos(ctx context.Context) (v []types.UploadedVideo, err error) {
+func (m *IPCReportEventMutation) OldVideoID(ctx context.Context) (v int, err error) {
 	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldVideos is only allowed on UpdateOne operations")
+		return v, errors.New("OldVideoID is only allowed on UpdateOne operations")
 	}
 	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldVideos requires an ID field in the mutation")
+		return v, errors.New("OldVideoID requires an ID field in the mutation")
 	}
 	oldValue, err := m.oldValue(ctx)
 	if err != nil {
-		return v, fmt.Errorf("querying old value for OldVideos: %w", err)
+		return v, fmt.Errorf("querying old value for OldVideoID: %w", err)
 	}
-	return oldValue.Videos, nil
+	return oldValue.VideoID, nil
 }
 
-// AppendVideos adds tv to the "videos" field.
-func (m *IPCReportEventMutation) AppendVideos(tv []types.UploadedVideo) {
-	m.appendvideos = append(m.appendvideos, tv...)
+// ClearVideoID clears the value of the "video_id" field.
+func (m *IPCReportEventMutation) ClearVideoID() {
+	m.video = nil
+	m.clearedFields[ipcreportevent.FieldVideoID] = struct{}{}
 }
 
-// AppendedVideos returns the list of values that were appended to the "videos" field in this mutation.
-func (m *IPCReportEventMutation) AppendedVideos() ([]types.UploadedVideo, bool) {
-	if len(m.appendvideos) == 0 {
-		return nil, false
-	}
-	return m.appendvideos, true
-}
-
-// ClearVideos clears the value of the "videos" field.
-func (m *IPCReportEventMutation) ClearVideos() {
-	m.videos = nil
-	m.appendvideos = nil
-	m.clearedFields[ipcreportevent.FieldVideos] = struct{}{}
-}
-
-// VideosCleared returns if the "videos" field was cleared in this mutation.
-func (m *IPCReportEventMutation) VideosCleared() bool {
-	_, ok := m.clearedFields[ipcreportevent.FieldVideos]
+// VideoIDCleared returns if the "video_id" field was cleared in this mutation.
+func (m *IPCReportEventMutation) VideoIDCleared() bool {
+	_, ok := m.clearedFields[ipcreportevent.FieldVideoID]
 	return ok
 }
 
-// ResetVideos resets all changes to the "videos" field.
-func (m *IPCReportEventMutation) ResetVideos() {
-	m.videos = nil
-	m.appendvideos = nil
-	delete(m.clearedFields, ipcreportevent.FieldVideos)
+// ResetVideoID resets all changes to the "video_id" field.
+func (m *IPCReportEventMutation) ResetVideoID() {
+	m.video = nil
+	delete(m.clearedFields, ipcreportevent.FieldVideoID)
 }
 
 // SetDescription sets the "description" field.
@@ -6656,6 +6924,33 @@ func (m *IPCReportEventMutation) ResetUpdater() {
 	m.clearedupdater = false
 }
 
+// ClearVideo clears the "video" edge to the Video entity.
+func (m *IPCReportEventMutation) ClearVideo() {
+	m.clearedvideo = true
+	m.clearedFields[ipcreportevent.FieldVideoID] = struct{}{}
+}
+
+// VideoCleared reports if the "video" edge to the Video entity was cleared.
+func (m *IPCReportEventMutation) VideoCleared() bool {
+	return m.VideoIDCleared() || m.clearedvideo
+}
+
+// VideoIDs returns the "video" edge IDs in the mutation.
+// Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
+// VideoID instead. It exists only for internal usage by the builders.
+func (m *IPCReportEventMutation) VideoIDs() (ids []int) {
+	if id := m.video; id != nil {
+		ids = append(ids, *id)
+	}
+	return
+}
+
+// ResetVideo resets all changes to the "video" edge.
+func (m *IPCReportEventMutation) ResetVideo() {
+	m.video = nil
+	m.clearedvideo = false
+}
+
 // Where appends a list predicates to the IPCReportEventMutation builder.
 func (m *IPCReportEventMutation) Where(ps ...predicate.IPCReportEvent) {
 	m.predicates = append(m.predicates, ps...)
@@ -6690,7 +6985,7 @@ func (m *IPCReportEventMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *IPCReportEventMutation) Fields() []string {
-	fields := make([]string, 0, 15)
+	fields := make([]string, 0, 17)
 	if m.created_at != nil {
 		fields = append(fields, ipcreportevent.FieldCreatedAt)
 	}
@@ -6705,6 +7000,12 @@ func (m *IPCReportEventMutation) Fields() []string {
 	}
 	if m.updated_at != nil {
 		fields = append(fields, ipcreportevent.FieldUpdatedAt)
+	}
+	if m.device_brand != nil {
+		fields = append(fields, ipcreportevent.FieldDeviceBrand)
+	}
+	if m.device_model != nil {
+		fields = append(fields, ipcreportevent.FieldDeviceModel)
 	}
 	if m.device_id != nil {
 		fields = append(fields, ipcreportevent.FieldDeviceID)
@@ -6727,8 +7028,8 @@ func (m *IPCReportEventMutation) Fields() []string {
 	if m.labeled_images != nil {
 		fields = append(fields, ipcreportevent.FieldLabeledImages)
 	}
-	if m.videos != nil {
-		fields = append(fields, ipcreportevent.FieldVideos)
+	if m.video != nil {
+		fields = append(fields, ipcreportevent.FieldVideoID)
 	}
 	if m.description != nil {
 		fields = append(fields, ipcreportevent.FieldDescription)
@@ -6754,6 +7055,10 @@ func (m *IPCReportEventMutation) Field(name string) (ent.Value, bool) {
 		return m.UpdatedBy()
 	case ipcreportevent.FieldUpdatedAt:
 		return m.UpdatedAt()
+	case ipcreportevent.FieldDeviceBrand:
+		return m.DeviceBrand()
+	case ipcreportevent.FieldDeviceModel:
+		return m.DeviceModel()
 	case ipcreportevent.FieldDeviceID:
 		return m.DeviceID()
 	case ipcreportevent.FieldEventID:
@@ -6768,8 +7073,8 @@ func (m *IPCReportEventMutation) Field(name string) (ent.Value, bool) {
 		return m.Images()
 	case ipcreportevent.FieldLabeledImages:
 		return m.LabeledImages()
-	case ipcreportevent.FieldVideos:
-		return m.Videos()
+	case ipcreportevent.FieldVideoID:
+		return m.VideoID()
 	case ipcreportevent.FieldDescription:
 		return m.Description()
 	case ipcreportevent.FieldRawData:
@@ -6793,6 +7098,10 @@ func (m *IPCReportEventMutation) OldField(ctx context.Context, name string) (ent
 		return m.OldUpdatedBy(ctx)
 	case ipcreportevent.FieldUpdatedAt:
 		return m.OldUpdatedAt(ctx)
+	case ipcreportevent.FieldDeviceBrand:
+		return m.OldDeviceBrand(ctx)
+	case ipcreportevent.FieldDeviceModel:
+		return m.OldDeviceModel(ctx)
 	case ipcreportevent.FieldDeviceID:
 		return m.OldDeviceID(ctx)
 	case ipcreportevent.FieldEventID:
@@ -6807,8 +7116,8 @@ func (m *IPCReportEventMutation) OldField(ctx context.Context, name string) (ent
 		return m.OldImages(ctx)
 	case ipcreportevent.FieldLabeledImages:
 		return m.OldLabeledImages(ctx)
-	case ipcreportevent.FieldVideos:
-		return m.OldVideos(ctx)
+	case ipcreportevent.FieldVideoID:
+		return m.OldVideoID(ctx)
 	case ipcreportevent.FieldDescription:
 		return m.OldDescription(ctx)
 	case ipcreportevent.FieldRawData:
@@ -6857,6 +7166,20 @@ func (m *IPCReportEventMutation) SetField(name string, value ent.Value) error {
 		}
 		m.SetUpdatedAt(v)
 		return nil
+	case ipcreportevent.FieldDeviceBrand:
+		v, ok := value.(enums.IPCReportEventDeviceBrand)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetDeviceBrand(v)
+		return nil
+	case ipcreportevent.FieldDeviceModel:
+		v, ok := value.(enums.IPCReportEventDeviceModel)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetDeviceModel(v)
+		return nil
 	case ipcreportevent.FieldDeviceID:
 		v, ok := value.(string)
 		if !ok {
@@ -6893,25 +7216,25 @@ func (m *IPCReportEventMutation) SetField(name string, value ent.Value) error {
 		m.SetEventStatus(v)
 		return nil
 	case ipcreportevent.FieldImages:
-		v, ok := value.([]types.UploadedImage)
+		v, ok := value.([]*types.UploadedImage)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetImages(v)
 		return nil
 	case ipcreportevent.FieldLabeledImages:
-		v, ok := value.([]types.UploadedImage)
+		v, ok := value.([]*types.UploadedImage)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetLabeledImages(v)
 		return nil
-	case ipcreportevent.FieldVideos:
-		v, ok := value.([]types.UploadedVideo)
+	case ipcreportevent.FieldVideoID:
+		v, ok := value.(int)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
-		m.SetVideos(v)
+		m.SetVideoID(v)
 		return nil
 	case ipcreportevent.FieldDescription:
 		v, ok := value.(string)
@@ -6935,6 +7258,12 @@ func (m *IPCReportEventMutation) SetField(name string, value ent.Value) error {
 // this mutation.
 func (m *IPCReportEventMutation) AddedFields() []string {
 	var fields []string
+	if m.adddevice_brand != nil {
+		fields = append(fields, ipcreportevent.FieldDeviceBrand)
+	}
+	if m.adddevice_model != nil {
+		fields = append(fields, ipcreportevent.FieldDeviceModel)
+	}
 	if m.addevent_type != nil {
 		fields = append(fields, ipcreportevent.FieldEventType)
 	}
@@ -6949,6 +7278,10 @@ func (m *IPCReportEventMutation) AddedFields() []string {
 // was not set, or was not defined in the schema.
 func (m *IPCReportEventMutation) AddedField(name string) (ent.Value, bool) {
 	switch name {
+	case ipcreportevent.FieldDeviceBrand:
+		return m.AddedDeviceBrand()
+	case ipcreportevent.FieldDeviceModel:
+		return m.AddedDeviceModel()
 	case ipcreportevent.FieldEventType:
 		return m.AddedEventType()
 	case ipcreportevent.FieldEventStatus:
@@ -6962,6 +7295,20 @@ func (m *IPCReportEventMutation) AddedField(name string) (ent.Value, bool) {
 // type.
 func (m *IPCReportEventMutation) AddField(name string, value ent.Value) error {
 	switch name {
+	case ipcreportevent.FieldDeviceBrand:
+		v, ok := value.(enums.IPCReportEventDeviceBrand)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddDeviceBrand(v)
+		return nil
+	case ipcreportevent.FieldDeviceModel:
+		v, ok := value.(enums.IPCReportEventDeviceModel)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddDeviceModel(v)
+		return nil
 	case ipcreportevent.FieldEventType:
 		v, ok := value.(enums.IPCReportEventType)
 		if !ok {
@@ -6993,8 +7340,8 @@ func (m *IPCReportEventMutation) ClearedFields() []string {
 	if m.FieldCleared(ipcreportevent.FieldLabeledImages) {
 		fields = append(fields, ipcreportevent.FieldLabeledImages)
 	}
-	if m.FieldCleared(ipcreportevent.FieldVideos) {
-		fields = append(fields, ipcreportevent.FieldVideos)
+	if m.FieldCleared(ipcreportevent.FieldVideoID) {
+		fields = append(fields, ipcreportevent.FieldVideoID)
 	}
 	if m.FieldCleared(ipcreportevent.FieldDescription) {
 		fields = append(fields, ipcreportevent.FieldDescription)
@@ -7025,8 +7372,8 @@ func (m *IPCReportEventMutation) ClearField(name string) error {
 	case ipcreportevent.FieldLabeledImages:
 		m.ClearLabeledImages()
 		return nil
-	case ipcreportevent.FieldVideos:
-		m.ClearVideos()
+	case ipcreportevent.FieldVideoID:
+		m.ClearVideoID()
 		return nil
 	case ipcreportevent.FieldDescription:
 		m.ClearDescription()
@@ -7057,6 +7404,12 @@ func (m *IPCReportEventMutation) ResetField(name string) error {
 	case ipcreportevent.FieldUpdatedAt:
 		m.ResetUpdatedAt()
 		return nil
+	case ipcreportevent.FieldDeviceBrand:
+		m.ResetDeviceBrand()
+		return nil
+	case ipcreportevent.FieldDeviceModel:
+		m.ResetDeviceModel()
+		return nil
 	case ipcreportevent.FieldDeviceID:
 		m.ResetDeviceID()
 		return nil
@@ -7078,8 +7431,8 @@ func (m *IPCReportEventMutation) ResetField(name string) error {
 	case ipcreportevent.FieldLabeledImages:
 		m.ResetLabeledImages()
 		return nil
-	case ipcreportevent.FieldVideos:
-		m.ResetVideos()
+	case ipcreportevent.FieldVideoID:
+		m.ResetVideoID()
 		return nil
 	case ipcreportevent.FieldDescription:
 		m.ResetDescription()
@@ -7093,12 +7446,15 @@ func (m *IPCReportEventMutation) ResetField(name string) error {
 
 // AddedEdges returns all edge names that were set/added in this mutation.
 func (m *IPCReportEventMutation) AddedEdges() []string {
-	edges := make([]string, 0, 2)
+	edges := make([]string, 0, 3)
 	if m.creator != nil {
 		edges = append(edges, ipcreportevent.EdgeCreator)
 	}
 	if m.updater != nil {
 		edges = append(edges, ipcreportevent.EdgeUpdater)
+	}
+	if m.video != nil {
+		edges = append(edges, ipcreportevent.EdgeVideo)
 	}
 	return edges
 }
@@ -7115,13 +7471,17 @@ func (m *IPCReportEventMutation) AddedIDs(name string) []ent.Value {
 		if id := m.updater; id != nil {
 			return []ent.Value{*id}
 		}
+	case ipcreportevent.EdgeVideo:
+		if id := m.video; id != nil {
+			return []ent.Value{*id}
+		}
 	}
 	return nil
 }
 
 // RemovedEdges returns all edge names that were removed in this mutation.
 func (m *IPCReportEventMutation) RemovedEdges() []string {
-	edges := make([]string, 0, 2)
+	edges := make([]string, 0, 3)
 	return edges
 }
 
@@ -7133,12 +7493,15 @@ func (m *IPCReportEventMutation) RemovedIDs(name string) []ent.Value {
 
 // ClearedEdges returns all edge names that were cleared in this mutation.
 func (m *IPCReportEventMutation) ClearedEdges() []string {
-	edges := make([]string, 0, 2)
+	edges := make([]string, 0, 3)
 	if m.clearedcreator {
 		edges = append(edges, ipcreportevent.EdgeCreator)
 	}
 	if m.clearedupdater {
 		edges = append(edges, ipcreportevent.EdgeUpdater)
+	}
+	if m.clearedvideo {
+		edges = append(edges, ipcreportevent.EdgeVideo)
 	}
 	return edges
 }
@@ -7151,6 +7514,8 @@ func (m *IPCReportEventMutation) EdgeCleared(name string) bool {
 		return m.clearedcreator
 	case ipcreportevent.EdgeUpdater:
 		return m.clearedupdater
+	case ipcreportevent.EdgeVideo:
+		return m.clearedvideo
 	}
 	return false
 }
@@ -7165,6 +7530,9 @@ func (m *IPCReportEventMutation) ClearEdge(name string) error {
 	case ipcreportevent.EdgeUpdater:
 		m.ClearUpdater()
 		return nil
+	case ipcreportevent.EdgeVideo:
+		m.ClearVideo()
+		return nil
 	}
 	return fmt.Errorf("unknown IPCReportEvent unique edge %s", name)
 }
@@ -7178,6 +7546,9 @@ func (m *IPCReportEventMutation) ResetEdge(name string) error {
 		return nil
 	case ipcreportevent.EdgeUpdater:
 		m.ResetUpdater()
+		return nil
+	case ipcreportevent.EdgeVideo:
+		m.ResetVideo()
 		return nil
 	}
 	return fmt.Errorf("unknown IPCReportEvent edge %s", name)
@@ -11274,4 +11645,1161 @@ func (m *RiskLocationMutation) ResetEdge(name string) error {
 		return nil
 	}
 	return fmt.Errorf("unknown RiskLocation edge %s", name)
+}
+
+// VideoMutation represents an operation that mutates the Video nodes in the graph.
+type VideoMutation struct {
+	config
+	op                            Op
+	typ                           string
+	id                            *int
+	created_at                    *time.Time
+	deleted_at                    *time.Time
+	updated_at                    *time.Time
+	name                          *string
+	url                           *string
+	size                          *int64
+	addsize                       *int64
+	duration                      *string
+	uploaded_at                   *time.Time
+	clearedFields                 map[string]struct{}
+	creator                       *int
+	clearedcreator                bool
+	updater                       *int
+	clearedupdater                bool
+	ipc_report_event_video        map[int]struct{}
+	removedipc_report_event_video map[int]struct{}
+	clearedipc_report_event_video bool
+	done                          bool
+	oldValue                      func(context.Context) (*Video, error)
+	predicates                    []predicate.Video
+}
+
+var _ ent.Mutation = (*VideoMutation)(nil)
+
+// videoOption allows management of the mutation configuration using functional options.
+type videoOption func(*VideoMutation)
+
+// newVideoMutation creates new mutation for the Video entity.
+func newVideoMutation(c config, op Op, opts ...videoOption) *VideoMutation {
+	m := &VideoMutation{
+		config:        c,
+		op:            op,
+		typ:           TypeVideo,
+		clearedFields: make(map[string]struct{}),
+	}
+	for _, opt := range opts {
+		opt(m)
+	}
+	return m
+}
+
+// withVideoID sets the ID field of the mutation.
+func withVideoID(id int) videoOption {
+	return func(m *VideoMutation) {
+		var (
+			err   error
+			once  sync.Once
+			value *Video
+		)
+		m.oldValue = func(ctx context.Context) (*Video, error) {
+			once.Do(func() {
+				if m.done {
+					err = errors.New("querying old values post mutation is not allowed")
+				} else {
+					value, err = m.Client().Video.Get(ctx, id)
+				}
+			})
+			return value, err
+		}
+		m.id = &id
+	}
+}
+
+// withVideo sets the old Video of the mutation.
+func withVideo(node *Video) videoOption {
+	return func(m *VideoMutation) {
+		m.oldValue = func(context.Context) (*Video, error) {
+			return node, nil
+		}
+		m.id = &node.ID
+	}
+}
+
+// Client returns a new `ent.Client` from the mutation. If the mutation was
+// executed in a transaction (ent.Tx), a transactional client is returned.
+func (m VideoMutation) Client() *Client {
+	client := &Client{config: m.config}
+	client.init()
+	return client
+}
+
+// Tx returns an `ent.Tx` for mutations that were executed in transactions;
+// it returns an error otherwise.
+func (m VideoMutation) Tx() (*Tx, error) {
+	if _, ok := m.driver.(*txDriver); !ok {
+		return nil, errors.New("dao: mutation is not running in a transaction")
+	}
+	tx := &Tx{config: m.config}
+	tx.init()
+	return tx, nil
+}
+
+// ID returns the ID value in the mutation. Note that the ID is only available
+// if it was provided to the builder or after it was returned from the database.
+func (m *VideoMutation) ID() (id int, exists bool) {
+	if m.id == nil {
+		return
+	}
+	return *m.id, true
+}
+
+// IDs queries the database and returns the entity ids that match the mutation's predicate.
+// That means, if the mutation is applied within a transaction with an isolation level such
+// as sql.LevelSerializable, the returned ids match the ids of the rows that will be updated
+// or updated by the mutation.
+func (m *VideoMutation) IDs(ctx context.Context) ([]int, error) {
+	switch {
+	case m.op.Is(OpUpdateOne | OpDeleteOne):
+		id, exists := m.ID()
+		if exists {
+			return []int{id}, nil
+		}
+		fallthrough
+	case m.op.Is(OpUpdate | OpDelete):
+		return m.Client().Video.Query().Where(m.predicates...).IDs(ctx)
+	default:
+		return nil, fmt.Errorf("IDs is not allowed on %s operations", m.op)
+	}
+}
+
+// SetCreatedAt sets the "created_at" field.
+func (m *VideoMutation) SetCreatedAt(t time.Time) {
+	m.created_at = &t
+}
+
+// CreatedAt returns the value of the "created_at" field in the mutation.
+func (m *VideoMutation) CreatedAt() (r time.Time, exists bool) {
+	v := m.created_at
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldCreatedAt returns the old "created_at" field's value of the Video entity.
+// If the Video object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *VideoMutation) OldCreatedAt(ctx context.Context) (v time.Time, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldCreatedAt is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldCreatedAt requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldCreatedAt: %w", err)
+	}
+	return oldValue.CreatedAt, nil
+}
+
+// ResetCreatedAt resets all changes to the "created_at" field.
+func (m *VideoMutation) ResetCreatedAt() {
+	m.created_at = nil
+}
+
+// SetCreatedBy sets the "created_by" field.
+func (m *VideoMutation) SetCreatedBy(i int) {
+	m.creator = &i
+}
+
+// CreatedBy returns the value of the "created_by" field in the mutation.
+func (m *VideoMutation) CreatedBy() (r int, exists bool) {
+	v := m.creator
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldCreatedBy returns the old "created_by" field's value of the Video entity.
+// If the Video object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *VideoMutation) OldCreatedBy(ctx context.Context) (v int, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldCreatedBy is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldCreatedBy requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldCreatedBy: %w", err)
+	}
+	return oldValue.CreatedBy, nil
+}
+
+// ResetCreatedBy resets all changes to the "created_by" field.
+func (m *VideoMutation) ResetCreatedBy() {
+	m.creator = nil
+}
+
+// SetDeletedAt sets the "deleted_at" field.
+func (m *VideoMutation) SetDeletedAt(t time.Time) {
+	m.deleted_at = &t
+}
+
+// DeletedAt returns the value of the "deleted_at" field in the mutation.
+func (m *VideoMutation) DeletedAt() (r time.Time, exists bool) {
+	v := m.deleted_at
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldDeletedAt returns the old "deleted_at" field's value of the Video entity.
+// If the Video object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *VideoMutation) OldDeletedAt(ctx context.Context) (v *time.Time, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldDeletedAt is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldDeletedAt requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldDeletedAt: %w", err)
+	}
+	return oldValue.DeletedAt, nil
+}
+
+// ClearDeletedAt clears the value of the "deleted_at" field.
+func (m *VideoMutation) ClearDeletedAt() {
+	m.deleted_at = nil
+	m.clearedFields[video.FieldDeletedAt] = struct{}{}
+}
+
+// DeletedAtCleared returns if the "deleted_at" field was cleared in this mutation.
+func (m *VideoMutation) DeletedAtCleared() bool {
+	_, ok := m.clearedFields[video.FieldDeletedAt]
+	return ok
+}
+
+// ResetDeletedAt resets all changes to the "deleted_at" field.
+func (m *VideoMutation) ResetDeletedAt() {
+	m.deleted_at = nil
+	delete(m.clearedFields, video.FieldDeletedAt)
+}
+
+// SetUpdatedBy sets the "updated_by" field.
+func (m *VideoMutation) SetUpdatedBy(i int) {
+	m.updater = &i
+}
+
+// UpdatedBy returns the value of the "updated_by" field in the mutation.
+func (m *VideoMutation) UpdatedBy() (r int, exists bool) {
+	v := m.updater
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldUpdatedBy returns the old "updated_by" field's value of the Video entity.
+// If the Video object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *VideoMutation) OldUpdatedBy(ctx context.Context) (v int, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldUpdatedBy is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldUpdatedBy requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldUpdatedBy: %w", err)
+	}
+	return oldValue.UpdatedBy, nil
+}
+
+// ResetUpdatedBy resets all changes to the "updated_by" field.
+func (m *VideoMutation) ResetUpdatedBy() {
+	m.updater = nil
+}
+
+// SetUpdatedAt sets the "updated_at" field.
+func (m *VideoMutation) SetUpdatedAt(t time.Time) {
+	m.updated_at = &t
+}
+
+// UpdatedAt returns the value of the "updated_at" field in the mutation.
+func (m *VideoMutation) UpdatedAt() (r time.Time, exists bool) {
+	v := m.updated_at
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldUpdatedAt returns the old "updated_at" field's value of the Video entity.
+// If the Video object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *VideoMutation) OldUpdatedAt(ctx context.Context) (v time.Time, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldUpdatedAt is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldUpdatedAt requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldUpdatedAt: %w", err)
+	}
+	return oldValue.UpdatedAt, nil
+}
+
+// ResetUpdatedAt resets all changes to the "updated_at" field.
+func (m *VideoMutation) ResetUpdatedAt() {
+	m.updated_at = nil
+}
+
+// SetName sets the "name" field.
+func (m *VideoMutation) SetName(s string) {
+	m.name = &s
+}
+
+// Name returns the value of the "name" field in the mutation.
+func (m *VideoMutation) Name() (r string, exists bool) {
+	v := m.name
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldName returns the old "name" field's value of the Video entity.
+// If the Video object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *VideoMutation) OldName(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldName is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldName requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldName: %w", err)
+	}
+	return oldValue.Name, nil
+}
+
+// ClearName clears the value of the "name" field.
+func (m *VideoMutation) ClearName() {
+	m.name = nil
+	m.clearedFields[video.FieldName] = struct{}{}
+}
+
+// NameCleared returns if the "name" field was cleared in this mutation.
+func (m *VideoMutation) NameCleared() bool {
+	_, ok := m.clearedFields[video.FieldName]
+	return ok
+}
+
+// ResetName resets all changes to the "name" field.
+func (m *VideoMutation) ResetName() {
+	m.name = nil
+	delete(m.clearedFields, video.FieldName)
+}
+
+// SetURL sets the "url" field.
+func (m *VideoMutation) SetURL(s string) {
+	m.url = &s
+}
+
+// URL returns the value of the "url" field in the mutation.
+func (m *VideoMutation) URL() (r string, exists bool) {
+	v := m.url
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldURL returns the old "url" field's value of the Video entity.
+// If the Video object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *VideoMutation) OldURL(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldURL is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldURL requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldURL: %w", err)
+	}
+	return oldValue.URL, nil
+}
+
+// ClearURL clears the value of the "url" field.
+func (m *VideoMutation) ClearURL() {
+	m.url = nil
+	m.clearedFields[video.FieldURL] = struct{}{}
+}
+
+// URLCleared returns if the "url" field was cleared in this mutation.
+func (m *VideoMutation) URLCleared() bool {
+	_, ok := m.clearedFields[video.FieldURL]
+	return ok
+}
+
+// ResetURL resets all changes to the "url" field.
+func (m *VideoMutation) ResetURL() {
+	m.url = nil
+	delete(m.clearedFields, video.FieldURL)
+}
+
+// SetSize sets the "size" field.
+func (m *VideoMutation) SetSize(i int64) {
+	m.size = &i
+	m.addsize = nil
+}
+
+// Size returns the value of the "size" field in the mutation.
+func (m *VideoMutation) Size() (r int64, exists bool) {
+	v := m.size
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldSize returns the old "size" field's value of the Video entity.
+// If the Video object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *VideoMutation) OldSize(ctx context.Context) (v int64, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldSize is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldSize requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldSize: %w", err)
+	}
+	return oldValue.Size, nil
+}
+
+// AddSize adds i to the "size" field.
+func (m *VideoMutation) AddSize(i int64) {
+	if m.addsize != nil {
+		*m.addsize += i
+	} else {
+		m.addsize = &i
+	}
+}
+
+// AddedSize returns the value that was added to the "size" field in this mutation.
+func (m *VideoMutation) AddedSize() (r int64, exists bool) {
+	v := m.addsize
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ResetSize resets all changes to the "size" field.
+func (m *VideoMutation) ResetSize() {
+	m.size = nil
+	m.addsize = nil
+}
+
+// SetDuration sets the "duration" field.
+func (m *VideoMutation) SetDuration(s string) {
+	m.duration = &s
+}
+
+// Duration returns the value of the "duration" field in the mutation.
+func (m *VideoMutation) Duration() (r string, exists bool) {
+	v := m.duration
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldDuration returns the old "duration" field's value of the Video entity.
+// If the Video object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *VideoMutation) OldDuration(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldDuration is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldDuration requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldDuration: %w", err)
+	}
+	return oldValue.Duration, nil
+}
+
+// ClearDuration clears the value of the "duration" field.
+func (m *VideoMutation) ClearDuration() {
+	m.duration = nil
+	m.clearedFields[video.FieldDuration] = struct{}{}
+}
+
+// DurationCleared returns if the "duration" field was cleared in this mutation.
+func (m *VideoMutation) DurationCleared() bool {
+	_, ok := m.clearedFields[video.FieldDuration]
+	return ok
+}
+
+// ResetDuration resets all changes to the "duration" field.
+func (m *VideoMutation) ResetDuration() {
+	m.duration = nil
+	delete(m.clearedFields, video.FieldDuration)
+}
+
+// SetUploadedAt sets the "uploaded_at" field.
+func (m *VideoMutation) SetUploadedAt(t time.Time) {
+	m.uploaded_at = &t
+}
+
+// UploadedAt returns the value of the "uploaded_at" field in the mutation.
+func (m *VideoMutation) UploadedAt() (r time.Time, exists bool) {
+	v := m.uploaded_at
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldUploadedAt returns the old "uploaded_at" field's value of the Video entity.
+// If the Video object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *VideoMutation) OldUploadedAt(ctx context.Context) (v *time.Time, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldUploadedAt is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldUploadedAt requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldUploadedAt: %w", err)
+	}
+	return oldValue.UploadedAt, nil
+}
+
+// ClearUploadedAt clears the value of the "uploaded_at" field.
+func (m *VideoMutation) ClearUploadedAt() {
+	m.uploaded_at = nil
+	m.clearedFields[video.FieldUploadedAt] = struct{}{}
+}
+
+// UploadedAtCleared returns if the "uploaded_at" field was cleared in this mutation.
+func (m *VideoMutation) UploadedAtCleared() bool {
+	_, ok := m.clearedFields[video.FieldUploadedAt]
+	return ok
+}
+
+// ResetUploadedAt resets all changes to the "uploaded_at" field.
+func (m *VideoMutation) ResetUploadedAt() {
+	m.uploaded_at = nil
+	delete(m.clearedFields, video.FieldUploadedAt)
+}
+
+// SetCreatorID sets the "creator" edge to the Admin entity by id.
+func (m *VideoMutation) SetCreatorID(id int) {
+	m.creator = &id
+}
+
+// ClearCreator clears the "creator" edge to the Admin entity.
+func (m *VideoMutation) ClearCreator() {
+	m.clearedcreator = true
+	m.clearedFields[video.FieldCreatedBy] = struct{}{}
+}
+
+// CreatorCleared reports if the "creator" edge to the Admin entity was cleared.
+func (m *VideoMutation) CreatorCleared() bool {
+	return m.clearedcreator
+}
+
+// CreatorID returns the "creator" edge ID in the mutation.
+func (m *VideoMutation) CreatorID() (id int, exists bool) {
+	if m.creator != nil {
+		return *m.creator, true
+	}
+	return
+}
+
+// CreatorIDs returns the "creator" edge IDs in the mutation.
+// Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
+// CreatorID instead. It exists only for internal usage by the builders.
+func (m *VideoMutation) CreatorIDs() (ids []int) {
+	if id := m.creator; id != nil {
+		ids = append(ids, *id)
+	}
+	return
+}
+
+// ResetCreator resets all changes to the "creator" edge.
+func (m *VideoMutation) ResetCreator() {
+	m.creator = nil
+	m.clearedcreator = false
+}
+
+// SetUpdaterID sets the "updater" edge to the Admin entity by id.
+func (m *VideoMutation) SetUpdaterID(id int) {
+	m.updater = &id
+}
+
+// ClearUpdater clears the "updater" edge to the Admin entity.
+func (m *VideoMutation) ClearUpdater() {
+	m.clearedupdater = true
+	m.clearedFields[video.FieldUpdatedBy] = struct{}{}
+}
+
+// UpdaterCleared reports if the "updater" edge to the Admin entity was cleared.
+func (m *VideoMutation) UpdaterCleared() bool {
+	return m.clearedupdater
+}
+
+// UpdaterID returns the "updater" edge ID in the mutation.
+func (m *VideoMutation) UpdaterID() (id int, exists bool) {
+	if m.updater != nil {
+		return *m.updater, true
+	}
+	return
+}
+
+// UpdaterIDs returns the "updater" edge IDs in the mutation.
+// Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
+// UpdaterID instead. It exists only for internal usage by the builders.
+func (m *VideoMutation) UpdaterIDs() (ids []int) {
+	if id := m.updater; id != nil {
+		ids = append(ids, *id)
+	}
+	return
+}
+
+// ResetUpdater resets all changes to the "updater" edge.
+func (m *VideoMutation) ResetUpdater() {
+	m.updater = nil
+	m.clearedupdater = false
+}
+
+// AddIpcReportEventVideoIDs adds the "ipc_report_event_video" edge to the IPCReportEvent entity by ids.
+func (m *VideoMutation) AddIpcReportEventVideoIDs(ids ...int) {
+	if m.ipc_report_event_video == nil {
+		m.ipc_report_event_video = make(map[int]struct{})
+	}
+	for i := range ids {
+		m.ipc_report_event_video[ids[i]] = struct{}{}
+	}
+}
+
+// ClearIpcReportEventVideo clears the "ipc_report_event_video" edge to the IPCReportEvent entity.
+func (m *VideoMutation) ClearIpcReportEventVideo() {
+	m.clearedipc_report_event_video = true
+}
+
+// IpcReportEventVideoCleared reports if the "ipc_report_event_video" edge to the IPCReportEvent entity was cleared.
+func (m *VideoMutation) IpcReportEventVideoCleared() bool {
+	return m.clearedipc_report_event_video
+}
+
+// RemoveIpcReportEventVideoIDs removes the "ipc_report_event_video" edge to the IPCReportEvent entity by IDs.
+func (m *VideoMutation) RemoveIpcReportEventVideoIDs(ids ...int) {
+	if m.removedipc_report_event_video == nil {
+		m.removedipc_report_event_video = make(map[int]struct{})
+	}
+	for i := range ids {
+		delete(m.ipc_report_event_video, ids[i])
+		m.removedipc_report_event_video[ids[i]] = struct{}{}
+	}
+}
+
+// RemovedIpcReportEventVideo returns the removed IDs of the "ipc_report_event_video" edge to the IPCReportEvent entity.
+func (m *VideoMutation) RemovedIpcReportEventVideoIDs() (ids []int) {
+	for id := range m.removedipc_report_event_video {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// IpcReportEventVideoIDs returns the "ipc_report_event_video" edge IDs in the mutation.
+func (m *VideoMutation) IpcReportEventVideoIDs() (ids []int) {
+	for id := range m.ipc_report_event_video {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// ResetIpcReportEventVideo resets all changes to the "ipc_report_event_video" edge.
+func (m *VideoMutation) ResetIpcReportEventVideo() {
+	m.ipc_report_event_video = nil
+	m.clearedipc_report_event_video = false
+	m.removedipc_report_event_video = nil
+}
+
+// Where appends a list predicates to the VideoMutation builder.
+func (m *VideoMutation) Where(ps ...predicate.Video) {
+	m.predicates = append(m.predicates, ps...)
+}
+
+// WhereP appends storage-level predicates to the VideoMutation builder. Using this method,
+// users can use type-assertion to append predicates that do not depend on any generated package.
+func (m *VideoMutation) WhereP(ps ...func(*sql.Selector)) {
+	p := make([]predicate.Video, len(ps))
+	for i := range ps {
+		p[i] = ps[i]
+	}
+	m.Where(p...)
+}
+
+// Op returns the operation name.
+func (m *VideoMutation) Op() Op {
+	return m.op
+}
+
+// SetOp allows setting the mutation operation.
+func (m *VideoMutation) SetOp(op Op) {
+	m.op = op
+}
+
+// Type returns the node type of this mutation (Video).
+func (m *VideoMutation) Type() string {
+	return m.typ
+}
+
+// Fields returns all fields that were changed during this mutation. Note that in
+// order to get all numeric fields that were incremented/decremented, call
+// AddedFields().
+func (m *VideoMutation) Fields() []string {
+	fields := make([]string, 0, 10)
+	if m.created_at != nil {
+		fields = append(fields, video.FieldCreatedAt)
+	}
+	if m.creator != nil {
+		fields = append(fields, video.FieldCreatedBy)
+	}
+	if m.deleted_at != nil {
+		fields = append(fields, video.FieldDeletedAt)
+	}
+	if m.updater != nil {
+		fields = append(fields, video.FieldUpdatedBy)
+	}
+	if m.updated_at != nil {
+		fields = append(fields, video.FieldUpdatedAt)
+	}
+	if m.name != nil {
+		fields = append(fields, video.FieldName)
+	}
+	if m.url != nil {
+		fields = append(fields, video.FieldURL)
+	}
+	if m.size != nil {
+		fields = append(fields, video.FieldSize)
+	}
+	if m.duration != nil {
+		fields = append(fields, video.FieldDuration)
+	}
+	if m.uploaded_at != nil {
+		fields = append(fields, video.FieldUploadedAt)
+	}
+	return fields
+}
+
+// Field returns the value of a field with the given name. The second boolean
+// return value indicates that this field was not set, or was not defined in the
+// schema.
+func (m *VideoMutation) Field(name string) (ent.Value, bool) {
+	switch name {
+	case video.FieldCreatedAt:
+		return m.CreatedAt()
+	case video.FieldCreatedBy:
+		return m.CreatedBy()
+	case video.FieldDeletedAt:
+		return m.DeletedAt()
+	case video.FieldUpdatedBy:
+		return m.UpdatedBy()
+	case video.FieldUpdatedAt:
+		return m.UpdatedAt()
+	case video.FieldName:
+		return m.Name()
+	case video.FieldURL:
+		return m.URL()
+	case video.FieldSize:
+		return m.Size()
+	case video.FieldDuration:
+		return m.Duration()
+	case video.FieldUploadedAt:
+		return m.UploadedAt()
+	}
+	return nil, false
+}
+
+// OldField returns the old value of the field from the database. An error is
+// returned if the mutation operation is not UpdateOne, or the query to the
+// database failed.
+func (m *VideoMutation) OldField(ctx context.Context, name string) (ent.Value, error) {
+	switch name {
+	case video.FieldCreatedAt:
+		return m.OldCreatedAt(ctx)
+	case video.FieldCreatedBy:
+		return m.OldCreatedBy(ctx)
+	case video.FieldDeletedAt:
+		return m.OldDeletedAt(ctx)
+	case video.FieldUpdatedBy:
+		return m.OldUpdatedBy(ctx)
+	case video.FieldUpdatedAt:
+		return m.OldUpdatedAt(ctx)
+	case video.FieldName:
+		return m.OldName(ctx)
+	case video.FieldURL:
+		return m.OldURL(ctx)
+	case video.FieldSize:
+		return m.OldSize(ctx)
+	case video.FieldDuration:
+		return m.OldDuration(ctx)
+	case video.FieldUploadedAt:
+		return m.OldUploadedAt(ctx)
+	}
+	return nil, fmt.Errorf("unknown Video field %s", name)
+}
+
+// SetField sets the value of a field with the given name. It returns an error if
+// the field is not defined in the schema, or if the type mismatched the field
+// type.
+func (m *VideoMutation) SetField(name string, value ent.Value) error {
+	switch name {
+	case video.FieldCreatedAt:
+		v, ok := value.(time.Time)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetCreatedAt(v)
+		return nil
+	case video.FieldCreatedBy:
+		v, ok := value.(int)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetCreatedBy(v)
+		return nil
+	case video.FieldDeletedAt:
+		v, ok := value.(time.Time)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetDeletedAt(v)
+		return nil
+	case video.FieldUpdatedBy:
+		v, ok := value.(int)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetUpdatedBy(v)
+		return nil
+	case video.FieldUpdatedAt:
+		v, ok := value.(time.Time)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetUpdatedAt(v)
+		return nil
+	case video.FieldName:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetName(v)
+		return nil
+	case video.FieldURL:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetURL(v)
+		return nil
+	case video.FieldSize:
+		v, ok := value.(int64)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetSize(v)
+		return nil
+	case video.FieldDuration:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetDuration(v)
+		return nil
+	case video.FieldUploadedAt:
+		v, ok := value.(time.Time)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetUploadedAt(v)
+		return nil
+	}
+	return fmt.Errorf("unknown Video field %s", name)
+}
+
+// AddedFields returns all numeric fields that were incremented/decremented during
+// this mutation.
+func (m *VideoMutation) AddedFields() []string {
+	var fields []string
+	if m.addsize != nil {
+		fields = append(fields, video.FieldSize)
+	}
+	return fields
+}
+
+// AddedField returns the numeric value that was incremented/decremented on a field
+// with the given name. The second boolean return value indicates that this field
+// was not set, or was not defined in the schema.
+func (m *VideoMutation) AddedField(name string) (ent.Value, bool) {
+	switch name {
+	case video.FieldSize:
+		return m.AddedSize()
+	}
+	return nil, false
+}
+
+// AddField adds the value to the field with the given name. It returns an error if
+// the field is not defined in the schema, or if the type mismatched the field
+// type.
+func (m *VideoMutation) AddField(name string, value ent.Value) error {
+	switch name {
+	case video.FieldSize:
+		v, ok := value.(int64)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddSize(v)
+		return nil
+	}
+	return fmt.Errorf("unknown Video numeric field %s", name)
+}
+
+// ClearedFields returns all nullable fields that were cleared during this
+// mutation.
+func (m *VideoMutation) ClearedFields() []string {
+	var fields []string
+	if m.FieldCleared(video.FieldDeletedAt) {
+		fields = append(fields, video.FieldDeletedAt)
+	}
+	if m.FieldCleared(video.FieldName) {
+		fields = append(fields, video.FieldName)
+	}
+	if m.FieldCleared(video.FieldURL) {
+		fields = append(fields, video.FieldURL)
+	}
+	if m.FieldCleared(video.FieldDuration) {
+		fields = append(fields, video.FieldDuration)
+	}
+	if m.FieldCleared(video.FieldUploadedAt) {
+		fields = append(fields, video.FieldUploadedAt)
+	}
+	return fields
+}
+
+// FieldCleared returns a boolean indicating if a field with the given name was
+// cleared in this mutation.
+func (m *VideoMutation) FieldCleared(name string) bool {
+	_, ok := m.clearedFields[name]
+	return ok
+}
+
+// ClearField clears the value of the field with the given name. It returns an
+// error if the field is not defined in the schema.
+func (m *VideoMutation) ClearField(name string) error {
+	switch name {
+	case video.FieldDeletedAt:
+		m.ClearDeletedAt()
+		return nil
+	case video.FieldName:
+		m.ClearName()
+		return nil
+	case video.FieldURL:
+		m.ClearURL()
+		return nil
+	case video.FieldDuration:
+		m.ClearDuration()
+		return nil
+	case video.FieldUploadedAt:
+		m.ClearUploadedAt()
+		return nil
+	}
+	return fmt.Errorf("unknown Video nullable field %s", name)
+}
+
+// ResetField resets all changes in the mutation for the field with the given name.
+// It returns an error if the field is not defined in the schema.
+func (m *VideoMutation) ResetField(name string) error {
+	switch name {
+	case video.FieldCreatedAt:
+		m.ResetCreatedAt()
+		return nil
+	case video.FieldCreatedBy:
+		m.ResetCreatedBy()
+		return nil
+	case video.FieldDeletedAt:
+		m.ResetDeletedAt()
+		return nil
+	case video.FieldUpdatedBy:
+		m.ResetUpdatedBy()
+		return nil
+	case video.FieldUpdatedAt:
+		m.ResetUpdatedAt()
+		return nil
+	case video.FieldName:
+		m.ResetName()
+		return nil
+	case video.FieldURL:
+		m.ResetURL()
+		return nil
+	case video.FieldSize:
+		m.ResetSize()
+		return nil
+	case video.FieldDuration:
+		m.ResetDuration()
+		return nil
+	case video.FieldUploadedAt:
+		m.ResetUploadedAt()
+		return nil
+	}
+	return fmt.Errorf("unknown Video field %s", name)
+}
+
+// AddedEdges returns all edge names that were set/added in this mutation.
+func (m *VideoMutation) AddedEdges() []string {
+	edges := make([]string, 0, 3)
+	if m.creator != nil {
+		edges = append(edges, video.EdgeCreator)
+	}
+	if m.updater != nil {
+		edges = append(edges, video.EdgeUpdater)
+	}
+	if m.ipc_report_event_video != nil {
+		edges = append(edges, video.EdgeIpcReportEventVideo)
+	}
+	return edges
+}
+
+// AddedIDs returns all IDs (to other nodes) that were added for the given edge
+// name in this mutation.
+func (m *VideoMutation) AddedIDs(name string) []ent.Value {
+	switch name {
+	case video.EdgeCreator:
+		if id := m.creator; id != nil {
+			return []ent.Value{*id}
+		}
+	case video.EdgeUpdater:
+		if id := m.updater; id != nil {
+			return []ent.Value{*id}
+		}
+	case video.EdgeIpcReportEventVideo:
+		ids := make([]ent.Value, 0, len(m.ipc_report_event_video))
+		for id := range m.ipc_report_event_video {
+			ids = append(ids, id)
+		}
+		return ids
+	}
+	return nil
+}
+
+// RemovedEdges returns all edge names that were removed in this mutation.
+func (m *VideoMutation) RemovedEdges() []string {
+	edges := make([]string, 0, 3)
+	if m.removedipc_report_event_video != nil {
+		edges = append(edges, video.EdgeIpcReportEventVideo)
+	}
+	return edges
+}
+
+// RemovedIDs returns all IDs (to other nodes) that were removed for the edge with
+// the given name in this mutation.
+func (m *VideoMutation) RemovedIDs(name string) []ent.Value {
+	switch name {
+	case video.EdgeIpcReportEventVideo:
+		ids := make([]ent.Value, 0, len(m.removedipc_report_event_video))
+		for id := range m.removedipc_report_event_video {
+			ids = append(ids, id)
+		}
+		return ids
+	}
+	return nil
+}
+
+// ClearedEdges returns all edge names that were cleared in this mutation.
+func (m *VideoMutation) ClearedEdges() []string {
+	edges := make([]string, 0, 3)
+	if m.clearedcreator {
+		edges = append(edges, video.EdgeCreator)
+	}
+	if m.clearedupdater {
+		edges = append(edges, video.EdgeUpdater)
+	}
+	if m.clearedipc_report_event_video {
+		edges = append(edges, video.EdgeIpcReportEventVideo)
+	}
+	return edges
+}
+
+// EdgeCleared returns a boolean which indicates if the edge with the given name
+// was cleared in this mutation.
+func (m *VideoMutation) EdgeCleared(name string) bool {
+	switch name {
+	case video.EdgeCreator:
+		return m.clearedcreator
+	case video.EdgeUpdater:
+		return m.clearedupdater
+	case video.EdgeIpcReportEventVideo:
+		return m.clearedipc_report_event_video
+	}
+	return false
+}
+
+// ClearEdge clears the value of the edge with the given name. It returns an error
+// if that edge is not defined in the schema.
+func (m *VideoMutation) ClearEdge(name string) error {
+	switch name {
+	case video.EdgeCreator:
+		m.ClearCreator()
+		return nil
+	case video.EdgeUpdater:
+		m.ClearUpdater()
+		return nil
+	}
+	return fmt.Errorf("unknown Video unique edge %s", name)
+}
+
+// ResetEdge resets all changes to the edge with the given name in this mutation.
+// It returns an error if the edge is not defined in the schema.
+func (m *VideoMutation) ResetEdge(name string) error {
+	switch name {
+	case video.EdgeCreator:
+		m.ResetCreator()
+		return nil
+	case video.EdgeUpdater:
+		m.ResetUpdater()
+		return nil
+	case video.EdgeIpcReportEventVideo:
+		m.ResetIpcReportEventVideo()
+		return nil
+	}
+	return fmt.Errorf("unknown Video edge %s", name)
 }

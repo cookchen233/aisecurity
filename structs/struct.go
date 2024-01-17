@@ -1,14 +1,17 @@
 package structs
 
 import (
+	"aisecurity/utils"
 	"encoding/json"
 	"entgo.io/ent"
 	"fmt"
+	"github.com/gogf/gf/v2/util/gconv"
+	"go.uber.org/zap"
 	"hash/crc32"
 	"reflect"
 )
 
-func ConvertTo[T any](from interface{}) T {
+func ConvertTo2[T any](from interface{}) T {
 	var to T
 	fromVal := reflect.ValueOf(from)
 	toType := reflect.TypeOf(to)
@@ -51,6 +54,23 @@ func ConvertTo[T any](from interface{}) T {
 		return toVal.Addr().Interface().(T)
 	}
 	return toVal.Interface().(T)
+}
+
+func ConvertListTo[Tdata any, Tto any](list []Tdata) []*Tto {
+	list2 := make([]*Tto, len(list))
+	for i, v := range list {
+		list2[i] = ConvertTo[Tdata, Tto](v)
+	}
+	return list2
+}
+
+func ConvertTo[Tdata any, Tto any](data Tdata) *Tto {
+	data2 := new(Tto)
+	err := gconv.Struct(data, data2)
+	if err != nil {
+		utils.Logger.Error("failed converting", zap.Error(err))
+	}
+	return data2
 }
 
 // IFilter represents qeury parameters

@@ -82,6 +82,42 @@ func (s *RiskService) GetDetails(fit structs.IFilter) (structs.IEntity, error) {
 	return list[0], nil
 }
 
+func (s *RiskService) GetList(fit structs.IFilter) ([]structs.IEntity, error) {
+	// list
+	list, err := s.query(fit).
+		WithRiskLocation().
+		WithRiskCategory().
+		WithMaintainer(func(q *dao.EmployeeQuery) {
+			q.WithDepartment().WithOccupations().WithAdmin(func(q *dao.AdminQuery) {
+				q.WithAdminRoles()
+			})
+		}).
+		WithReporter(func(q *dao.EmployeeQuery) {
+			q.WithDepartment().WithOccupations().WithAdmin(func(q *dao.AdminQuery) {
+				q.WithAdminRoles()
+			})
+		}).
+		Limit(fit.GetLimit()).
+		Offset(fit.GetOffset()).
+		All(s.Ctx)
+	if err != nil {
+		return nil, utils.ErrorWithStack(err)
+	}
+	ents := make([]structs.IEntity, len(list))
+	for i, v := range list {
+		v2 := new(entities.Risk)
+		ents[i] = v
+		err := gconv.Struct(v, v2)
+		if err != nil {
+			utils.Logger.Warn("convert error", zap.Error(err))
+		} else {
+			v2.MaintainStatusLabel = v2.MaintainStatus.Label()
+			ents[i] = v2
+		}
+	}
+	return ents, nil
+}
+
 func (s *RiskService) query(fit structs.IFilter) *dao.RiskQuery {
 	utils.Logger.Info("risk query", zap.Any("fit", fit))
 	f := fit.(*filters.Risk)
@@ -157,40 +193,4 @@ func (s *RiskService) GetMaintainStatusCounts(fit structs.IFilter) ([]*types.Mai
 		}
 	}
 	return counts, nil
-}
-
-func (s *RiskService) GetList(fit structs.IFilter) ([]structs.IEntity, error) {
-	// list
-	list, err := s.query(fit).
-		WithRiskLocation().
-		WithRiskCategory().
-		WithMaintainer(func(q *dao.EmployeeQuery) {
-			q.WithDepartment().WithOccupations().WithAdmin(func(q *dao.AdminQuery) {
-				q.WithAdminRoles()
-			})
-		}).
-		WithReporter(func(q *dao.EmployeeQuery) {
-			q.WithDepartment().WithOccupations().WithAdmin(func(q *dao.AdminQuery) {
-				q.WithAdminRoles()
-			})
-		}).
-		Limit(fit.GetLimit()).
-		Offset(fit.GetOffset()).
-		All(s.Ctx)
-	if err != nil {
-		return nil, utils.ErrorWithStack(err)
-	}
-	ents := make([]structs.IEntity, len(list))
-	for i, v := range list {
-		v2 := new(entities.Risk)
-		ents[i] = v
-		err := gconv.Struct(v, v2)
-		if err != nil {
-			utils.Logger.Warn("convert error", zap.Error(err))
-		} else {
-			v2.MaintainStatusLabel = v2.MaintainStatus.Label()
-			ents[i] = v2
-		}
-	}
-	return ents, nil
 }

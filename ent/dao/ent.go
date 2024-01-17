@@ -12,6 +12,7 @@ import (
 	"aisecurity/ent/dao/risk"
 	"aisecurity/ent/dao/riskcategory"
 	"aisecurity/ent/dao/risklocation"
+	"aisecurity/ent/dao/video"
 	"context"
 	"errors"
 	"fmt"
@@ -90,6 +91,7 @@ func checkColumn(table, column string) error {
 			risk.Table:           risk.ValidColumn,
 			riskcategory.Table:   riskcategory.ValidColumn,
 			risklocation.Table:   risklocation.ValidColumn,
+			video.Table:          video.ValidColumn,
 		})
 	})
 	return columnCheck(table, column)
