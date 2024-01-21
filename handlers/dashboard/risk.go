@@ -8,7 +8,6 @@ import (
 	"aisecurity/structs/filters"
 	"aisecurity/structs/types"
 	"aisecurity/utils/http"
-	"fmt"
 	"github.com/gin-gonic/gin"
 )
 
@@ -58,7 +57,6 @@ func (h *RiskHandler) GetList(c *gin.Context) {
 		return
 	}
 
-	fmt.Println("total handler filter", h.Filter)
 	resp.Total, err = h.Service.GetTotal(h.Filter)
 	if err != nil {
 		http.Error(c, err, 1000)

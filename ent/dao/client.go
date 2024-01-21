@@ -13,9 +13,13 @@ import (
 
 	"aisecurity/ent/dao/admin"
 	"aisecurity/ent/dao/adminrole"
+	"aisecurity/ent/dao/area"
 	"aisecurity/ent/dao/department"
+	"aisecurity/ent/dao/device"
+	"aisecurity/ent/dao/deviceinstallation"
 	"aisecurity/ent/dao/employee"
-	"aisecurity/ent/dao/ipcreportevent"
+	"aisecurity/ent/dao/eventlevel"
+	"aisecurity/ent/dao/ipcevent"
 	"aisecurity/ent/dao/occupation"
 	"aisecurity/ent/dao/risk"
 	"aisecurity/ent/dao/riskcategory"
@@ -39,12 +43,20 @@ type Client struct {
 	Admin *AdminClient
 	// AdminRole is the client for interacting with the AdminRole builders.
 	AdminRole *AdminRoleClient
+	// Area is the client for interacting with the Area builders.
+	Area *AreaClient
 	// Department is the client for interacting with the Department builders.
 	Department *DepartmentClient
+	// Device is the client for interacting with the Device builders.
+	Device *DeviceClient
+	// DeviceInstallation is the client for interacting with the DeviceInstallation builders.
+	DeviceInstallation *DeviceInstallationClient
 	// Employee is the client for interacting with the Employee builders.
 	Employee *EmployeeClient
-	// IPCReportEvent is the client for interacting with the IPCReportEvent builders.
-	IPCReportEvent *IPCReportEventClient
+	// EventLevel is the client for interacting with the EventLevel builders.
+	EventLevel *EventLevelClient
+	// IPCEvent is the client for interacting with the IPCEvent builders.
+	IPCEvent *IPCEventClient
 	// Occupation is the client for interacting with the Occupation builders.
 	Occupation *OccupationClient
 	// Risk is the client for interacting with the Risk builders.
@@ -68,9 +80,13 @@ func (c *Client) init() {
 	c.Schema = migrate.NewSchema(c.driver)
 	c.Admin = NewAdminClient(c.config)
 	c.AdminRole = NewAdminRoleClient(c.config)
+	c.Area = NewAreaClient(c.config)
 	c.Department = NewDepartmentClient(c.config)
+	c.Device = NewDeviceClient(c.config)
+	c.DeviceInstallation = NewDeviceInstallationClient(c.config)
 	c.Employee = NewEmployeeClient(c.config)
-	c.IPCReportEvent = NewIPCReportEventClient(c.config)
+	c.EventLevel = NewEventLevelClient(c.config)
+	c.IPCEvent = NewIPCEventClient(c.config)
 	c.Occupation = NewOccupationClient(c.config)
 	c.Risk = NewRiskClient(c.config)
 	c.RiskCategory = NewRiskCategoryClient(c.config)
@@ -166,18 +182,22 @@ func (c *Client) Tx(ctx context.Context) (*Tx, error) {
 	cfg := c.config
 	cfg.driver = tx
 	return &Tx{
-		ctx:            ctx,
-		config:         cfg,
-		Admin:          NewAdminClient(cfg),
-		AdminRole:      NewAdminRoleClient(cfg),
-		Department:     NewDepartmentClient(cfg),
-		Employee:       NewEmployeeClient(cfg),
-		IPCReportEvent: NewIPCReportEventClient(cfg),
-		Occupation:     NewOccupationClient(cfg),
-		Risk:           NewRiskClient(cfg),
-		RiskCategory:   NewRiskCategoryClient(cfg),
-		RiskLocation:   NewRiskLocationClient(cfg),
-		Video:          NewVideoClient(cfg),
+		ctx:                ctx,
+		config:             cfg,
+		Admin:              NewAdminClient(cfg),
+		AdminRole:          NewAdminRoleClient(cfg),
+		Area:               NewAreaClient(cfg),
+		Department:         NewDepartmentClient(cfg),
+		Device:             NewDeviceClient(cfg),
+		DeviceInstallation: NewDeviceInstallationClient(cfg),
+		Employee:           NewEmployeeClient(cfg),
+		EventLevel:         NewEventLevelClient(cfg),
+		IPCEvent:           NewIPCEventClient(cfg),
+		Occupation:         NewOccupationClient(cfg),
+		Risk:               NewRiskClient(cfg),
+		RiskCategory:       NewRiskCategoryClient(cfg),
+		RiskLocation:       NewRiskLocationClient(cfg),
+		Video:              NewVideoClient(cfg),
 	}, nil
 }
 
@@ -195,18 +215,22 @@ func (c *Client) BeginTx(ctx context.Context, opts *sql.TxOptions) (*Tx, error) 
 	cfg := c.config
 	cfg.driver = &txDriver{tx: tx, drv: c.driver}
 	return &Tx{
-		ctx:            ctx,
-		config:         cfg,
-		Admin:          NewAdminClient(cfg),
-		AdminRole:      NewAdminRoleClient(cfg),
-		Department:     NewDepartmentClient(cfg),
-		Employee:       NewEmployeeClient(cfg),
-		IPCReportEvent: NewIPCReportEventClient(cfg),
-		Occupation:     NewOccupationClient(cfg),
-		Risk:           NewRiskClient(cfg),
-		RiskCategory:   NewRiskCategoryClient(cfg),
-		RiskLocation:   NewRiskLocationClient(cfg),
-		Video:          NewVideoClient(cfg),
+		ctx:                ctx,
+		config:             cfg,
+		Admin:              NewAdminClient(cfg),
+		AdminRole:          NewAdminRoleClient(cfg),
+		Area:               NewAreaClient(cfg),
+		Department:         NewDepartmentClient(cfg),
+		Device:             NewDeviceClient(cfg),
+		DeviceInstallation: NewDeviceInstallationClient(cfg),
+		Employee:           NewEmployeeClient(cfg),
+		EventLevel:         NewEventLevelClient(cfg),
+		IPCEvent:           NewIPCEventClient(cfg),
+		Occupation:         NewOccupationClient(cfg),
+		Risk:               NewRiskClient(cfg),
+		RiskCategory:       NewRiskCategoryClient(cfg),
+		RiskLocation:       NewRiskLocationClient(cfg),
+		Video:              NewVideoClient(cfg),
 	}, nil
 }
 
@@ -236,8 +260,9 @@ func (c *Client) Close() error {
 // In order to add hooks to a specific client, call: `client.Node.Use(...)`.
 func (c *Client) Use(hooks ...Hook) {
 	for _, n := range []interface{ Use(...Hook) }{
-		c.Admin, c.AdminRole, c.Department, c.Employee, c.IPCReportEvent, c.Occupation,
-		c.Risk, c.RiskCategory, c.RiskLocation, c.Video,
+		c.Admin, c.AdminRole, c.Area, c.Department, c.Device, c.DeviceInstallation,
+		c.Employee, c.EventLevel, c.IPCEvent, c.Occupation, c.Risk, c.RiskCategory,
+		c.RiskLocation, c.Video,
 	} {
 		n.Use(hooks...)
 	}
@@ -247,8 +272,9 @@ func (c *Client) Use(hooks ...Hook) {
 // In order to add interceptors to a specific client, call: `client.Node.Intercept(...)`.
 func (c *Client) Intercept(interceptors ...Interceptor) {
 	for _, n := range []interface{ Intercept(...Interceptor) }{
-		c.Admin, c.AdminRole, c.Department, c.Employee, c.IPCReportEvent, c.Occupation,
-		c.Risk, c.RiskCategory, c.RiskLocation, c.Video,
+		c.Admin, c.AdminRole, c.Area, c.Department, c.Device, c.DeviceInstallation,
+		c.Employee, c.EventLevel, c.IPCEvent, c.Occupation, c.Risk, c.RiskCategory,
+		c.RiskLocation, c.Video,
 	} {
 		n.Intercept(interceptors...)
 	}
@@ -261,12 +287,20 @@ func (c *Client) Mutate(ctx context.Context, m Mutation) (Value, error) {
 		return c.Admin.mutate(ctx, m)
 	case *AdminRoleMutation:
 		return c.AdminRole.mutate(ctx, m)
+	case *AreaMutation:
+		return c.Area.mutate(ctx, m)
 	case *DepartmentMutation:
 		return c.Department.mutate(ctx, m)
+	case *DeviceMutation:
+		return c.Device.mutate(ctx, m)
+	case *DeviceInstallationMutation:
+		return c.DeviceInstallation.mutate(ctx, m)
 	case *EmployeeMutation:
 		return c.Employee.mutate(ctx, m)
-	case *IPCReportEventMutation:
-		return c.IPCReportEvent.mutate(ctx, m)
+	case *EventLevelMutation:
+		return c.EventLevel.mutate(ctx, m)
+	case *IPCEventMutation:
+		return c.IPCEvent.mutate(ctx, m)
 	case *OccupationMutation:
 		return c.Occupation.mutate(ctx, m)
 	case *RiskMutation:
@@ -710,15 +744,15 @@ func (c *AdminClient) QueryOccupationUpdater(a *Admin) *OccupationQuery {
 	return query
 }
 
-// QueryIpcReportEventCreator queries the ipc_report_event_creator edge of a Admin.
-func (c *AdminClient) QueryIpcReportEventCreator(a *Admin) *IPCReportEventQuery {
-	query := (&IPCReportEventClient{config: c.config}).Query()
+// QueryIpcEventCreator queries the ipc_event_creator edge of a Admin.
+func (c *AdminClient) QueryIpcEventCreator(a *Admin) *IPCEventQuery {
+	query := (&IPCEventClient{config: c.config}).Query()
 	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
 		id := a.ID
 		step := sqlgraph.NewStep(
 			sqlgraph.From(admin.Table, admin.FieldID, id),
-			sqlgraph.To(ipcreportevent.Table, ipcreportevent.FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, false, admin.IpcReportEventCreatorTable, admin.IpcReportEventCreatorColumn),
+			sqlgraph.To(ipcevent.Table, ipcevent.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, admin.IpcEventCreatorTable, admin.IpcEventCreatorColumn),
 		)
 		fromV = sqlgraph.Neighbors(a.driver.Dialect(), step)
 		return fromV, nil
@@ -726,15 +760,15 @@ func (c *AdminClient) QueryIpcReportEventCreator(a *Admin) *IPCReportEventQuery 
 	return query
 }
 
-// QueryIpcReportEventUpdater queries the ipc_report_event_updater edge of a Admin.
-func (c *AdminClient) QueryIpcReportEventUpdater(a *Admin) *IPCReportEventQuery {
-	query := (&IPCReportEventClient{config: c.config}).Query()
+// QueryIpcEventUpdater queries the ipc_event_updater edge of a Admin.
+func (c *AdminClient) QueryIpcEventUpdater(a *Admin) *IPCEventQuery {
+	query := (&IPCEventClient{config: c.config}).Query()
 	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
 		id := a.ID
 		step := sqlgraph.NewStep(
 			sqlgraph.From(admin.Table, admin.FieldID, id),
-			sqlgraph.To(ipcreportevent.Table, ipcreportevent.FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, false, admin.IpcReportEventUpdaterTable, admin.IpcReportEventUpdaterColumn),
+			sqlgraph.To(ipcevent.Table, ipcevent.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, admin.IpcEventUpdaterTable, admin.IpcEventUpdaterColumn),
 		)
 		fromV = sqlgraph.Neighbors(a.driver.Dialect(), step)
 		return fromV, nil
@@ -767,6 +801,134 @@ func (c *AdminClient) QueryVideoUpdater(a *Admin) *VideoQuery {
 			sqlgraph.From(admin.Table, admin.FieldID, id),
 			sqlgraph.To(video.Table, video.FieldID),
 			sqlgraph.Edge(sqlgraph.O2M, false, admin.VideoUpdaterTable, admin.VideoUpdaterColumn),
+		)
+		fromV = sqlgraph.Neighbors(a.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryAreaCreator queries the area_creator edge of a Admin.
+func (c *AdminClient) QueryAreaCreator(a *Admin) *AreaQuery {
+	query := (&AreaClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := a.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(admin.Table, admin.FieldID, id),
+			sqlgraph.To(area.Table, area.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, admin.AreaCreatorTable, admin.AreaCreatorColumn),
+		)
+		fromV = sqlgraph.Neighbors(a.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryAreaUpdater queries the area_updater edge of a Admin.
+func (c *AdminClient) QueryAreaUpdater(a *Admin) *AreaQuery {
+	query := (&AreaClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := a.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(admin.Table, admin.FieldID, id),
+			sqlgraph.To(area.Table, area.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, admin.AreaUpdaterTable, admin.AreaUpdaterColumn),
+		)
+		fromV = sqlgraph.Neighbors(a.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryDeviceCreator queries the device_creator edge of a Admin.
+func (c *AdminClient) QueryDeviceCreator(a *Admin) *DeviceQuery {
+	query := (&DeviceClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := a.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(admin.Table, admin.FieldID, id),
+			sqlgraph.To(device.Table, device.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, admin.DeviceCreatorTable, admin.DeviceCreatorColumn),
+		)
+		fromV = sqlgraph.Neighbors(a.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryDeviceUpdater queries the device_updater edge of a Admin.
+func (c *AdminClient) QueryDeviceUpdater(a *Admin) *DeviceQuery {
+	query := (&DeviceClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := a.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(admin.Table, admin.FieldID, id),
+			sqlgraph.To(device.Table, device.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, admin.DeviceUpdaterTable, admin.DeviceUpdaterColumn),
+		)
+		fromV = sqlgraph.Neighbors(a.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryDeviceInstallationCreator queries the device_installation_creator edge of a Admin.
+func (c *AdminClient) QueryDeviceInstallationCreator(a *Admin) *DeviceInstallationQuery {
+	query := (&DeviceInstallationClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := a.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(admin.Table, admin.FieldID, id),
+			sqlgraph.To(deviceinstallation.Table, deviceinstallation.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, admin.DeviceInstallationCreatorTable, admin.DeviceInstallationCreatorColumn),
+		)
+		fromV = sqlgraph.Neighbors(a.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryDeviceInstallationUpdater queries the device_installation_updater edge of a Admin.
+func (c *AdminClient) QueryDeviceInstallationUpdater(a *Admin) *DeviceInstallationQuery {
+	query := (&DeviceInstallationClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := a.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(admin.Table, admin.FieldID, id),
+			sqlgraph.To(deviceinstallation.Table, deviceinstallation.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, admin.DeviceInstallationUpdaterTable, admin.DeviceInstallationUpdaterColumn),
+		)
+		fromV = sqlgraph.Neighbors(a.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryEventLevelCreator queries the event_level_creator edge of a Admin.
+func (c *AdminClient) QueryEventLevelCreator(a *Admin) *EventLevelQuery {
+	query := (&EventLevelClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := a.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(admin.Table, admin.FieldID, id),
+			sqlgraph.To(eventlevel.Table, eventlevel.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, admin.EventLevelCreatorTable, admin.EventLevelCreatorColumn),
+		)
+		fromV = sqlgraph.Neighbors(a.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryEventLevelUpdater queries the event_level_updater edge of a Admin.
+func (c *AdminClient) QueryEventLevelUpdater(a *Admin) *EventLevelQuery {
+	query := (&EventLevelClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := a.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(admin.Table, admin.FieldID, id),
+			sqlgraph.To(eventlevel.Table, eventlevel.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, admin.EventLevelUpdaterTable, admin.EventLevelUpdaterColumn),
 		)
 		fromV = sqlgraph.Neighbors(a.driver.Dialect(), step)
 		return fromV, nil
@@ -978,6 +1140,188 @@ func (c *AdminRoleClient) mutate(ctx context.Context, m *AdminRoleMutation) (Val
 		return (&AdminRoleDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
 	default:
 		return nil, fmt.Errorf("dao: unknown AdminRole mutation op: %q", m.Op())
+	}
+}
+
+// AreaClient is a client for the Area schema.
+type AreaClient struct {
+	config
+}
+
+// NewAreaClient returns a client for the Area from the given config.
+func NewAreaClient(c config) *AreaClient {
+	return &AreaClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `area.Hooks(f(g(h())))`.
+func (c *AreaClient) Use(hooks ...Hook) {
+	c.hooks.Area = append(c.hooks.Area, hooks...)
+}
+
+// Intercept adds a list of query interceptors to the interceptors stack.
+// A call to `Intercept(f, g, h)` equals to `area.Intercept(f(g(h())))`.
+func (c *AreaClient) Intercept(interceptors ...Interceptor) {
+	c.inters.Area = append(c.inters.Area, interceptors...)
+}
+
+// Create returns a builder for creating a Area entity.
+func (c *AreaClient) Create() *AreaCreate {
+	mutation := newAreaMutation(c.config, OpCreate)
+	return &AreaCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of Area entities.
+func (c *AreaClient) CreateBulk(builders ...*AreaCreate) *AreaCreateBulk {
+	return &AreaCreateBulk{config: c.config, builders: builders}
+}
+
+// MapCreateBulk creates a bulk creation builder from the given slice. For each item in the slice, the function creates
+// a builder and applies setFunc on it.
+func (c *AreaClient) MapCreateBulk(slice any, setFunc func(*AreaCreate, int)) *AreaCreateBulk {
+	rv := reflect.ValueOf(slice)
+	if rv.Kind() != reflect.Slice {
+		return &AreaCreateBulk{err: fmt.Errorf("calling to AreaClient.MapCreateBulk with wrong type %T, need slice", slice)}
+	}
+	builders := make([]*AreaCreate, rv.Len())
+	for i := 0; i < rv.Len(); i++ {
+		builders[i] = c.Create()
+		setFunc(builders[i], i)
+	}
+	return &AreaCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for Area.
+func (c *AreaClient) Update() *AreaUpdate {
+	mutation := newAreaMutation(c.config, OpUpdate)
+	return &AreaUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *AreaClient) UpdateOne(a *Area) *AreaUpdateOne {
+	mutation := newAreaMutation(c.config, OpUpdateOne, withArea(a))
+	return &AreaUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *AreaClient) UpdateOneID(id int) *AreaUpdateOne {
+	mutation := newAreaMutation(c.config, OpUpdateOne, withAreaID(id))
+	return &AreaUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for Area.
+func (c *AreaClient) Delete() *AreaDelete {
+	mutation := newAreaMutation(c.config, OpDelete)
+	return &AreaDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a builder for deleting the given entity.
+func (c *AreaClient) DeleteOne(a *Area) *AreaDeleteOne {
+	return c.DeleteOneID(a.ID)
+}
+
+// DeleteOneID returns a builder for deleting the given entity by its id.
+func (c *AreaClient) DeleteOneID(id int) *AreaDeleteOne {
+	builder := c.Delete().Where(area.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &AreaDeleteOne{builder}
+}
+
+// Query returns a query builder for Area.
+func (c *AreaClient) Query() *AreaQuery {
+	return &AreaQuery{
+		config: c.config,
+		ctx:    &QueryContext{Type: TypeArea},
+		inters: c.Interceptors(),
+	}
+}
+
+// Get returns a Area entity by its id.
+func (c *AreaClient) Get(ctx context.Context, id int) (*Area, error) {
+	return c.Query().Where(area.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *AreaClient) GetX(ctx context.Context, id int) *Area {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// QueryCreator queries the creator edge of a Area.
+func (c *AreaClient) QueryCreator(a *Area) *AdminQuery {
+	query := (&AdminClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := a.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(area.Table, area.FieldID, id),
+			sqlgraph.To(admin.Table, admin.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, area.CreatorTable, area.CreatorColumn),
+		)
+		fromV = sqlgraph.Neighbors(a.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryUpdater queries the updater edge of a Area.
+func (c *AreaClient) QueryUpdater(a *Area) *AdminQuery {
+	query := (&AdminClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := a.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(area.Table, area.FieldID, id),
+			sqlgraph.To(admin.Table, admin.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, area.UpdaterTable, area.UpdaterColumn),
+		)
+		fromV = sqlgraph.Neighbors(a.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryDeviceInstallationArea queries the device_installation_area edge of a Area.
+func (c *AreaClient) QueryDeviceInstallationArea(a *Area) *DeviceInstallationQuery {
+	query := (&DeviceInstallationClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := a.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(area.Table, area.FieldID, id),
+			sqlgraph.To(deviceinstallation.Table, deviceinstallation.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, area.DeviceInstallationAreaTable, area.DeviceInstallationAreaColumn),
+		)
+		fromV = sqlgraph.Neighbors(a.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// Hooks returns the client hooks.
+func (c *AreaClient) Hooks() []Hook {
+	hooks := c.hooks.Area
+	return append(hooks[:len(hooks):len(hooks)], area.Hooks[:]...)
+}
+
+// Interceptors returns the client interceptors.
+func (c *AreaClient) Interceptors() []Interceptor {
+	return c.inters.Area
+}
+
+func (c *AreaClient) mutate(ctx context.Context, m *AreaMutation) (Value, error) {
+	switch m.Op() {
+	case OpCreate:
+		return (&AreaCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdate:
+		return (&AreaUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdateOne:
+		return (&AreaUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpDelete, OpDeleteOne:
+		return (&AreaDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+	default:
+		return nil, fmt.Errorf("dao: unknown Area mutation op: %q", m.Op())
 	}
 }
 
@@ -1195,6 +1539,402 @@ func (c *DepartmentClient) mutate(ctx context.Context, m *DepartmentMutation) (V
 	}
 }
 
+// DeviceClient is a client for the Device schema.
+type DeviceClient struct {
+	config
+}
+
+// NewDeviceClient returns a client for the Device from the given config.
+func NewDeviceClient(c config) *DeviceClient {
+	return &DeviceClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `device.Hooks(f(g(h())))`.
+func (c *DeviceClient) Use(hooks ...Hook) {
+	c.hooks.Device = append(c.hooks.Device, hooks...)
+}
+
+// Intercept adds a list of query interceptors to the interceptors stack.
+// A call to `Intercept(f, g, h)` equals to `device.Intercept(f(g(h())))`.
+func (c *DeviceClient) Intercept(interceptors ...Interceptor) {
+	c.inters.Device = append(c.inters.Device, interceptors...)
+}
+
+// Create returns a builder for creating a Device entity.
+func (c *DeviceClient) Create() *DeviceCreate {
+	mutation := newDeviceMutation(c.config, OpCreate)
+	return &DeviceCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of Device entities.
+func (c *DeviceClient) CreateBulk(builders ...*DeviceCreate) *DeviceCreateBulk {
+	return &DeviceCreateBulk{config: c.config, builders: builders}
+}
+
+// MapCreateBulk creates a bulk creation builder from the given slice. For each item in the slice, the function creates
+// a builder and applies setFunc on it.
+func (c *DeviceClient) MapCreateBulk(slice any, setFunc func(*DeviceCreate, int)) *DeviceCreateBulk {
+	rv := reflect.ValueOf(slice)
+	if rv.Kind() != reflect.Slice {
+		return &DeviceCreateBulk{err: fmt.Errorf("calling to DeviceClient.MapCreateBulk with wrong type %T, need slice", slice)}
+	}
+	builders := make([]*DeviceCreate, rv.Len())
+	for i := 0; i < rv.Len(); i++ {
+		builders[i] = c.Create()
+		setFunc(builders[i], i)
+	}
+	return &DeviceCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for Device.
+func (c *DeviceClient) Update() *DeviceUpdate {
+	mutation := newDeviceMutation(c.config, OpUpdate)
+	return &DeviceUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *DeviceClient) UpdateOne(d *Device) *DeviceUpdateOne {
+	mutation := newDeviceMutation(c.config, OpUpdateOne, withDevice(d))
+	return &DeviceUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *DeviceClient) UpdateOneID(id int) *DeviceUpdateOne {
+	mutation := newDeviceMutation(c.config, OpUpdateOne, withDeviceID(id))
+	return &DeviceUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for Device.
+func (c *DeviceClient) Delete() *DeviceDelete {
+	mutation := newDeviceMutation(c.config, OpDelete)
+	return &DeviceDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a builder for deleting the given entity.
+func (c *DeviceClient) DeleteOne(d *Device) *DeviceDeleteOne {
+	return c.DeleteOneID(d.ID)
+}
+
+// DeleteOneID returns a builder for deleting the given entity by its id.
+func (c *DeviceClient) DeleteOneID(id int) *DeviceDeleteOne {
+	builder := c.Delete().Where(device.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &DeviceDeleteOne{builder}
+}
+
+// Query returns a query builder for Device.
+func (c *DeviceClient) Query() *DeviceQuery {
+	return &DeviceQuery{
+		config: c.config,
+		ctx:    &QueryContext{Type: TypeDevice},
+		inters: c.Interceptors(),
+	}
+}
+
+// Get returns a Device entity by its id.
+func (c *DeviceClient) Get(ctx context.Context, id int) (*Device, error) {
+	return c.Query().Where(device.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *DeviceClient) GetX(ctx context.Context, id int) *Device {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// QueryCreator queries the creator edge of a Device.
+func (c *DeviceClient) QueryCreator(d *Device) *AdminQuery {
+	query := (&AdminClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := d.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(device.Table, device.FieldID, id),
+			sqlgraph.To(admin.Table, admin.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, device.CreatorTable, device.CreatorColumn),
+		)
+		fromV = sqlgraph.Neighbors(d.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryUpdater queries the updater edge of a Device.
+func (c *DeviceClient) QueryUpdater(d *Device) *AdminQuery {
+	query := (&AdminClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := d.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(device.Table, device.FieldID, id),
+			sqlgraph.To(admin.Table, admin.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, device.UpdaterTable, device.UpdaterColumn),
+		)
+		fromV = sqlgraph.Neighbors(d.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryIpcEventDevice queries the ipc_event_device edge of a Device.
+func (c *DeviceClient) QueryIpcEventDevice(d *Device) *IPCEventQuery {
+	query := (&IPCEventClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := d.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(device.Table, device.FieldID, id),
+			sqlgraph.To(ipcevent.Table, ipcevent.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, device.IpcEventDeviceTable, device.IpcEventDeviceColumn),
+		)
+		fromV = sqlgraph.Neighbors(d.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryDeviceInstallationDevice queries the device_installation_device edge of a Device.
+func (c *DeviceClient) QueryDeviceInstallationDevice(d *Device) *DeviceInstallationQuery {
+	query := (&DeviceInstallationClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := d.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(device.Table, device.FieldID, id),
+			sqlgraph.To(deviceinstallation.Table, deviceinstallation.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, device.DeviceInstallationDeviceTable, device.DeviceInstallationDeviceColumn),
+		)
+		fromV = sqlgraph.Neighbors(d.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// Hooks returns the client hooks.
+func (c *DeviceClient) Hooks() []Hook {
+	hooks := c.hooks.Device
+	return append(hooks[:len(hooks):len(hooks)], device.Hooks[:]...)
+}
+
+// Interceptors returns the client interceptors.
+func (c *DeviceClient) Interceptors() []Interceptor {
+	return c.inters.Device
+}
+
+func (c *DeviceClient) mutate(ctx context.Context, m *DeviceMutation) (Value, error) {
+	switch m.Op() {
+	case OpCreate:
+		return (&DeviceCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdate:
+		return (&DeviceUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdateOne:
+		return (&DeviceUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpDelete, OpDeleteOne:
+		return (&DeviceDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+	default:
+		return nil, fmt.Errorf("dao: unknown Device mutation op: %q", m.Op())
+	}
+}
+
+// DeviceInstallationClient is a client for the DeviceInstallation schema.
+type DeviceInstallationClient struct {
+	config
+}
+
+// NewDeviceInstallationClient returns a client for the DeviceInstallation from the given config.
+func NewDeviceInstallationClient(c config) *DeviceInstallationClient {
+	return &DeviceInstallationClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `deviceinstallation.Hooks(f(g(h())))`.
+func (c *DeviceInstallationClient) Use(hooks ...Hook) {
+	c.hooks.DeviceInstallation = append(c.hooks.DeviceInstallation, hooks...)
+}
+
+// Intercept adds a list of query interceptors to the interceptors stack.
+// A call to `Intercept(f, g, h)` equals to `deviceinstallation.Intercept(f(g(h())))`.
+func (c *DeviceInstallationClient) Intercept(interceptors ...Interceptor) {
+	c.inters.DeviceInstallation = append(c.inters.DeviceInstallation, interceptors...)
+}
+
+// Create returns a builder for creating a DeviceInstallation entity.
+func (c *DeviceInstallationClient) Create() *DeviceInstallationCreate {
+	mutation := newDeviceInstallationMutation(c.config, OpCreate)
+	return &DeviceInstallationCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of DeviceInstallation entities.
+func (c *DeviceInstallationClient) CreateBulk(builders ...*DeviceInstallationCreate) *DeviceInstallationCreateBulk {
+	return &DeviceInstallationCreateBulk{config: c.config, builders: builders}
+}
+
+// MapCreateBulk creates a bulk creation builder from the given slice. For each item in the slice, the function creates
+// a builder and applies setFunc on it.
+func (c *DeviceInstallationClient) MapCreateBulk(slice any, setFunc func(*DeviceInstallationCreate, int)) *DeviceInstallationCreateBulk {
+	rv := reflect.ValueOf(slice)
+	if rv.Kind() != reflect.Slice {
+		return &DeviceInstallationCreateBulk{err: fmt.Errorf("calling to DeviceInstallationClient.MapCreateBulk with wrong type %T, need slice", slice)}
+	}
+	builders := make([]*DeviceInstallationCreate, rv.Len())
+	for i := 0; i < rv.Len(); i++ {
+		builders[i] = c.Create()
+		setFunc(builders[i], i)
+	}
+	return &DeviceInstallationCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for DeviceInstallation.
+func (c *DeviceInstallationClient) Update() *DeviceInstallationUpdate {
+	mutation := newDeviceInstallationMutation(c.config, OpUpdate)
+	return &DeviceInstallationUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *DeviceInstallationClient) UpdateOne(di *DeviceInstallation) *DeviceInstallationUpdateOne {
+	mutation := newDeviceInstallationMutation(c.config, OpUpdateOne, withDeviceInstallation(di))
+	return &DeviceInstallationUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *DeviceInstallationClient) UpdateOneID(id int) *DeviceInstallationUpdateOne {
+	mutation := newDeviceInstallationMutation(c.config, OpUpdateOne, withDeviceInstallationID(id))
+	return &DeviceInstallationUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for DeviceInstallation.
+func (c *DeviceInstallationClient) Delete() *DeviceInstallationDelete {
+	mutation := newDeviceInstallationMutation(c.config, OpDelete)
+	return &DeviceInstallationDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a builder for deleting the given entity.
+func (c *DeviceInstallationClient) DeleteOne(di *DeviceInstallation) *DeviceInstallationDeleteOne {
+	return c.DeleteOneID(di.ID)
+}
+
+// DeleteOneID returns a builder for deleting the given entity by its id.
+func (c *DeviceInstallationClient) DeleteOneID(id int) *DeviceInstallationDeleteOne {
+	builder := c.Delete().Where(deviceinstallation.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &DeviceInstallationDeleteOne{builder}
+}
+
+// Query returns a query builder for DeviceInstallation.
+func (c *DeviceInstallationClient) Query() *DeviceInstallationQuery {
+	return &DeviceInstallationQuery{
+		config: c.config,
+		ctx:    &QueryContext{Type: TypeDeviceInstallation},
+		inters: c.Interceptors(),
+	}
+}
+
+// Get returns a DeviceInstallation entity by its id.
+func (c *DeviceInstallationClient) Get(ctx context.Context, id int) (*DeviceInstallation, error) {
+	return c.Query().Where(deviceinstallation.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *DeviceInstallationClient) GetX(ctx context.Context, id int) *DeviceInstallation {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// QueryCreator queries the creator edge of a DeviceInstallation.
+func (c *DeviceInstallationClient) QueryCreator(di *DeviceInstallation) *AdminQuery {
+	query := (&AdminClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := di.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(deviceinstallation.Table, deviceinstallation.FieldID, id),
+			sqlgraph.To(admin.Table, admin.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, deviceinstallation.CreatorTable, deviceinstallation.CreatorColumn),
+		)
+		fromV = sqlgraph.Neighbors(di.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryUpdater queries the updater edge of a DeviceInstallation.
+func (c *DeviceInstallationClient) QueryUpdater(di *DeviceInstallation) *AdminQuery {
+	query := (&AdminClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := di.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(deviceinstallation.Table, deviceinstallation.FieldID, id),
+			sqlgraph.To(admin.Table, admin.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, deviceinstallation.UpdaterTable, deviceinstallation.UpdaterColumn),
+		)
+		fromV = sqlgraph.Neighbors(di.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryArea queries the area edge of a DeviceInstallation.
+func (c *DeviceInstallationClient) QueryArea(di *DeviceInstallation) *AreaQuery {
+	query := (&AreaClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := di.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(deviceinstallation.Table, deviceinstallation.FieldID, id),
+			sqlgraph.To(area.Table, area.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, deviceinstallation.AreaTable, deviceinstallation.AreaColumn),
+		)
+		fromV = sqlgraph.Neighbors(di.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryDevice queries the device edge of a DeviceInstallation.
+func (c *DeviceInstallationClient) QueryDevice(di *DeviceInstallation) *DeviceQuery {
+	query := (&DeviceClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := di.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(deviceinstallation.Table, deviceinstallation.FieldID, id),
+			sqlgraph.To(device.Table, device.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, deviceinstallation.DeviceTable, deviceinstallation.DeviceColumn),
+		)
+		fromV = sqlgraph.Neighbors(di.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// Hooks returns the client hooks.
+func (c *DeviceInstallationClient) Hooks() []Hook {
+	hooks := c.hooks.DeviceInstallation
+	return append(hooks[:len(hooks):len(hooks)], deviceinstallation.Hooks[:]...)
+}
+
+// Interceptors returns the client interceptors.
+func (c *DeviceInstallationClient) Interceptors() []Interceptor {
+	return c.inters.DeviceInstallation
+}
+
+func (c *DeviceInstallationClient) mutate(ctx context.Context, m *DeviceInstallationMutation) (Value, error) {
+	switch m.Op() {
+	case OpCreate:
+		return (&DeviceInstallationCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdate:
+		return (&DeviceInstallationUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdateOne:
+		return (&DeviceInstallationUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpDelete, OpDeleteOne:
+		return (&DeviceInstallationDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+	default:
+		return nil, fmt.Errorf("dao: unknown DeviceInstallation mutation op: %q", m.Op())
+	}
+}
+
 // EmployeeClient is a client for the Employee schema.
 type EmployeeClient struct {
 	config
@@ -1383,6 +2123,22 @@ func (c *EmployeeClient) QueryOccupations(e *Employee) *OccupationQuery {
 	return query
 }
 
+// QueryIpcEvents queries the ipc_events edge of a Employee.
+func (c *EmployeeClient) QueryIpcEvents(e *Employee) *IPCEventQuery {
+	query := (&IPCEventClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := e.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(employee.Table, employee.FieldID, id),
+			sqlgraph.To(ipcevent.Table, ipcevent.FieldID),
+			sqlgraph.Edge(sqlgraph.M2M, true, employee.IpcEventsTable, employee.IpcEventsPrimaryKey...),
+		)
+		fromV = sqlgraph.Neighbors(e.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
 // QueryRiskReporter queries the risk_reporter edge of a Employee.
 func (c *EmployeeClient) QueryRiskReporter(e *Employee) *RiskQuery {
 	query := (&RiskClient{config: c.config}).Query()
@@ -1441,107 +2197,107 @@ func (c *EmployeeClient) mutate(ctx context.Context, m *EmployeeMutation) (Value
 	}
 }
 
-// IPCReportEventClient is a client for the IPCReportEvent schema.
-type IPCReportEventClient struct {
+// EventLevelClient is a client for the EventLevel schema.
+type EventLevelClient struct {
 	config
 }
 
-// NewIPCReportEventClient returns a client for the IPCReportEvent from the given config.
-func NewIPCReportEventClient(c config) *IPCReportEventClient {
-	return &IPCReportEventClient{config: c}
+// NewEventLevelClient returns a client for the EventLevel from the given config.
+func NewEventLevelClient(c config) *EventLevelClient {
+	return &EventLevelClient{config: c}
 }
 
 // Use adds a list of mutation hooks to the hooks stack.
-// A call to `Use(f, g, h)` equals to `ipcreportevent.Hooks(f(g(h())))`.
-func (c *IPCReportEventClient) Use(hooks ...Hook) {
-	c.hooks.IPCReportEvent = append(c.hooks.IPCReportEvent, hooks...)
+// A call to `Use(f, g, h)` equals to `eventlevel.Hooks(f(g(h())))`.
+func (c *EventLevelClient) Use(hooks ...Hook) {
+	c.hooks.EventLevel = append(c.hooks.EventLevel, hooks...)
 }
 
 // Intercept adds a list of query interceptors to the interceptors stack.
-// A call to `Intercept(f, g, h)` equals to `ipcreportevent.Intercept(f(g(h())))`.
-func (c *IPCReportEventClient) Intercept(interceptors ...Interceptor) {
-	c.inters.IPCReportEvent = append(c.inters.IPCReportEvent, interceptors...)
+// A call to `Intercept(f, g, h)` equals to `eventlevel.Intercept(f(g(h())))`.
+func (c *EventLevelClient) Intercept(interceptors ...Interceptor) {
+	c.inters.EventLevel = append(c.inters.EventLevel, interceptors...)
 }
 
-// Create returns a builder for creating a IPCReportEvent entity.
-func (c *IPCReportEventClient) Create() *IPCReportEventCreate {
-	mutation := newIPCReportEventMutation(c.config, OpCreate)
-	return &IPCReportEventCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+// Create returns a builder for creating a EventLevel entity.
+func (c *EventLevelClient) Create() *EventLevelCreate {
+	mutation := newEventLevelMutation(c.config, OpCreate)
+	return &EventLevelCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
 }
 
-// CreateBulk returns a builder for creating a bulk of IPCReportEvent entities.
-func (c *IPCReportEventClient) CreateBulk(builders ...*IPCReportEventCreate) *IPCReportEventCreateBulk {
-	return &IPCReportEventCreateBulk{config: c.config, builders: builders}
+// CreateBulk returns a builder for creating a bulk of EventLevel entities.
+func (c *EventLevelClient) CreateBulk(builders ...*EventLevelCreate) *EventLevelCreateBulk {
+	return &EventLevelCreateBulk{config: c.config, builders: builders}
 }
 
 // MapCreateBulk creates a bulk creation builder from the given slice. For each item in the slice, the function creates
 // a builder and applies setFunc on it.
-func (c *IPCReportEventClient) MapCreateBulk(slice any, setFunc func(*IPCReportEventCreate, int)) *IPCReportEventCreateBulk {
+func (c *EventLevelClient) MapCreateBulk(slice any, setFunc func(*EventLevelCreate, int)) *EventLevelCreateBulk {
 	rv := reflect.ValueOf(slice)
 	if rv.Kind() != reflect.Slice {
-		return &IPCReportEventCreateBulk{err: fmt.Errorf("calling to IPCReportEventClient.MapCreateBulk with wrong type %T, need slice", slice)}
+		return &EventLevelCreateBulk{err: fmt.Errorf("calling to EventLevelClient.MapCreateBulk with wrong type %T, need slice", slice)}
 	}
-	builders := make([]*IPCReportEventCreate, rv.Len())
+	builders := make([]*EventLevelCreate, rv.Len())
 	for i := 0; i < rv.Len(); i++ {
 		builders[i] = c.Create()
 		setFunc(builders[i], i)
 	}
-	return &IPCReportEventCreateBulk{config: c.config, builders: builders}
+	return &EventLevelCreateBulk{config: c.config, builders: builders}
 }
 
-// Update returns an update builder for IPCReportEvent.
-func (c *IPCReportEventClient) Update() *IPCReportEventUpdate {
-	mutation := newIPCReportEventMutation(c.config, OpUpdate)
-	return &IPCReportEventUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+// Update returns an update builder for EventLevel.
+func (c *EventLevelClient) Update() *EventLevelUpdate {
+	mutation := newEventLevelMutation(c.config, OpUpdate)
+	return &EventLevelUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
 }
 
 // UpdateOne returns an update builder for the given entity.
-func (c *IPCReportEventClient) UpdateOne(ire *IPCReportEvent) *IPCReportEventUpdateOne {
-	mutation := newIPCReportEventMutation(c.config, OpUpdateOne, withIPCReportEvent(ire))
-	return &IPCReportEventUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+func (c *EventLevelClient) UpdateOne(el *EventLevel) *EventLevelUpdateOne {
+	mutation := newEventLevelMutation(c.config, OpUpdateOne, withEventLevel(el))
+	return &EventLevelUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
 }
 
 // UpdateOneID returns an update builder for the given id.
-func (c *IPCReportEventClient) UpdateOneID(id int) *IPCReportEventUpdateOne {
-	mutation := newIPCReportEventMutation(c.config, OpUpdateOne, withIPCReportEventID(id))
-	return &IPCReportEventUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+func (c *EventLevelClient) UpdateOneID(id int) *EventLevelUpdateOne {
+	mutation := newEventLevelMutation(c.config, OpUpdateOne, withEventLevelID(id))
+	return &EventLevelUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
 }
 
-// Delete returns a delete builder for IPCReportEvent.
-func (c *IPCReportEventClient) Delete() *IPCReportEventDelete {
-	mutation := newIPCReportEventMutation(c.config, OpDelete)
-	return &IPCReportEventDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+// Delete returns a delete builder for EventLevel.
+func (c *EventLevelClient) Delete() *EventLevelDelete {
+	mutation := newEventLevelMutation(c.config, OpDelete)
+	return &EventLevelDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
 }
 
 // DeleteOne returns a builder for deleting the given entity.
-func (c *IPCReportEventClient) DeleteOne(ire *IPCReportEvent) *IPCReportEventDeleteOne {
-	return c.DeleteOneID(ire.ID)
+func (c *EventLevelClient) DeleteOne(el *EventLevel) *EventLevelDeleteOne {
+	return c.DeleteOneID(el.ID)
 }
 
 // DeleteOneID returns a builder for deleting the given entity by its id.
-func (c *IPCReportEventClient) DeleteOneID(id int) *IPCReportEventDeleteOne {
-	builder := c.Delete().Where(ipcreportevent.ID(id))
+func (c *EventLevelClient) DeleteOneID(id int) *EventLevelDeleteOne {
+	builder := c.Delete().Where(eventlevel.ID(id))
 	builder.mutation.id = &id
 	builder.mutation.op = OpDeleteOne
-	return &IPCReportEventDeleteOne{builder}
+	return &EventLevelDeleteOne{builder}
 }
 
-// Query returns a query builder for IPCReportEvent.
-func (c *IPCReportEventClient) Query() *IPCReportEventQuery {
-	return &IPCReportEventQuery{
+// Query returns a query builder for EventLevel.
+func (c *EventLevelClient) Query() *EventLevelQuery {
+	return &EventLevelQuery{
 		config: c.config,
-		ctx:    &QueryContext{Type: TypeIPCReportEvent},
+		ctx:    &QueryContext{Type: TypeEventLevel},
 		inters: c.Interceptors(),
 	}
 }
 
-// Get returns a IPCReportEvent entity by its id.
-func (c *IPCReportEventClient) Get(ctx context.Context, id int) (*IPCReportEvent, error) {
-	return c.Query().Where(ipcreportevent.ID(id)).Only(ctx)
+// Get returns a EventLevel entity by its id.
+func (c *EventLevelClient) Get(ctx context.Context, id int) (*EventLevel, error) {
+	return c.Query().Where(eventlevel.ID(id)).Only(ctx)
 }
 
 // GetX is like Get, but panics if an error occurs.
-func (c *IPCReportEventClient) GetX(ctx context.Context, id int) *IPCReportEvent {
+func (c *EventLevelClient) GetX(ctx context.Context, id int) *EventLevel {
 	obj, err := c.Get(ctx, id)
 	if err != nil {
 		panic(err)
@@ -1549,77 +2305,275 @@ func (c *IPCReportEventClient) GetX(ctx context.Context, id int) *IPCReportEvent
 	return obj
 }
 
-// QueryCreator queries the creator edge of a IPCReportEvent.
-func (c *IPCReportEventClient) QueryCreator(ire *IPCReportEvent) *AdminQuery {
+// QueryCreator queries the creator edge of a EventLevel.
+func (c *EventLevelClient) QueryCreator(el *EventLevel) *AdminQuery {
 	query := (&AdminClient{config: c.config}).Query()
 	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
-		id := ire.ID
+		id := el.ID
 		step := sqlgraph.NewStep(
-			sqlgraph.From(ipcreportevent.Table, ipcreportevent.FieldID, id),
+			sqlgraph.From(eventlevel.Table, eventlevel.FieldID, id),
 			sqlgraph.To(admin.Table, admin.FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, true, ipcreportevent.CreatorTable, ipcreportevent.CreatorColumn),
+			sqlgraph.Edge(sqlgraph.M2O, true, eventlevel.CreatorTable, eventlevel.CreatorColumn),
 		)
-		fromV = sqlgraph.Neighbors(ire.driver.Dialect(), step)
+		fromV = sqlgraph.Neighbors(el.driver.Dialect(), step)
 		return fromV, nil
 	}
 	return query
 }
 
-// QueryUpdater queries the updater edge of a IPCReportEvent.
-func (c *IPCReportEventClient) QueryUpdater(ire *IPCReportEvent) *AdminQuery {
+// QueryUpdater queries the updater edge of a EventLevel.
+func (c *EventLevelClient) QueryUpdater(el *EventLevel) *AdminQuery {
 	query := (&AdminClient{config: c.config}).Query()
 	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
-		id := ire.ID
+		id := el.ID
 		step := sqlgraph.NewStep(
-			sqlgraph.From(ipcreportevent.Table, ipcreportevent.FieldID, id),
+			sqlgraph.From(eventlevel.Table, eventlevel.FieldID, id),
 			sqlgraph.To(admin.Table, admin.FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, true, ipcreportevent.UpdaterTable, ipcreportevent.UpdaterColumn),
+			sqlgraph.Edge(sqlgraph.M2O, true, eventlevel.UpdaterTable, eventlevel.UpdaterColumn),
 		)
-		fromV = sqlgraph.Neighbors(ire.driver.Dialect(), step)
-		return fromV, nil
-	}
-	return query
-}
-
-// QueryVideo queries the video edge of a IPCReportEvent.
-func (c *IPCReportEventClient) QueryVideo(ire *IPCReportEvent) *VideoQuery {
-	query := (&VideoClient{config: c.config}).Query()
-	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
-		id := ire.ID
-		step := sqlgraph.NewStep(
-			sqlgraph.From(ipcreportevent.Table, ipcreportevent.FieldID, id),
-			sqlgraph.To(video.Table, video.FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, true, ipcreportevent.VideoTable, ipcreportevent.VideoColumn),
-		)
-		fromV = sqlgraph.Neighbors(ire.driver.Dialect(), step)
+		fromV = sqlgraph.Neighbors(el.driver.Dialect(), step)
 		return fromV, nil
 	}
 	return query
 }
 
 // Hooks returns the client hooks.
-func (c *IPCReportEventClient) Hooks() []Hook {
-	hooks := c.hooks.IPCReportEvent
-	return append(hooks[:len(hooks):len(hooks)], ipcreportevent.Hooks[:]...)
+func (c *EventLevelClient) Hooks() []Hook {
+	hooks := c.hooks.EventLevel
+	return append(hooks[:len(hooks):len(hooks)], eventlevel.Hooks[:]...)
 }
 
 // Interceptors returns the client interceptors.
-func (c *IPCReportEventClient) Interceptors() []Interceptor {
-	return c.inters.IPCReportEvent
+func (c *EventLevelClient) Interceptors() []Interceptor {
+	return c.inters.EventLevel
 }
 
-func (c *IPCReportEventClient) mutate(ctx context.Context, m *IPCReportEventMutation) (Value, error) {
+func (c *EventLevelClient) mutate(ctx context.Context, m *EventLevelMutation) (Value, error) {
 	switch m.Op() {
 	case OpCreate:
-		return (&IPCReportEventCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+		return (&EventLevelCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
 	case OpUpdate:
-		return (&IPCReportEventUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+		return (&EventLevelUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
 	case OpUpdateOne:
-		return (&IPCReportEventUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+		return (&EventLevelUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
 	case OpDelete, OpDeleteOne:
-		return (&IPCReportEventDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+		return (&EventLevelDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
 	default:
-		return nil, fmt.Errorf("dao: unknown IPCReportEvent mutation op: %q", m.Op())
+		return nil, fmt.Errorf("dao: unknown EventLevel mutation op: %q", m.Op())
+	}
+}
+
+// IPCEventClient is a client for the IPCEvent schema.
+type IPCEventClient struct {
+	config
+}
+
+// NewIPCEventClient returns a client for the IPCEvent from the given config.
+func NewIPCEventClient(c config) *IPCEventClient {
+	return &IPCEventClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `ipcevent.Hooks(f(g(h())))`.
+func (c *IPCEventClient) Use(hooks ...Hook) {
+	c.hooks.IPCEvent = append(c.hooks.IPCEvent, hooks...)
+}
+
+// Intercept adds a list of query interceptors to the interceptors stack.
+// A call to `Intercept(f, g, h)` equals to `ipcevent.Intercept(f(g(h())))`.
+func (c *IPCEventClient) Intercept(interceptors ...Interceptor) {
+	c.inters.IPCEvent = append(c.inters.IPCEvent, interceptors...)
+}
+
+// Create returns a builder for creating a IPCEvent entity.
+func (c *IPCEventClient) Create() *IPCEventCreate {
+	mutation := newIPCEventMutation(c.config, OpCreate)
+	return &IPCEventCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of IPCEvent entities.
+func (c *IPCEventClient) CreateBulk(builders ...*IPCEventCreate) *IPCEventCreateBulk {
+	return &IPCEventCreateBulk{config: c.config, builders: builders}
+}
+
+// MapCreateBulk creates a bulk creation builder from the given slice. For each item in the slice, the function creates
+// a builder and applies setFunc on it.
+func (c *IPCEventClient) MapCreateBulk(slice any, setFunc func(*IPCEventCreate, int)) *IPCEventCreateBulk {
+	rv := reflect.ValueOf(slice)
+	if rv.Kind() != reflect.Slice {
+		return &IPCEventCreateBulk{err: fmt.Errorf("calling to IPCEventClient.MapCreateBulk with wrong type %T, need slice", slice)}
+	}
+	builders := make([]*IPCEventCreate, rv.Len())
+	for i := 0; i < rv.Len(); i++ {
+		builders[i] = c.Create()
+		setFunc(builders[i], i)
+	}
+	return &IPCEventCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for IPCEvent.
+func (c *IPCEventClient) Update() *IPCEventUpdate {
+	mutation := newIPCEventMutation(c.config, OpUpdate)
+	return &IPCEventUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *IPCEventClient) UpdateOne(ie *IPCEvent) *IPCEventUpdateOne {
+	mutation := newIPCEventMutation(c.config, OpUpdateOne, withIPCEvent(ie))
+	return &IPCEventUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *IPCEventClient) UpdateOneID(id int) *IPCEventUpdateOne {
+	mutation := newIPCEventMutation(c.config, OpUpdateOne, withIPCEventID(id))
+	return &IPCEventUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for IPCEvent.
+func (c *IPCEventClient) Delete() *IPCEventDelete {
+	mutation := newIPCEventMutation(c.config, OpDelete)
+	return &IPCEventDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a builder for deleting the given entity.
+func (c *IPCEventClient) DeleteOne(ie *IPCEvent) *IPCEventDeleteOne {
+	return c.DeleteOneID(ie.ID)
+}
+
+// DeleteOneID returns a builder for deleting the given entity by its id.
+func (c *IPCEventClient) DeleteOneID(id int) *IPCEventDeleteOne {
+	builder := c.Delete().Where(ipcevent.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &IPCEventDeleteOne{builder}
+}
+
+// Query returns a query builder for IPCEvent.
+func (c *IPCEventClient) Query() *IPCEventQuery {
+	return &IPCEventQuery{
+		config: c.config,
+		ctx:    &QueryContext{Type: TypeIPCEvent},
+		inters: c.Interceptors(),
+	}
+}
+
+// Get returns a IPCEvent entity by its id.
+func (c *IPCEventClient) Get(ctx context.Context, id int) (*IPCEvent, error) {
+	return c.Query().Where(ipcevent.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *IPCEventClient) GetX(ctx context.Context, id int) *IPCEvent {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// QueryCreator queries the creator edge of a IPCEvent.
+func (c *IPCEventClient) QueryCreator(ie *IPCEvent) *AdminQuery {
+	query := (&AdminClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := ie.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(ipcevent.Table, ipcevent.FieldID, id),
+			sqlgraph.To(admin.Table, admin.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, ipcevent.CreatorTable, ipcevent.CreatorColumn),
+		)
+		fromV = sqlgraph.Neighbors(ie.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryUpdater queries the updater edge of a IPCEvent.
+func (c *IPCEventClient) QueryUpdater(ie *IPCEvent) *AdminQuery {
+	query := (&AdminClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := ie.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(ipcevent.Table, ipcevent.FieldID, id),
+			sqlgraph.To(admin.Table, admin.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, ipcevent.UpdaterTable, ipcevent.UpdaterColumn),
+		)
+		fromV = sqlgraph.Neighbors(ie.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryVideo queries the video edge of a IPCEvent.
+func (c *IPCEventClient) QueryVideo(ie *IPCEvent) *VideoQuery {
+	query := (&VideoClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := ie.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(ipcevent.Table, ipcevent.FieldID, id),
+			sqlgraph.To(video.Table, video.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, ipcevent.VideoTable, ipcevent.VideoColumn),
+		)
+		fromV = sqlgraph.Neighbors(ie.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryDevice queries the device edge of a IPCEvent.
+func (c *IPCEventClient) QueryDevice(ie *IPCEvent) *DeviceQuery {
+	query := (&DeviceClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := ie.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(ipcevent.Table, ipcevent.FieldID, id),
+			sqlgraph.To(device.Table, device.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, ipcevent.DeviceTable, ipcevent.DeviceColumn),
+		)
+		fromV = sqlgraph.Neighbors(ie.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryFixers queries the fixers edge of a IPCEvent.
+func (c *IPCEventClient) QueryFixers(ie *IPCEvent) *EmployeeQuery {
+	query := (&EmployeeClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := ie.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(ipcevent.Table, ipcevent.FieldID, id),
+			sqlgraph.To(employee.Table, employee.FieldID),
+			sqlgraph.Edge(sqlgraph.M2M, false, ipcevent.FixersTable, ipcevent.FixersPrimaryKey...),
+		)
+		fromV = sqlgraph.Neighbors(ie.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// Hooks returns the client hooks.
+func (c *IPCEventClient) Hooks() []Hook {
+	hooks := c.hooks.IPCEvent
+	return append(hooks[:len(hooks):len(hooks)], ipcevent.Hooks[:]...)
+}
+
+// Interceptors returns the client interceptors.
+func (c *IPCEventClient) Interceptors() []Interceptor {
+	return c.inters.IPCEvent
+}
+
+func (c *IPCEventClient) mutate(ctx context.Context, m *IPCEventMutation) (Value, error) {
+	switch m.Op() {
+	case OpCreate:
+		return (&IPCEventCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdate:
+		return (&IPCEventUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdateOne:
+		return (&IPCEventUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpDelete, OpDeleteOne:
+		return (&IPCEventDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+	default:
+		return nil, fmt.Errorf("dao: unknown IPCEvent mutation op: %q", m.Op())
 	}
 }
 
@@ -2539,15 +3493,15 @@ func (c *VideoClient) QueryUpdater(v *Video) *AdminQuery {
 	return query
 }
 
-// QueryIpcReportEventVideo queries the ipc_report_event_video edge of a Video.
-func (c *VideoClient) QueryIpcReportEventVideo(v *Video) *IPCReportEventQuery {
-	query := (&IPCReportEventClient{config: c.config}).Query()
+// QueryIpcEventVideo queries the ipc_event_video edge of a Video.
+func (c *VideoClient) QueryIpcEventVideo(v *Video) *IPCEventQuery {
+	query := (&IPCEventClient{config: c.config}).Query()
 	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
 		id := v.ID
 		step := sqlgraph.NewStep(
 			sqlgraph.From(video.Table, video.FieldID, id),
-			sqlgraph.To(ipcreportevent.Table, ipcreportevent.FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, false, video.IpcReportEventVideoTable, video.IpcReportEventVideoColumn),
+			sqlgraph.To(ipcevent.Table, ipcevent.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, video.IpcEventVideoTable, video.IpcEventVideoColumn),
 		)
 		fromV = sqlgraph.Neighbors(v.driver.Dialect(), step)
 		return fromV, nil
@@ -2584,12 +3538,14 @@ func (c *VideoClient) mutate(ctx context.Context, m *VideoMutation) (Value, erro
 // hooks and interceptors per client, for fast access.
 type (
 	hooks struct {
-		Admin, AdminRole, Department, Employee, IPCReportEvent, Occupation, Risk,
-		RiskCategory, RiskLocation, Video []ent.Hook
+		Admin, AdminRole, Area, Department, Device, DeviceInstallation, Employee,
+		EventLevel, IPCEvent, Occupation, Risk, RiskCategory, RiskLocation,
+		Video []ent.Hook
 	}
 	inters struct {
-		Admin, AdminRole, Department, Employee, IPCReportEvent, Occupation, Risk,
-		RiskCategory, RiskLocation, Video []ent.Interceptor
+		Admin, AdminRole, Area, Department, Device, DeviceInstallation, Employee,
+		EventLevel, IPCEvent, Occupation, Risk, RiskCategory, RiskLocation,
+		Video []ent.Interceptor
 	}
 )
 

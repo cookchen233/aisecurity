@@ -12,14 +12,26 @@ type Admin func(*sql.Selector)
 // AdminRole is the predicate function for adminrole builders.
 type AdminRole func(*sql.Selector)
 
+// Area is the predicate function for area builders.
+type Area func(*sql.Selector)
+
 // Department is the predicate function for department builders.
 type Department func(*sql.Selector)
+
+// Device is the predicate function for device builders.
+type Device func(*sql.Selector)
+
+// DeviceInstallation is the predicate function for deviceinstallation builders.
+type DeviceInstallation func(*sql.Selector)
 
 // Employee is the predicate function for employee builders.
 type Employee func(*sql.Selector)
 
-// IPCReportEvent is the predicate function for ipcreportevent builders.
-type IPCReportEvent func(*sql.Selector)
+// EventLevel is the predicate function for eventlevel builders.
+type EventLevel func(*sql.Selector)
+
+// IPCEvent is the predicate function for ipcevent builders.
+type IPCEvent func(*sql.Selector)
 
 // Occupation is the predicate function for occupation builders.
 type Occupation func(*sql.Selector)

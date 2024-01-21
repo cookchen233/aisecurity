@@ -6,6 +6,7 @@ import (
 	"aisecurity/ent/dao/admin"
 	"aisecurity/ent/dao/department"
 	"aisecurity/ent/dao/employee"
+	"aisecurity/ent/dao/ipcevent"
 	"aisecurity/ent/dao/occupation"
 	"aisecurity/ent/dao/risk"
 	"context"
@@ -135,6 +136,21 @@ func (ec *EmployeeCreate) AddOccupations(o ...*Occupation) *EmployeeCreate {
 		ids[i] = o[i].ID
 	}
 	return ec.AddOccupationIDs(ids...)
+}
+
+// AddIpcEventIDs adds the "ipc_events" edge to the IPCEvent entity by IDs.
+func (ec *EmployeeCreate) AddIpcEventIDs(ids ...int) *EmployeeCreate {
+	ec.mutation.AddIpcEventIDs(ids...)
+	return ec
+}
+
+// AddIpcEvents adds the "ipc_events" edges to the IPCEvent entity.
+func (ec *EmployeeCreate) AddIpcEvents(i ...*IPCEvent) *EmployeeCreate {
+	ids := make([]int, len(i))
+	for j := range i {
+		ids[j] = i[j].ID
+	}
+	return ec.AddIpcEventIDs(ids...)
 }
 
 // AddRiskReporterIDs adds the "risk_reporter" edge to the Risk entity by IDs.
@@ -388,6 +404,22 @@ func (ec *EmployeeCreate) createSpec() (*Employee, *sqlgraph.CreateSpec) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(occupation.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := ec.mutation.IpcEventsIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: true,
+			Table:   employee.IpcEventsTable,
+			Columns: employee.IpcEventsPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(ipcevent.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {

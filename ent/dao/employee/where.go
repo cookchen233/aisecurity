@@ -415,6 +415,29 @@ func HasOccupationsWith(preds ...predicate.Occupation) predicate.Employee {
 	})
 }
 
+// HasIpcEvents applies the HasEdge predicate on the "ipc_events" edge.
+func HasIpcEvents() predicate.Employee {
+	return predicate.Employee(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.M2M, true, IpcEventsTable, IpcEventsPrimaryKey...),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasIpcEventsWith applies the HasEdge predicate on the "ipc_events" edge with a given conditions (other predicates).
+func HasIpcEventsWith(preds ...predicate.IPCEvent) predicate.Employee {
+	return predicate.Employee(func(s *sql.Selector) {
+		step := newIpcEventsStep()
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
+}
+
 // HasRiskReporter applies the HasEdge predicate on the "risk_reporter" edge.
 func HasRiskReporter() predicate.Employee {
 	return predicate.Employee(func(s *sql.Selector) {

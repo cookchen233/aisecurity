@@ -5,9 +5,13 @@ package dao
 import (
 	"aisecurity/ent/dao/admin"
 	"aisecurity/ent/dao/adminrole"
+	"aisecurity/ent/dao/area"
 	"aisecurity/ent/dao/department"
+	"aisecurity/ent/dao/device"
+	"aisecurity/ent/dao/deviceinstallation"
 	"aisecurity/ent/dao/employee"
-	"aisecurity/ent/dao/ipcreportevent"
+	"aisecurity/ent/dao/eventlevel"
+	"aisecurity/ent/dao/ipcevent"
 	"aisecurity/ent/dao/occupation"
 	"aisecurity/ent/dao/predicate"
 	"aisecurity/ent/dao/risk"
@@ -36,106 +40,134 @@ const (
 	OpUpdateOne = ent.OpUpdateOne
 
 	// Node types.
-	TypeAdmin          = "Admin"
-	TypeAdminRole      = "AdminRole"
-	TypeDepartment     = "Department"
-	TypeEmployee       = "Employee"
-	TypeIPCReportEvent = "IPCReportEvent"
-	TypeOccupation     = "Occupation"
-	TypeRisk           = "Risk"
-	TypeRiskCategory   = "RiskCategory"
-	TypeRiskLocation   = "RiskLocation"
-	TypeVideo          = "Video"
+	TypeAdmin              = "Admin"
+	TypeAdminRole          = "AdminRole"
+	TypeArea               = "Area"
+	TypeDepartment         = "Department"
+	TypeDevice             = "Device"
+	TypeDeviceInstallation = "DeviceInstallation"
+	TypeEmployee           = "Employee"
+	TypeEventLevel         = "EventLevel"
+	TypeIPCEvent           = "IPCEvent"
+	TypeOccupation         = "Occupation"
+	TypeRisk               = "Risk"
+	TypeRiskCategory       = "RiskCategory"
+	TypeRiskLocation       = "RiskLocation"
+	TypeVideo              = "Video"
 )
 
 // AdminMutation represents an operation that mutates the Admin nodes in the graph.
 type AdminMutation struct {
 	config
-	op                              Op
-	typ                             string
-	id                              *int
-	created_at                      *time.Time
-	deleted_at                      *time.Time
-	updated_at                      *time.Time
-	username                        *string
-	password                        *string
-	nickname                        *string
-	real_name                       *string
-	avatar                          *string
-	clearedFields                   map[string]struct{}
-	creator                         *int
-	clearedcreator                  bool
-	updater                         *int
-	clearedupdater                  bool
-	admin_roles                     map[int]struct{}
-	removedadmin_roles              map[int]struct{}
-	clearedadmin_roles              bool
-	admin_creator                   map[int]struct{}
-	removedadmin_creator            map[int]struct{}
-	clearedadmin_creator            bool
-	admin_updater                   map[int]struct{}
-	removedadmin_updater            map[int]struct{}
-	clearedadmin_updater            bool
-	admin_role_creator              map[int]struct{}
-	removedadmin_role_creator       map[int]struct{}
-	clearedadmin_role_creator       bool
-	admin_role_updater              map[int]struct{}
-	removedadmin_role_updater       map[int]struct{}
-	clearedadmin_role_updater       bool
-	risk_creator                    map[int]struct{}
-	removedrisk_creator             map[int]struct{}
-	clearedrisk_creator             bool
-	risk_updater                    map[int]struct{}
-	removedrisk_updater             map[int]struct{}
-	clearedrisk_updater             bool
-	risk_location_creator           map[int]struct{}
-	removedrisk_location_creator    map[int]struct{}
-	clearedrisk_location_creator    bool
-	risk_location_updater           map[int]struct{}
-	removedrisk_location_updater    map[int]struct{}
-	clearedrisk_location_updater    bool
-	risk_category_creator           map[int]struct{}
-	removedrisk_category_creator    map[int]struct{}
-	clearedrisk_category_creator    bool
-	risk_category_updater           map[int]struct{}
-	removedrisk_category_updater    map[int]struct{}
-	clearedrisk_category_updater    bool
-	department_creator              map[int]struct{}
-	removeddepartment_creator       map[int]struct{}
-	cleareddepartment_creator       bool
-	department_updater              map[int]struct{}
-	removeddepartment_updater       map[int]struct{}
-	cleareddepartment_updater       bool
-	employee_creator                map[int]struct{}
-	removedemployee_creator         map[int]struct{}
-	clearedemployee_creator         bool
-	employee_updater                map[int]struct{}
-	removedemployee_updater         map[int]struct{}
-	clearedemployee_updater         bool
-	employee                        map[int]struct{}
-	removedemployee                 map[int]struct{}
-	clearedemployee                 bool
-	occupation_creator              map[int]struct{}
-	removedoccupation_creator       map[int]struct{}
-	clearedoccupation_creator       bool
-	occupation_updater              map[int]struct{}
-	removedoccupation_updater       map[int]struct{}
-	clearedoccupation_updater       bool
-	ipc_report_event_creator        map[int]struct{}
-	removedipc_report_event_creator map[int]struct{}
-	clearedipc_report_event_creator bool
-	ipc_report_event_updater        map[int]struct{}
-	removedipc_report_event_updater map[int]struct{}
-	clearedipc_report_event_updater bool
-	video_creator                   map[int]struct{}
-	removedvideo_creator            map[int]struct{}
-	clearedvideo_creator            bool
-	video_updater                   map[int]struct{}
-	removedvideo_updater            map[int]struct{}
-	clearedvideo_updater            bool
-	done                            bool
-	oldValue                        func(context.Context) (*Admin, error)
-	predicates                      []predicate.Admin
+	op                                 Op
+	typ                                string
+	id                                 *int
+	created_at                         *time.Time
+	deleted_at                         *time.Time
+	updated_at                         *time.Time
+	username                           *string
+	password                           *string
+	nickname                           *string
+	real_name                          *string
+	avatar                             *string
+	clearedFields                      map[string]struct{}
+	creator                            *int
+	clearedcreator                     bool
+	updater                            *int
+	clearedupdater                     bool
+	admin_roles                        map[int]struct{}
+	removedadmin_roles                 map[int]struct{}
+	clearedadmin_roles                 bool
+	admin_creator                      map[int]struct{}
+	removedadmin_creator               map[int]struct{}
+	clearedadmin_creator               bool
+	admin_updater                      map[int]struct{}
+	removedadmin_updater               map[int]struct{}
+	clearedadmin_updater               bool
+	admin_role_creator                 map[int]struct{}
+	removedadmin_role_creator          map[int]struct{}
+	clearedadmin_role_creator          bool
+	admin_role_updater                 map[int]struct{}
+	removedadmin_role_updater          map[int]struct{}
+	clearedadmin_role_updater          bool
+	risk_creator                       map[int]struct{}
+	removedrisk_creator                map[int]struct{}
+	clearedrisk_creator                bool
+	risk_updater                       map[int]struct{}
+	removedrisk_updater                map[int]struct{}
+	clearedrisk_updater                bool
+	risk_location_creator              map[int]struct{}
+	removedrisk_location_creator       map[int]struct{}
+	clearedrisk_location_creator       bool
+	risk_location_updater              map[int]struct{}
+	removedrisk_location_updater       map[int]struct{}
+	clearedrisk_location_updater       bool
+	risk_category_creator              map[int]struct{}
+	removedrisk_category_creator       map[int]struct{}
+	clearedrisk_category_creator       bool
+	risk_category_updater              map[int]struct{}
+	removedrisk_category_updater       map[int]struct{}
+	clearedrisk_category_updater       bool
+	department_creator                 map[int]struct{}
+	removeddepartment_creator          map[int]struct{}
+	cleareddepartment_creator          bool
+	department_updater                 map[int]struct{}
+	removeddepartment_updater          map[int]struct{}
+	cleareddepartment_updater          bool
+	employee_creator                   map[int]struct{}
+	removedemployee_creator            map[int]struct{}
+	clearedemployee_creator            bool
+	employee_updater                   map[int]struct{}
+	removedemployee_updater            map[int]struct{}
+	clearedemployee_updater            bool
+	employee                           map[int]struct{}
+	removedemployee                    map[int]struct{}
+	clearedemployee                    bool
+	occupation_creator                 map[int]struct{}
+	removedoccupation_creator          map[int]struct{}
+	clearedoccupation_creator          bool
+	occupation_updater                 map[int]struct{}
+	removedoccupation_updater          map[int]struct{}
+	clearedoccupation_updater          bool
+	ipc_event_creator                  map[int]struct{}
+	removedipc_event_creator           map[int]struct{}
+	clearedipc_event_creator           bool
+	ipc_event_updater                  map[int]struct{}
+	removedipc_event_updater           map[int]struct{}
+	clearedipc_event_updater           bool
+	video_creator                      map[int]struct{}
+	removedvideo_creator               map[int]struct{}
+	clearedvideo_creator               bool
+	video_updater                      map[int]struct{}
+	removedvideo_updater               map[int]struct{}
+	clearedvideo_updater               bool
+	area_creator                       map[int]struct{}
+	removedarea_creator                map[int]struct{}
+	clearedarea_creator                bool
+	area_updater                       map[int]struct{}
+	removedarea_updater                map[int]struct{}
+	clearedarea_updater                bool
+	device_creator                     map[int]struct{}
+	removeddevice_creator              map[int]struct{}
+	cleareddevice_creator              bool
+	device_updater                     map[int]struct{}
+	removeddevice_updater              map[int]struct{}
+	cleareddevice_updater              bool
+	device_installation_creator        map[int]struct{}
+	removeddevice_installation_creator map[int]struct{}
+	cleareddevice_installation_creator bool
+	device_installation_updater        map[int]struct{}
+	removeddevice_installation_updater map[int]struct{}
+	cleareddevice_installation_updater bool
+	event_level_creator                map[int]struct{}
+	removedevent_level_creator         map[int]struct{}
+	clearedevent_level_creator         bool
+	event_level_updater                map[int]struct{}
+	removedevent_level_updater         map[int]struct{}
+	clearedevent_level_updater         bool
+	done                               bool
+	oldValue                           func(context.Context) (*Admin, error)
+	predicates                         []predicate.Admin
 }
 
 var _ ent.Mutation = (*AdminMutation)(nil)
@@ -1674,112 +1706,112 @@ func (m *AdminMutation) ResetOccupationUpdater() {
 	m.removedoccupation_updater = nil
 }
 
-// AddIpcReportEventCreatorIDs adds the "ipc_report_event_creator" edge to the IPCReportEvent entity by ids.
-func (m *AdminMutation) AddIpcReportEventCreatorIDs(ids ...int) {
-	if m.ipc_report_event_creator == nil {
-		m.ipc_report_event_creator = make(map[int]struct{})
+// AddIpcEventCreatorIDs adds the "ipc_event_creator" edge to the IPCEvent entity by ids.
+func (m *AdminMutation) AddIpcEventCreatorIDs(ids ...int) {
+	if m.ipc_event_creator == nil {
+		m.ipc_event_creator = make(map[int]struct{})
 	}
 	for i := range ids {
-		m.ipc_report_event_creator[ids[i]] = struct{}{}
+		m.ipc_event_creator[ids[i]] = struct{}{}
 	}
 }
 
-// ClearIpcReportEventCreator clears the "ipc_report_event_creator" edge to the IPCReportEvent entity.
-func (m *AdminMutation) ClearIpcReportEventCreator() {
-	m.clearedipc_report_event_creator = true
+// ClearIpcEventCreator clears the "ipc_event_creator" edge to the IPCEvent entity.
+func (m *AdminMutation) ClearIpcEventCreator() {
+	m.clearedipc_event_creator = true
 }
 
-// IpcReportEventCreatorCleared reports if the "ipc_report_event_creator" edge to the IPCReportEvent entity was cleared.
-func (m *AdminMutation) IpcReportEventCreatorCleared() bool {
-	return m.clearedipc_report_event_creator
+// IpcEventCreatorCleared reports if the "ipc_event_creator" edge to the IPCEvent entity was cleared.
+func (m *AdminMutation) IpcEventCreatorCleared() bool {
+	return m.clearedipc_event_creator
 }
 
-// RemoveIpcReportEventCreatorIDs removes the "ipc_report_event_creator" edge to the IPCReportEvent entity by IDs.
-func (m *AdminMutation) RemoveIpcReportEventCreatorIDs(ids ...int) {
-	if m.removedipc_report_event_creator == nil {
-		m.removedipc_report_event_creator = make(map[int]struct{})
+// RemoveIpcEventCreatorIDs removes the "ipc_event_creator" edge to the IPCEvent entity by IDs.
+func (m *AdminMutation) RemoveIpcEventCreatorIDs(ids ...int) {
+	if m.removedipc_event_creator == nil {
+		m.removedipc_event_creator = make(map[int]struct{})
 	}
 	for i := range ids {
-		delete(m.ipc_report_event_creator, ids[i])
-		m.removedipc_report_event_creator[ids[i]] = struct{}{}
+		delete(m.ipc_event_creator, ids[i])
+		m.removedipc_event_creator[ids[i]] = struct{}{}
 	}
 }
 
-// RemovedIpcReportEventCreator returns the removed IDs of the "ipc_report_event_creator" edge to the IPCReportEvent entity.
-func (m *AdminMutation) RemovedIpcReportEventCreatorIDs() (ids []int) {
-	for id := range m.removedipc_report_event_creator {
+// RemovedIpcEventCreator returns the removed IDs of the "ipc_event_creator" edge to the IPCEvent entity.
+func (m *AdminMutation) RemovedIpcEventCreatorIDs() (ids []int) {
+	for id := range m.removedipc_event_creator {
 		ids = append(ids, id)
 	}
 	return
 }
 
-// IpcReportEventCreatorIDs returns the "ipc_report_event_creator" edge IDs in the mutation.
-func (m *AdminMutation) IpcReportEventCreatorIDs() (ids []int) {
-	for id := range m.ipc_report_event_creator {
+// IpcEventCreatorIDs returns the "ipc_event_creator" edge IDs in the mutation.
+func (m *AdminMutation) IpcEventCreatorIDs() (ids []int) {
+	for id := range m.ipc_event_creator {
 		ids = append(ids, id)
 	}
 	return
 }
 
-// ResetIpcReportEventCreator resets all changes to the "ipc_report_event_creator" edge.
-func (m *AdminMutation) ResetIpcReportEventCreator() {
-	m.ipc_report_event_creator = nil
-	m.clearedipc_report_event_creator = false
-	m.removedipc_report_event_creator = nil
+// ResetIpcEventCreator resets all changes to the "ipc_event_creator" edge.
+func (m *AdminMutation) ResetIpcEventCreator() {
+	m.ipc_event_creator = nil
+	m.clearedipc_event_creator = false
+	m.removedipc_event_creator = nil
 }
 
-// AddIpcReportEventUpdaterIDs adds the "ipc_report_event_updater" edge to the IPCReportEvent entity by ids.
-func (m *AdminMutation) AddIpcReportEventUpdaterIDs(ids ...int) {
-	if m.ipc_report_event_updater == nil {
-		m.ipc_report_event_updater = make(map[int]struct{})
+// AddIpcEventUpdaterIDs adds the "ipc_event_updater" edge to the IPCEvent entity by ids.
+func (m *AdminMutation) AddIpcEventUpdaterIDs(ids ...int) {
+	if m.ipc_event_updater == nil {
+		m.ipc_event_updater = make(map[int]struct{})
 	}
 	for i := range ids {
-		m.ipc_report_event_updater[ids[i]] = struct{}{}
+		m.ipc_event_updater[ids[i]] = struct{}{}
 	}
 }
 
-// ClearIpcReportEventUpdater clears the "ipc_report_event_updater" edge to the IPCReportEvent entity.
-func (m *AdminMutation) ClearIpcReportEventUpdater() {
-	m.clearedipc_report_event_updater = true
+// ClearIpcEventUpdater clears the "ipc_event_updater" edge to the IPCEvent entity.
+func (m *AdminMutation) ClearIpcEventUpdater() {
+	m.clearedipc_event_updater = true
 }
 
-// IpcReportEventUpdaterCleared reports if the "ipc_report_event_updater" edge to the IPCReportEvent entity was cleared.
-func (m *AdminMutation) IpcReportEventUpdaterCleared() bool {
-	return m.clearedipc_report_event_updater
+// IpcEventUpdaterCleared reports if the "ipc_event_updater" edge to the IPCEvent entity was cleared.
+func (m *AdminMutation) IpcEventUpdaterCleared() bool {
+	return m.clearedipc_event_updater
 }
 
-// RemoveIpcReportEventUpdaterIDs removes the "ipc_report_event_updater" edge to the IPCReportEvent entity by IDs.
-func (m *AdminMutation) RemoveIpcReportEventUpdaterIDs(ids ...int) {
-	if m.removedipc_report_event_updater == nil {
-		m.removedipc_report_event_updater = make(map[int]struct{})
+// RemoveIpcEventUpdaterIDs removes the "ipc_event_updater" edge to the IPCEvent entity by IDs.
+func (m *AdminMutation) RemoveIpcEventUpdaterIDs(ids ...int) {
+	if m.removedipc_event_updater == nil {
+		m.removedipc_event_updater = make(map[int]struct{})
 	}
 	for i := range ids {
-		delete(m.ipc_report_event_updater, ids[i])
-		m.removedipc_report_event_updater[ids[i]] = struct{}{}
+		delete(m.ipc_event_updater, ids[i])
+		m.removedipc_event_updater[ids[i]] = struct{}{}
 	}
 }
 
-// RemovedIpcReportEventUpdater returns the removed IDs of the "ipc_report_event_updater" edge to the IPCReportEvent entity.
-func (m *AdminMutation) RemovedIpcReportEventUpdaterIDs() (ids []int) {
-	for id := range m.removedipc_report_event_updater {
+// RemovedIpcEventUpdater returns the removed IDs of the "ipc_event_updater" edge to the IPCEvent entity.
+func (m *AdminMutation) RemovedIpcEventUpdaterIDs() (ids []int) {
+	for id := range m.removedipc_event_updater {
 		ids = append(ids, id)
 	}
 	return
 }
 
-// IpcReportEventUpdaterIDs returns the "ipc_report_event_updater" edge IDs in the mutation.
-func (m *AdminMutation) IpcReportEventUpdaterIDs() (ids []int) {
-	for id := range m.ipc_report_event_updater {
+// IpcEventUpdaterIDs returns the "ipc_event_updater" edge IDs in the mutation.
+func (m *AdminMutation) IpcEventUpdaterIDs() (ids []int) {
+	for id := range m.ipc_event_updater {
 		ids = append(ids, id)
 	}
 	return
 }
 
-// ResetIpcReportEventUpdater resets all changes to the "ipc_report_event_updater" edge.
-func (m *AdminMutation) ResetIpcReportEventUpdater() {
-	m.ipc_report_event_updater = nil
-	m.clearedipc_report_event_updater = false
-	m.removedipc_report_event_updater = nil
+// ResetIpcEventUpdater resets all changes to the "ipc_event_updater" edge.
+func (m *AdminMutation) ResetIpcEventUpdater() {
+	m.ipc_event_updater = nil
+	m.clearedipc_event_updater = false
+	m.removedipc_event_updater = nil
 }
 
 // AddVideoCreatorIDs adds the "video_creator" edge to the Video entity by ids.
@@ -1888,6 +1920,438 @@ func (m *AdminMutation) ResetVideoUpdater() {
 	m.video_updater = nil
 	m.clearedvideo_updater = false
 	m.removedvideo_updater = nil
+}
+
+// AddAreaCreatorIDs adds the "area_creator" edge to the Area entity by ids.
+func (m *AdminMutation) AddAreaCreatorIDs(ids ...int) {
+	if m.area_creator == nil {
+		m.area_creator = make(map[int]struct{})
+	}
+	for i := range ids {
+		m.area_creator[ids[i]] = struct{}{}
+	}
+}
+
+// ClearAreaCreator clears the "area_creator" edge to the Area entity.
+func (m *AdminMutation) ClearAreaCreator() {
+	m.clearedarea_creator = true
+}
+
+// AreaCreatorCleared reports if the "area_creator" edge to the Area entity was cleared.
+func (m *AdminMutation) AreaCreatorCleared() bool {
+	return m.clearedarea_creator
+}
+
+// RemoveAreaCreatorIDs removes the "area_creator" edge to the Area entity by IDs.
+func (m *AdminMutation) RemoveAreaCreatorIDs(ids ...int) {
+	if m.removedarea_creator == nil {
+		m.removedarea_creator = make(map[int]struct{})
+	}
+	for i := range ids {
+		delete(m.area_creator, ids[i])
+		m.removedarea_creator[ids[i]] = struct{}{}
+	}
+}
+
+// RemovedAreaCreator returns the removed IDs of the "area_creator" edge to the Area entity.
+func (m *AdminMutation) RemovedAreaCreatorIDs() (ids []int) {
+	for id := range m.removedarea_creator {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// AreaCreatorIDs returns the "area_creator" edge IDs in the mutation.
+func (m *AdminMutation) AreaCreatorIDs() (ids []int) {
+	for id := range m.area_creator {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// ResetAreaCreator resets all changes to the "area_creator" edge.
+func (m *AdminMutation) ResetAreaCreator() {
+	m.area_creator = nil
+	m.clearedarea_creator = false
+	m.removedarea_creator = nil
+}
+
+// AddAreaUpdaterIDs adds the "area_updater" edge to the Area entity by ids.
+func (m *AdminMutation) AddAreaUpdaterIDs(ids ...int) {
+	if m.area_updater == nil {
+		m.area_updater = make(map[int]struct{})
+	}
+	for i := range ids {
+		m.area_updater[ids[i]] = struct{}{}
+	}
+}
+
+// ClearAreaUpdater clears the "area_updater" edge to the Area entity.
+func (m *AdminMutation) ClearAreaUpdater() {
+	m.clearedarea_updater = true
+}
+
+// AreaUpdaterCleared reports if the "area_updater" edge to the Area entity was cleared.
+func (m *AdminMutation) AreaUpdaterCleared() bool {
+	return m.clearedarea_updater
+}
+
+// RemoveAreaUpdaterIDs removes the "area_updater" edge to the Area entity by IDs.
+func (m *AdminMutation) RemoveAreaUpdaterIDs(ids ...int) {
+	if m.removedarea_updater == nil {
+		m.removedarea_updater = make(map[int]struct{})
+	}
+	for i := range ids {
+		delete(m.area_updater, ids[i])
+		m.removedarea_updater[ids[i]] = struct{}{}
+	}
+}
+
+// RemovedAreaUpdater returns the removed IDs of the "area_updater" edge to the Area entity.
+func (m *AdminMutation) RemovedAreaUpdaterIDs() (ids []int) {
+	for id := range m.removedarea_updater {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// AreaUpdaterIDs returns the "area_updater" edge IDs in the mutation.
+func (m *AdminMutation) AreaUpdaterIDs() (ids []int) {
+	for id := range m.area_updater {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// ResetAreaUpdater resets all changes to the "area_updater" edge.
+func (m *AdminMutation) ResetAreaUpdater() {
+	m.area_updater = nil
+	m.clearedarea_updater = false
+	m.removedarea_updater = nil
+}
+
+// AddDeviceCreatorIDs adds the "device_creator" edge to the Device entity by ids.
+func (m *AdminMutation) AddDeviceCreatorIDs(ids ...int) {
+	if m.device_creator == nil {
+		m.device_creator = make(map[int]struct{})
+	}
+	for i := range ids {
+		m.device_creator[ids[i]] = struct{}{}
+	}
+}
+
+// ClearDeviceCreator clears the "device_creator" edge to the Device entity.
+func (m *AdminMutation) ClearDeviceCreator() {
+	m.cleareddevice_creator = true
+}
+
+// DeviceCreatorCleared reports if the "device_creator" edge to the Device entity was cleared.
+func (m *AdminMutation) DeviceCreatorCleared() bool {
+	return m.cleareddevice_creator
+}
+
+// RemoveDeviceCreatorIDs removes the "device_creator" edge to the Device entity by IDs.
+func (m *AdminMutation) RemoveDeviceCreatorIDs(ids ...int) {
+	if m.removeddevice_creator == nil {
+		m.removeddevice_creator = make(map[int]struct{})
+	}
+	for i := range ids {
+		delete(m.device_creator, ids[i])
+		m.removeddevice_creator[ids[i]] = struct{}{}
+	}
+}
+
+// RemovedDeviceCreator returns the removed IDs of the "device_creator" edge to the Device entity.
+func (m *AdminMutation) RemovedDeviceCreatorIDs() (ids []int) {
+	for id := range m.removeddevice_creator {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// DeviceCreatorIDs returns the "device_creator" edge IDs in the mutation.
+func (m *AdminMutation) DeviceCreatorIDs() (ids []int) {
+	for id := range m.device_creator {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// ResetDeviceCreator resets all changes to the "device_creator" edge.
+func (m *AdminMutation) ResetDeviceCreator() {
+	m.device_creator = nil
+	m.cleareddevice_creator = false
+	m.removeddevice_creator = nil
+}
+
+// AddDeviceUpdaterIDs adds the "device_updater" edge to the Device entity by ids.
+func (m *AdminMutation) AddDeviceUpdaterIDs(ids ...int) {
+	if m.device_updater == nil {
+		m.device_updater = make(map[int]struct{})
+	}
+	for i := range ids {
+		m.device_updater[ids[i]] = struct{}{}
+	}
+}
+
+// ClearDeviceUpdater clears the "device_updater" edge to the Device entity.
+func (m *AdminMutation) ClearDeviceUpdater() {
+	m.cleareddevice_updater = true
+}
+
+// DeviceUpdaterCleared reports if the "device_updater" edge to the Device entity was cleared.
+func (m *AdminMutation) DeviceUpdaterCleared() bool {
+	return m.cleareddevice_updater
+}
+
+// RemoveDeviceUpdaterIDs removes the "device_updater" edge to the Device entity by IDs.
+func (m *AdminMutation) RemoveDeviceUpdaterIDs(ids ...int) {
+	if m.removeddevice_updater == nil {
+		m.removeddevice_updater = make(map[int]struct{})
+	}
+	for i := range ids {
+		delete(m.device_updater, ids[i])
+		m.removeddevice_updater[ids[i]] = struct{}{}
+	}
+}
+
+// RemovedDeviceUpdater returns the removed IDs of the "device_updater" edge to the Device entity.
+func (m *AdminMutation) RemovedDeviceUpdaterIDs() (ids []int) {
+	for id := range m.removeddevice_updater {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// DeviceUpdaterIDs returns the "device_updater" edge IDs in the mutation.
+func (m *AdminMutation) DeviceUpdaterIDs() (ids []int) {
+	for id := range m.device_updater {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// ResetDeviceUpdater resets all changes to the "device_updater" edge.
+func (m *AdminMutation) ResetDeviceUpdater() {
+	m.device_updater = nil
+	m.cleareddevice_updater = false
+	m.removeddevice_updater = nil
+}
+
+// AddDeviceInstallationCreatorIDs adds the "device_installation_creator" edge to the DeviceInstallation entity by ids.
+func (m *AdminMutation) AddDeviceInstallationCreatorIDs(ids ...int) {
+	if m.device_installation_creator == nil {
+		m.device_installation_creator = make(map[int]struct{})
+	}
+	for i := range ids {
+		m.device_installation_creator[ids[i]] = struct{}{}
+	}
+}
+
+// ClearDeviceInstallationCreator clears the "device_installation_creator" edge to the DeviceInstallation entity.
+func (m *AdminMutation) ClearDeviceInstallationCreator() {
+	m.cleareddevice_installation_creator = true
+}
+
+// DeviceInstallationCreatorCleared reports if the "device_installation_creator" edge to the DeviceInstallation entity was cleared.
+func (m *AdminMutation) DeviceInstallationCreatorCleared() bool {
+	return m.cleareddevice_installation_creator
+}
+
+// RemoveDeviceInstallationCreatorIDs removes the "device_installation_creator" edge to the DeviceInstallation entity by IDs.
+func (m *AdminMutation) RemoveDeviceInstallationCreatorIDs(ids ...int) {
+	if m.removeddevice_installation_creator == nil {
+		m.removeddevice_installation_creator = make(map[int]struct{})
+	}
+	for i := range ids {
+		delete(m.device_installation_creator, ids[i])
+		m.removeddevice_installation_creator[ids[i]] = struct{}{}
+	}
+}
+
+// RemovedDeviceInstallationCreator returns the removed IDs of the "device_installation_creator" edge to the DeviceInstallation entity.
+func (m *AdminMutation) RemovedDeviceInstallationCreatorIDs() (ids []int) {
+	for id := range m.removeddevice_installation_creator {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// DeviceInstallationCreatorIDs returns the "device_installation_creator" edge IDs in the mutation.
+func (m *AdminMutation) DeviceInstallationCreatorIDs() (ids []int) {
+	for id := range m.device_installation_creator {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// ResetDeviceInstallationCreator resets all changes to the "device_installation_creator" edge.
+func (m *AdminMutation) ResetDeviceInstallationCreator() {
+	m.device_installation_creator = nil
+	m.cleareddevice_installation_creator = false
+	m.removeddevice_installation_creator = nil
+}
+
+// AddDeviceInstallationUpdaterIDs adds the "device_installation_updater" edge to the DeviceInstallation entity by ids.
+func (m *AdminMutation) AddDeviceInstallationUpdaterIDs(ids ...int) {
+	if m.device_installation_updater == nil {
+		m.device_installation_updater = make(map[int]struct{})
+	}
+	for i := range ids {
+		m.device_installation_updater[ids[i]] = struct{}{}
+	}
+}
+
+// ClearDeviceInstallationUpdater clears the "device_installation_updater" edge to the DeviceInstallation entity.
+func (m *AdminMutation) ClearDeviceInstallationUpdater() {
+	m.cleareddevice_installation_updater = true
+}
+
+// DeviceInstallationUpdaterCleared reports if the "device_installation_updater" edge to the DeviceInstallation entity was cleared.
+func (m *AdminMutation) DeviceInstallationUpdaterCleared() bool {
+	return m.cleareddevice_installation_updater
+}
+
+// RemoveDeviceInstallationUpdaterIDs removes the "device_installation_updater" edge to the DeviceInstallation entity by IDs.
+func (m *AdminMutation) RemoveDeviceInstallationUpdaterIDs(ids ...int) {
+	if m.removeddevice_installation_updater == nil {
+		m.removeddevice_installation_updater = make(map[int]struct{})
+	}
+	for i := range ids {
+		delete(m.device_installation_updater, ids[i])
+		m.removeddevice_installation_updater[ids[i]] = struct{}{}
+	}
+}
+
+// RemovedDeviceInstallationUpdater returns the removed IDs of the "device_installation_updater" edge to the DeviceInstallation entity.
+func (m *AdminMutation) RemovedDeviceInstallationUpdaterIDs() (ids []int) {
+	for id := range m.removeddevice_installation_updater {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// DeviceInstallationUpdaterIDs returns the "device_installation_updater" edge IDs in the mutation.
+func (m *AdminMutation) DeviceInstallationUpdaterIDs() (ids []int) {
+	for id := range m.device_installation_updater {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// ResetDeviceInstallationUpdater resets all changes to the "device_installation_updater" edge.
+func (m *AdminMutation) ResetDeviceInstallationUpdater() {
+	m.device_installation_updater = nil
+	m.cleareddevice_installation_updater = false
+	m.removeddevice_installation_updater = nil
+}
+
+// AddEventLevelCreatorIDs adds the "event_level_creator" edge to the EventLevel entity by ids.
+func (m *AdminMutation) AddEventLevelCreatorIDs(ids ...int) {
+	if m.event_level_creator == nil {
+		m.event_level_creator = make(map[int]struct{})
+	}
+	for i := range ids {
+		m.event_level_creator[ids[i]] = struct{}{}
+	}
+}
+
+// ClearEventLevelCreator clears the "event_level_creator" edge to the EventLevel entity.
+func (m *AdminMutation) ClearEventLevelCreator() {
+	m.clearedevent_level_creator = true
+}
+
+// EventLevelCreatorCleared reports if the "event_level_creator" edge to the EventLevel entity was cleared.
+func (m *AdminMutation) EventLevelCreatorCleared() bool {
+	return m.clearedevent_level_creator
+}
+
+// RemoveEventLevelCreatorIDs removes the "event_level_creator" edge to the EventLevel entity by IDs.
+func (m *AdminMutation) RemoveEventLevelCreatorIDs(ids ...int) {
+	if m.removedevent_level_creator == nil {
+		m.removedevent_level_creator = make(map[int]struct{})
+	}
+	for i := range ids {
+		delete(m.event_level_creator, ids[i])
+		m.removedevent_level_creator[ids[i]] = struct{}{}
+	}
+}
+
+// RemovedEventLevelCreator returns the removed IDs of the "event_level_creator" edge to the EventLevel entity.
+func (m *AdminMutation) RemovedEventLevelCreatorIDs() (ids []int) {
+	for id := range m.removedevent_level_creator {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// EventLevelCreatorIDs returns the "event_level_creator" edge IDs in the mutation.
+func (m *AdminMutation) EventLevelCreatorIDs() (ids []int) {
+	for id := range m.event_level_creator {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// ResetEventLevelCreator resets all changes to the "event_level_creator" edge.
+func (m *AdminMutation) ResetEventLevelCreator() {
+	m.event_level_creator = nil
+	m.clearedevent_level_creator = false
+	m.removedevent_level_creator = nil
+}
+
+// AddEventLevelUpdaterIDs adds the "event_level_updater" edge to the EventLevel entity by ids.
+func (m *AdminMutation) AddEventLevelUpdaterIDs(ids ...int) {
+	if m.event_level_updater == nil {
+		m.event_level_updater = make(map[int]struct{})
+	}
+	for i := range ids {
+		m.event_level_updater[ids[i]] = struct{}{}
+	}
+}
+
+// ClearEventLevelUpdater clears the "event_level_updater" edge to the EventLevel entity.
+func (m *AdminMutation) ClearEventLevelUpdater() {
+	m.clearedevent_level_updater = true
+}
+
+// EventLevelUpdaterCleared reports if the "event_level_updater" edge to the EventLevel entity was cleared.
+func (m *AdminMutation) EventLevelUpdaterCleared() bool {
+	return m.clearedevent_level_updater
+}
+
+// RemoveEventLevelUpdaterIDs removes the "event_level_updater" edge to the EventLevel entity by IDs.
+func (m *AdminMutation) RemoveEventLevelUpdaterIDs(ids ...int) {
+	if m.removedevent_level_updater == nil {
+		m.removedevent_level_updater = make(map[int]struct{})
+	}
+	for i := range ids {
+		delete(m.event_level_updater, ids[i])
+		m.removedevent_level_updater[ids[i]] = struct{}{}
+	}
+}
+
+// RemovedEventLevelUpdater returns the removed IDs of the "event_level_updater" edge to the EventLevel entity.
+func (m *AdminMutation) RemovedEventLevelUpdaterIDs() (ids []int) {
+	for id := range m.removedevent_level_updater {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// EventLevelUpdaterIDs returns the "event_level_updater" edge IDs in the mutation.
+func (m *AdminMutation) EventLevelUpdaterIDs() (ids []int) {
+	for id := range m.event_level_updater {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// ResetEventLevelUpdater resets all changes to the "event_level_updater" edge.
+func (m *AdminMutation) ResetEventLevelUpdater() {
+	m.event_level_updater = nil
+	m.clearedevent_level_updater = false
+	m.removedevent_level_updater = nil
 }
 
 // Where appends a list predicates to the AdminMutation builder.
@@ -2194,7 +2658,7 @@ func (m *AdminMutation) ResetField(name string) error {
 
 // AddedEdges returns all edge names that were set/added in this mutation.
 func (m *AdminMutation) AddedEdges() []string {
-	edges := make([]string, 0, 24)
+	edges := make([]string, 0, 32)
 	if m.creator != nil {
 		edges = append(edges, admin.EdgeCreator)
 	}
@@ -2255,17 +2719,41 @@ func (m *AdminMutation) AddedEdges() []string {
 	if m.occupation_updater != nil {
 		edges = append(edges, admin.EdgeOccupationUpdater)
 	}
-	if m.ipc_report_event_creator != nil {
-		edges = append(edges, admin.EdgeIpcReportEventCreator)
+	if m.ipc_event_creator != nil {
+		edges = append(edges, admin.EdgeIpcEventCreator)
 	}
-	if m.ipc_report_event_updater != nil {
-		edges = append(edges, admin.EdgeIpcReportEventUpdater)
+	if m.ipc_event_updater != nil {
+		edges = append(edges, admin.EdgeIpcEventUpdater)
 	}
 	if m.video_creator != nil {
 		edges = append(edges, admin.EdgeVideoCreator)
 	}
 	if m.video_updater != nil {
 		edges = append(edges, admin.EdgeVideoUpdater)
+	}
+	if m.area_creator != nil {
+		edges = append(edges, admin.EdgeAreaCreator)
+	}
+	if m.area_updater != nil {
+		edges = append(edges, admin.EdgeAreaUpdater)
+	}
+	if m.device_creator != nil {
+		edges = append(edges, admin.EdgeDeviceCreator)
+	}
+	if m.device_updater != nil {
+		edges = append(edges, admin.EdgeDeviceUpdater)
+	}
+	if m.device_installation_creator != nil {
+		edges = append(edges, admin.EdgeDeviceInstallationCreator)
+	}
+	if m.device_installation_updater != nil {
+		edges = append(edges, admin.EdgeDeviceInstallationUpdater)
+	}
+	if m.event_level_creator != nil {
+		edges = append(edges, admin.EdgeEventLevelCreator)
+	}
+	if m.event_level_updater != nil {
+		edges = append(edges, admin.EdgeEventLevelUpdater)
 	}
 	return edges
 }
@@ -2390,15 +2878,15 @@ func (m *AdminMutation) AddedIDs(name string) []ent.Value {
 			ids = append(ids, id)
 		}
 		return ids
-	case admin.EdgeIpcReportEventCreator:
-		ids := make([]ent.Value, 0, len(m.ipc_report_event_creator))
-		for id := range m.ipc_report_event_creator {
+	case admin.EdgeIpcEventCreator:
+		ids := make([]ent.Value, 0, len(m.ipc_event_creator))
+		for id := range m.ipc_event_creator {
 			ids = append(ids, id)
 		}
 		return ids
-	case admin.EdgeIpcReportEventUpdater:
-		ids := make([]ent.Value, 0, len(m.ipc_report_event_updater))
-		for id := range m.ipc_report_event_updater {
+	case admin.EdgeIpcEventUpdater:
+		ids := make([]ent.Value, 0, len(m.ipc_event_updater))
+		for id := range m.ipc_event_updater {
 			ids = append(ids, id)
 		}
 		return ids
@@ -2414,13 +2902,61 @@ func (m *AdminMutation) AddedIDs(name string) []ent.Value {
 			ids = append(ids, id)
 		}
 		return ids
+	case admin.EdgeAreaCreator:
+		ids := make([]ent.Value, 0, len(m.area_creator))
+		for id := range m.area_creator {
+			ids = append(ids, id)
+		}
+		return ids
+	case admin.EdgeAreaUpdater:
+		ids := make([]ent.Value, 0, len(m.area_updater))
+		for id := range m.area_updater {
+			ids = append(ids, id)
+		}
+		return ids
+	case admin.EdgeDeviceCreator:
+		ids := make([]ent.Value, 0, len(m.device_creator))
+		for id := range m.device_creator {
+			ids = append(ids, id)
+		}
+		return ids
+	case admin.EdgeDeviceUpdater:
+		ids := make([]ent.Value, 0, len(m.device_updater))
+		for id := range m.device_updater {
+			ids = append(ids, id)
+		}
+		return ids
+	case admin.EdgeDeviceInstallationCreator:
+		ids := make([]ent.Value, 0, len(m.device_installation_creator))
+		for id := range m.device_installation_creator {
+			ids = append(ids, id)
+		}
+		return ids
+	case admin.EdgeDeviceInstallationUpdater:
+		ids := make([]ent.Value, 0, len(m.device_installation_updater))
+		for id := range m.device_installation_updater {
+			ids = append(ids, id)
+		}
+		return ids
+	case admin.EdgeEventLevelCreator:
+		ids := make([]ent.Value, 0, len(m.event_level_creator))
+		for id := range m.event_level_creator {
+			ids = append(ids, id)
+		}
+		return ids
+	case admin.EdgeEventLevelUpdater:
+		ids := make([]ent.Value, 0, len(m.event_level_updater))
+		for id := range m.event_level_updater {
+			ids = append(ids, id)
+		}
+		return ids
 	}
 	return nil
 }
 
 // RemovedEdges returns all edge names that were removed in this mutation.
 func (m *AdminMutation) RemovedEdges() []string {
-	edges := make([]string, 0, 24)
+	edges := make([]string, 0, 32)
 	if m.removedadmin_roles != nil {
 		edges = append(edges, admin.EdgeAdminRoles)
 	}
@@ -2475,17 +3011,41 @@ func (m *AdminMutation) RemovedEdges() []string {
 	if m.removedoccupation_updater != nil {
 		edges = append(edges, admin.EdgeOccupationUpdater)
 	}
-	if m.removedipc_report_event_creator != nil {
-		edges = append(edges, admin.EdgeIpcReportEventCreator)
+	if m.removedipc_event_creator != nil {
+		edges = append(edges, admin.EdgeIpcEventCreator)
 	}
-	if m.removedipc_report_event_updater != nil {
-		edges = append(edges, admin.EdgeIpcReportEventUpdater)
+	if m.removedipc_event_updater != nil {
+		edges = append(edges, admin.EdgeIpcEventUpdater)
 	}
 	if m.removedvideo_creator != nil {
 		edges = append(edges, admin.EdgeVideoCreator)
 	}
 	if m.removedvideo_updater != nil {
 		edges = append(edges, admin.EdgeVideoUpdater)
+	}
+	if m.removedarea_creator != nil {
+		edges = append(edges, admin.EdgeAreaCreator)
+	}
+	if m.removedarea_updater != nil {
+		edges = append(edges, admin.EdgeAreaUpdater)
+	}
+	if m.removeddevice_creator != nil {
+		edges = append(edges, admin.EdgeDeviceCreator)
+	}
+	if m.removeddevice_updater != nil {
+		edges = append(edges, admin.EdgeDeviceUpdater)
+	}
+	if m.removeddevice_installation_creator != nil {
+		edges = append(edges, admin.EdgeDeviceInstallationCreator)
+	}
+	if m.removeddevice_installation_updater != nil {
+		edges = append(edges, admin.EdgeDeviceInstallationUpdater)
+	}
+	if m.removedevent_level_creator != nil {
+		edges = append(edges, admin.EdgeEventLevelCreator)
+	}
+	if m.removedevent_level_updater != nil {
+		edges = append(edges, admin.EdgeEventLevelUpdater)
 	}
 	return edges
 }
@@ -2602,15 +3162,15 @@ func (m *AdminMutation) RemovedIDs(name string) []ent.Value {
 			ids = append(ids, id)
 		}
 		return ids
-	case admin.EdgeIpcReportEventCreator:
-		ids := make([]ent.Value, 0, len(m.removedipc_report_event_creator))
-		for id := range m.removedipc_report_event_creator {
+	case admin.EdgeIpcEventCreator:
+		ids := make([]ent.Value, 0, len(m.removedipc_event_creator))
+		for id := range m.removedipc_event_creator {
 			ids = append(ids, id)
 		}
 		return ids
-	case admin.EdgeIpcReportEventUpdater:
-		ids := make([]ent.Value, 0, len(m.removedipc_report_event_updater))
-		for id := range m.removedipc_report_event_updater {
+	case admin.EdgeIpcEventUpdater:
+		ids := make([]ent.Value, 0, len(m.removedipc_event_updater))
+		for id := range m.removedipc_event_updater {
 			ids = append(ids, id)
 		}
 		return ids
@@ -2626,13 +3186,61 @@ func (m *AdminMutation) RemovedIDs(name string) []ent.Value {
 			ids = append(ids, id)
 		}
 		return ids
+	case admin.EdgeAreaCreator:
+		ids := make([]ent.Value, 0, len(m.removedarea_creator))
+		for id := range m.removedarea_creator {
+			ids = append(ids, id)
+		}
+		return ids
+	case admin.EdgeAreaUpdater:
+		ids := make([]ent.Value, 0, len(m.removedarea_updater))
+		for id := range m.removedarea_updater {
+			ids = append(ids, id)
+		}
+		return ids
+	case admin.EdgeDeviceCreator:
+		ids := make([]ent.Value, 0, len(m.removeddevice_creator))
+		for id := range m.removeddevice_creator {
+			ids = append(ids, id)
+		}
+		return ids
+	case admin.EdgeDeviceUpdater:
+		ids := make([]ent.Value, 0, len(m.removeddevice_updater))
+		for id := range m.removeddevice_updater {
+			ids = append(ids, id)
+		}
+		return ids
+	case admin.EdgeDeviceInstallationCreator:
+		ids := make([]ent.Value, 0, len(m.removeddevice_installation_creator))
+		for id := range m.removeddevice_installation_creator {
+			ids = append(ids, id)
+		}
+		return ids
+	case admin.EdgeDeviceInstallationUpdater:
+		ids := make([]ent.Value, 0, len(m.removeddevice_installation_updater))
+		for id := range m.removeddevice_installation_updater {
+			ids = append(ids, id)
+		}
+		return ids
+	case admin.EdgeEventLevelCreator:
+		ids := make([]ent.Value, 0, len(m.removedevent_level_creator))
+		for id := range m.removedevent_level_creator {
+			ids = append(ids, id)
+		}
+		return ids
+	case admin.EdgeEventLevelUpdater:
+		ids := make([]ent.Value, 0, len(m.removedevent_level_updater))
+		for id := range m.removedevent_level_updater {
+			ids = append(ids, id)
+		}
+		return ids
 	}
 	return nil
 }
 
 // ClearedEdges returns all edge names that were cleared in this mutation.
 func (m *AdminMutation) ClearedEdges() []string {
-	edges := make([]string, 0, 24)
+	edges := make([]string, 0, 32)
 	if m.clearedcreator {
 		edges = append(edges, admin.EdgeCreator)
 	}
@@ -2693,17 +3301,41 @@ func (m *AdminMutation) ClearedEdges() []string {
 	if m.clearedoccupation_updater {
 		edges = append(edges, admin.EdgeOccupationUpdater)
 	}
-	if m.clearedipc_report_event_creator {
-		edges = append(edges, admin.EdgeIpcReportEventCreator)
+	if m.clearedipc_event_creator {
+		edges = append(edges, admin.EdgeIpcEventCreator)
 	}
-	if m.clearedipc_report_event_updater {
-		edges = append(edges, admin.EdgeIpcReportEventUpdater)
+	if m.clearedipc_event_updater {
+		edges = append(edges, admin.EdgeIpcEventUpdater)
 	}
 	if m.clearedvideo_creator {
 		edges = append(edges, admin.EdgeVideoCreator)
 	}
 	if m.clearedvideo_updater {
 		edges = append(edges, admin.EdgeVideoUpdater)
+	}
+	if m.clearedarea_creator {
+		edges = append(edges, admin.EdgeAreaCreator)
+	}
+	if m.clearedarea_updater {
+		edges = append(edges, admin.EdgeAreaUpdater)
+	}
+	if m.cleareddevice_creator {
+		edges = append(edges, admin.EdgeDeviceCreator)
+	}
+	if m.cleareddevice_updater {
+		edges = append(edges, admin.EdgeDeviceUpdater)
+	}
+	if m.cleareddevice_installation_creator {
+		edges = append(edges, admin.EdgeDeviceInstallationCreator)
+	}
+	if m.cleareddevice_installation_updater {
+		edges = append(edges, admin.EdgeDeviceInstallationUpdater)
+	}
+	if m.clearedevent_level_creator {
+		edges = append(edges, admin.EdgeEventLevelCreator)
+	}
+	if m.clearedevent_level_updater {
+		edges = append(edges, admin.EdgeEventLevelUpdater)
 	}
 	return edges
 }
@@ -2752,14 +3384,30 @@ func (m *AdminMutation) EdgeCleared(name string) bool {
 		return m.clearedoccupation_creator
 	case admin.EdgeOccupationUpdater:
 		return m.clearedoccupation_updater
-	case admin.EdgeIpcReportEventCreator:
-		return m.clearedipc_report_event_creator
-	case admin.EdgeIpcReportEventUpdater:
-		return m.clearedipc_report_event_updater
+	case admin.EdgeIpcEventCreator:
+		return m.clearedipc_event_creator
+	case admin.EdgeIpcEventUpdater:
+		return m.clearedipc_event_updater
 	case admin.EdgeVideoCreator:
 		return m.clearedvideo_creator
 	case admin.EdgeVideoUpdater:
 		return m.clearedvideo_updater
+	case admin.EdgeAreaCreator:
+		return m.clearedarea_creator
+	case admin.EdgeAreaUpdater:
+		return m.clearedarea_updater
+	case admin.EdgeDeviceCreator:
+		return m.cleareddevice_creator
+	case admin.EdgeDeviceUpdater:
+		return m.cleareddevice_updater
+	case admin.EdgeDeviceInstallationCreator:
+		return m.cleareddevice_installation_creator
+	case admin.EdgeDeviceInstallationUpdater:
+		return m.cleareddevice_installation_updater
+	case admin.EdgeEventLevelCreator:
+		return m.clearedevent_level_creator
+	case admin.EdgeEventLevelUpdater:
+		return m.clearedevent_level_updater
 	}
 	return false
 }
@@ -2842,17 +3490,41 @@ func (m *AdminMutation) ResetEdge(name string) error {
 	case admin.EdgeOccupationUpdater:
 		m.ResetOccupationUpdater()
 		return nil
-	case admin.EdgeIpcReportEventCreator:
-		m.ResetIpcReportEventCreator()
+	case admin.EdgeIpcEventCreator:
+		m.ResetIpcEventCreator()
 		return nil
-	case admin.EdgeIpcReportEventUpdater:
-		m.ResetIpcReportEventUpdater()
+	case admin.EdgeIpcEventUpdater:
+		m.ResetIpcEventUpdater()
 		return nil
 	case admin.EdgeVideoCreator:
 		m.ResetVideoCreator()
 		return nil
 	case admin.EdgeVideoUpdater:
 		m.ResetVideoUpdater()
+		return nil
+	case admin.EdgeAreaCreator:
+		m.ResetAreaCreator()
+		return nil
+	case admin.EdgeAreaUpdater:
+		m.ResetAreaUpdater()
+		return nil
+	case admin.EdgeDeviceCreator:
+		m.ResetDeviceCreator()
+		return nil
+	case admin.EdgeDeviceUpdater:
+		m.ResetDeviceUpdater()
+		return nil
+	case admin.EdgeDeviceInstallationCreator:
+		m.ResetDeviceInstallationCreator()
+		return nil
+	case admin.EdgeDeviceInstallationUpdater:
+		m.ResetDeviceInstallationUpdater()
+		return nil
+	case admin.EdgeEventLevelCreator:
+		m.ResetEventLevelCreator()
+		return nil
+	case admin.EdgeEventLevelUpdater:
+		m.ResetEventLevelUpdater()
 		return nil
 	}
 	return fmt.Errorf("unknown Admin edge %s", name)
@@ -3726,6 +4398,930 @@ func (m *AdminRoleMutation) ResetEdge(name string) error {
 		return nil
 	}
 	return fmt.Errorf("unknown AdminRole edge %s", name)
+}
+
+// AreaMutation represents an operation that mutates the Area nodes in the graph.
+type AreaMutation struct {
+	config
+	op                              Op
+	typ                             string
+	id                              *int
+	created_at                      *time.Time
+	deleted_at                      *time.Time
+	updated_at                      *time.Time
+	name                            *string
+	description                     *string
+	clearedFields                   map[string]struct{}
+	creator                         *int
+	clearedcreator                  bool
+	updater                         *int
+	clearedupdater                  bool
+	device_installation_area        map[int]struct{}
+	removeddevice_installation_area map[int]struct{}
+	cleareddevice_installation_area bool
+	done                            bool
+	oldValue                        func(context.Context) (*Area, error)
+	predicates                      []predicate.Area
+}
+
+var _ ent.Mutation = (*AreaMutation)(nil)
+
+// areaOption allows management of the mutation configuration using functional options.
+type areaOption func(*AreaMutation)
+
+// newAreaMutation creates new mutation for the Area entity.
+func newAreaMutation(c config, op Op, opts ...areaOption) *AreaMutation {
+	m := &AreaMutation{
+		config:        c,
+		op:            op,
+		typ:           TypeArea,
+		clearedFields: make(map[string]struct{}),
+	}
+	for _, opt := range opts {
+		opt(m)
+	}
+	return m
+}
+
+// withAreaID sets the ID field of the mutation.
+func withAreaID(id int) areaOption {
+	return func(m *AreaMutation) {
+		var (
+			err   error
+			once  sync.Once
+			value *Area
+		)
+		m.oldValue = func(ctx context.Context) (*Area, error) {
+			once.Do(func() {
+				if m.done {
+					err = errors.New("querying old values post mutation is not allowed")
+				} else {
+					value, err = m.Client().Area.Get(ctx, id)
+				}
+			})
+			return value, err
+		}
+		m.id = &id
+	}
+}
+
+// withArea sets the old Area of the mutation.
+func withArea(node *Area) areaOption {
+	return func(m *AreaMutation) {
+		m.oldValue = func(context.Context) (*Area, error) {
+			return node, nil
+		}
+		m.id = &node.ID
+	}
+}
+
+// Client returns a new `ent.Client` from the mutation. If the mutation was
+// executed in a transaction (ent.Tx), a transactional client is returned.
+func (m AreaMutation) Client() *Client {
+	client := &Client{config: m.config}
+	client.init()
+	return client
+}
+
+// Tx returns an `ent.Tx` for mutations that were executed in transactions;
+// it returns an error otherwise.
+func (m AreaMutation) Tx() (*Tx, error) {
+	if _, ok := m.driver.(*txDriver); !ok {
+		return nil, errors.New("dao: mutation is not running in a transaction")
+	}
+	tx := &Tx{config: m.config}
+	tx.init()
+	return tx, nil
+}
+
+// ID returns the ID value in the mutation. Note that the ID is only available
+// if it was provided to the builder or after it was returned from the database.
+func (m *AreaMutation) ID() (id int, exists bool) {
+	if m.id == nil {
+		return
+	}
+	return *m.id, true
+}
+
+// IDs queries the database and returns the entity ids that match the mutation's predicate.
+// That means, if the mutation is applied within a transaction with an isolation level such
+// as sql.LevelSerializable, the returned ids match the ids of the rows that will be updated
+// or updated by the mutation.
+func (m *AreaMutation) IDs(ctx context.Context) ([]int, error) {
+	switch {
+	case m.op.Is(OpUpdateOne | OpDeleteOne):
+		id, exists := m.ID()
+		if exists {
+			return []int{id}, nil
+		}
+		fallthrough
+	case m.op.Is(OpUpdate | OpDelete):
+		return m.Client().Area.Query().Where(m.predicates...).IDs(ctx)
+	default:
+		return nil, fmt.Errorf("IDs is not allowed on %s operations", m.op)
+	}
+}
+
+// SetCreatedAt sets the "created_at" field.
+func (m *AreaMutation) SetCreatedAt(t time.Time) {
+	m.created_at = &t
+}
+
+// CreatedAt returns the value of the "created_at" field in the mutation.
+func (m *AreaMutation) CreatedAt() (r time.Time, exists bool) {
+	v := m.created_at
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldCreatedAt returns the old "created_at" field's value of the Area entity.
+// If the Area object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *AreaMutation) OldCreatedAt(ctx context.Context) (v time.Time, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldCreatedAt is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldCreatedAt requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldCreatedAt: %w", err)
+	}
+	return oldValue.CreatedAt, nil
+}
+
+// ResetCreatedAt resets all changes to the "created_at" field.
+func (m *AreaMutation) ResetCreatedAt() {
+	m.created_at = nil
+}
+
+// SetCreatedBy sets the "created_by" field.
+func (m *AreaMutation) SetCreatedBy(i int) {
+	m.creator = &i
+}
+
+// CreatedBy returns the value of the "created_by" field in the mutation.
+func (m *AreaMutation) CreatedBy() (r int, exists bool) {
+	v := m.creator
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldCreatedBy returns the old "created_by" field's value of the Area entity.
+// If the Area object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *AreaMutation) OldCreatedBy(ctx context.Context) (v int, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldCreatedBy is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldCreatedBy requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldCreatedBy: %w", err)
+	}
+	return oldValue.CreatedBy, nil
+}
+
+// ResetCreatedBy resets all changes to the "created_by" field.
+func (m *AreaMutation) ResetCreatedBy() {
+	m.creator = nil
+}
+
+// SetDeletedAt sets the "deleted_at" field.
+func (m *AreaMutation) SetDeletedAt(t time.Time) {
+	m.deleted_at = &t
+}
+
+// DeletedAt returns the value of the "deleted_at" field in the mutation.
+func (m *AreaMutation) DeletedAt() (r time.Time, exists bool) {
+	v := m.deleted_at
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldDeletedAt returns the old "deleted_at" field's value of the Area entity.
+// If the Area object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *AreaMutation) OldDeletedAt(ctx context.Context) (v *time.Time, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldDeletedAt is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldDeletedAt requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldDeletedAt: %w", err)
+	}
+	return oldValue.DeletedAt, nil
+}
+
+// ClearDeletedAt clears the value of the "deleted_at" field.
+func (m *AreaMutation) ClearDeletedAt() {
+	m.deleted_at = nil
+	m.clearedFields[area.FieldDeletedAt] = struct{}{}
+}
+
+// DeletedAtCleared returns if the "deleted_at" field was cleared in this mutation.
+func (m *AreaMutation) DeletedAtCleared() bool {
+	_, ok := m.clearedFields[area.FieldDeletedAt]
+	return ok
+}
+
+// ResetDeletedAt resets all changes to the "deleted_at" field.
+func (m *AreaMutation) ResetDeletedAt() {
+	m.deleted_at = nil
+	delete(m.clearedFields, area.FieldDeletedAt)
+}
+
+// SetUpdatedBy sets the "updated_by" field.
+func (m *AreaMutation) SetUpdatedBy(i int) {
+	m.updater = &i
+}
+
+// UpdatedBy returns the value of the "updated_by" field in the mutation.
+func (m *AreaMutation) UpdatedBy() (r int, exists bool) {
+	v := m.updater
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldUpdatedBy returns the old "updated_by" field's value of the Area entity.
+// If the Area object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *AreaMutation) OldUpdatedBy(ctx context.Context) (v int, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldUpdatedBy is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldUpdatedBy requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldUpdatedBy: %w", err)
+	}
+	return oldValue.UpdatedBy, nil
+}
+
+// ResetUpdatedBy resets all changes to the "updated_by" field.
+func (m *AreaMutation) ResetUpdatedBy() {
+	m.updater = nil
+}
+
+// SetUpdatedAt sets the "updated_at" field.
+func (m *AreaMutation) SetUpdatedAt(t time.Time) {
+	m.updated_at = &t
+}
+
+// UpdatedAt returns the value of the "updated_at" field in the mutation.
+func (m *AreaMutation) UpdatedAt() (r time.Time, exists bool) {
+	v := m.updated_at
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldUpdatedAt returns the old "updated_at" field's value of the Area entity.
+// If the Area object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *AreaMutation) OldUpdatedAt(ctx context.Context) (v time.Time, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldUpdatedAt is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldUpdatedAt requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldUpdatedAt: %w", err)
+	}
+	return oldValue.UpdatedAt, nil
+}
+
+// ResetUpdatedAt resets all changes to the "updated_at" field.
+func (m *AreaMutation) ResetUpdatedAt() {
+	m.updated_at = nil
+}
+
+// SetName sets the "name" field.
+func (m *AreaMutation) SetName(s string) {
+	m.name = &s
+}
+
+// Name returns the value of the "name" field in the mutation.
+func (m *AreaMutation) Name() (r string, exists bool) {
+	v := m.name
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldName returns the old "name" field's value of the Area entity.
+// If the Area object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *AreaMutation) OldName(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldName is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldName requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldName: %w", err)
+	}
+	return oldValue.Name, nil
+}
+
+// ClearName clears the value of the "name" field.
+func (m *AreaMutation) ClearName() {
+	m.name = nil
+	m.clearedFields[area.FieldName] = struct{}{}
+}
+
+// NameCleared returns if the "name" field was cleared in this mutation.
+func (m *AreaMutation) NameCleared() bool {
+	_, ok := m.clearedFields[area.FieldName]
+	return ok
+}
+
+// ResetName resets all changes to the "name" field.
+func (m *AreaMutation) ResetName() {
+	m.name = nil
+	delete(m.clearedFields, area.FieldName)
+}
+
+// SetDescription sets the "description" field.
+func (m *AreaMutation) SetDescription(s string) {
+	m.description = &s
+}
+
+// Description returns the value of the "description" field in the mutation.
+func (m *AreaMutation) Description() (r string, exists bool) {
+	v := m.description
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldDescription returns the old "description" field's value of the Area entity.
+// If the Area object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *AreaMutation) OldDescription(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldDescription is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldDescription requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldDescription: %w", err)
+	}
+	return oldValue.Description, nil
+}
+
+// ClearDescription clears the value of the "description" field.
+func (m *AreaMutation) ClearDescription() {
+	m.description = nil
+	m.clearedFields[area.FieldDescription] = struct{}{}
+}
+
+// DescriptionCleared returns if the "description" field was cleared in this mutation.
+func (m *AreaMutation) DescriptionCleared() bool {
+	_, ok := m.clearedFields[area.FieldDescription]
+	return ok
+}
+
+// ResetDescription resets all changes to the "description" field.
+func (m *AreaMutation) ResetDescription() {
+	m.description = nil
+	delete(m.clearedFields, area.FieldDescription)
+}
+
+// SetCreatorID sets the "creator" edge to the Admin entity by id.
+func (m *AreaMutation) SetCreatorID(id int) {
+	m.creator = &id
+}
+
+// ClearCreator clears the "creator" edge to the Admin entity.
+func (m *AreaMutation) ClearCreator() {
+	m.clearedcreator = true
+	m.clearedFields[area.FieldCreatedBy] = struct{}{}
+}
+
+// CreatorCleared reports if the "creator" edge to the Admin entity was cleared.
+func (m *AreaMutation) CreatorCleared() bool {
+	return m.clearedcreator
+}
+
+// CreatorID returns the "creator" edge ID in the mutation.
+func (m *AreaMutation) CreatorID() (id int, exists bool) {
+	if m.creator != nil {
+		return *m.creator, true
+	}
+	return
+}
+
+// CreatorIDs returns the "creator" edge IDs in the mutation.
+// Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
+// CreatorID instead. It exists only for internal usage by the builders.
+func (m *AreaMutation) CreatorIDs() (ids []int) {
+	if id := m.creator; id != nil {
+		ids = append(ids, *id)
+	}
+	return
+}
+
+// ResetCreator resets all changes to the "creator" edge.
+func (m *AreaMutation) ResetCreator() {
+	m.creator = nil
+	m.clearedcreator = false
+}
+
+// SetUpdaterID sets the "updater" edge to the Admin entity by id.
+func (m *AreaMutation) SetUpdaterID(id int) {
+	m.updater = &id
+}
+
+// ClearUpdater clears the "updater" edge to the Admin entity.
+func (m *AreaMutation) ClearUpdater() {
+	m.clearedupdater = true
+	m.clearedFields[area.FieldUpdatedBy] = struct{}{}
+}
+
+// UpdaterCleared reports if the "updater" edge to the Admin entity was cleared.
+func (m *AreaMutation) UpdaterCleared() bool {
+	return m.clearedupdater
+}
+
+// UpdaterID returns the "updater" edge ID in the mutation.
+func (m *AreaMutation) UpdaterID() (id int, exists bool) {
+	if m.updater != nil {
+		return *m.updater, true
+	}
+	return
+}
+
+// UpdaterIDs returns the "updater" edge IDs in the mutation.
+// Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
+// UpdaterID instead. It exists only for internal usage by the builders.
+func (m *AreaMutation) UpdaterIDs() (ids []int) {
+	if id := m.updater; id != nil {
+		ids = append(ids, *id)
+	}
+	return
+}
+
+// ResetUpdater resets all changes to the "updater" edge.
+func (m *AreaMutation) ResetUpdater() {
+	m.updater = nil
+	m.clearedupdater = false
+}
+
+// AddDeviceInstallationAreaIDs adds the "device_installation_area" edge to the DeviceInstallation entity by ids.
+func (m *AreaMutation) AddDeviceInstallationAreaIDs(ids ...int) {
+	if m.device_installation_area == nil {
+		m.device_installation_area = make(map[int]struct{})
+	}
+	for i := range ids {
+		m.device_installation_area[ids[i]] = struct{}{}
+	}
+}
+
+// ClearDeviceInstallationArea clears the "device_installation_area" edge to the DeviceInstallation entity.
+func (m *AreaMutation) ClearDeviceInstallationArea() {
+	m.cleareddevice_installation_area = true
+}
+
+// DeviceInstallationAreaCleared reports if the "device_installation_area" edge to the DeviceInstallation entity was cleared.
+func (m *AreaMutation) DeviceInstallationAreaCleared() bool {
+	return m.cleareddevice_installation_area
+}
+
+// RemoveDeviceInstallationAreaIDs removes the "device_installation_area" edge to the DeviceInstallation entity by IDs.
+func (m *AreaMutation) RemoveDeviceInstallationAreaIDs(ids ...int) {
+	if m.removeddevice_installation_area == nil {
+		m.removeddevice_installation_area = make(map[int]struct{})
+	}
+	for i := range ids {
+		delete(m.device_installation_area, ids[i])
+		m.removeddevice_installation_area[ids[i]] = struct{}{}
+	}
+}
+
+// RemovedDeviceInstallationArea returns the removed IDs of the "device_installation_area" edge to the DeviceInstallation entity.
+func (m *AreaMutation) RemovedDeviceInstallationAreaIDs() (ids []int) {
+	for id := range m.removeddevice_installation_area {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// DeviceInstallationAreaIDs returns the "device_installation_area" edge IDs in the mutation.
+func (m *AreaMutation) DeviceInstallationAreaIDs() (ids []int) {
+	for id := range m.device_installation_area {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// ResetDeviceInstallationArea resets all changes to the "device_installation_area" edge.
+func (m *AreaMutation) ResetDeviceInstallationArea() {
+	m.device_installation_area = nil
+	m.cleareddevice_installation_area = false
+	m.removeddevice_installation_area = nil
+}
+
+// Where appends a list predicates to the AreaMutation builder.
+func (m *AreaMutation) Where(ps ...predicate.Area) {
+	m.predicates = append(m.predicates, ps...)
+}
+
+// WhereP appends storage-level predicates to the AreaMutation builder. Using this method,
+// users can use type-assertion to append predicates that do not depend on any generated package.
+func (m *AreaMutation) WhereP(ps ...func(*sql.Selector)) {
+	p := make([]predicate.Area, len(ps))
+	for i := range ps {
+		p[i] = ps[i]
+	}
+	m.Where(p...)
+}
+
+// Op returns the operation name.
+func (m *AreaMutation) Op() Op {
+	return m.op
+}
+
+// SetOp allows setting the mutation operation.
+func (m *AreaMutation) SetOp(op Op) {
+	m.op = op
+}
+
+// Type returns the node type of this mutation (Area).
+func (m *AreaMutation) Type() string {
+	return m.typ
+}
+
+// Fields returns all fields that were changed during this mutation. Note that in
+// order to get all numeric fields that were incremented/decremented, call
+// AddedFields().
+func (m *AreaMutation) Fields() []string {
+	fields := make([]string, 0, 7)
+	if m.created_at != nil {
+		fields = append(fields, area.FieldCreatedAt)
+	}
+	if m.creator != nil {
+		fields = append(fields, area.FieldCreatedBy)
+	}
+	if m.deleted_at != nil {
+		fields = append(fields, area.FieldDeletedAt)
+	}
+	if m.updater != nil {
+		fields = append(fields, area.FieldUpdatedBy)
+	}
+	if m.updated_at != nil {
+		fields = append(fields, area.FieldUpdatedAt)
+	}
+	if m.name != nil {
+		fields = append(fields, area.FieldName)
+	}
+	if m.description != nil {
+		fields = append(fields, area.FieldDescription)
+	}
+	return fields
+}
+
+// Field returns the value of a field with the given name. The second boolean
+// return value indicates that this field was not set, or was not defined in the
+// schema.
+func (m *AreaMutation) Field(name string) (ent.Value, bool) {
+	switch name {
+	case area.FieldCreatedAt:
+		return m.CreatedAt()
+	case area.FieldCreatedBy:
+		return m.CreatedBy()
+	case area.FieldDeletedAt:
+		return m.DeletedAt()
+	case area.FieldUpdatedBy:
+		return m.UpdatedBy()
+	case area.FieldUpdatedAt:
+		return m.UpdatedAt()
+	case area.FieldName:
+		return m.Name()
+	case area.FieldDescription:
+		return m.Description()
+	}
+	return nil, false
+}
+
+// OldField returns the old value of the field from the database. An error is
+// returned if the mutation operation is not UpdateOne, or the query to the
+// database failed.
+func (m *AreaMutation) OldField(ctx context.Context, name string) (ent.Value, error) {
+	switch name {
+	case area.FieldCreatedAt:
+		return m.OldCreatedAt(ctx)
+	case area.FieldCreatedBy:
+		return m.OldCreatedBy(ctx)
+	case area.FieldDeletedAt:
+		return m.OldDeletedAt(ctx)
+	case area.FieldUpdatedBy:
+		return m.OldUpdatedBy(ctx)
+	case area.FieldUpdatedAt:
+		return m.OldUpdatedAt(ctx)
+	case area.FieldName:
+		return m.OldName(ctx)
+	case area.FieldDescription:
+		return m.OldDescription(ctx)
+	}
+	return nil, fmt.Errorf("unknown Area field %s", name)
+}
+
+// SetField sets the value of a field with the given name. It returns an error if
+// the field is not defined in the schema, or if the type mismatched the field
+// type.
+func (m *AreaMutation) SetField(name string, value ent.Value) error {
+	switch name {
+	case area.FieldCreatedAt:
+		v, ok := value.(time.Time)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetCreatedAt(v)
+		return nil
+	case area.FieldCreatedBy:
+		v, ok := value.(int)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetCreatedBy(v)
+		return nil
+	case area.FieldDeletedAt:
+		v, ok := value.(time.Time)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetDeletedAt(v)
+		return nil
+	case area.FieldUpdatedBy:
+		v, ok := value.(int)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetUpdatedBy(v)
+		return nil
+	case area.FieldUpdatedAt:
+		v, ok := value.(time.Time)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetUpdatedAt(v)
+		return nil
+	case area.FieldName:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetName(v)
+		return nil
+	case area.FieldDescription:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetDescription(v)
+		return nil
+	}
+	return fmt.Errorf("unknown Area field %s", name)
+}
+
+// AddedFields returns all numeric fields that were incremented/decremented during
+// this mutation.
+func (m *AreaMutation) AddedFields() []string {
+	var fields []string
+	return fields
+}
+
+// AddedField returns the numeric value that was incremented/decremented on a field
+// with the given name. The second boolean return value indicates that this field
+// was not set, or was not defined in the schema.
+func (m *AreaMutation) AddedField(name string) (ent.Value, bool) {
+	switch name {
+	}
+	return nil, false
+}
+
+// AddField adds the value to the field with the given name. It returns an error if
+// the field is not defined in the schema, or if the type mismatched the field
+// type.
+func (m *AreaMutation) AddField(name string, value ent.Value) error {
+	switch name {
+	}
+	return fmt.Errorf("unknown Area numeric field %s", name)
+}
+
+// ClearedFields returns all nullable fields that were cleared during this
+// mutation.
+func (m *AreaMutation) ClearedFields() []string {
+	var fields []string
+	if m.FieldCleared(area.FieldDeletedAt) {
+		fields = append(fields, area.FieldDeletedAt)
+	}
+	if m.FieldCleared(area.FieldName) {
+		fields = append(fields, area.FieldName)
+	}
+	if m.FieldCleared(area.FieldDescription) {
+		fields = append(fields, area.FieldDescription)
+	}
+	return fields
+}
+
+// FieldCleared returns a boolean indicating if a field with the given name was
+// cleared in this mutation.
+func (m *AreaMutation) FieldCleared(name string) bool {
+	_, ok := m.clearedFields[name]
+	return ok
+}
+
+// ClearField clears the value of the field with the given name. It returns an
+// error if the field is not defined in the schema.
+func (m *AreaMutation) ClearField(name string) error {
+	switch name {
+	case area.FieldDeletedAt:
+		m.ClearDeletedAt()
+		return nil
+	case area.FieldName:
+		m.ClearName()
+		return nil
+	case area.FieldDescription:
+		m.ClearDescription()
+		return nil
+	}
+	return fmt.Errorf("unknown Area nullable field %s", name)
+}
+
+// ResetField resets all changes in the mutation for the field with the given name.
+// It returns an error if the field is not defined in the schema.
+func (m *AreaMutation) ResetField(name string) error {
+	switch name {
+	case area.FieldCreatedAt:
+		m.ResetCreatedAt()
+		return nil
+	case area.FieldCreatedBy:
+		m.ResetCreatedBy()
+		return nil
+	case area.FieldDeletedAt:
+		m.ResetDeletedAt()
+		return nil
+	case area.FieldUpdatedBy:
+		m.ResetUpdatedBy()
+		return nil
+	case area.FieldUpdatedAt:
+		m.ResetUpdatedAt()
+		return nil
+	case area.FieldName:
+		m.ResetName()
+		return nil
+	case area.FieldDescription:
+		m.ResetDescription()
+		return nil
+	}
+	return fmt.Errorf("unknown Area field %s", name)
+}
+
+// AddedEdges returns all edge names that were set/added in this mutation.
+func (m *AreaMutation) AddedEdges() []string {
+	edges := make([]string, 0, 3)
+	if m.creator != nil {
+		edges = append(edges, area.EdgeCreator)
+	}
+	if m.updater != nil {
+		edges = append(edges, area.EdgeUpdater)
+	}
+	if m.device_installation_area != nil {
+		edges = append(edges, area.EdgeDeviceInstallationArea)
+	}
+	return edges
+}
+
+// AddedIDs returns all IDs (to other nodes) that were added for the given edge
+// name in this mutation.
+func (m *AreaMutation) AddedIDs(name string) []ent.Value {
+	switch name {
+	case area.EdgeCreator:
+		if id := m.creator; id != nil {
+			return []ent.Value{*id}
+		}
+	case area.EdgeUpdater:
+		if id := m.updater; id != nil {
+			return []ent.Value{*id}
+		}
+	case area.EdgeDeviceInstallationArea:
+		ids := make([]ent.Value, 0, len(m.device_installation_area))
+		for id := range m.device_installation_area {
+			ids = append(ids, id)
+		}
+		return ids
+	}
+	return nil
+}
+
+// RemovedEdges returns all edge names that were removed in this mutation.
+func (m *AreaMutation) RemovedEdges() []string {
+	edges := make([]string, 0, 3)
+	if m.removeddevice_installation_area != nil {
+		edges = append(edges, area.EdgeDeviceInstallationArea)
+	}
+	return edges
+}
+
+// RemovedIDs returns all IDs (to other nodes) that were removed for the edge with
+// the given name in this mutation.
+func (m *AreaMutation) RemovedIDs(name string) []ent.Value {
+	switch name {
+	case area.EdgeDeviceInstallationArea:
+		ids := make([]ent.Value, 0, len(m.removeddevice_installation_area))
+		for id := range m.removeddevice_installation_area {
+			ids = append(ids, id)
+		}
+		return ids
+	}
+	return nil
+}
+
+// ClearedEdges returns all edge names that were cleared in this mutation.
+func (m *AreaMutation) ClearedEdges() []string {
+	edges := make([]string, 0, 3)
+	if m.clearedcreator {
+		edges = append(edges, area.EdgeCreator)
+	}
+	if m.clearedupdater {
+		edges = append(edges, area.EdgeUpdater)
+	}
+	if m.cleareddevice_installation_area {
+		edges = append(edges, area.EdgeDeviceInstallationArea)
+	}
+	return edges
+}
+
+// EdgeCleared returns a boolean which indicates if the edge with the given name
+// was cleared in this mutation.
+func (m *AreaMutation) EdgeCleared(name string) bool {
+	switch name {
+	case area.EdgeCreator:
+		return m.clearedcreator
+	case area.EdgeUpdater:
+		return m.clearedupdater
+	case area.EdgeDeviceInstallationArea:
+		return m.cleareddevice_installation_area
+	}
+	return false
+}
+
+// ClearEdge clears the value of the edge with the given name. It returns an error
+// if that edge is not defined in the schema.
+func (m *AreaMutation) ClearEdge(name string) error {
+	switch name {
+	case area.EdgeCreator:
+		m.ClearCreator()
+		return nil
+	case area.EdgeUpdater:
+		m.ClearUpdater()
+		return nil
+	}
+	return fmt.Errorf("unknown Area unique edge %s", name)
+}
+
+// ResetEdge resets all changes to the edge with the given name in this mutation.
+// It returns an error if the edge is not defined in the schema.
+func (m *AreaMutation) ResetEdge(name string) error {
+	switch name {
+	case area.EdgeCreator:
+		m.ResetCreator()
+		return nil
+	case area.EdgeUpdater:
+		m.ResetUpdater()
+		return nil
+	case area.EdgeDeviceInstallationArea:
+		m.ResetDeviceInstallationArea()
+		return nil
+	}
+	return fmt.Errorf("unknown Area edge %s", name)
 }
 
 // DepartmentMutation represents an operation that mutates the Department nodes in the graph.
@@ -4762,6 +6358,2746 @@ func (m *DepartmentMutation) ResetEdge(name string) error {
 	return fmt.Errorf("unknown Department edge %s", name)
 }
 
+// DeviceMutation represents an operation that mutates the Device nodes in the graph.
+type DeviceMutation struct {
+	config
+	op                                Op
+	typ                               string
+	id                                *int
+	created_at                        *time.Time
+	deleted_at                        *time.Time
+	updated_at                        *time.Time
+	brand                             *enums.DeviceBrand
+	addbrand                          *enums.DeviceBrand
+	model                             *enums.DeviceModel
+	addmodel                          *enums.DeviceModel
+	name                              *string
+	sn                                *string
+	device_type                       *enums.DeviceType
+	adddevice_type                    *enums.DeviceType
+	clearedFields                     map[string]struct{}
+	creator                           *int
+	clearedcreator                    bool
+	updater                           *int
+	clearedupdater                    bool
+	ipc_event_device                  map[int]struct{}
+	removedipc_event_device           map[int]struct{}
+	clearedipc_event_device           bool
+	device_installation_device        map[int]struct{}
+	removeddevice_installation_device map[int]struct{}
+	cleareddevice_installation_device bool
+	done                              bool
+	oldValue                          func(context.Context) (*Device, error)
+	predicates                        []predicate.Device
+}
+
+var _ ent.Mutation = (*DeviceMutation)(nil)
+
+// deviceOption allows management of the mutation configuration using functional options.
+type deviceOption func(*DeviceMutation)
+
+// newDeviceMutation creates new mutation for the Device entity.
+func newDeviceMutation(c config, op Op, opts ...deviceOption) *DeviceMutation {
+	m := &DeviceMutation{
+		config:        c,
+		op:            op,
+		typ:           TypeDevice,
+		clearedFields: make(map[string]struct{}),
+	}
+	for _, opt := range opts {
+		opt(m)
+	}
+	return m
+}
+
+// withDeviceID sets the ID field of the mutation.
+func withDeviceID(id int) deviceOption {
+	return func(m *DeviceMutation) {
+		var (
+			err   error
+			once  sync.Once
+			value *Device
+		)
+		m.oldValue = func(ctx context.Context) (*Device, error) {
+			once.Do(func() {
+				if m.done {
+					err = errors.New("querying old values post mutation is not allowed")
+				} else {
+					value, err = m.Client().Device.Get(ctx, id)
+				}
+			})
+			return value, err
+		}
+		m.id = &id
+	}
+}
+
+// withDevice sets the old Device of the mutation.
+func withDevice(node *Device) deviceOption {
+	return func(m *DeviceMutation) {
+		m.oldValue = func(context.Context) (*Device, error) {
+			return node, nil
+		}
+		m.id = &node.ID
+	}
+}
+
+// Client returns a new `ent.Client` from the mutation. If the mutation was
+// executed in a transaction (ent.Tx), a transactional client is returned.
+func (m DeviceMutation) Client() *Client {
+	client := &Client{config: m.config}
+	client.init()
+	return client
+}
+
+// Tx returns an `ent.Tx` for mutations that were executed in transactions;
+// it returns an error otherwise.
+func (m DeviceMutation) Tx() (*Tx, error) {
+	if _, ok := m.driver.(*txDriver); !ok {
+		return nil, errors.New("dao: mutation is not running in a transaction")
+	}
+	tx := &Tx{config: m.config}
+	tx.init()
+	return tx, nil
+}
+
+// ID returns the ID value in the mutation. Note that the ID is only available
+// if it was provided to the builder or after it was returned from the database.
+func (m *DeviceMutation) ID() (id int, exists bool) {
+	if m.id == nil {
+		return
+	}
+	return *m.id, true
+}
+
+// IDs queries the database and returns the entity ids that match the mutation's predicate.
+// That means, if the mutation is applied within a transaction with an isolation level such
+// as sql.LevelSerializable, the returned ids match the ids of the rows that will be updated
+// or updated by the mutation.
+func (m *DeviceMutation) IDs(ctx context.Context) ([]int, error) {
+	switch {
+	case m.op.Is(OpUpdateOne | OpDeleteOne):
+		id, exists := m.ID()
+		if exists {
+			return []int{id}, nil
+		}
+		fallthrough
+	case m.op.Is(OpUpdate | OpDelete):
+		return m.Client().Device.Query().Where(m.predicates...).IDs(ctx)
+	default:
+		return nil, fmt.Errorf("IDs is not allowed on %s operations", m.op)
+	}
+}
+
+// SetCreatedAt sets the "created_at" field.
+func (m *DeviceMutation) SetCreatedAt(t time.Time) {
+	m.created_at = &t
+}
+
+// CreatedAt returns the value of the "created_at" field in the mutation.
+func (m *DeviceMutation) CreatedAt() (r time.Time, exists bool) {
+	v := m.created_at
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldCreatedAt returns the old "created_at" field's value of the Device entity.
+// If the Device object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *DeviceMutation) OldCreatedAt(ctx context.Context) (v time.Time, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldCreatedAt is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldCreatedAt requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldCreatedAt: %w", err)
+	}
+	return oldValue.CreatedAt, nil
+}
+
+// ResetCreatedAt resets all changes to the "created_at" field.
+func (m *DeviceMutation) ResetCreatedAt() {
+	m.created_at = nil
+}
+
+// SetCreatedBy sets the "created_by" field.
+func (m *DeviceMutation) SetCreatedBy(i int) {
+	m.creator = &i
+}
+
+// CreatedBy returns the value of the "created_by" field in the mutation.
+func (m *DeviceMutation) CreatedBy() (r int, exists bool) {
+	v := m.creator
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldCreatedBy returns the old "created_by" field's value of the Device entity.
+// If the Device object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *DeviceMutation) OldCreatedBy(ctx context.Context) (v int, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldCreatedBy is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldCreatedBy requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldCreatedBy: %w", err)
+	}
+	return oldValue.CreatedBy, nil
+}
+
+// ResetCreatedBy resets all changes to the "created_by" field.
+func (m *DeviceMutation) ResetCreatedBy() {
+	m.creator = nil
+}
+
+// SetDeletedAt sets the "deleted_at" field.
+func (m *DeviceMutation) SetDeletedAt(t time.Time) {
+	m.deleted_at = &t
+}
+
+// DeletedAt returns the value of the "deleted_at" field in the mutation.
+func (m *DeviceMutation) DeletedAt() (r time.Time, exists bool) {
+	v := m.deleted_at
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldDeletedAt returns the old "deleted_at" field's value of the Device entity.
+// If the Device object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *DeviceMutation) OldDeletedAt(ctx context.Context) (v *time.Time, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldDeletedAt is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldDeletedAt requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldDeletedAt: %w", err)
+	}
+	return oldValue.DeletedAt, nil
+}
+
+// ClearDeletedAt clears the value of the "deleted_at" field.
+func (m *DeviceMutation) ClearDeletedAt() {
+	m.deleted_at = nil
+	m.clearedFields[device.FieldDeletedAt] = struct{}{}
+}
+
+// DeletedAtCleared returns if the "deleted_at" field was cleared in this mutation.
+func (m *DeviceMutation) DeletedAtCleared() bool {
+	_, ok := m.clearedFields[device.FieldDeletedAt]
+	return ok
+}
+
+// ResetDeletedAt resets all changes to the "deleted_at" field.
+func (m *DeviceMutation) ResetDeletedAt() {
+	m.deleted_at = nil
+	delete(m.clearedFields, device.FieldDeletedAt)
+}
+
+// SetUpdatedBy sets the "updated_by" field.
+func (m *DeviceMutation) SetUpdatedBy(i int) {
+	m.updater = &i
+}
+
+// UpdatedBy returns the value of the "updated_by" field in the mutation.
+func (m *DeviceMutation) UpdatedBy() (r int, exists bool) {
+	v := m.updater
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldUpdatedBy returns the old "updated_by" field's value of the Device entity.
+// If the Device object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *DeviceMutation) OldUpdatedBy(ctx context.Context) (v int, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldUpdatedBy is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldUpdatedBy requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldUpdatedBy: %w", err)
+	}
+	return oldValue.UpdatedBy, nil
+}
+
+// ResetUpdatedBy resets all changes to the "updated_by" field.
+func (m *DeviceMutation) ResetUpdatedBy() {
+	m.updater = nil
+}
+
+// SetUpdatedAt sets the "updated_at" field.
+func (m *DeviceMutation) SetUpdatedAt(t time.Time) {
+	m.updated_at = &t
+}
+
+// UpdatedAt returns the value of the "updated_at" field in the mutation.
+func (m *DeviceMutation) UpdatedAt() (r time.Time, exists bool) {
+	v := m.updated_at
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldUpdatedAt returns the old "updated_at" field's value of the Device entity.
+// If the Device object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *DeviceMutation) OldUpdatedAt(ctx context.Context) (v time.Time, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldUpdatedAt is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldUpdatedAt requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldUpdatedAt: %w", err)
+	}
+	return oldValue.UpdatedAt, nil
+}
+
+// ResetUpdatedAt resets all changes to the "updated_at" field.
+func (m *DeviceMutation) ResetUpdatedAt() {
+	m.updated_at = nil
+}
+
+// SetBrand sets the "brand" field.
+func (m *DeviceMutation) SetBrand(eb enums.DeviceBrand) {
+	m.brand = &eb
+	m.addbrand = nil
+}
+
+// Brand returns the value of the "brand" field in the mutation.
+func (m *DeviceMutation) Brand() (r enums.DeviceBrand, exists bool) {
+	v := m.brand
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldBrand returns the old "brand" field's value of the Device entity.
+// If the Device object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *DeviceMutation) OldBrand(ctx context.Context) (v enums.DeviceBrand, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldBrand is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldBrand requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldBrand: %w", err)
+	}
+	return oldValue.Brand, nil
+}
+
+// AddBrand adds eb to the "brand" field.
+func (m *DeviceMutation) AddBrand(eb enums.DeviceBrand) {
+	if m.addbrand != nil {
+		*m.addbrand += eb
+	} else {
+		m.addbrand = &eb
+	}
+}
+
+// AddedBrand returns the value that was added to the "brand" field in this mutation.
+func (m *DeviceMutation) AddedBrand() (r enums.DeviceBrand, exists bool) {
+	v := m.addbrand
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ClearBrand clears the value of the "brand" field.
+func (m *DeviceMutation) ClearBrand() {
+	m.brand = nil
+	m.addbrand = nil
+	m.clearedFields[device.FieldBrand] = struct{}{}
+}
+
+// BrandCleared returns if the "brand" field was cleared in this mutation.
+func (m *DeviceMutation) BrandCleared() bool {
+	_, ok := m.clearedFields[device.FieldBrand]
+	return ok
+}
+
+// ResetBrand resets all changes to the "brand" field.
+func (m *DeviceMutation) ResetBrand() {
+	m.brand = nil
+	m.addbrand = nil
+	delete(m.clearedFields, device.FieldBrand)
+}
+
+// SetModel sets the "model" field.
+func (m *DeviceMutation) SetModel(em enums.DeviceModel) {
+	m.model = &em
+	m.addmodel = nil
+}
+
+// Model returns the value of the "model" field in the mutation.
+func (m *DeviceMutation) Model() (r enums.DeviceModel, exists bool) {
+	v := m.model
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldModel returns the old "model" field's value of the Device entity.
+// If the Device object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *DeviceMutation) OldModel(ctx context.Context) (v enums.DeviceModel, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldModel is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldModel requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldModel: %w", err)
+	}
+	return oldValue.Model, nil
+}
+
+// AddModel adds em to the "model" field.
+func (m *DeviceMutation) AddModel(em enums.DeviceModel) {
+	if m.addmodel != nil {
+		*m.addmodel += em
+	} else {
+		m.addmodel = &em
+	}
+}
+
+// AddedModel returns the value that was added to the "model" field in this mutation.
+func (m *DeviceMutation) AddedModel() (r enums.DeviceModel, exists bool) {
+	v := m.addmodel
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ClearModel clears the value of the "model" field.
+func (m *DeviceMutation) ClearModel() {
+	m.model = nil
+	m.addmodel = nil
+	m.clearedFields[device.FieldModel] = struct{}{}
+}
+
+// ModelCleared returns if the "model" field was cleared in this mutation.
+func (m *DeviceMutation) ModelCleared() bool {
+	_, ok := m.clearedFields[device.FieldModel]
+	return ok
+}
+
+// ResetModel resets all changes to the "model" field.
+func (m *DeviceMutation) ResetModel() {
+	m.model = nil
+	m.addmodel = nil
+	delete(m.clearedFields, device.FieldModel)
+}
+
+// SetName sets the "name" field.
+func (m *DeviceMutation) SetName(s string) {
+	m.name = &s
+}
+
+// Name returns the value of the "name" field in the mutation.
+func (m *DeviceMutation) Name() (r string, exists bool) {
+	v := m.name
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldName returns the old "name" field's value of the Device entity.
+// If the Device object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *DeviceMutation) OldName(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldName is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldName requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldName: %w", err)
+	}
+	return oldValue.Name, nil
+}
+
+// ClearName clears the value of the "name" field.
+func (m *DeviceMutation) ClearName() {
+	m.name = nil
+	m.clearedFields[device.FieldName] = struct{}{}
+}
+
+// NameCleared returns if the "name" field was cleared in this mutation.
+func (m *DeviceMutation) NameCleared() bool {
+	_, ok := m.clearedFields[device.FieldName]
+	return ok
+}
+
+// ResetName resets all changes to the "name" field.
+func (m *DeviceMutation) ResetName() {
+	m.name = nil
+	delete(m.clearedFields, device.FieldName)
+}
+
+// SetSn sets the "sn" field.
+func (m *DeviceMutation) SetSn(s string) {
+	m.sn = &s
+}
+
+// Sn returns the value of the "sn" field in the mutation.
+func (m *DeviceMutation) Sn() (r string, exists bool) {
+	v := m.sn
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldSn returns the old "sn" field's value of the Device entity.
+// If the Device object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *DeviceMutation) OldSn(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldSn is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldSn requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldSn: %w", err)
+	}
+	return oldValue.Sn, nil
+}
+
+// ClearSn clears the value of the "sn" field.
+func (m *DeviceMutation) ClearSn() {
+	m.sn = nil
+	m.clearedFields[device.FieldSn] = struct{}{}
+}
+
+// SnCleared returns if the "sn" field was cleared in this mutation.
+func (m *DeviceMutation) SnCleared() bool {
+	_, ok := m.clearedFields[device.FieldSn]
+	return ok
+}
+
+// ResetSn resets all changes to the "sn" field.
+func (m *DeviceMutation) ResetSn() {
+	m.sn = nil
+	delete(m.clearedFields, device.FieldSn)
+}
+
+// SetDeviceType sets the "device_type" field.
+func (m *DeviceMutation) SetDeviceType(et enums.DeviceType) {
+	m.device_type = &et
+	m.adddevice_type = nil
+}
+
+// DeviceType returns the value of the "device_type" field in the mutation.
+func (m *DeviceMutation) DeviceType() (r enums.DeviceType, exists bool) {
+	v := m.device_type
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldDeviceType returns the old "device_type" field's value of the Device entity.
+// If the Device object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *DeviceMutation) OldDeviceType(ctx context.Context) (v enums.DeviceType, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldDeviceType is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldDeviceType requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldDeviceType: %w", err)
+	}
+	return oldValue.DeviceType, nil
+}
+
+// AddDeviceType adds et to the "device_type" field.
+func (m *DeviceMutation) AddDeviceType(et enums.DeviceType) {
+	if m.adddevice_type != nil {
+		*m.adddevice_type += et
+	} else {
+		m.adddevice_type = &et
+	}
+}
+
+// AddedDeviceType returns the value that was added to the "device_type" field in this mutation.
+func (m *DeviceMutation) AddedDeviceType() (r enums.DeviceType, exists bool) {
+	v := m.adddevice_type
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ResetDeviceType resets all changes to the "device_type" field.
+func (m *DeviceMutation) ResetDeviceType() {
+	m.device_type = nil
+	m.adddevice_type = nil
+}
+
+// SetCreatorID sets the "creator" edge to the Admin entity by id.
+func (m *DeviceMutation) SetCreatorID(id int) {
+	m.creator = &id
+}
+
+// ClearCreator clears the "creator" edge to the Admin entity.
+func (m *DeviceMutation) ClearCreator() {
+	m.clearedcreator = true
+	m.clearedFields[device.FieldCreatedBy] = struct{}{}
+}
+
+// CreatorCleared reports if the "creator" edge to the Admin entity was cleared.
+func (m *DeviceMutation) CreatorCleared() bool {
+	return m.clearedcreator
+}
+
+// CreatorID returns the "creator" edge ID in the mutation.
+func (m *DeviceMutation) CreatorID() (id int, exists bool) {
+	if m.creator != nil {
+		return *m.creator, true
+	}
+	return
+}
+
+// CreatorIDs returns the "creator" edge IDs in the mutation.
+// Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
+// CreatorID instead. It exists only for internal usage by the builders.
+func (m *DeviceMutation) CreatorIDs() (ids []int) {
+	if id := m.creator; id != nil {
+		ids = append(ids, *id)
+	}
+	return
+}
+
+// ResetCreator resets all changes to the "creator" edge.
+func (m *DeviceMutation) ResetCreator() {
+	m.creator = nil
+	m.clearedcreator = false
+}
+
+// SetUpdaterID sets the "updater" edge to the Admin entity by id.
+func (m *DeviceMutation) SetUpdaterID(id int) {
+	m.updater = &id
+}
+
+// ClearUpdater clears the "updater" edge to the Admin entity.
+func (m *DeviceMutation) ClearUpdater() {
+	m.clearedupdater = true
+	m.clearedFields[device.FieldUpdatedBy] = struct{}{}
+}
+
+// UpdaterCleared reports if the "updater" edge to the Admin entity was cleared.
+func (m *DeviceMutation) UpdaterCleared() bool {
+	return m.clearedupdater
+}
+
+// UpdaterID returns the "updater" edge ID in the mutation.
+func (m *DeviceMutation) UpdaterID() (id int, exists bool) {
+	if m.updater != nil {
+		return *m.updater, true
+	}
+	return
+}
+
+// UpdaterIDs returns the "updater" edge IDs in the mutation.
+// Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
+// UpdaterID instead. It exists only for internal usage by the builders.
+func (m *DeviceMutation) UpdaterIDs() (ids []int) {
+	if id := m.updater; id != nil {
+		ids = append(ids, *id)
+	}
+	return
+}
+
+// ResetUpdater resets all changes to the "updater" edge.
+func (m *DeviceMutation) ResetUpdater() {
+	m.updater = nil
+	m.clearedupdater = false
+}
+
+// AddIpcEventDeviceIDs adds the "ipc_event_device" edge to the IPCEvent entity by ids.
+func (m *DeviceMutation) AddIpcEventDeviceIDs(ids ...int) {
+	if m.ipc_event_device == nil {
+		m.ipc_event_device = make(map[int]struct{})
+	}
+	for i := range ids {
+		m.ipc_event_device[ids[i]] = struct{}{}
+	}
+}
+
+// ClearIpcEventDevice clears the "ipc_event_device" edge to the IPCEvent entity.
+func (m *DeviceMutation) ClearIpcEventDevice() {
+	m.clearedipc_event_device = true
+}
+
+// IpcEventDeviceCleared reports if the "ipc_event_device" edge to the IPCEvent entity was cleared.
+func (m *DeviceMutation) IpcEventDeviceCleared() bool {
+	return m.clearedipc_event_device
+}
+
+// RemoveIpcEventDeviceIDs removes the "ipc_event_device" edge to the IPCEvent entity by IDs.
+func (m *DeviceMutation) RemoveIpcEventDeviceIDs(ids ...int) {
+	if m.removedipc_event_device == nil {
+		m.removedipc_event_device = make(map[int]struct{})
+	}
+	for i := range ids {
+		delete(m.ipc_event_device, ids[i])
+		m.removedipc_event_device[ids[i]] = struct{}{}
+	}
+}
+
+// RemovedIpcEventDevice returns the removed IDs of the "ipc_event_device" edge to the IPCEvent entity.
+func (m *DeviceMutation) RemovedIpcEventDeviceIDs() (ids []int) {
+	for id := range m.removedipc_event_device {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// IpcEventDeviceIDs returns the "ipc_event_device" edge IDs in the mutation.
+func (m *DeviceMutation) IpcEventDeviceIDs() (ids []int) {
+	for id := range m.ipc_event_device {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// ResetIpcEventDevice resets all changes to the "ipc_event_device" edge.
+func (m *DeviceMutation) ResetIpcEventDevice() {
+	m.ipc_event_device = nil
+	m.clearedipc_event_device = false
+	m.removedipc_event_device = nil
+}
+
+// AddDeviceInstallationDeviceIDs adds the "device_installation_device" edge to the DeviceInstallation entity by ids.
+func (m *DeviceMutation) AddDeviceInstallationDeviceIDs(ids ...int) {
+	if m.device_installation_device == nil {
+		m.device_installation_device = make(map[int]struct{})
+	}
+	for i := range ids {
+		m.device_installation_device[ids[i]] = struct{}{}
+	}
+}
+
+// ClearDeviceInstallationDevice clears the "device_installation_device" edge to the DeviceInstallation entity.
+func (m *DeviceMutation) ClearDeviceInstallationDevice() {
+	m.cleareddevice_installation_device = true
+}
+
+// DeviceInstallationDeviceCleared reports if the "device_installation_device" edge to the DeviceInstallation entity was cleared.
+func (m *DeviceMutation) DeviceInstallationDeviceCleared() bool {
+	return m.cleareddevice_installation_device
+}
+
+// RemoveDeviceInstallationDeviceIDs removes the "device_installation_device" edge to the DeviceInstallation entity by IDs.
+func (m *DeviceMutation) RemoveDeviceInstallationDeviceIDs(ids ...int) {
+	if m.removeddevice_installation_device == nil {
+		m.removeddevice_installation_device = make(map[int]struct{})
+	}
+	for i := range ids {
+		delete(m.device_installation_device, ids[i])
+		m.removeddevice_installation_device[ids[i]] = struct{}{}
+	}
+}
+
+// RemovedDeviceInstallationDevice returns the removed IDs of the "device_installation_device" edge to the DeviceInstallation entity.
+func (m *DeviceMutation) RemovedDeviceInstallationDeviceIDs() (ids []int) {
+	for id := range m.removeddevice_installation_device {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// DeviceInstallationDeviceIDs returns the "device_installation_device" edge IDs in the mutation.
+func (m *DeviceMutation) DeviceInstallationDeviceIDs() (ids []int) {
+	for id := range m.device_installation_device {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// ResetDeviceInstallationDevice resets all changes to the "device_installation_device" edge.
+func (m *DeviceMutation) ResetDeviceInstallationDevice() {
+	m.device_installation_device = nil
+	m.cleareddevice_installation_device = false
+	m.removeddevice_installation_device = nil
+}
+
+// Where appends a list predicates to the DeviceMutation builder.
+func (m *DeviceMutation) Where(ps ...predicate.Device) {
+	m.predicates = append(m.predicates, ps...)
+}
+
+// WhereP appends storage-level predicates to the DeviceMutation builder. Using this method,
+// users can use type-assertion to append predicates that do not depend on any generated package.
+func (m *DeviceMutation) WhereP(ps ...func(*sql.Selector)) {
+	p := make([]predicate.Device, len(ps))
+	for i := range ps {
+		p[i] = ps[i]
+	}
+	m.Where(p...)
+}
+
+// Op returns the operation name.
+func (m *DeviceMutation) Op() Op {
+	return m.op
+}
+
+// SetOp allows setting the mutation operation.
+func (m *DeviceMutation) SetOp(op Op) {
+	m.op = op
+}
+
+// Type returns the node type of this mutation (Device).
+func (m *DeviceMutation) Type() string {
+	return m.typ
+}
+
+// Fields returns all fields that were changed during this mutation. Note that in
+// order to get all numeric fields that were incremented/decremented, call
+// AddedFields().
+func (m *DeviceMutation) Fields() []string {
+	fields := make([]string, 0, 10)
+	if m.created_at != nil {
+		fields = append(fields, device.FieldCreatedAt)
+	}
+	if m.creator != nil {
+		fields = append(fields, device.FieldCreatedBy)
+	}
+	if m.deleted_at != nil {
+		fields = append(fields, device.FieldDeletedAt)
+	}
+	if m.updater != nil {
+		fields = append(fields, device.FieldUpdatedBy)
+	}
+	if m.updated_at != nil {
+		fields = append(fields, device.FieldUpdatedAt)
+	}
+	if m.brand != nil {
+		fields = append(fields, device.FieldBrand)
+	}
+	if m.model != nil {
+		fields = append(fields, device.FieldModel)
+	}
+	if m.name != nil {
+		fields = append(fields, device.FieldName)
+	}
+	if m.sn != nil {
+		fields = append(fields, device.FieldSn)
+	}
+	if m.device_type != nil {
+		fields = append(fields, device.FieldDeviceType)
+	}
+	return fields
+}
+
+// Field returns the value of a field with the given name. The second boolean
+// return value indicates that this field was not set, or was not defined in the
+// schema.
+func (m *DeviceMutation) Field(name string) (ent.Value, bool) {
+	switch name {
+	case device.FieldCreatedAt:
+		return m.CreatedAt()
+	case device.FieldCreatedBy:
+		return m.CreatedBy()
+	case device.FieldDeletedAt:
+		return m.DeletedAt()
+	case device.FieldUpdatedBy:
+		return m.UpdatedBy()
+	case device.FieldUpdatedAt:
+		return m.UpdatedAt()
+	case device.FieldBrand:
+		return m.Brand()
+	case device.FieldModel:
+		return m.Model()
+	case device.FieldName:
+		return m.Name()
+	case device.FieldSn:
+		return m.Sn()
+	case device.FieldDeviceType:
+		return m.DeviceType()
+	}
+	return nil, false
+}
+
+// OldField returns the old value of the field from the database. An error is
+// returned if the mutation operation is not UpdateOne, or the query to the
+// database failed.
+func (m *DeviceMutation) OldField(ctx context.Context, name string) (ent.Value, error) {
+	switch name {
+	case device.FieldCreatedAt:
+		return m.OldCreatedAt(ctx)
+	case device.FieldCreatedBy:
+		return m.OldCreatedBy(ctx)
+	case device.FieldDeletedAt:
+		return m.OldDeletedAt(ctx)
+	case device.FieldUpdatedBy:
+		return m.OldUpdatedBy(ctx)
+	case device.FieldUpdatedAt:
+		return m.OldUpdatedAt(ctx)
+	case device.FieldBrand:
+		return m.OldBrand(ctx)
+	case device.FieldModel:
+		return m.OldModel(ctx)
+	case device.FieldName:
+		return m.OldName(ctx)
+	case device.FieldSn:
+		return m.OldSn(ctx)
+	case device.FieldDeviceType:
+		return m.OldDeviceType(ctx)
+	}
+	return nil, fmt.Errorf("unknown Device field %s", name)
+}
+
+// SetField sets the value of a field with the given name. It returns an error if
+// the field is not defined in the schema, or if the type mismatched the field
+// type.
+func (m *DeviceMutation) SetField(name string, value ent.Value) error {
+	switch name {
+	case device.FieldCreatedAt:
+		v, ok := value.(time.Time)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetCreatedAt(v)
+		return nil
+	case device.FieldCreatedBy:
+		v, ok := value.(int)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetCreatedBy(v)
+		return nil
+	case device.FieldDeletedAt:
+		v, ok := value.(time.Time)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetDeletedAt(v)
+		return nil
+	case device.FieldUpdatedBy:
+		v, ok := value.(int)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetUpdatedBy(v)
+		return nil
+	case device.FieldUpdatedAt:
+		v, ok := value.(time.Time)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetUpdatedAt(v)
+		return nil
+	case device.FieldBrand:
+		v, ok := value.(enums.DeviceBrand)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetBrand(v)
+		return nil
+	case device.FieldModel:
+		v, ok := value.(enums.DeviceModel)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetModel(v)
+		return nil
+	case device.FieldName:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetName(v)
+		return nil
+	case device.FieldSn:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetSn(v)
+		return nil
+	case device.FieldDeviceType:
+		v, ok := value.(enums.DeviceType)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetDeviceType(v)
+		return nil
+	}
+	return fmt.Errorf("unknown Device field %s", name)
+}
+
+// AddedFields returns all numeric fields that were incremented/decremented during
+// this mutation.
+func (m *DeviceMutation) AddedFields() []string {
+	var fields []string
+	if m.addbrand != nil {
+		fields = append(fields, device.FieldBrand)
+	}
+	if m.addmodel != nil {
+		fields = append(fields, device.FieldModel)
+	}
+	if m.adddevice_type != nil {
+		fields = append(fields, device.FieldDeviceType)
+	}
+	return fields
+}
+
+// AddedField returns the numeric value that was incremented/decremented on a field
+// with the given name. The second boolean return value indicates that this field
+// was not set, or was not defined in the schema.
+func (m *DeviceMutation) AddedField(name string) (ent.Value, bool) {
+	switch name {
+	case device.FieldBrand:
+		return m.AddedBrand()
+	case device.FieldModel:
+		return m.AddedModel()
+	case device.FieldDeviceType:
+		return m.AddedDeviceType()
+	}
+	return nil, false
+}
+
+// AddField adds the value to the field with the given name. It returns an error if
+// the field is not defined in the schema, or if the type mismatched the field
+// type.
+func (m *DeviceMutation) AddField(name string, value ent.Value) error {
+	switch name {
+	case device.FieldBrand:
+		v, ok := value.(enums.DeviceBrand)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddBrand(v)
+		return nil
+	case device.FieldModel:
+		v, ok := value.(enums.DeviceModel)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddModel(v)
+		return nil
+	case device.FieldDeviceType:
+		v, ok := value.(enums.DeviceType)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddDeviceType(v)
+		return nil
+	}
+	return fmt.Errorf("unknown Device numeric field %s", name)
+}
+
+// ClearedFields returns all nullable fields that were cleared during this
+// mutation.
+func (m *DeviceMutation) ClearedFields() []string {
+	var fields []string
+	if m.FieldCleared(device.FieldDeletedAt) {
+		fields = append(fields, device.FieldDeletedAt)
+	}
+	if m.FieldCleared(device.FieldBrand) {
+		fields = append(fields, device.FieldBrand)
+	}
+	if m.FieldCleared(device.FieldModel) {
+		fields = append(fields, device.FieldModel)
+	}
+	if m.FieldCleared(device.FieldName) {
+		fields = append(fields, device.FieldName)
+	}
+	if m.FieldCleared(device.FieldSn) {
+		fields = append(fields, device.FieldSn)
+	}
+	return fields
+}
+
+// FieldCleared returns a boolean indicating if a field with the given name was
+// cleared in this mutation.
+func (m *DeviceMutation) FieldCleared(name string) bool {
+	_, ok := m.clearedFields[name]
+	return ok
+}
+
+// ClearField clears the value of the field with the given name. It returns an
+// error if the field is not defined in the schema.
+func (m *DeviceMutation) ClearField(name string) error {
+	switch name {
+	case device.FieldDeletedAt:
+		m.ClearDeletedAt()
+		return nil
+	case device.FieldBrand:
+		m.ClearBrand()
+		return nil
+	case device.FieldModel:
+		m.ClearModel()
+		return nil
+	case device.FieldName:
+		m.ClearName()
+		return nil
+	case device.FieldSn:
+		m.ClearSn()
+		return nil
+	}
+	return fmt.Errorf("unknown Device nullable field %s", name)
+}
+
+// ResetField resets all changes in the mutation for the field with the given name.
+// It returns an error if the field is not defined in the schema.
+func (m *DeviceMutation) ResetField(name string) error {
+	switch name {
+	case device.FieldCreatedAt:
+		m.ResetCreatedAt()
+		return nil
+	case device.FieldCreatedBy:
+		m.ResetCreatedBy()
+		return nil
+	case device.FieldDeletedAt:
+		m.ResetDeletedAt()
+		return nil
+	case device.FieldUpdatedBy:
+		m.ResetUpdatedBy()
+		return nil
+	case device.FieldUpdatedAt:
+		m.ResetUpdatedAt()
+		return nil
+	case device.FieldBrand:
+		m.ResetBrand()
+		return nil
+	case device.FieldModel:
+		m.ResetModel()
+		return nil
+	case device.FieldName:
+		m.ResetName()
+		return nil
+	case device.FieldSn:
+		m.ResetSn()
+		return nil
+	case device.FieldDeviceType:
+		m.ResetDeviceType()
+		return nil
+	}
+	return fmt.Errorf("unknown Device field %s", name)
+}
+
+// AddedEdges returns all edge names that were set/added in this mutation.
+func (m *DeviceMutation) AddedEdges() []string {
+	edges := make([]string, 0, 4)
+	if m.creator != nil {
+		edges = append(edges, device.EdgeCreator)
+	}
+	if m.updater != nil {
+		edges = append(edges, device.EdgeUpdater)
+	}
+	if m.ipc_event_device != nil {
+		edges = append(edges, device.EdgeIpcEventDevice)
+	}
+	if m.device_installation_device != nil {
+		edges = append(edges, device.EdgeDeviceInstallationDevice)
+	}
+	return edges
+}
+
+// AddedIDs returns all IDs (to other nodes) that were added for the given edge
+// name in this mutation.
+func (m *DeviceMutation) AddedIDs(name string) []ent.Value {
+	switch name {
+	case device.EdgeCreator:
+		if id := m.creator; id != nil {
+			return []ent.Value{*id}
+		}
+	case device.EdgeUpdater:
+		if id := m.updater; id != nil {
+			return []ent.Value{*id}
+		}
+	case device.EdgeIpcEventDevice:
+		ids := make([]ent.Value, 0, len(m.ipc_event_device))
+		for id := range m.ipc_event_device {
+			ids = append(ids, id)
+		}
+		return ids
+	case device.EdgeDeviceInstallationDevice:
+		ids := make([]ent.Value, 0, len(m.device_installation_device))
+		for id := range m.device_installation_device {
+			ids = append(ids, id)
+		}
+		return ids
+	}
+	return nil
+}
+
+// RemovedEdges returns all edge names that were removed in this mutation.
+func (m *DeviceMutation) RemovedEdges() []string {
+	edges := make([]string, 0, 4)
+	if m.removedipc_event_device != nil {
+		edges = append(edges, device.EdgeIpcEventDevice)
+	}
+	if m.removeddevice_installation_device != nil {
+		edges = append(edges, device.EdgeDeviceInstallationDevice)
+	}
+	return edges
+}
+
+// RemovedIDs returns all IDs (to other nodes) that were removed for the edge with
+// the given name in this mutation.
+func (m *DeviceMutation) RemovedIDs(name string) []ent.Value {
+	switch name {
+	case device.EdgeIpcEventDevice:
+		ids := make([]ent.Value, 0, len(m.removedipc_event_device))
+		for id := range m.removedipc_event_device {
+			ids = append(ids, id)
+		}
+		return ids
+	case device.EdgeDeviceInstallationDevice:
+		ids := make([]ent.Value, 0, len(m.removeddevice_installation_device))
+		for id := range m.removeddevice_installation_device {
+			ids = append(ids, id)
+		}
+		return ids
+	}
+	return nil
+}
+
+// ClearedEdges returns all edge names that were cleared in this mutation.
+func (m *DeviceMutation) ClearedEdges() []string {
+	edges := make([]string, 0, 4)
+	if m.clearedcreator {
+		edges = append(edges, device.EdgeCreator)
+	}
+	if m.clearedupdater {
+		edges = append(edges, device.EdgeUpdater)
+	}
+	if m.clearedipc_event_device {
+		edges = append(edges, device.EdgeIpcEventDevice)
+	}
+	if m.cleareddevice_installation_device {
+		edges = append(edges, device.EdgeDeviceInstallationDevice)
+	}
+	return edges
+}
+
+// EdgeCleared returns a boolean which indicates if the edge with the given name
+// was cleared in this mutation.
+func (m *DeviceMutation) EdgeCleared(name string) bool {
+	switch name {
+	case device.EdgeCreator:
+		return m.clearedcreator
+	case device.EdgeUpdater:
+		return m.clearedupdater
+	case device.EdgeIpcEventDevice:
+		return m.clearedipc_event_device
+	case device.EdgeDeviceInstallationDevice:
+		return m.cleareddevice_installation_device
+	}
+	return false
+}
+
+// ClearEdge clears the value of the edge with the given name. It returns an error
+// if that edge is not defined in the schema.
+func (m *DeviceMutation) ClearEdge(name string) error {
+	switch name {
+	case device.EdgeCreator:
+		m.ClearCreator()
+		return nil
+	case device.EdgeUpdater:
+		m.ClearUpdater()
+		return nil
+	}
+	return fmt.Errorf("unknown Device unique edge %s", name)
+}
+
+// ResetEdge resets all changes to the edge with the given name in this mutation.
+// It returns an error if the edge is not defined in the schema.
+func (m *DeviceMutation) ResetEdge(name string) error {
+	switch name {
+	case device.EdgeCreator:
+		m.ResetCreator()
+		return nil
+	case device.EdgeUpdater:
+		m.ResetUpdater()
+		return nil
+	case device.EdgeIpcEventDevice:
+		m.ResetIpcEventDevice()
+		return nil
+	case device.EdgeDeviceInstallationDevice:
+		m.ResetDeviceInstallationDevice()
+		return nil
+	}
+	return fmt.Errorf("unknown Device edge %s", name)
+}
+
+// DeviceInstallationMutation represents an operation that mutates the DeviceInstallation nodes in the graph.
+type DeviceInstallationMutation struct {
+	config
+	op             Op
+	typ            string
+	id             *int
+	created_at     *time.Time
+	deleted_at     *time.Time
+	updated_at     *time.Time
+	alias_name     *string
+	longitude      *float64
+	addlongitude   *float64
+	latitude       *float64
+	addlatitude    *float64
+	location_data  *string
+	location       *string
+	installer      *string
+	install_time   *time.Time
+	clearedFields  map[string]struct{}
+	creator        *int
+	clearedcreator bool
+	updater        *int
+	clearedupdater bool
+	area           *int
+	clearedarea    bool
+	device         *int
+	cleareddevice  bool
+	done           bool
+	oldValue       func(context.Context) (*DeviceInstallation, error)
+	predicates     []predicate.DeviceInstallation
+}
+
+var _ ent.Mutation = (*DeviceInstallationMutation)(nil)
+
+// deviceinstallationOption allows management of the mutation configuration using functional options.
+type deviceinstallationOption func(*DeviceInstallationMutation)
+
+// newDeviceInstallationMutation creates new mutation for the DeviceInstallation entity.
+func newDeviceInstallationMutation(c config, op Op, opts ...deviceinstallationOption) *DeviceInstallationMutation {
+	m := &DeviceInstallationMutation{
+		config:        c,
+		op:            op,
+		typ:           TypeDeviceInstallation,
+		clearedFields: make(map[string]struct{}),
+	}
+	for _, opt := range opts {
+		opt(m)
+	}
+	return m
+}
+
+// withDeviceInstallationID sets the ID field of the mutation.
+func withDeviceInstallationID(id int) deviceinstallationOption {
+	return func(m *DeviceInstallationMutation) {
+		var (
+			err   error
+			once  sync.Once
+			value *DeviceInstallation
+		)
+		m.oldValue = func(ctx context.Context) (*DeviceInstallation, error) {
+			once.Do(func() {
+				if m.done {
+					err = errors.New("querying old values post mutation is not allowed")
+				} else {
+					value, err = m.Client().DeviceInstallation.Get(ctx, id)
+				}
+			})
+			return value, err
+		}
+		m.id = &id
+	}
+}
+
+// withDeviceInstallation sets the old DeviceInstallation of the mutation.
+func withDeviceInstallation(node *DeviceInstallation) deviceinstallationOption {
+	return func(m *DeviceInstallationMutation) {
+		m.oldValue = func(context.Context) (*DeviceInstallation, error) {
+			return node, nil
+		}
+		m.id = &node.ID
+	}
+}
+
+// Client returns a new `ent.Client` from the mutation. If the mutation was
+// executed in a transaction (ent.Tx), a transactional client is returned.
+func (m DeviceInstallationMutation) Client() *Client {
+	client := &Client{config: m.config}
+	client.init()
+	return client
+}
+
+// Tx returns an `ent.Tx` for mutations that were executed in transactions;
+// it returns an error otherwise.
+func (m DeviceInstallationMutation) Tx() (*Tx, error) {
+	if _, ok := m.driver.(*txDriver); !ok {
+		return nil, errors.New("dao: mutation is not running in a transaction")
+	}
+	tx := &Tx{config: m.config}
+	tx.init()
+	return tx, nil
+}
+
+// ID returns the ID value in the mutation. Note that the ID is only available
+// if it was provided to the builder or after it was returned from the database.
+func (m *DeviceInstallationMutation) ID() (id int, exists bool) {
+	if m.id == nil {
+		return
+	}
+	return *m.id, true
+}
+
+// IDs queries the database and returns the entity ids that match the mutation's predicate.
+// That means, if the mutation is applied within a transaction with an isolation level such
+// as sql.LevelSerializable, the returned ids match the ids of the rows that will be updated
+// or updated by the mutation.
+func (m *DeviceInstallationMutation) IDs(ctx context.Context) ([]int, error) {
+	switch {
+	case m.op.Is(OpUpdateOne | OpDeleteOne):
+		id, exists := m.ID()
+		if exists {
+			return []int{id}, nil
+		}
+		fallthrough
+	case m.op.Is(OpUpdate | OpDelete):
+		return m.Client().DeviceInstallation.Query().Where(m.predicates...).IDs(ctx)
+	default:
+		return nil, fmt.Errorf("IDs is not allowed on %s operations", m.op)
+	}
+}
+
+// SetCreatedAt sets the "created_at" field.
+func (m *DeviceInstallationMutation) SetCreatedAt(t time.Time) {
+	m.created_at = &t
+}
+
+// CreatedAt returns the value of the "created_at" field in the mutation.
+func (m *DeviceInstallationMutation) CreatedAt() (r time.Time, exists bool) {
+	v := m.created_at
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldCreatedAt returns the old "created_at" field's value of the DeviceInstallation entity.
+// If the DeviceInstallation object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *DeviceInstallationMutation) OldCreatedAt(ctx context.Context) (v time.Time, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldCreatedAt is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldCreatedAt requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldCreatedAt: %w", err)
+	}
+	return oldValue.CreatedAt, nil
+}
+
+// ResetCreatedAt resets all changes to the "created_at" field.
+func (m *DeviceInstallationMutation) ResetCreatedAt() {
+	m.created_at = nil
+}
+
+// SetCreatedBy sets the "created_by" field.
+func (m *DeviceInstallationMutation) SetCreatedBy(i int) {
+	m.creator = &i
+}
+
+// CreatedBy returns the value of the "created_by" field in the mutation.
+func (m *DeviceInstallationMutation) CreatedBy() (r int, exists bool) {
+	v := m.creator
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldCreatedBy returns the old "created_by" field's value of the DeviceInstallation entity.
+// If the DeviceInstallation object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *DeviceInstallationMutation) OldCreatedBy(ctx context.Context) (v int, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldCreatedBy is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldCreatedBy requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldCreatedBy: %w", err)
+	}
+	return oldValue.CreatedBy, nil
+}
+
+// ResetCreatedBy resets all changes to the "created_by" field.
+func (m *DeviceInstallationMutation) ResetCreatedBy() {
+	m.creator = nil
+}
+
+// SetDeletedAt sets the "deleted_at" field.
+func (m *DeviceInstallationMutation) SetDeletedAt(t time.Time) {
+	m.deleted_at = &t
+}
+
+// DeletedAt returns the value of the "deleted_at" field in the mutation.
+func (m *DeviceInstallationMutation) DeletedAt() (r time.Time, exists bool) {
+	v := m.deleted_at
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldDeletedAt returns the old "deleted_at" field's value of the DeviceInstallation entity.
+// If the DeviceInstallation object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *DeviceInstallationMutation) OldDeletedAt(ctx context.Context) (v *time.Time, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldDeletedAt is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldDeletedAt requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldDeletedAt: %w", err)
+	}
+	return oldValue.DeletedAt, nil
+}
+
+// ClearDeletedAt clears the value of the "deleted_at" field.
+func (m *DeviceInstallationMutation) ClearDeletedAt() {
+	m.deleted_at = nil
+	m.clearedFields[deviceinstallation.FieldDeletedAt] = struct{}{}
+}
+
+// DeletedAtCleared returns if the "deleted_at" field was cleared in this mutation.
+func (m *DeviceInstallationMutation) DeletedAtCleared() bool {
+	_, ok := m.clearedFields[deviceinstallation.FieldDeletedAt]
+	return ok
+}
+
+// ResetDeletedAt resets all changes to the "deleted_at" field.
+func (m *DeviceInstallationMutation) ResetDeletedAt() {
+	m.deleted_at = nil
+	delete(m.clearedFields, deviceinstallation.FieldDeletedAt)
+}
+
+// SetUpdatedBy sets the "updated_by" field.
+func (m *DeviceInstallationMutation) SetUpdatedBy(i int) {
+	m.updater = &i
+}
+
+// UpdatedBy returns the value of the "updated_by" field in the mutation.
+func (m *DeviceInstallationMutation) UpdatedBy() (r int, exists bool) {
+	v := m.updater
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldUpdatedBy returns the old "updated_by" field's value of the DeviceInstallation entity.
+// If the DeviceInstallation object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *DeviceInstallationMutation) OldUpdatedBy(ctx context.Context) (v int, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldUpdatedBy is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldUpdatedBy requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldUpdatedBy: %w", err)
+	}
+	return oldValue.UpdatedBy, nil
+}
+
+// ResetUpdatedBy resets all changes to the "updated_by" field.
+func (m *DeviceInstallationMutation) ResetUpdatedBy() {
+	m.updater = nil
+}
+
+// SetUpdatedAt sets the "updated_at" field.
+func (m *DeviceInstallationMutation) SetUpdatedAt(t time.Time) {
+	m.updated_at = &t
+}
+
+// UpdatedAt returns the value of the "updated_at" field in the mutation.
+func (m *DeviceInstallationMutation) UpdatedAt() (r time.Time, exists bool) {
+	v := m.updated_at
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldUpdatedAt returns the old "updated_at" field's value of the DeviceInstallation entity.
+// If the DeviceInstallation object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *DeviceInstallationMutation) OldUpdatedAt(ctx context.Context) (v time.Time, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldUpdatedAt is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldUpdatedAt requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldUpdatedAt: %w", err)
+	}
+	return oldValue.UpdatedAt, nil
+}
+
+// ResetUpdatedAt resets all changes to the "updated_at" field.
+func (m *DeviceInstallationMutation) ResetUpdatedAt() {
+	m.updated_at = nil
+}
+
+// SetDeviceID sets the "device_id" field.
+func (m *DeviceInstallationMutation) SetDeviceID(i int) {
+	m.device = &i
+}
+
+// DeviceID returns the value of the "device_id" field in the mutation.
+func (m *DeviceInstallationMutation) DeviceID() (r int, exists bool) {
+	v := m.device
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldDeviceID returns the old "device_id" field's value of the DeviceInstallation entity.
+// If the DeviceInstallation object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *DeviceInstallationMutation) OldDeviceID(ctx context.Context) (v int, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldDeviceID is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldDeviceID requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldDeviceID: %w", err)
+	}
+	return oldValue.DeviceID, nil
+}
+
+// ResetDeviceID resets all changes to the "device_id" field.
+func (m *DeviceInstallationMutation) ResetDeviceID() {
+	m.device = nil
+}
+
+// SetAreaID sets the "area_id" field.
+func (m *DeviceInstallationMutation) SetAreaID(i int) {
+	m.area = &i
+}
+
+// AreaID returns the value of the "area_id" field in the mutation.
+func (m *DeviceInstallationMutation) AreaID() (r int, exists bool) {
+	v := m.area
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldAreaID returns the old "area_id" field's value of the DeviceInstallation entity.
+// If the DeviceInstallation object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *DeviceInstallationMutation) OldAreaID(ctx context.Context) (v int, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldAreaID is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldAreaID requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldAreaID: %w", err)
+	}
+	return oldValue.AreaID, nil
+}
+
+// ResetAreaID resets all changes to the "area_id" field.
+func (m *DeviceInstallationMutation) ResetAreaID() {
+	m.area = nil
+}
+
+// SetAliasName sets the "alias_name" field.
+func (m *DeviceInstallationMutation) SetAliasName(s string) {
+	m.alias_name = &s
+}
+
+// AliasName returns the value of the "alias_name" field in the mutation.
+func (m *DeviceInstallationMutation) AliasName() (r string, exists bool) {
+	v := m.alias_name
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldAliasName returns the old "alias_name" field's value of the DeviceInstallation entity.
+// If the DeviceInstallation object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *DeviceInstallationMutation) OldAliasName(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldAliasName is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldAliasName requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldAliasName: %w", err)
+	}
+	return oldValue.AliasName, nil
+}
+
+// ClearAliasName clears the value of the "alias_name" field.
+func (m *DeviceInstallationMutation) ClearAliasName() {
+	m.alias_name = nil
+	m.clearedFields[deviceinstallation.FieldAliasName] = struct{}{}
+}
+
+// AliasNameCleared returns if the "alias_name" field was cleared in this mutation.
+func (m *DeviceInstallationMutation) AliasNameCleared() bool {
+	_, ok := m.clearedFields[deviceinstallation.FieldAliasName]
+	return ok
+}
+
+// ResetAliasName resets all changes to the "alias_name" field.
+func (m *DeviceInstallationMutation) ResetAliasName() {
+	m.alias_name = nil
+	delete(m.clearedFields, deviceinstallation.FieldAliasName)
+}
+
+// SetLongitude sets the "longitude" field.
+func (m *DeviceInstallationMutation) SetLongitude(f float64) {
+	m.longitude = &f
+	m.addlongitude = nil
+}
+
+// Longitude returns the value of the "longitude" field in the mutation.
+func (m *DeviceInstallationMutation) Longitude() (r float64, exists bool) {
+	v := m.longitude
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldLongitude returns the old "longitude" field's value of the DeviceInstallation entity.
+// If the DeviceInstallation object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *DeviceInstallationMutation) OldLongitude(ctx context.Context) (v float64, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldLongitude is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldLongitude requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldLongitude: %w", err)
+	}
+	return oldValue.Longitude, nil
+}
+
+// AddLongitude adds f to the "longitude" field.
+func (m *DeviceInstallationMutation) AddLongitude(f float64) {
+	if m.addlongitude != nil {
+		*m.addlongitude += f
+	} else {
+		m.addlongitude = &f
+	}
+}
+
+// AddedLongitude returns the value that was added to the "longitude" field in this mutation.
+func (m *DeviceInstallationMutation) AddedLongitude() (r float64, exists bool) {
+	v := m.addlongitude
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ResetLongitude resets all changes to the "longitude" field.
+func (m *DeviceInstallationMutation) ResetLongitude() {
+	m.longitude = nil
+	m.addlongitude = nil
+}
+
+// SetLatitude sets the "latitude" field.
+func (m *DeviceInstallationMutation) SetLatitude(f float64) {
+	m.latitude = &f
+	m.addlatitude = nil
+}
+
+// Latitude returns the value of the "latitude" field in the mutation.
+func (m *DeviceInstallationMutation) Latitude() (r float64, exists bool) {
+	v := m.latitude
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldLatitude returns the old "latitude" field's value of the DeviceInstallation entity.
+// If the DeviceInstallation object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *DeviceInstallationMutation) OldLatitude(ctx context.Context) (v float64, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldLatitude is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldLatitude requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldLatitude: %w", err)
+	}
+	return oldValue.Latitude, nil
+}
+
+// AddLatitude adds f to the "latitude" field.
+func (m *DeviceInstallationMutation) AddLatitude(f float64) {
+	if m.addlatitude != nil {
+		*m.addlatitude += f
+	} else {
+		m.addlatitude = &f
+	}
+}
+
+// AddedLatitude returns the value that was added to the "latitude" field in this mutation.
+func (m *DeviceInstallationMutation) AddedLatitude() (r float64, exists bool) {
+	v := m.addlatitude
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ResetLatitude resets all changes to the "latitude" field.
+func (m *DeviceInstallationMutation) ResetLatitude() {
+	m.latitude = nil
+	m.addlatitude = nil
+}
+
+// SetLocationData sets the "location_data" field.
+func (m *DeviceInstallationMutation) SetLocationData(s string) {
+	m.location_data = &s
+}
+
+// LocationData returns the value of the "location_data" field in the mutation.
+func (m *DeviceInstallationMutation) LocationData() (r string, exists bool) {
+	v := m.location_data
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldLocationData returns the old "location_data" field's value of the DeviceInstallation entity.
+// If the DeviceInstallation object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *DeviceInstallationMutation) OldLocationData(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldLocationData is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldLocationData requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldLocationData: %w", err)
+	}
+	return oldValue.LocationData, nil
+}
+
+// ClearLocationData clears the value of the "location_data" field.
+func (m *DeviceInstallationMutation) ClearLocationData() {
+	m.location_data = nil
+	m.clearedFields[deviceinstallation.FieldLocationData] = struct{}{}
+}
+
+// LocationDataCleared returns if the "location_data" field was cleared in this mutation.
+func (m *DeviceInstallationMutation) LocationDataCleared() bool {
+	_, ok := m.clearedFields[deviceinstallation.FieldLocationData]
+	return ok
+}
+
+// ResetLocationData resets all changes to the "location_data" field.
+func (m *DeviceInstallationMutation) ResetLocationData() {
+	m.location_data = nil
+	delete(m.clearedFields, deviceinstallation.FieldLocationData)
+}
+
+// SetLocation sets the "location" field.
+func (m *DeviceInstallationMutation) SetLocation(s string) {
+	m.location = &s
+}
+
+// Location returns the value of the "location" field in the mutation.
+func (m *DeviceInstallationMutation) Location() (r string, exists bool) {
+	v := m.location
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldLocation returns the old "location" field's value of the DeviceInstallation entity.
+// If the DeviceInstallation object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *DeviceInstallationMutation) OldLocation(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldLocation is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldLocation requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldLocation: %w", err)
+	}
+	return oldValue.Location, nil
+}
+
+// ClearLocation clears the value of the "location" field.
+func (m *DeviceInstallationMutation) ClearLocation() {
+	m.location = nil
+	m.clearedFields[deviceinstallation.FieldLocation] = struct{}{}
+}
+
+// LocationCleared returns if the "location" field was cleared in this mutation.
+func (m *DeviceInstallationMutation) LocationCleared() bool {
+	_, ok := m.clearedFields[deviceinstallation.FieldLocation]
+	return ok
+}
+
+// ResetLocation resets all changes to the "location" field.
+func (m *DeviceInstallationMutation) ResetLocation() {
+	m.location = nil
+	delete(m.clearedFields, deviceinstallation.FieldLocation)
+}
+
+// SetInstaller sets the "installer" field.
+func (m *DeviceInstallationMutation) SetInstaller(s string) {
+	m.installer = &s
+}
+
+// Installer returns the value of the "installer" field in the mutation.
+func (m *DeviceInstallationMutation) Installer() (r string, exists bool) {
+	v := m.installer
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldInstaller returns the old "installer" field's value of the DeviceInstallation entity.
+// If the DeviceInstallation object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *DeviceInstallationMutation) OldInstaller(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldInstaller is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldInstaller requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldInstaller: %w", err)
+	}
+	return oldValue.Installer, nil
+}
+
+// ClearInstaller clears the value of the "installer" field.
+func (m *DeviceInstallationMutation) ClearInstaller() {
+	m.installer = nil
+	m.clearedFields[deviceinstallation.FieldInstaller] = struct{}{}
+}
+
+// InstallerCleared returns if the "installer" field was cleared in this mutation.
+func (m *DeviceInstallationMutation) InstallerCleared() bool {
+	_, ok := m.clearedFields[deviceinstallation.FieldInstaller]
+	return ok
+}
+
+// ResetInstaller resets all changes to the "installer" field.
+func (m *DeviceInstallationMutation) ResetInstaller() {
+	m.installer = nil
+	delete(m.clearedFields, deviceinstallation.FieldInstaller)
+}
+
+// SetInstallTime sets the "install_time" field.
+func (m *DeviceInstallationMutation) SetInstallTime(t time.Time) {
+	m.install_time = &t
+}
+
+// InstallTime returns the value of the "install_time" field in the mutation.
+func (m *DeviceInstallationMutation) InstallTime() (r time.Time, exists bool) {
+	v := m.install_time
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldInstallTime returns the old "install_time" field's value of the DeviceInstallation entity.
+// If the DeviceInstallation object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *DeviceInstallationMutation) OldInstallTime(ctx context.Context) (v time.Time, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldInstallTime is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldInstallTime requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldInstallTime: %w", err)
+	}
+	return oldValue.InstallTime, nil
+}
+
+// ClearInstallTime clears the value of the "install_time" field.
+func (m *DeviceInstallationMutation) ClearInstallTime() {
+	m.install_time = nil
+	m.clearedFields[deviceinstallation.FieldInstallTime] = struct{}{}
+}
+
+// InstallTimeCleared returns if the "install_time" field was cleared in this mutation.
+func (m *DeviceInstallationMutation) InstallTimeCleared() bool {
+	_, ok := m.clearedFields[deviceinstallation.FieldInstallTime]
+	return ok
+}
+
+// ResetInstallTime resets all changes to the "install_time" field.
+func (m *DeviceInstallationMutation) ResetInstallTime() {
+	m.install_time = nil
+	delete(m.clearedFields, deviceinstallation.FieldInstallTime)
+}
+
+// SetCreatorID sets the "creator" edge to the Admin entity by id.
+func (m *DeviceInstallationMutation) SetCreatorID(id int) {
+	m.creator = &id
+}
+
+// ClearCreator clears the "creator" edge to the Admin entity.
+func (m *DeviceInstallationMutation) ClearCreator() {
+	m.clearedcreator = true
+	m.clearedFields[deviceinstallation.FieldCreatedBy] = struct{}{}
+}
+
+// CreatorCleared reports if the "creator" edge to the Admin entity was cleared.
+func (m *DeviceInstallationMutation) CreatorCleared() bool {
+	return m.clearedcreator
+}
+
+// CreatorID returns the "creator" edge ID in the mutation.
+func (m *DeviceInstallationMutation) CreatorID() (id int, exists bool) {
+	if m.creator != nil {
+		return *m.creator, true
+	}
+	return
+}
+
+// CreatorIDs returns the "creator" edge IDs in the mutation.
+// Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
+// CreatorID instead. It exists only for internal usage by the builders.
+func (m *DeviceInstallationMutation) CreatorIDs() (ids []int) {
+	if id := m.creator; id != nil {
+		ids = append(ids, *id)
+	}
+	return
+}
+
+// ResetCreator resets all changes to the "creator" edge.
+func (m *DeviceInstallationMutation) ResetCreator() {
+	m.creator = nil
+	m.clearedcreator = false
+}
+
+// SetUpdaterID sets the "updater" edge to the Admin entity by id.
+func (m *DeviceInstallationMutation) SetUpdaterID(id int) {
+	m.updater = &id
+}
+
+// ClearUpdater clears the "updater" edge to the Admin entity.
+func (m *DeviceInstallationMutation) ClearUpdater() {
+	m.clearedupdater = true
+	m.clearedFields[deviceinstallation.FieldUpdatedBy] = struct{}{}
+}
+
+// UpdaterCleared reports if the "updater" edge to the Admin entity was cleared.
+func (m *DeviceInstallationMutation) UpdaterCleared() bool {
+	return m.clearedupdater
+}
+
+// UpdaterID returns the "updater" edge ID in the mutation.
+func (m *DeviceInstallationMutation) UpdaterID() (id int, exists bool) {
+	if m.updater != nil {
+		return *m.updater, true
+	}
+	return
+}
+
+// UpdaterIDs returns the "updater" edge IDs in the mutation.
+// Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
+// UpdaterID instead. It exists only for internal usage by the builders.
+func (m *DeviceInstallationMutation) UpdaterIDs() (ids []int) {
+	if id := m.updater; id != nil {
+		ids = append(ids, *id)
+	}
+	return
+}
+
+// ResetUpdater resets all changes to the "updater" edge.
+func (m *DeviceInstallationMutation) ResetUpdater() {
+	m.updater = nil
+	m.clearedupdater = false
+}
+
+// ClearArea clears the "area" edge to the Area entity.
+func (m *DeviceInstallationMutation) ClearArea() {
+	m.clearedarea = true
+	m.clearedFields[deviceinstallation.FieldAreaID] = struct{}{}
+}
+
+// AreaCleared reports if the "area" edge to the Area entity was cleared.
+func (m *DeviceInstallationMutation) AreaCleared() bool {
+	return m.clearedarea
+}
+
+// AreaIDs returns the "area" edge IDs in the mutation.
+// Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
+// AreaID instead. It exists only for internal usage by the builders.
+func (m *DeviceInstallationMutation) AreaIDs() (ids []int) {
+	if id := m.area; id != nil {
+		ids = append(ids, *id)
+	}
+	return
+}
+
+// ResetArea resets all changes to the "area" edge.
+func (m *DeviceInstallationMutation) ResetArea() {
+	m.area = nil
+	m.clearedarea = false
+}
+
+// ClearDevice clears the "device" edge to the Device entity.
+func (m *DeviceInstallationMutation) ClearDevice() {
+	m.cleareddevice = true
+	m.clearedFields[deviceinstallation.FieldDeviceID] = struct{}{}
+}
+
+// DeviceCleared reports if the "device" edge to the Device entity was cleared.
+func (m *DeviceInstallationMutation) DeviceCleared() bool {
+	return m.cleareddevice
+}
+
+// DeviceIDs returns the "device" edge IDs in the mutation.
+// Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
+// DeviceID instead. It exists only for internal usage by the builders.
+func (m *DeviceInstallationMutation) DeviceIDs() (ids []int) {
+	if id := m.device; id != nil {
+		ids = append(ids, *id)
+	}
+	return
+}
+
+// ResetDevice resets all changes to the "device" edge.
+func (m *DeviceInstallationMutation) ResetDevice() {
+	m.device = nil
+	m.cleareddevice = false
+}
+
+// Where appends a list predicates to the DeviceInstallationMutation builder.
+func (m *DeviceInstallationMutation) Where(ps ...predicate.DeviceInstallation) {
+	m.predicates = append(m.predicates, ps...)
+}
+
+// WhereP appends storage-level predicates to the DeviceInstallationMutation builder. Using this method,
+// users can use type-assertion to append predicates that do not depend on any generated package.
+func (m *DeviceInstallationMutation) WhereP(ps ...func(*sql.Selector)) {
+	p := make([]predicate.DeviceInstallation, len(ps))
+	for i := range ps {
+		p[i] = ps[i]
+	}
+	m.Where(p...)
+}
+
+// Op returns the operation name.
+func (m *DeviceInstallationMutation) Op() Op {
+	return m.op
+}
+
+// SetOp allows setting the mutation operation.
+func (m *DeviceInstallationMutation) SetOp(op Op) {
+	m.op = op
+}
+
+// Type returns the node type of this mutation (DeviceInstallation).
+func (m *DeviceInstallationMutation) Type() string {
+	return m.typ
+}
+
+// Fields returns all fields that were changed during this mutation. Note that in
+// order to get all numeric fields that were incremented/decremented, call
+// AddedFields().
+func (m *DeviceInstallationMutation) Fields() []string {
+	fields := make([]string, 0, 14)
+	if m.created_at != nil {
+		fields = append(fields, deviceinstallation.FieldCreatedAt)
+	}
+	if m.creator != nil {
+		fields = append(fields, deviceinstallation.FieldCreatedBy)
+	}
+	if m.deleted_at != nil {
+		fields = append(fields, deviceinstallation.FieldDeletedAt)
+	}
+	if m.updater != nil {
+		fields = append(fields, deviceinstallation.FieldUpdatedBy)
+	}
+	if m.updated_at != nil {
+		fields = append(fields, deviceinstallation.FieldUpdatedAt)
+	}
+	if m.device != nil {
+		fields = append(fields, deviceinstallation.FieldDeviceID)
+	}
+	if m.area != nil {
+		fields = append(fields, deviceinstallation.FieldAreaID)
+	}
+	if m.alias_name != nil {
+		fields = append(fields, deviceinstallation.FieldAliasName)
+	}
+	if m.longitude != nil {
+		fields = append(fields, deviceinstallation.FieldLongitude)
+	}
+	if m.latitude != nil {
+		fields = append(fields, deviceinstallation.FieldLatitude)
+	}
+	if m.location_data != nil {
+		fields = append(fields, deviceinstallation.FieldLocationData)
+	}
+	if m.location != nil {
+		fields = append(fields, deviceinstallation.FieldLocation)
+	}
+	if m.installer != nil {
+		fields = append(fields, deviceinstallation.FieldInstaller)
+	}
+	if m.install_time != nil {
+		fields = append(fields, deviceinstallation.FieldInstallTime)
+	}
+	return fields
+}
+
+// Field returns the value of a field with the given name. The second boolean
+// return value indicates that this field was not set, or was not defined in the
+// schema.
+func (m *DeviceInstallationMutation) Field(name string) (ent.Value, bool) {
+	switch name {
+	case deviceinstallation.FieldCreatedAt:
+		return m.CreatedAt()
+	case deviceinstallation.FieldCreatedBy:
+		return m.CreatedBy()
+	case deviceinstallation.FieldDeletedAt:
+		return m.DeletedAt()
+	case deviceinstallation.FieldUpdatedBy:
+		return m.UpdatedBy()
+	case deviceinstallation.FieldUpdatedAt:
+		return m.UpdatedAt()
+	case deviceinstallation.FieldDeviceID:
+		return m.DeviceID()
+	case deviceinstallation.FieldAreaID:
+		return m.AreaID()
+	case deviceinstallation.FieldAliasName:
+		return m.AliasName()
+	case deviceinstallation.FieldLongitude:
+		return m.Longitude()
+	case deviceinstallation.FieldLatitude:
+		return m.Latitude()
+	case deviceinstallation.FieldLocationData:
+		return m.LocationData()
+	case deviceinstallation.FieldLocation:
+		return m.Location()
+	case deviceinstallation.FieldInstaller:
+		return m.Installer()
+	case deviceinstallation.FieldInstallTime:
+		return m.InstallTime()
+	}
+	return nil, false
+}
+
+// OldField returns the old value of the field from the database. An error is
+// returned if the mutation operation is not UpdateOne, or the query to the
+// database failed.
+func (m *DeviceInstallationMutation) OldField(ctx context.Context, name string) (ent.Value, error) {
+	switch name {
+	case deviceinstallation.FieldCreatedAt:
+		return m.OldCreatedAt(ctx)
+	case deviceinstallation.FieldCreatedBy:
+		return m.OldCreatedBy(ctx)
+	case deviceinstallation.FieldDeletedAt:
+		return m.OldDeletedAt(ctx)
+	case deviceinstallation.FieldUpdatedBy:
+		return m.OldUpdatedBy(ctx)
+	case deviceinstallation.FieldUpdatedAt:
+		return m.OldUpdatedAt(ctx)
+	case deviceinstallation.FieldDeviceID:
+		return m.OldDeviceID(ctx)
+	case deviceinstallation.FieldAreaID:
+		return m.OldAreaID(ctx)
+	case deviceinstallation.FieldAliasName:
+		return m.OldAliasName(ctx)
+	case deviceinstallation.FieldLongitude:
+		return m.OldLongitude(ctx)
+	case deviceinstallation.FieldLatitude:
+		return m.OldLatitude(ctx)
+	case deviceinstallation.FieldLocationData:
+		return m.OldLocationData(ctx)
+	case deviceinstallation.FieldLocation:
+		return m.OldLocation(ctx)
+	case deviceinstallation.FieldInstaller:
+		return m.OldInstaller(ctx)
+	case deviceinstallation.FieldInstallTime:
+		return m.OldInstallTime(ctx)
+	}
+	return nil, fmt.Errorf("unknown DeviceInstallation field %s", name)
+}
+
+// SetField sets the value of a field with the given name. It returns an error if
+// the field is not defined in the schema, or if the type mismatched the field
+// type.
+func (m *DeviceInstallationMutation) SetField(name string, value ent.Value) error {
+	switch name {
+	case deviceinstallation.FieldCreatedAt:
+		v, ok := value.(time.Time)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetCreatedAt(v)
+		return nil
+	case deviceinstallation.FieldCreatedBy:
+		v, ok := value.(int)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetCreatedBy(v)
+		return nil
+	case deviceinstallation.FieldDeletedAt:
+		v, ok := value.(time.Time)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetDeletedAt(v)
+		return nil
+	case deviceinstallation.FieldUpdatedBy:
+		v, ok := value.(int)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetUpdatedBy(v)
+		return nil
+	case deviceinstallation.FieldUpdatedAt:
+		v, ok := value.(time.Time)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetUpdatedAt(v)
+		return nil
+	case deviceinstallation.FieldDeviceID:
+		v, ok := value.(int)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetDeviceID(v)
+		return nil
+	case deviceinstallation.FieldAreaID:
+		v, ok := value.(int)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetAreaID(v)
+		return nil
+	case deviceinstallation.FieldAliasName:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetAliasName(v)
+		return nil
+	case deviceinstallation.FieldLongitude:
+		v, ok := value.(float64)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetLongitude(v)
+		return nil
+	case deviceinstallation.FieldLatitude:
+		v, ok := value.(float64)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetLatitude(v)
+		return nil
+	case deviceinstallation.FieldLocationData:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetLocationData(v)
+		return nil
+	case deviceinstallation.FieldLocation:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetLocation(v)
+		return nil
+	case deviceinstallation.FieldInstaller:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetInstaller(v)
+		return nil
+	case deviceinstallation.FieldInstallTime:
+		v, ok := value.(time.Time)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetInstallTime(v)
+		return nil
+	}
+	return fmt.Errorf("unknown DeviceInstallation field %s", name)
+}
+
+// AddedFields returns all numeric fields that were incremented/decremented during
+// this mutation.
+func (m *DeviceInstallationMutation) AddedFields() []string {
+	var fields []string
+	if m.addlongitude != nil {
+		fields = append(fields, deviceinstallation.FieldLongitude)
+	}
+	if m.addlatitude != nil {
+		fields = append(fields, deviceinstallation.FieldLatitude)
+	}
+	return fields
+}
+
+// AddedField returns the numeric value that was incremented/decremented on a field
+// with the given name. The second boolean return value indicates that this field
+// was not set, or was not defined in the schema.
+func (m *DeviceInstallationMutation) AddedField(name string) (ent.Value, bool) {
+	switch name {
+	case deviceinstallation.FieldLongitude:
+		return m.AddedLongitude()
+	case deviceinstallation.FieldLatitude:
+		return m.AddedLatitude()
+	}
+	return nil, false
+}
+
+// AddField adds the value to the field with the given name. It returns an error if
+// the field is not defined in the schema, or if the type mismatched the field
+// type.
+func (m *DeviceInstallationMutation) AddField(name string, value ent.Value) error {
+	switch name {
+	case deviceinstallation.FieldLongitude:
+		v, ok := value.(float64)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddLongitude(v)
+		return nil
+	case deviceinstallation.FieldLatitude:
+		v, ok := value.(float64)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddLatitude(v)
+		return nil
+	}
+	return fmt.Errorf("unknown DeviceInstallation numeric field %s", name)
+}
+
+// ClearedFields returns all nullable fields that were cleared during this
+// mutation.
+func (m *DeviceInstallationMutation) ClearedFields() []string {
+	var fields []string
+	if m.FieldCleared(deviceinstallation.FieldDeletedAt) {
+		fields = append(fields, deviceinstallation.FieldDeletedAt)
+	}
+	if m.FieldCleared(deviceinstallation.FieldAliasName) {
+		fields = append(fields, deviceinstallation.FieldAliasName)
+	}
+	if m.FieldCleared(deviceinstallation.FieldLocationData) {
+		fields = append(fields, deviceinstallation.FieldLocationData)
+	}
+	if m.FieldCleared(deviceinstallation.FieldLocation) {
+		fields = append(fields, deviceinstallation.FieldLocation)
+	}
+	if m.FieldCleared(deviceinstallation.FieldInstaller) {
+		fields = append(fields, deviceinstallation.FieldInstaller)
+	}
+	if m.FieldCleared(deviceinstallation.FieldInstallTime) {
+		fields = append(fields, deviceinstallation.FieldInstallTime)
+	}
+	return fields
+}
+
+// FieldCleared returns a boolean indicating if a field with the given name was
+// cleared in this mutation.
+func (m *DeviceInstallationMutation) FieldCleared(name string) bool {
+	_, ok := m.clearedFields[name]
+	return ok
+}
+
+// ClearField clears the value of the field with the given name. It returns an
+// error if the field is not defined in the schema.
+func (m *DeviceInstallationMutation) ClearField(name string) error {
+	switch name {
+	case deviceinstallation.FieldDeletedAt:
+		m.ClearDeletedAt()
+		return nil
+	case deviceinstallation.FieldAliasName:
+		m.ClearAliasName()
+		return nil
+	case deviceinstallation.FieldLocationData:
+		m.ClearLocationData()
+		return nil
+	case deviceinstallation.FieldLocation:
+		m.ClearLocation()
+		return nil
+	case deviceinstallation.FieldInstaller:
+		m.ClearInstaller()
+		return nil
+	case deviceinstallation.FieldInstallTime:
+		m.ClearInstallTime()
+		return nil
+	}
+	return fmt.Errorf("unknown DeviceInstallation nullable field %s", name)
+}
+
+// ResetField resets all changes in the mutation for the field with the given name.
+// It returns an error if the field is not defined in the schema.
+func (m *DeviceInstallationMutation) ResetField(name string) error {
+	switch name {
+	case deviceinstallation.FieldCreatedAt:
+		m.ResetCreatedAt()
+		return nil
+	case deviceinstallation.FieldCreatedBy:
+		m.ResetCreatedBy()
+		return nil
+	case deviceinstallation.FieldDeletedAt:
+		m.ResetDeletedAt()
+		return nil
+	case deviceinstallation.FieldUpdatedBy:
+		m.ResetUpdatedBy()
+		return nil
+	case deviceinstallation.FieldUpdatedAt:
+		m.ResetUpdatedAt()
+		return nil
+	case deviceinstallation.FieldDeviceID:
+		m.ResetDeviceID()
+		return nil
+	case deviceinstallation.FieldAreaID:
+		m.ResetAreaID()
+		return nil
+	case deviceinstallation.FieldAliasName:
+		m.ResetAliasName()
+		return nil
+	case deviceinstallation.FieldLongitude:
+		m.ResetLongitude()
+		return nil
+	case deviceinstallation.FieldLatitude:
+		m.ResetLatitude()
+		return nil
+	case deviceinstallation.FieldLocationData:
+		m.ResetLocationData()
+		return nil
+	case deviceinstallation.FieldLocation:
+		m.ResetLocation()
+		return nil
+	case deviceinstallation.FieldInstaller:
+		m.ResetInstaller()
+		return nil
+	case deviceinstallation.FieldInstallTime:
+		m.ResetInstallTime()
+		return nil
+	}
+	return fmt.Errorf("unknown DeviceInstallation field %s", name)
+}
+
+// AddedEdges returns all edge names that were set/added in this mutation.
+func (m *DeviceInstallationMutation) AddedEdges() []string {
+	edges := make([]string, 0, 4)
+	if m.creator != nil {
+		edges = append(edges, deviceinstallation.EdgeCreator)
+	}
+	if m.updater != nil {
+		edges = append(edges, deviceinstallation.EdgeUpdater)
+	}
+	if m.area != nil {
+		edges = append(edges, deviceinstallation.EdgeArea)
+	}
+	if m.device != nil {
+		edges = append(edges, deviceinstallation.EdgeDevice)
+	}
+	return edges
+}
+
+// AddedIDs returns all IDs (to other nodes) that were added for the given edge
+// name in this mutation.
+func (m *DeviceInstallationMutation) AddedIDs(name string) []ent.Value {
+	switch name {
+	case deviceinstallation.EdgeCreator:
+		if id := m.creator; id != nil {
+			return []ent.Value{*id}
+		}
+	case deviceinstallation.EdgeUpdater:
+		if id := m.updater; id != nil {
+			return []ent.Value{*id}
+		}
+	case deviceinstallation.EdgeArea:
+		if id := m.area; id != nil {
+			return []ent.Value{*id}
+		}
+	case deviceinstallation.EdgeDevice:
+		if id := m.device; id != nil {
+			return []ent.Value{*id}
+		}
+	}
+	return nil
+}
+
+// RemovedEdges returns all edge names that were removed in this mutation.
+func (m *DeviceInstallationMutation) RemovedEdges() []string {
+	edges := make([]string, 0, 4)
+	return edges
+}
+
+// RemovedIDs returns all IDs (to other nodes) that were removed for the edge with
+// the given name in this mutation.
+func (m *DeviceInstallationMutation) RemovedIDs(name string) []ent.Value {
+	return nil
+}
+
+// ClearedEdges returns all edge names that were cleared in this mutation.
+func (m *DeviceInstallationMutation) ClearedEdges() []string {
+	edges := make([]string, 0, 4)
+	if m.clearedcreator {
+		edges = append(edges, deviceinstallation.EdgeCreator)
+	}
+	if m.clearedupdater {
+		edges = append(edges, deviceinstallation.EdgeUpdater)
+	}
+	if m.clearedarea {
+		edges = append(edges, deviceinstallation.EdgeArea)
+	}
+	if m.cleareddevice {
+		edges = append(edges, deviceinstallation.EdgeDevice)
+	}
+	return edges
+}
+
+// EdgeCleared returns a boolean which indicates if the edge with the given name
+// was cleared in this mutation.
+func (m *DeviceInstallationMutation) EdgeCleared(name string) bool {
+	switch name {
+	case deviceinstallation.EdgeCreator:
+		return m.clearedcreator
+	case deviceinstallation.EdgeUpdater:
+		return m.clearedupdater
+	case deviceinstallation.EdgeArea:
+		return m.clearedarea
+	case deviceinstallation.EdgeDevice:
+		return m.cleareddevice
+	}
+	return false
+}
+
+// ClearEdge clears the value of the edge with the given name. It returns an error
+// if that edge is not defined in the schema.
+func (m *DeviceInstallationMutation) ClearEdge(name string) error {
+	switch name {
+	case deviceinstallation.EdgeCreator:
+		m.ClearCreator()
+		return nil
+	case deviceinstallation.EdgeUpdater:
+		m.ClearUpdater()
+		return nil
+	case deviceinstallation.EdgeArea:
+		m.ClearArea()
+		return nil
+	case deviceinstallation.EdgeDevice:
+		m.ClearDevice()
+		return nil
+	}
+	return fmt.Errorf("unknown DeviceInstallation unique edge %s", name)
+}
+
+// ResetEdge resets all changes to the edge with the given name in this mutation.
+// It returns an error if the edge is not defined in the schema.
+func (m *DeviceInstallationMutation) ResetEdge(name string) error {
+	switch name {
+	case deviceinstallation.EdgeCreator:
+		m.ResetCreator()
+		return nil
+	case deviceinstallation.EdgeUpdater:
+		m.ResetUpdater()
+		return nil
+	case deviceinstallation.EdgeArea:
+		m.ResetArea()
+		return nil
+	case deviceinstallation.EdgeDevice:
+		m.ResetDevice()
+		return nil
+	}
+	return fmt.Errorf("unknown DeviceInstallation edge %s", name)
+}
+
 // EmployeeMutation represents an operation that mutates the Employee nodes in the graph.
 type EmployeeMutation struct {
 	config
@@ -4783,6 +9119,9 @@ type EmployeeMutation struct {
 	occupations            map[int]struct{}
 	removedoccupations     map[int]struct{}
 	clearedoccupations     bool
+	ipc_events             map[int]struct{}
+	removedipc_events      map[int]struct{}
+	clearedipc_events      bool
 	risk_reporter          map[int]struct{}
 	removedrisk_reporter   map[int]struct{}
 	clearedrisk_reporter   bool
@@ -5345,6 +9684,60 @@ func (m *EmployeeMutation) ResetOccupations() {
 	m.removedoccupations = nil
 }
 
+// AddIpcEventIDs adds the "ipc_events" edge to the IPCEvent entity by ids.
+func (m *EmployeeMutation) AddIpcEventIDs(ids ...int) {
+	if m.ipc_events == nil {
+		m.ipc_events = make(map[int]struct{})
+	}
+	for i := range ids {
+		m.ipc_events[ids[i]] = struct{}{}
+	}
+}
+
+// ClearIpcEvents clears the "ipc_events" edge to the IPCEvent entity.
+func (m *EmployeeMutation) ClearIpcEvents() {
+	m.clearedipc_events = true
+}
+
+// IpcEventsCleared reports if the "ipc_events" edge to the IPCEvent entity was cleared.
+func (m *EmployeeMutation) IpcEventsCleared() bool {
+	return m.clearedipc_events
+}
+
+// RemoveIpcEventIDs removes the "ipc_events" edge to the IPCEvent entity by IDs.
+func (m *EmployeeMutation) RemoveIpcEventIDs(ids ...int) {
+	if m.removedipc_events == nil {
+		m.removedipc_events = make(map[int]struct{})
+	}
+	for i := range ids {
+		delete(m.ipc_events, ids[i])
+		m.removedipc_events[ids[i]] = struct{}{}
+	}
+}
+
+// RemovedIpcEvents returns the removed IDs of the "ipc_events" edge to the IPCEvent entity.
+func (m *EmployeeMutation) RemovedIpcEventsIDs() (ids []int) {
+	for id := range m.removedipc_events {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// IpcEventsIDs returns the "ipc_events" edge IDs in the mutation.
+func (m *EmployeeMutation) IpcEventsIDs() (ids []int) {
+	for id := range m.ipc_events {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// ResetIpcEvents resets all changes to the "ipc_events" edge.
+func (m *EmployeeMutation) ResetIpcEvents() {
+	m.ipc_events = nil
+	m.clearedipc_events = false
+	m.removedipc_events = nil
+}
+
 // AddRiskReporterIDs adds the "risk_reporter" edge to the Risk entity by ids.
 func (m *EmployeeMutation) AddRiskReporterIDs(ids ...int) {
 	if m.risk_reporter == nil {
@@ -5700,7 +10093,7 @@ func (m *EmployeeMutation) ResetField(name string) error {
 
 // AddedEdges returns all edge names that were set/added in this mutation.
 func (m *EmployeeMutation) AddedEdges() []string {
-	edges := make([]string, 0, 7)
+	edges := make([]string, 0, 8)
 	if m.creator != nil {
 		edges = append(edges, employee.EdgeCreator)
 	}
@@ -5715,6 +10108,9 @@ func (m *EmployeeMutation) AddedEdges() []string {
 	}
 	if m.occupations != nil {
 		edges = append(edges, employee.EdgeOccupations)
+	}
+	if m.ipc_events != nil {
+		edges = append(edges, employee.EdgeIpcEvents)
 	}
 	if m.risk_reporter != nil {
 		edges = append(edges, employee.EdgeRiskReporter)
@@ -5751,6 +10147,12 @@ func (m *EmployeeMutation) AddedIDs(name string) []ent.Value {
 			ids = append(ids, id)
 		}
 		return ids
+	case employee.EdgeIpcEvents:
+		ids := make([]ent.Value, 0, len(m.ipc_events))
+		for id := range m.ipc_events {
+			ids = append(ids, id)
+		}
+		return ids
 	case employee.EdgeRiskReporter:
 		ids := make([]ent.Value, 0, len(m.risk_reporter))
 		for id := range m.risk_reporter {
@@ -5769,9 +10171,12 @@ func (m *EmployeeMutation) AddedIDs(name string) []ent.Value {
 
 // RemovedEdges returns all edge names that were removed in this mutation.
 func (m *EmployeeMutation) RemovedEdges() []string {
-	edges := make([]string, 0, 7)
+	edges := make([]string, 0, 8)
 	if m.removedoccupations != nil {
 		edges = append(edges, employee.EdgeOccupations)
+	}
+	if m.removedipc_events != nil {
+		edges = append(edges, employee.EdgeIpcEvents)
 	}
 	if m.removedrisk_reporter != nil {
 		edges = append(edges, employee.EdgeRiskReporter)
@@ -5789,6 +10194,12 @@ func (m *EmployeeMutation) RemovedIDs(name string) []ent.Value {
 	case employee.EdgeOccupations:
 		ids := make([]ent.Value, 0, len(m.removedoccupations))
 		for id := range m.removedoccupations {
+			ids = append(ids, id)
+		}
+		return ids
+	case employee.EdgeIpcEvents:
+		ids := make([]ent.Value, 0, len(m.removedipc_events))
+		for id := range m.removedipc_events {
 			ids = append(ids, id)
 		}
 		return ids
@@ -5810,7 +10221,7 @@ func (m *EmployeeMutation) RemovedIDs(name string) []ent.Value {
 
 // ClearedEdges returns all edge names that were cleared in this mutation.
 func (m *EmployeeMutation) ClearedEdges() []string {
-	edges := make([]string, 0, 7)
+	edges := make([]string, 0, 8)
 	if m.clearedcreator {
 		edges = append(edges, employee.EdgeCreator)
 	}
@@ -5825,6 +10236,9 @@ func (m *EmployeeMutation) ClearedEdges() []string {
 	}
 	if m.clearedoccupations {
 		edges = append(edges, employee.EdgeOccupations)
+	}
+	if m.clearedipc_events {
+		edges = append(edges, employee.EdgeIpcEvents)
 	}
 	if m.clearedrisk_reporter {
 		edges = append(edges, employee.EdgeRiskReporter)
@@ -5849,6 +10263,8 @@ func (m *EmployeeMutation) EdgeCleared(name string) bool {
 		return m.cleareddepartment
 	case employee.EdgeOccupations:
 		return m.clearedoccupations
+	case employee.EdgeIpcEvents:
+		return m.clearedipc_events
 	case employee.EdgeRiskReporter:
 		return m.clearedrisk_reporter
 	case employee.EdgeRiskMaintainer:
@@ -5896,6 +10312,9 @@ func (m *EmployeeMutation) ResetEdge(name string) error {
 	case employee.EdgeOccupations:
 		m.ResetOccupations()
 		return nil
+	case employee.EdgeIpcEvents:
+		m.ResetIpcEvents()
+		return nil
 	case employee.EdgeRiskReporter:
 		m.ResetRiskReporter()
 		return nil
@@ -5906,55 +10325,41 @@ func (m *EmployeeMutation) ResetEdge(name string) error {
 	return fmt.Errorf("unknown Employee edge %s", name)
 }
 
-// IPCReportEventMutation represents an operation that mutates the IPCReportEvent nodes in the graph.
-type IPCReportEventMutation struct {
+// EventLevelMutation represents an operation that mutates the EventLevel nodes in the graph.
+type EventLevelMutation struct {
 	config
-	op                   Op
-	typ                  string
-	id                   *int
-	created_at           *time.Time
-	deleted_at           *time.Time
-	updated_at           *time.Time
-	device_brand         *enums.IPCReportEventDeviceBrand
-	adddevice_brand      *enums.IPCReportEventDeviceBrand
-	device_model         *enums.IPCReportEventDeviceModel
-	adddevice_model      *enums.IPCReportEventDeviceModel
-	device_id            *string
-	event_id             *string
-	event_time           *time.Time
-	event_type           *enums.IPCReportEventType
-	addevent_type        *enums.IPCReportEventType
-	event_status         *enums.IPCReportEventStatus
-	addevent_status      *enums.IPCReportEventStatus
-	images               *[]*types.UploadedImage
-	appendimages         []*types.UploadedImage
-	labeled_images       *[]*types.UploadedImage
-	appendlabeled_images []*types.UploadedImage
-	description          *string
-	raw_data             *string
-	clearedFields        map[string]struct{}
-	creator              *int
-	clearedcreator       bool
-	updater              *int
-	clearedupdater       bool
-	video                *int
-	clearedvideo         bool
-	done                 bool
-	oldValue             func(context.Context) (*IPCReportEvent, error)
-	predicates           []predicate.IPCReportEvent
+	op                Op
+	typ               string
+	id                *int
+	created_at        *time.Time
+	deleted_at        *time.Time
+	updated_at        *time.Time
+	name              *string
+	event_types       *[]enums.EventType
+	appendevent_types []enums.EventType
+	description       *string
+	is_report         *bool
+	clearedFields     map[string]struct{}
+	creator           *int
+	clearedcreator    bool
+	updater           *int
+	clearedupdater    bool
+	done              bool
+	oldValue          func(context.Context) (*EventLevel, error)
+	predicates        []predicate.EventLevel
 }
 
-var _ ent.Mutation = (*IPCReportEventMutation)(nil)
+var _ ent.Mutation = (*EventLevelMutation)(nil)
 
-// ipcreporteventOption allows management of the mutation configuration using functional options.
-type ipcreporteventOption func(*IPCReportEventMutation)
+// eventlevelOption allows management of the mutation configuration using functional options.
+type eventlevelOption func(*EventLevelMutation)
 
-// newIPCReportEventMutation creates new mutation for the IPCReportEvent entity.
-func newIPCReportEventMutation(c config, op Op, opts ...ipcreporteventOption) *IPCReportEventMutation {
-	m := &IPCReportEventMutation{
+// newEventLevelMutation creates new mutation for the EventLevel entity.
+func newEventLevelMutation(c config, op Op, opts ...eventlevelOption) *EventLevelMutation {
+	m := &EventLevelMutation{
 		config:        c,
 		op:            op,
-		typ:           TypeIPCReportEvent,
+		typ:           TypeEventLevel,
 		clearedFields: make(map[string]struct{}),
 	}
 	for _, opt := range opts {
@@ -5963,20 +10368,20 @@ func newIPCReportEventMutation(c config, op Op, opts ...ipcreporteventOption) *I
 	return m
 }
 
-// withIPCReportEventID sets the ID field of the mutation.
-func withIPCReportEventID(id int) ipcreporteventOption {
-	return func(m *IPCReportEventMutation) {
+// withEventLevelID sets the ID field of the mutation.
+func withEventLevelID(id int) eventlevelOption {
+	return func(m *EventLevelMutation) {
 		var (
 			err   error
 			once  sync.Once
-			value *IPCReportEvent
+			value *EventLevel
 		)
-		m.oldValue = func(ctx context.Context) (*IPCReportEvent, error) {
+		m.oldValue = func(ctx context.Context) (*EventLevel, error) {
 			once.Do(func() {
 				if m.done {
 					err = errors.New("querying old values post mutation is not allowed")
 				} else {
-					value, err = m.Client().IPCReportEvent.Get(ctx, id)
+					value, err = m.Client().EventLevel.Get(ctx, id)
 				}
 			})
 			return value, err
@@ -5985,10 +10390,10 @@ func withIPCReportEventID(id int) ipcreporteventOption {
 	}
 }
 
-// withIPCReportEvent sets the old IPCReportEvent of the mutation.
-func withIPCReportEvent(node *IPCReportEvent) ipcreporteventOption {
-	return func(m *IPCReportEventMutation) {
-		m.oldValue = func(context.Context) (*IPCReportEvent, error) {
+// withEventLevel sets the old EventLevel of the mutation.
+func withEventLevel(node *EventLevel) eventlevelOption {
+	return func(m *EventLevelMutation) {
+		m.oldValue = func(context.Context) (*EventLevel, error) {
 			return node, nil
 		}
 		m.id = &node.ID
@@ -5997,7 +10402,7 @@ func withIPCReportEvent(node *IPCReportEvent) ipcreporteventOption {
 
 // Client returns a new `ent.Client` from the mutation. If the mutation was
 // executed in a transaction (ent.Tx), a transactional client is returned.
-func (m IPCReportEventMutation) Client() *Client {
+func (m EventLevelMutation) Client() *Client {
 	client := &Client{config: m.config}
 	client.init()
 	return client
@@ -6005,7 +10410,7 @@ func (m IPCReportEventMutation) Client() *Client {
 
 // Tx returns an `ent.Tx` for mutations that were executed in transactions;
 // it returns an error otherwise.
-func (m IPCReportEventMutation) Tx() (*Tx, error) {
+func (m EventLevelMutation) Tx() (*Tx, error) {
 	if _, ok := m.driver.(*txDriver); !ok {
 		return nil, errors.New("dao: mutation is not running in a transaction")
 	}
@@ -6016,7 +10421,7 @@ func (m IPCReportEventMutation) Tx() (*Tx, error) {
 
 // ID returns the ID value in the mutation. Note that the ID is only available
 // if it was provided to the builder or after it was returned from the database.
-func (m *IPCReportEventMutation) ID() (id int, exists bool) {
+func (m *EventLevelMutation) ID() (id int, exists bool) {
 	if m.id == nil {
 		return
 	}
@@ -6027,7 +10432,7 @@ func (m *IPCReportEventMutation) ID() (id int, exists bool) {
 // That means, if the mutation is applied within a transaction with an isolation level such
 // as sql.LevelSerializable, the returned ids match the ids of the rows that will be updated
 // or updated by the mutation.
-func (m *IPCReportEventMutation) IDs(ctx context.Context) ([]int, error) {
+func (m *EventLevelMutation) IDs(ctx context.Context) ([]int, error) {
 	switch {
 	case m.op.Is(OpUpdateOne | OpDeleteOne):
 		id, exists := m.ID()
@@ -6036,19 +10441,19 @@ func (m *IPCReportEventMutation) IDs(ctx context.Context) ([]int, error) {
 		}
 		fallthrough
 	case m.op.Is(OpUpdate | OpDelete):
-		return m.Client().IPCReportEvent.Query().Where(m.predicates...).IDs(ctx)
+		return m.Client().EventLevel.Query().Where(m.predicates...).IDs(ctx)
 	default:
 		return nil, fmt.Errorf("IDs is not allowed on %s operations", m.op)
 	}
 }
 
 // SetCreatedAt sets the "created_at" field.
-func (m *IPCReportEventMutation) SetCreatedAt(t time.Time) {
+func (m *EventLevelMutation) SetCreatedAt(t time.Time) {
 	m.created_at = &t
 }
 
 // CreatedAt returns the value of the "created_at" field in the mutation.
-func (m *IPCReportEventMutation) CreatedAt() (r time.Time, exists bool) {
+func (m *EventLevelMutation) CreatedAt() (r time.Time, exists bool) {
 	v := m.created_at
 	if v == nil {
 		return
@@ -6056,10 +10461,10 @@ func (m *IPCReportEventMutation) CreatedAt() (r time.Time, exists bool) {
 	return *v, true
 }
 
-// OldCreatedAt returns the old "created_at" field's value of the IPCReportEvent entity.
-// If the IPCReportEvent object wasn't provided to the builder, the object is fetched from the database.
+// OldCreatedAt returns the old "created_at" field's value of the EventLevel entity.
+// If the EventLevel object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *IPCReportEventMutation) OldCreatedAt(ctx context.Context) (v time.Time, err error) {
+func (m *EventLevelMutation) OldCreatedAt(ctx context.Context) (v time.Time, err error) {
 	if !m.op.Is(OpUpdateOne) {
 		return v, errors.New("OldCreatedAt is only allowed on UpdateOne operations")
 	}
@@ -6074,17 +10479,17 @@ func (m *IPCReportEventMutation) OldCreatedAt(ctx context.Context) (v time.Time,
 }
 
 // ResetCreatedAt resets all changes to the "created_at" field.
-func (m *IPCReportEventMutation) ResetCreatedAt() {
+func (m *EventLevelMutation) ResetCreatedAt() {
 	m.created_at = nil
 }
 
 // SetCreatedBy sets the "created_by" field.
-func (m *IPCReportEventMutation) SetCreatedBy(i int) {
+func (m *EventLevelMutation) SetCreatedBy(i int) {
 	m.creator = &i
 }
 
 // CreatedBy returns the value of the "created_by" field in the mutation.
-func (m *IPCReportEventMutation) CreatedBy() (r int, exists bool) {
+func (m *EventLevelMutation) CreatedBy() (r int, exists bool) {
 	v := m.creator
 	if v == nil {
 		return
@@ -6092,10 +10497,10 @@ func (m *IPCReportEventMutation) CreatedBy() (r int, exists bool) {
 	return *v, true
 }
 
-// OldCreatedBy returns the old "created_by" field's value of the IPCReportEvent entity.
-// If the IPCReportEvent object wasn't provided to the builder, the object is fetched from the database.
+// OldCreatedBy returns the old "created_by" field's value of the EventLevel entity.
+// If the EventLevel object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *IPCReportEventMutation) OldCreatedBy(ctx context.Context) (v int, err error) {
+func (m *EventLevelMutation) OldCreatedBy(ctx context.Context) (v int, err error) {
 	if !m.op.Is(OpUpdateOne) {
 		return v, errors.New("OldCreatedBy is only allowed on UpdateOne operations")
 	}
@@ -6110,17 +10515,17 @@ func (m *IPCReportEventMutation) OldCreatedBy(ctx context.Context) (v int, err e
 }
 
 // ResetCreatedBy resets all changes to the "created_by" field.
-func (m *IPCReportEventMutation) ResetCreatedBy() {
+func (m *EventLevelMutation) ResetCreatedBy() {
 	m.creator = nil
 }
 
 // SetDeletedAt sets the "deleted_at" field.
-func (m *IPCReportEventMutation) SetDeletedAt(t time.Time) {
+func (m *EventLevelMutation) SetDeletedAt(t time.Time) {
 	m.deleted_at = &t
 }
 
 // DeletedAt returns the value of the "deleted_at" field in the mutation.
-func (m *IPCReportEventMutation) DeletedAt() (r time.Time, exists bool) {
+func (m *EventLevelMutation) DeletedAt() (r time.Time, exists bool) {
 	v := m.deleted_at
 	if v == nil {
 		return
@@ -6128,10 +10533,10 @@ func (m *IPCReportEventMutation) DeletedAt() (r time.Time, exists bool) {
 	return *v, true
 }
 
-// OldDeletedAt returns the old "deleted_at" field's value of the IPCReportEvent entity.
-// If the IPCReportEvent object wasn't provided to the builder, the object is fetched from the database.
+// OldDeletedAt returns the old "deleted_at" field's value of the EventLevel entity.
+// If the EventLevel object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *IPCReportEventMutation) OldDeletedAt(ctx context.Context) (v *time.Time, err error) {
+func (m *EventLevelMutation) OldDeletedAt(ctx context.Context) (v *time.Time, err error) {
 	if !m.op.Is(OpUpdateOne) {
 		return v, errors.New("OldDeletedAt is only allowed on UpdateOne operations")
 	}
@@ -6146,30 +10551,30 @@ func (m *IPCReportEventMutation) OldDeletedAt(ctx context.Context) (v *time.Time
 }
 
 // ClearDeletedAt clears the value of the "deleted_at" field.
-func (m *IPCReportEventMutation) ClearDeletedAt() {
+func (m *EventLevelMutation) ClearDeletedAt() {
 	m.deleted_at = nil
-	m.clearedFields[ipcreportevent.FieldDeletedAt] = struct{}{}
+	m.clearedFields[eventlevel.FieldDeletedAt] = struct{}{}
 }
 
 // DeletedAtCleared returns if the "deleted_at" field was cleared in this mutation.
-func (m *IPCReportEventMutation) DeletedAtCleared() bool {
-	_, ok := m.clearedFields[ipcreportevent.FieldDeletedAt]
+func (m *EventLevelMutation) DeletedAtCleared() bool {
+	_, ok := m.clearedFields[eventlevel.FieldDeletedAt]
 	return ok
 }
 
 // ResetDeletedAt resets all changes to the "deleted_at" field.
-func (m *IPCReportEventMutation) ResetDeletedAt() {
+func (m *EventLevelMutation) ResetDeletedAt() {
 	m.deleted_at = nil
-	delete(m.clearedFields, ipcreportevent.FieldDeletedAt)
+	delete(m.clearedFields, eventlevel.FieldDeletedAt)
 }
 
 // SetUpdatedBy sets the "updated_by" field.
-func (m *IPCReportEventMutation) SetUpdatedBy(i int) {
+func (m *EventLevelMutation) SetUpdatedBy(i int) {
 	m.updater = &i
 }
 
 // UpdatedBy returns the value of the "updated_by" field in the mutation.
-func (m *IPCReportEventMutation) UpdatedBy() (r int, exists bool) {
+func (m *EventLevelMutation) UpdatedBy() (r int, exists bool) {
 	v := m.updater
 	if v == nil {
 		return
@@ -6177,10 +10582,10 @@ func (m *IPCReportEventMutation) UpdatedBy() (r int, exists bool) {
 	return *v, true
 }
 
-// OldUpdatedBy returns the old "updated_by" field's value of the IPCReportEvent entity.
-// If the IPCReportEvent object wasn't provided to the builder, the object is fetched from the database.
+// OldUpdatedBy returns the old "updated_by" field's value of the EventLevel entity.
+// If the EventLevel object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *IPCReportEventMutation) OldUpdatedBy(ctx context.Context) (v int, err error) {
+func (m *EventLevelMutation) OldUpdatedBy(ctx context.Context) (v int, err error) {
 	if !m.op.Is(OpUpdateOne) {
 		return v, errors.New("OldUpdatedBy is only allowed on UpdateOne operations")
 	}
@@ -6195,17 +10600,17 @@ func (m *IPCReportEventMutation) OldUpdatedBy(ctx context.Context) (v int, err e
 }
 
 // ResetUpdatedBy resets all changes to the "updated_by" field.
-func (m *IPCReportEventMutation) ResetUpdatedBy() {
+func (m *EventLevelMutation) ResetUpdatedBy() {
 	m.updater = nil
 }
 
 // SetUpdatedAt sets the "updated_at" field.
-func (m *IPCReportEventMutation) SetUpdatedAt(t time.Time) {
+func (m *EventLevelMutation) SetUpdatedAt(t time.Time) {
 	m.updated_at = &t
 }
 
 // UpdatedAt returns the value of the "updated_at" field in the mutation.
-func (m *IPCReportEventMutation) UpdatedAt() (r time.Time, exists bool) {
+func (m *EventLevelMutation) UpdatedAt() (r time.Time, exists bool) {
 	v := m.updated_at
 	if v == nil {
 		return
@@ -6213,10 +10618,10 @@ func (m *IPCReportEventMutation) UpdatedAt() (r time.Time, exists bool) {
 	return *v, true
 }
 
-// OldUpdatedAt returns the old "updated_at" field's value of the IPCReportEvent entity.
-// If the IPCReportEvent object wasn't provided to the builder, the object is fetched from the database.
+// OldUpdatedAt returns the old "updated_at" field's value of the EventLevel entity.
+// If the EventLevel object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *IPCReportEventMutation) OldUpdatedAt(ctx context.Context) (v time.Time, err error) {
+func (m *EventLevelMutation) OldUpdatedAt(ctx context.Context) (v time.Time, err error) {
 	if !m.op.Is(OpUpdateOne) {
 		return v, errors.New("OldUpdatedAt is only allowed on UpdateOne operations")
 	}
@@ -6231,528 +10636,117 @@ func (m *IPCReportEventMutation) OldUpdatedAt(ctx context.Context) (v time.Time,
 }
 
 // ResetUpdatedAt resets all changes to the "updated_at" field.
-func (m *IPCReportEventMutation) ResetUpdatedAt() {
+func (m *EventLevelMutation) ResetUpdatedAt() {
 	m.updated_at = nil
 }
 
-// SetDeviceBrand sets the "device_brand" field.
-func (m *IPCReportEventMutation) SetDeviceBrand(eredb enums.IPCReportEventDeviceBrand) {
-	m.device_brand = &eredb
-	m.adddevice_brand = nil
+// SetName sets the "name" field.
+func (m *EventLevelMutation) SetName(s string) {
+	m.name = &s
 }
 
-// DeviceBrand returns the value of the "device_brand" field in the mutation.
-func (m *IPCReportEventMutation) DeviceBrand() (r enums.IPCReportEventDeviceBrand, exists bool) {
-	v := m.device_brand
+// Name returns the value of the "name" field in the mutation.
+func (m *EventLevelMutation) Name() (r string, exists bool) {
+	v := m.name
 	if v == nil {
 		return
 	}
 	return *v, true
 }
 
-// OldDeviceBrand returns the old "device_brand" field's value of the IPCReportEvent entity.
-// If the IPCReportEvent object wasn't provided to the builder, the object is fetched from the database.
+// OldName returns the old "name" field's value of the EventLevel entity.
+// If the EventLevel object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *IPCReportEventMutation) OldDeviceBrand(ctx context.Context) (v enums.IPCReportEventDeviceBrand, err error) {
+func (m *EventLevelMutation) OldName(ctx context.Context) (v string, err error) {
 	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldDeviceBrand is only allowed on UpdateOne operations")
+		return v, errors.New("OldName is only allowed on UpdateOne operations")
 	}
 	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldDeviceBrand requires an ID field in the mutation")
+		return v, errors.New("OldName requires an ID field in the mutation")
 	}
 	oldValue, err := m.oldValue(ctx)
 	if err != nil {
-		return v, fmt.Errorf("querying old value for OldDeviceBrand: %w", err)
+		return v, fmt.Errorf("querying old value for OldName: %w", err)
 	}
-	return oldValue.DeviceBrand, nil
+	return oldValue.Name, nil
 }
 
-// AddDeviceBrand adds eredb to the "device_brand" field.
-func (m *IPCReportEventMutation) AddDeviceBrand(eredb enums.IPCReportEventDeviceBrand) {
-	if m.adddevice_brand != nil {
-		*m.adddevice_brand += eredb
-	} else {
-		m.adddevice_brand = &eredb
-	}
+// ClearName clears the value of the "name" field.
+func (m *EventLevelMutation) ClearName() {
+	m.name = nil
+	m.clearedFields[eventlevel.FieldName] = struct{}{}
 }
 
-// AddedDeviceBrand returns the value that was added to the "device_brand" field in this mutation.
-func (m *IPCReportEventMutation) AddedDeviceBrand() (r enums.IPCReportEventDeviceBrand, exists bool) {
-	v := m.adddevice_brand
+// NameCleared returns if the "name" field was cleared in this mutation.
+func (m *EventLevelMutation) NameCleared() bool {
+	_, ok := m.clearedFields[eventlevel.FieldName]
+	return ok
+}
+
+// ResetName resets all changes to the "name" field.
+func (m *EventLevelMutation) ResetName() {
+	m.name = nil
+	delete(m.clearedFields, eventlevel.FieldName)
+}
+
+// SetEventTypes sets the "event_types" field.
+func (m *EventLevelMutation) SetEventTypes(et []enums.EventType) {
+	m.event_types = &et
+	m.appendevent_types = nil
+}
+
+// EventTypes returns the value of the "event_types" field in the mutation.
+func (m *EventLevelMutation) EventTypes() (r []enums.EventType, exists bool) {
+	v := m.event_types
 	if v == nil {
 		return
 	}
 	return *v, true
 }
 
-// ResetDeviceBrand resets all changes to the "device_brand" field.
-func (m *IPCReportEventMutation) ResetDeviceBrand() {
-	m.device_brand = nil
-	m.adddevice_brand = nil
-}
-
-// SetDeviceModel sets the "device_model" field.
-func (m *IPCReportEventMutation) SetDeviceModel(eredm enums.IPCReportEventDeviceModel) {
-	m.device_model = &eredm
-	m.adddevice_model = nil
-}
-
-// DeviceModel returns the value of the "device_model" field in the mutation.
-func (m *IPCReportEventMutation) DeviceModel() (r enums.IPCReportEventDeviceModel, exists bool) {
-	v := m.device_model
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// OldDeviceModel returns the old "device_model" field's value of the IPCReportEvent entity.
-// If the IPCReportEvent object wasn't provided to the builder, the object is fetched from the database.
+// OldEventTypes returns the old "event_types" field's value of the EventLevel entity.
+// If the EventLevel object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *IPCReportEventMutation) OldDeviceModel(ctx context.Context) (v enums.IPCReportEventDeviceModel, err error) {
+func (m *EventLevelMutation) OldEventTypes(ctx context.Context) (v []enums.EventType, err error) {
 	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldDeviceModel is only allowed on UpdateOne operations")
+		return v, errors.New("OldEventTypes is only allowed on UpdateOne operations")
 	}
 	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldDeviceModel requires an ID field in the mutation")
+		return v, errors.New("OldEventTypes requires an ID field in the mutation")
 	}
 	oldValue, err := m.oldValue(ctx)
 	if err != nil {
-		return v, fmt.Errorf("querying old value for OldDeviceModel: %w", err)
+		return v, fmt.Errorf("querying old value for OldEventTypes: %w", err)
 	}
-	return oldValue.DeviceModel, nil
+	return oldValue.EventTypes, nil
 }
 
-// AddDeviceModel adds eredm to the "device_model" field.
-func (m *IPCReportEventMutation) AddDeviceModel(eredm enums.IPCReportEventDeviceModel) {
-	if m.adddevice_model != nil {
-		*m.adddevice_model += eredm
-	} else {
-		m.adddevice_model = &eredm
-	}
+// AppendEventTypes adds et to the "event_types" field.
+func (m *EventLevelMutation) AppendEventTypes(et []enums.EventType) {
+	m.appendevent_types = append(m.appendevent_types, et...)
 }
 
-// AddedDeviceModel returns the value that was added to the "device_model" field in this mutation.
-func (m *IPCReportEventMutation) AddedDeviceModel() (r enums.IPCReportEventDeviceModel, exists bool) {
-	v := m.adddevice_model
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// ResetDeviceModel resets all changes to the "device_model" field.
-func (m *IPCReportEventMutation) ResetDeviceModel() {
-	m.device_model = nil
-	m.adddevice_model = nil
-}
-
-// SetDeviceID sets the "device_id" field.
-func (m *IPCReportEventMutation) SetDeviceID(s string) {
-	m.device_id = &s
-}
-
-// DeviceID returns the value of the "device_id" field in the mutation.
-func (m *IPCReportEventMutation) DeviceID() (r string, exists bool) {
-	v := m.device_id
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// OldDeviceID returns the old "device_id" field's value of the IPCReportEvent entity.
-// If the IPCReportEvent object wasn't provided to the builder, the object is fetched from the database.
-// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *IPCReportEventMutation) OldDeviceID(ctx context.Context) (v string, err error) {
-	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldDeviceID is only allowed on UpdateOne operations")
-	}
-	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldDeviceID requires an ID field in the mutation")
-	}
-	oldValue, err := m.oldValue(ctx)
-	if err != nil {
-		return v, fmt.Errorf("querying old value for OldDeviceID: %w", err)
-	}
-	return oldValue.DeviceID, nil
-}
-
-// ResetDeviceID resets all changes to the "device_id" field.
-func (m *IPCReportEventMutation) ResetDeviceID() {
-	m.device_id = nil
-}
-
-// SetEventID sets the "event_id" field.
-func (m *IPCReportEventMutation) SetEventID(s string) {
-	m.event_id = &s
-}
-
-// EventID returns the value of the "event_id" field in the mutation.
-func (m *IPCReportEventMutation) EventID() (r string, exists bool) {
-	v := m.event_id
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// OldEventID returns the old "event_id" field's value of the IPCReportEvent entity.
-// If the IPCReportEvent object wasn't provided to the builder, the object is fetched from the database.
-// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *IPCReportEventMutation) OldEventID(ctx context.Context) (v string, err error) {
-	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldEventID is only allowed on UpdateOne operations")
-	}
-	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldEventID requires an ID field in the mutation")
-	}
-	oldValue, err := m.oldValue(ctx)
-	if err != nil {
-		return v, fmt.Errorf("querying old value for OldEventID: %w", err)
-	}
-	return oldValue.EventID, nil
-}
-
-// ResetEventID resets all changes to the "event_id" field.
-func (m *IPCReportEventMutation) ResetEventID() {
-	m.event_id = nil
-}
-
-// SetEventTime sets the "event_time" field.
-func (m *IPCReportEventMutation) SetEventTime(t time.Time) {
-	m.event_time = &t
-}
-
-// EventTime returns the value of the "event_time" field in the mutation.
-func (m *IPCReportEventMutation) EventTime() (r time.Time, exists bool) {
-	v := m.event_time
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// OldEventTime returns the old "event_time" field's value of the IPCReportEvent entity.
-// If the IPCReportEvent object wasn't provided to the builder, the object is fetched from the database.
-// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *IPCReportEventMutation) OldEventTime(ctx context.Context) (v time.Time, err error) {
-	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldEventTime is only allowed on UpdateOne operations")
-	}
-	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldEventTime requires an ID field in the mutation")
-	}
-	oldValue, err := m.oldValue(ctx)
-	if err != nil {
-		return v, fmt.Errorf("querying old value for OldEventTime: %w", err)
-	}
-	return oldValue.EventTime, nil
-}
-
-// ResetEventTime resets all changes to the "event_time" field.
-func (m *IPCReportEventMutation) ResetEventTime() {
-	m.event_time = nil
-}
-
-// SetEventType sets the "event_type" field.
-func (m *IPCReportEventMutation) SetEventType(eret enums.IPCReportEventType) {
-	m.event_type = &eret
-	m.addevent_type = nil
-}
-
-// EventType returns the value of the "event_type" field in the mutation.
-func (m *IPCReportEventMutation) EventType() (r enums.IPCReportEventType, exists bool) {
-	v := m.event_type
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// OldEventType returns the old "event_type" field's value of the IPCReportEvent entity.
-// If the IPCReportEvent object wasn't provided to the builder, the object is fetched from the database.
-// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *IPCReportEventMutation) OldEventType(ctx context.Context) (v enums.IPCReportEventType, err error) {
-	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldEventType is only allowed on UpdateOne operations")
-	}
-	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldEventType requires an ID field in the mutation")
-	}
-	oldValue, err := m.oldValue(ctx)
-	if err != nil {
-		return v, fmt.Errorf("querying old value for OldEventType: %w", err)
-	}
-	return oldValue.EventType, nil
-}
-
-// AddEventType adds eret to the "event_type" field.
-func (m *IPCReportEventMutation) AddEventType(eret enums.IPCReportEventType) {
-	if m.addevent_type != nil {
-		*m.addevent_type += eret
-	} else {
-		m.addevent_type = &eret
-	}
-}
-
-// AddedEventType returns the value that was added to the "event_type" field in this mutation.
-func (m *IPCReportEventMutation) AddedEventType() (r enums.IPCReportEventType, exists bool) {
-	v := m.addevent_type
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// ResetEventType resets all changes to the "event_type" field.
-func (m *IPCReportEventMutation) ResetEventType() {
-	m.event_type = nil
-	m.addevent_type = nil
-}
-
-// SetEventStatus sets the "event_status" field.
-func (m *IPCReportEventMutation) SetEventStatus(eres enums.IPCReportEventStatus) {
-	m.event_status = &eres
-	m.addevent_status = nil
-}
-
-// EventStatus returns the value of the "event_status" field in the mutation.
-func (m *IPCReportEventMutation) EventStatus() (r enums.IPCReportEventStatus, exists bool) {
-	v := m.event_status
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// OldEventStatus returns the old "event_status" field's value of the IPCReportEvent entity.
-// If the IPCReportEvent object wasn't provided to the builder, the object is fetched from the database.
-// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *IPCReportEventMutation) OldEventStatus(ctx context.Context) (v enums.IPCReportEventStatus, err error) {
-	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldEventStatus is only allowed on UpdateOne operations")
-	}
-	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldEventStatus requires an ID field in the mutation")
-	}
-	oldValue, err := m.oldValue(ctx)
-	if err != nil {
-		return v, fmt.Errorf("querying old value for OldEventStatus: %w", err)
-	}
-	return oldValue.EventStatus, nil
-}
-
-// AddEventStatus adds eres to the "event_status" field.
-func (m *IPCReportEventMutation) AddEventStatus(eres enums.IPCReportEventStatus) {
-	if m.addevent_status != nil {
-		*m.addevent_status += eres
-	} else {
-		m.addevent_status = &eres
-	}
-}
-
-// AddedEventStatus returns the value that was added to the "event_status" field in this mutation.
-func (m *IPCReportEventMutation) AddedEventStatus() (r enums.IPCReportEventStatus, exists bool) {
-	v := m.addevent_status
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// ResetEventStatus resets all changes to the "event_status" field.
-func (m *IPCReportEventMutation) ResetEventStatus() {
-	m.event_status = nil
-	m.addevent_status = nil
-}
-
-// SetImages sets the "images" field.
-func (m *IPCReportEventMutation) SetImages(ti []*types.UploadedImage) {
-	m.images = &ti
-	m.appendimages = nil
-}
-
-// Images returns the value of the "images" field in the mutation.
-func (m *IPCReportEventMutation) Images() (r []*types.UploadedImage, exists bool) {
-	v := m.images
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// OldImages returns the old "images" field's value of the IPCReportEvent entity.
-// If the IPCReportEvent object wasn't provided to the builder, the object is fetched from the database.
-// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *IPCReportEventMutation) OldImages(ctx context.Context) (v []*types.UploadedImage, err error) {
-	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldImages is only allowed on UpdateOne operations")
-	}
-	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldImages requires an ID field in the mutation")
-	}
-	oldValue, err := m.oldValue(ctx)
-	if err != nil {
-		return v, fmt.Errorf("querying old value for OldImages: %w", err)
-	}
-	return oldValue.Images, nil
-}
-
-// AppendImages adds ti to the "images" field.
-func (m *IPCReportEventMutation) AppendImages(ti []*types.UploadedImage) {
-	m.appendimages = append(m.appendimages, ti...)
-}
-
-// AppendedImages returns the list of values that were appended to the "images" field in this mutation.
-func (m *IPCReportEventMutation) AppendedImages() ([]*types.UploadedImage, bool) {
-	if len(m.appendimages) == 0 {
+// AppendedEventTypes returns the list of values that were appended to the "event_types" field in this mutation.
+func (m *EventLevelMutation) AppendedEventTypes() ([]enums.EventType, bool) {
+	if len(m.appendevent_types) == 0 {
 		return nil, false
 	}
-	return m.appendimages, true
+	return m.appendevent_types, true
 }
 
-// ClearImages clears the value of the "images" field.
-func (m *IPCReportEventMutation) ClearImages() {
-	m.images = nil
-	m.appendimages = nil
-	m.clearedFields[ipcreportevent.FieldImages] = struct{}{}
-}
-
-// ImagesCleared returns if the "images" field was cleared in this mutation.
-func (m *IPCReportEventMutation) ImagesCleared() bool {
-	_, ok := m.clearedFields[ipcreportevent.FieldImages]
-	return ok
-}
-
-// ResetImages resets all changes to the "images" field.
-func (m *IPCReportEventMutation) ResetImages() {
-	m.images = nil
-	m.appendimages = nil
-	delete(m.clearedFields, ipcreportevent.FieldImages)
-}
-
-// SetLabeledImages sets the "labeled_images" field.
-func (m *IPCReportEventMutation) SetLabeledImages(ti []*types.UploadedImage) {
-	m.labeled_images = &ti
-	m.appendlabeled_images = nil
-}
-
-// LabeledImages returns the value of the "labeled_images" field in the mutation.
-func (m *IPCReportEventMutation) LabeledImages() (r []*types.UploadedImage, exists bool) {
-	v := m.labeled_images
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// OldLabeledImages returns the old "labeled_images" field's value of the IPCReportEvent entity.
-// If the IPCReportEvent object wasn't provided to the builder, the object is fetched from the database.
-// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *IPCReportEventMutation) OldLabeledImages(ctx context.Context) (v []*types.UploadedImage, err error) {
-	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldLabeledImages is only allowed on UpdateOne operations")
-	}
-	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldLabeledImages requires an ID field in the mutation")
-	}
-	oldValue, err := m.oldValue(ctx)
-	if err != nil {
-		return v, fmt.Errorf("querying old value for OldLabeledImages: %w", err)
-	}
-	return oldValue.LabeledImages, nil
-}
-
-// AppendLabeledImages adds ti to the "labeled_images" field.
-func (m *IPCReportEventMutation) AppendLabeledImages(ti []*types.UploadedImage) {
-	m.appendlabeled_images = append(m.appendlabeled_images, ti...)
-}
-
-// AppendedLabeledImages returns the list of values that were appended to the "labeled_images" field in this mutation.
-func (m *IPCReportEventMutation) AppendedLabeledImages() ([]*types.UploadedImage, bool) {
-	if len(m.appendlabeled_images) == 0 {
-		return nil, false
-	}
-	return m.appendlabeled_images, true
-}
-
-// ClearLabeledImages clears the value of the "labeled_images" field.
-func (m *IPCReportEventMutation) ClearLabeledImages() {
-	m.labeled_images = nil
-	m.appendlabeled_images = nil
-	m.clearedFields[ipcreportevent.FieldLabeledImages] = struct{}{}
-}
-
-// LabeledImagesCleared returns if the "labeled_images" field was cleared in this mutation.
-func (m *IPCReportEventMutation) LabeledImagesCleared() bool {
-	_, ok := m.clearedFields[ipcreportevent.FieldLabeledImages]
-	return ok
-}
-
-// ResetLabeledImages resets all changes to the "labeled_images" field.
-func (m *IPCReportEventMutation) ResetLabeledImages() {
-	m.labeled_images = nil
-	m.appendlabeled_images = nil
-	delete(m.clearedFields, ipcreportevent.FieldLabeledImages)
-}
-
-// SetVideoID sets the "video_id" field.
-func (m *IPCReportEventMutation) SetVideoID(i int) {
-	m.video = &i
-}
-
-// VideoID returns the value of the "video_id" field in the mutation.
-func (m *IPCReportEventMutation) VideoID() (r int, exists bool) {
-	v := m.video
-	if v == nil {
-		return
-	}
-	return *v, true
-}
-
-// OldVideoID returns the old "video_id" field's value of the IPCReportEvent entity.
-// If the IPCReportEvent object wasn't provided to the builder, the object is fetched from the database.
-// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *IPCReportEventMutation) OldVideoID(ctx context.Context) (v int, err error) {
-	if !m.op.Is(OpUpdateOne) {
-		return v, errors.New("OldVideoID is only allowed on UpdateOne operations")
-	}
-	if m.id == nil || m.oldValue == nil {
-		return v, errors.New("OldVideoID requires an ID field in the mutation")
-	}
-	oldValue, err := m.oldValue(ctx)
-	if err != nil {
-		return v, fmt.Errorf("querying old value for OldVideoID: %w", err)
-	}
-	return oldValue.VideoID, nil
-}
-
-// ClearVideoID clears the value of the "video_id" field.
-func (m *IPCReportEventMutation) ClearVideoID() {
-	m.video = nil
-	m.clearedFields[ipcreportevent.FieldVideoID] = struct{}{}
-}
-
-// VideoIDCleared returns if the "video_id" field was cleared in this mutation.
-func (m *IPCReportEventMutation) VideoIDCleared() bool {
-	_, ok := m.clearedFields[ipcreportevent.FieldVideoID]
-	return ok
-}
-
-// ResetVideoID resets all changes to the "video_id" field.
-func (m *IPCReportEventMutation) ResetVideoID() {
-	m.video = nil
-	delete(m.clearedFields, ipcreportevent.FieldVideoID)
+// ResetEventTypes resets all changes to the "event_types" field.
+func (m *EventLevelMutation) ResetEventTypes() {
+	m.event_types = nil
+	m.appendevent_types = nil
 }
 
 // SetDescription sets the "description" field.
-func (m *IPCReportEventMutation) SetDescription(s string) {
+func (m *EventLevelMutation) SetDescription(s string) {
 	m.description = &s
 }
 
 // Description returns the value of the "description" field in the mutation.
-func (m *IPCReportEventMutation) Description() (r string, exists bool) {
+func (m *EventLevelMutation) Description() (r string, exists bool) {
 	v := m.description
 	if v == nil {
 		return
@@ -6760,10 +10754,10 @@ func (m *IPCReportEventMutation) Description() (r string, exists bool) {
 	return *v, true
 }
 
-// OldDescription returns the old "description" field's value of the IPCReportEvent entity.
-// If the IPCReportEvent object wasn't provided to the builder, the object is fetched from the database.
+// OldDescription returns the old "description" field's value of the EventLevel entity.
+// If the EventLevel object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *IPCReportEventMutation) OldDescription(ctx context.Context) (v string, err error) {
+func (m *EventLevelMutation) OldDescription(ctx context.Context) (v string, err error) {
 	if !m.op.Is(OpUpdateOne) {
 		return v, errors.New("OldDescription is only allowed on UpdateOne operations")
 	}
@@ -6778,30 +10772,1325 @@ func (m *IPCReportEventMutation) OldDescription(ctx context.Context) (v string, 
 }
 
 // ClearDescription clears the value of the "description" field.
-func (m *IPCReportEventMutation) ClearDescription() {
+func (m *EventLevelMutation) ClearDescription() {
 	m.description = nil
-	m.clearedFields[ipcreportevent.FieldDescription] = struct{}{}
+	m.clearedFields[eventlevel.FieldDescription] = struct{}{}
 }
 
 // DescriptionCleared returns if the "description" field was cleared in this mutation.
-func (m *IPCReportEventMutation) DescriptionCleared() bool {
-	_, ok := m.clearedFields[ipcreportevent.FieldDescription]
+func (m *EventLevelMutation) DescriptionCleared() bool {
+	_, ok := m.clearedFields[eventlevel.FieldDescription]
 	return ok
 }
 
 // ResetDescription resets all changes to the "description" field.
-func (m *IPCReportEventMutation) ResetDescription() {
+func (m *EventLevelMutation) ResetDescription() {
 	m.description = nil
-	delete(m.clearedFields, ipcreportevent.FieldDescription)
+	delete(m.clearedFields, eventlevel.FieldDescription)
+}
+
+// SetIsReport sets the "is_report" field.
+func (m *EventLevelMutation) SetIsReport(b bool) {
+	m.is_report = &b
+}
+
+// IsReport returns the value of the "is_report" field in the mutation.
+func (m *EventLevelMutation) IsReport() (r bool, exists bool) {
+	v := m.is_report
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldIsReport returns the old "is_report" field's value of the EventLevel entity.
+// If the EventLevel object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *EventLevelMutation) OldIsReport(ctx context.Context) (v bool, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldIsReport is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldIsReport requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldIsReport: %w", err)
+	}
+	return oldValue.IsReport, nil
+}
+
+// ClearIsReport clears the value of the "is_report" field.
+func (m *EventLevelMutation) ClearIsReport() {
+	m.is_report = nil
+	m.clearedFields[eventlevel.FieldIsReport] = struct{}{}
+}
+
+// IsReportCleared returns if the "is_report" field was cleared in this mutation.
+func (m *EventLevelMutation) IsReportCleared() bool {
+	_, ok := m.clearedFields[eventlevel.FieldIsReport]
+	return ok
+}
+
+// ResetIsReport resets all changes to the "is_report" field.
+func (m *EventLevelMutation) ResetIsReport() {
+	m.is_report = nil
+	delete(m.clearedFields, eventlevel.FieldIsReport)
+}
+
+// SetCreatorID sets the "creator" edge to the Admin entity by id.
+func (m *EventLevelMutation) SetCreatorID(id int) {
+	m.creator = &id
+}
+
+// ClearCreator clears the "creator" edge to the Admin entity.
+func (m *EventLevelMutation) ClearCreator() {
+	m.clearedcreator = true
+	m.clearedFields[eventlevel.FieldCreatedBy] = struct{}{}
+}
+
+// CreatorCleared reports if the "creator" edge to the Admin entity was cleared.
+func (m *EventLevelMutation) CreatorCleared() bool {
+	return m.clearedcreator
+}
+
+// CreatorID returns the "creator" edge ID in the mutation.
+func (m *EventLevelMutation) CreatorID() (id int, exists bool) {
+	if m.creator != nil {
+		return *m.creator, true
+	}
+	return
+}
+
+// CreatorIDs returns the "creator" edge IDs in the mutation.
+// Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
+// CreatorID instead. It exists only for internal usage by the builders.
+func (m *EventLevelMutation) CreatorIDs() (ids []int) {
+	if id := m.creator; id != nil {
+		ids = append(ids, *id)
+	}
+	return
+}
+
+// ResetCreator resets all changes to the "creator" edge.
+func (m *EventLevelMutation) ResetCreator() {
+	m.creator = nil
+	m.clearedcreator = false
+}
+
+// SetUpdaterID sets the "updater" edge to the Admin entity by id.
+func (m *EventLevelMutation) SetUpdaterID(id int) {
+	m.updater = &id
+}
+
+// ClearUpdater clears the "updater" edge to the Admin entity.
+func (m *EventLevelMutation) ClearUpdater() {
+	m.clearedupdater = true
+	m.clearedFields[eventlevel.FieldUpdatedBy] = struct{}{}
+}
+
+// UpdaterCleared reports if the "updater" edge to the Admin entity was cleared.
+func (m *EventLevelMutation) UpdaterCleared() bool {
+	return m.clearedupdater
+}
+
+// UpdaterID returns the "updater" edge ID in the mutation.
+func (m *EventLevelMutation) UpdaterID() (id int, exists bool) {
+	if m.updater != nil {
+		return *m.updater, true
+	}
+	return
+}
+
+// UpdaterIDs returns the "updater" edge IDs in the mutation.
+// Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
+// UpdaterID instead. It exists only for internal usage by the builders.
+func (m *EventLevelMutation) UpdaterIDs() (ids []int) {
+	if id := m.updater; id != nil {
+		ids = append(ids, *id)
+	}
+	return
+}
+
+// ResetUpdater resets all changes to the "updater" edge.
+func (m *EventLevelMutation) ResetUpdater() {
+	m.updater = nil
+	m.clearedupdater = false
+}
+
+// Where appends a list predicates to the EventLevelMutation builder.
+func (m *EventLevelMutation) Where(ps ...predicate.EventLevel) {
+	m.predicates = append(m.predicates, ps...)
+}
+
+// WhereP appends storage-level predicates to the EventLevelMutation builder. Using this method,
+// users can use type-assertion to append predicates that do not depend on any generated package.
+func (m *EventLevelMutation) WhereP(ps ...func(*sql.Selector)) {
+	p := make([]predicate.EventLevel, len(ps))
+	for i := range ps {
+		p[i] = ps[i]
+	}
+	m.Where(p...)
+}
+
+// Op returns the operation name.
+func (m *EventLevelMutation) Op() Op {
+	return m.op
+}
+
+// SetOp allows setting the mutation operation.
+func (m *EventLevelMutation) SetOp(op Op) {
+	m.op = op
+}
+
+// Type returns the node type of this mutation (EventLevel).
+func (m *EventLevelMutation) Type() string {
+	return m.typ
+}
+
+// Fields returns all fields that were changed during this mutation. Note that in
+// order to get all numeric fields that were incremented/decremented, call
+// AddedFields().
+func (m *EventLevelMutation) Fields() []string {
+	fields := make([]string, 0, 9)
+	if m.created_at != nil {
+		fields = append(fields, eventlevel.FieldCreatedAt)
+	}
+	if m.creator != nil {
+		fields = append(fields, eventlevel.FieldCreatedBy)
+	}
+	if m.deleted_at != nil {
+		fields = append(fields, eventlevel.FieldDeletedAt)
+	}
+	if m.updater != nil {
+		fields = append(fields, eventlevel.FieldUpdatedBy)
+	}
+	if m.updated_at != nil {
+		fields = append(fields, eventlevel.FieldUpdatedAt)
+	}
+	if m.name != nil {
+		fields = append(fields, eventlevel.FieldName)
+	}
+	if m.event_types != nil {
+		fields = append(fields, eventlevel.FieldEventTypes)
+	}
+	if m.description != nil {
+		fields = append(fields, eventlevel.FieldDescription)
+	}
+	if m.is_report != nil {
+		fields = append(fields, eventlevel.FieldIsReport)
+	}
+	return fields
+}
+
+// Field returns the value of a field with the given name. The second boolean
+// return value indicates that this field was not set, or was not defined in the
+// schema.
+func (m *EventLevelMutation) Field(name string) (ent.Value, bool) {
+	switch name {
+	case eventlevel.FieldCreatedAt:
+		return m.CreatedAt()
+	case eventlevel.FieldCreatedBy:
+		return m.CreatedBy()
+	case eventlevel.FieldDeletedAt:
+		return m.DeletedAt()
+	case eventlevel.FieldUpdatedBy:
+		return m.UpdatedBy()
+	case eventlevel.FieldUpdatedAt:
+		return m.UpdatedAt()
+	case eventlevel.FieldName:
+		return m.Name()
+	case eventlevel.FieldEventTypes:
+		return m.EventTypes()
+	case eventlevel.FieldDescription:
+		return m.Description()
+	case eventlevel.FieldIsReport:
+		return m.IsReport()
+	}
+	return nil, false
+}
+
+// OldField returns the old value of the field from the database. An error is
+// returned if the mutation operation is not UpdateOne, or the query to the
+// database failed.
+func (m *EventLevelMutation) OldField(ctx context.Context, name string) (ent.Value, error) {
+	switch name {
+	case eventlevel.FieldCreatedAt:
+		return m.OldCreatedAt(ctx)
+	case eventlevel.FieldCreatedBy:
+		return m.OldCreatedBy(ctx)
+	case eventlevel.FieldDeletedAt:
+		return m.OldDeletedAt(ctx)
+	case eventlevel.FieldUpdatedBy:
+		return m.OldUpdatedBy(ctx)
+	case eventlevel.FieldUpdatedAt:
+		return m.OldUpdatedAt(ctx)
+	case eventlevel.FieldName:
+		return m.OldName(ctx)
+	case eventlevel.FieldEventTypes:
+		return m.OldEventTypes(ctx)
+	case eventlevel.FieldDescription:
+		return m.OldDescription(ctx)
+	case eventlevel.FieldIsReport:
+		return m.OldIsReport(ctx)
+	}
+	return nil, fmt.Errorf("unknown EventLevel field %s", name)
+}
+
+// SetField sets the value of a field with the given name. It returns an error if
+// the field is not defined in the schema, or if the type mismatched the field
+// type.
+func (m *EventLevelMutation) SetField(name string, value ent.Value) error {
+	switch name {
+	case eventlevel.FieldCreatedAt:
+		v, ok := value.(time.Time)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetCreatedAt(v)
+		return nil
+	case eventlevel.FieldCreatedBy:
+		v, ok := value.(int)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetCreatedBy(v)
+		return nil
+	case eventlevel.FieldDeletedAt:
+		v, ok := value.(time.Time)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetDeletedAt(v)
+		return nil
+	case eventlevel.FieldUpdatedBy:
+		v, ok := value.(int)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetUpdatedBy(v)
+		return nil
+	case eventlevel.FieldUpdatedAt:
+		v, ok := value.(time.Time)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetUpdatedAt(v)
+		return nil
+	case eventlevel.FieldName:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetName(v)
+		return nil
+	case eventlevel.FieldEventTypes:
+		v, ok := value.([]enums.EventType)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetEventTypes(v)
+		return nil
+	case eventlevel.FieldDescription:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetDescription(v)
+		return nil
+	case eventlevel.FieldIsReport:
+		v, ok := value.(bool)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetIsReport(v)
+		return nil
+	}
+	return fmt.Errorf("unknown EventLevel field %s", name)
+}
+
+// AddedFields returns all numeric fields that were incremented/decremented during
+// this mutation.
+func (m *EventLevelMutation) AddedFields() []string {
+	var fields []string
+	return fields
+}
+
+// AddedField returns the numeric value that was incremented/decremented on a field
+// with the given name. The second boolean return value indicates that this field
+// was not set, or was not defined in the schema.
+func (m *EventLevelMutation) AddedField(name string) (ent.Value, bool) {
+	switch name {
+	}
+	return nil, false
+}
+
+// AddField adds the value to the field with the given name. It returns an error if
+// the field is not defined in the schema, or if the type mismatched the field
+// type.
+func (m *EventLevelMutation) AddField(name string, value ent.Value) error {
+	switch name {
+	}
+	return fmt.Errorf("unknown EventLevel numeric field %s", name)
+}
+
+// ClearedFields returns all nullable fields that were cleared during this
+// mutation.
+func (m *EventLevelMutation) ClearedFields() []string {
+	var fields []string
+	if m.FieldCleared(eventlevel.FieldDeletedAt) {
+		fields = append(fields, eventlevel.FieldDeletedAt)
+	}
+	if m.FieldCleared(eventlevel.FieldName) {
+		fields = append(fields, eventlevel.FieldName)
+	}
+	if m.FieldCleared(eventlevel.FieldDescription) {
+		fields = append(fields, eventlevel.FieldDescription)
+	}
+	if m.FieldCleared(eventlevel.FieldIsReport) {
+		fields = append(fields, eventlevel.FieldIsReport)
+	}
+	return fields
+}
+
+// FieldCleared returns a boolean indicating if a field with the given name was
+// cleared in this mutation.
+func (m *EventLevelMutation) FieldCleared(name string) bool {
+	_, ok := m.clearedFields[name]
+	return ok
+}
+
+// ClearField clears the value of the field with the given name. It returns an
+// error if the field is not defined in the schema.
+func (m *EventLevelMutation) ClearField(name string) error {
+	switch name {
+	case eventlevel.FieldDeletedAt:
+		m.ClearDeletedAt()
+		return nil
+	case eventlevel.FieldName:
+		m.ClearName()
+		return nil
+	case eventlevel.FieldDescription:
+		m.ClearDescription()
+		return nil
+	case eventlevel.FieldIsReport:
+		m.ClearIsReport()
+		return nil
+	}
+	return fmt.Errorf("unknown EventLevel nullable field %s", name)
+}
+
+// ResetField resets all changes in the mutation for the field with the given name.
+// It returns an error if the field is not defined in the schema.
+func (m *EventLevelMutation) ResetField(name string) error {
+	switch name {
+	case eventlevel.FieldCreatedAt:
+		m.ResetCreatedAt()
+		return nil
+	case eventlevel.FieldCreatedBy:
+		m.ResetCreatedBy()
+		return nil
+	case eventlevel.FieldDeletedAt:
+		m.ResetDeletedAt()
+		return nil
+	case eventlevel.FieldUpdatedBy:
+		m.ResetUpdatedBy()
+		return nil
+	case eventlevel.FieldUpdatedAt:
+		m.ResetUpdatedAt()
+		return nil
+	case eventlevel.FieldName:
+		m.ResetName()
+		return nil
+	case eventlevel.FieldEventTypes:
+		m.ResetEventTypes()
+		return nil
+	case eventlevel.FieldDescription:
+		m.ResetDescription()
+		return nil
+	case eventlevel.FieldIsReport:
+		m.ResetIsReport()
+		return nil
+	}
+	return fmt.Errorf("unknown EventLevel field %s", name)
+}
+
+// AddedEdges returns all edge names that were set/added in this mutation.
+func (m *EventLevelMutation) AddedEdges() []string {
+	edges := make([]string, 0, 2)
+	if m.creator != nil {
+		edges = append(edges, eventlevel.EdgeCreator)
+	}
+	if m.updater != nil {
+		edges = append(edges, eventlevel.EdgeUpdater)
+	}
+	return edges
+}
+
+// AddedIDs returns all IDs (to other nodes) that were added for the given edge
+// name in this mutation.
+func (m *EventLevelMutation) AddedIDs(name string) []ent.Value {
+	switch name {
+	case eventlevel.EdgeCreator:
+		if id := m.creator; id != nil {
+			return []ent.Value{*id}
+		}
+	case eventlevel.EdgeUpdater:
+		if id := m.updater; id != nil {
+			return []ent.Value{*id}
+		}
+	}
+	return nil
+}
+
+// RemovedEdges returns all edge names that were removed in this mutation.
+func (m *EventLevelMutation) RemovedEdges() []string {
+	edges := make([]string, 0, 2)
+	return edges
+}
+
+// RemovedIDs returns all IDs (to other nodes) that were removed for the edge with
+// the given name in this mutation.
+func (m *EventLevelMutation) RemovedIDs(name string) []ent.Value {
+	return nil
+}
+
+// ClearedEdges returns all edge names that were cleared in this mutation.
+func (m *EventLevelMutation) ClearedEdges() []string {
+	edges := make([]string, 0, 2)
+	if m.clearedcreator {
+		edges = append(edges, eventlevel.EdgeCreator)
+	}
+	if m.clearedupdater {
+		edges = append(edges, eventlevel.EdgeUpdater)
+	}
+	return edges
+}
+
+// EdgeCleared returns a boolean which indicates if the edge with the given name
+// was cleared in this mutation.
+func (m *EventLevelMutation) EdgeCleared(name string) bool {
+	switch name {
+	case eventlevel.EdgeCreator:
+		return m.clearedcreator
+	case eventlevel.EdgeUpdater:
+		return m.clearedupdater
+	}
+	return false
+}
+
+// ClearEdge clears the value of the edge with the given name. It returns an error
+// if that edge is not defined in the schema.
+func (m *EventLevelMutation) ClearEdge(name string) error {
+	switch name {
+	case eventlevel.EdgeCreator:
+		m.ClearCreator()
+		return nil
+	case eventlevel.EdgeUpdater:
+		m.ClearUpdater()
+		return nil
+	}
+	return fmt.Errorf("unknown EventLevel unique edge %s", name)
+}
+
+// ResetEdge resets all changes to the edge with the given name in this mutation.
+// It returns an error if the edge is not defined in the schema.
+func (m *EventLevelMutation) ResetEdge(name string) error {
+	switch name {
+	case eventlevel.EdgeCreator:
+		m.ResetCreator()
+		return nil
+	case eventlevel.EdgeUpdater:
+		m.ResetUpdater()
+		return nil
+	}
+	return fmt.Errorf("unknown EventLevel edge %s", name)
+}
+
+// IPCEventMutation represents an operation that mutates the IPCEvent nodes in the graph.
+type IPCEventMutation struct {
+	config
+	op                   Op
+	typ                  string
+	id                   *int
+	created_at           *time.Time
+	deleted_at           *time.Time
+	updated_at           *time.Time
+	event_time           *time.Time
+	event_type           *enums.EventType
+	addevent_type        *enums.EventType
+	event_status         *enums.EventStatus
+	addevent_status      *enums.EventStatus
+	images               *[]*types.UploadedImage
+	appendimages         []*types.UploadedImage
+	labeled_images       *[]*types.UploadedImage
+	appendlabeled_images []*types.UploadedImage
+	event_id             *string
+	description          *string
+	raw_data             *string
+	clearedFields        map[string]struct{}
+	creator              *int
+	clearedcreator       bool
+	updater              *int
+	clearedupdater       bool
+	video                *int
+	clearedvideo         bool
+	device               *int
+	cleareddevice        bool
+	fixers               map[int]struct{}
+	removedfixers        map[int]struct{}
+	clearedfixers        bool
+	done                 bool
+	oldValue             func(context.Context) (*IPCEvent, error)
+	predicates           []predicate.IPCEvent
+}
+
+var _ ent.Mutation = (*IPCEventMutation)(nil)
+
+// ipceventOption allows management of the mutation configuration using functional options.
+type ipceventOption func(*IPCEventMutation)
+
+// newIPCEventMutation creates new mutation for the IPCEvent entity.
+func newIPCEventMutation(c config, op Op, opts ...ipceventOption) *IPCEventMutation {
+	m := &IPCEventMutation{
+		config:        c,
+		op:            op,
+		typ:           TypeIPCEvent,
+		clearedFields: make(map[string]struct{}),
+	}
+	for _, opt := range opts {
+		opt(m)
+	}
+	return m
+}
+
+// withIPCEventID sets the ID field of the mutation.
+func withIPCEventID(id int) ipceventOption {
+	return func(m *IPCEventMutation) {
+		var (
+			err   error
+			once  sync.Once
+			value *IPCEvent
+		)
+		m.oldValue = func(ctx context.Context) (*IPCEvent, error) {
+			once.Do(func() {
+				if m.done {
+					err = errors.New("querying old values post mutation is not allowed")
+				} else {
+					value, err = m.Client().IPCEvent.Get(ctx, id)
+				}
+			})
+			return value, err
+		}
+		m.id = &id
+	}
+}
+
+// withIPCEvent sets the old IPCEvent of the mutation.
+func withIPCEvent(node *IPCEvent) ipceventOption {
+	return func(m *IPCEventMutation) {
+		m.oldValue = func(context.Context) (*IPCEvent, error) {
+			return node, nil
+		}
+		m.id = &node.ID
+	}
+}
+
+// Client returns a new `ent.Client` from the mutation. If the mutation was
+// executed in a transaction (ent.Tx), a transactional client is returned.
+func (m IPCEventMutation) Client() *Client {
+	client := &Client{config: m.config}
+	client.init()
+	return client
+}
+
+// Tx returns an `ent.Tx` for mutations that were executed in transactions;
+// it returns an error otherwise.
+func (m IPCEventMutation) Tx() (*Tx, error) {
+	if _, ok := m.driver.(*txDriver); !ok {
+		return nil, errors.New("dao: mutation is not running in a transaction")
+	}
+	tx := &Tx{config: m.config}
+	tx.init()
+	return tx, nil
+}
+
+// ID returns the ID value in the mutation. Note that the ID is only available
+// if it was provided to the builder or after it was returned from the database.
+func (m *IPCEventMutation) ID() (id int, exists bool) {
+	if m.id == nil {
+		return
+	}
+	return *m.id, true
+}
+
+// IDs queries the database and returns the entity ids that match the mutation's predicate.
+// That means, if the mutation is applied within a transaction with an isolation level such
+// as sql.LevelSerializable, the returned ids match the ids of the rows that will be updated
+// or updated by the mutation.
+func (m *IPCEventMutation) IDs(ctx context.Context) ([]int, error) {
+	switch {
+	case m.op.Is(OpUpdateOne | OpDeleteOne):
+		id, exists := m.ID()
+		if exists {
+			return []int{id}, nil
+		}
+		fallthrough
+	case m.op.Is(OpUpdate | OpDelete):
+		return m.Client().IPCEvent.Query().Where(m.predicates...).IDs(ctx)
+	default:
+		return nil, fmt.Errorf("IDs is not allowed on %s operations", m.op)
+	}
+}
+
+// SetCreatedAt sets the "created_at" field.
+func (m *IPCEventMutation) SetCreatedAt(t time.Time) {
+	m.created_at = &t
+}
+
+// CreatedAt returns the value of the "created_at" field in the mutation.
+func (m *IPCEventMutation) CreatedAt() (r time.Time, exists bool) {
+	v := m.created_at
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldCreatedAt returns the old "created_at" field's value of the IPCEvent entity.
+// If the IPCEvent object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *IPCEventMutation) OldCreatedAt(ctx context.Context) (v time.Time, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldCreatedAt is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldCreatedAt requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldCreatedAt: %w", err)
+	}
+	return oldValue.CreatedAt, nil
+}
+
+// ResetCreatedAt resets all changes to the "created_at" field.
+func (m *IPCEventMutation) ResetCreatedAt() {
+	m.created_at = nil
+}
+
+// SetCreatedBy sets the "created_by" field.
+func (m *IPCEventMutation) SetCreatedBy(i int) {
+	m.creator = &i
+}
+
+// CreatedBy returns the value of the "created_by" field in the mutation.
+func (m *IPCEventMutation) CreatedBy() (r int, exists bool) {
+	v := m.creator
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldCreatedBy returns the old "created_by" field's value of the IPCEvent entity.
+// If the IPCEvent object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *IPCEventMutation) OldCreatedBy(ctx context.Context) (v int, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldCreatedBy is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldCreatedBy requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldCreatedBy: %w", err)
+	}
+	return oldValue.CreatedBy, nil
+}
+
+// ResetCreatedBy resets all changes to the "created_by" field.
+func (m *IPCEventMutation) ResetCreatedBy() {
+	m.creator = nil
+}
+
+// SetDeletedAt sets the "deleted_at" field.
+func (m *IPCEventMutation) SetDeletedAt(t time.Time) {
+	m.deleted_at = &t
+}
+
+// DeletedAt returns the value of the "deleted_at" field in the mutation.
+func (m *IPCEventMutation) DeletedAt() (r time.Time, exists bool) {
+	v := m.deleted_at
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldDeletedAt returns the old "deleted_at" field's value of the IPCEvent entity.
+// If the IPCEvent object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *IPCEventMutation) OldDeletedAt(ctx context.Context) (v *time.Time, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldDeletedAt is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldDeletedAt requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldDeletedAt: %w", err)
+	}
+	return oldValue.DeletedAt, nil
+}
+
+// ClearDeletedAt clears the value of the "deleted_at" field.
+func (m *IPCEventMutation) ClearDeletedAt() {
+	m.deleted_at = nil
+	m.clearedFields[ipcevent.FieldDeletedAt] = struct{}{}
+}
+
+// DeletedAtCleared returns if the "deleted_at" field was cleared in this mutation.
+func (m *IPCEventMutation) DeletedAtCleared() bool {
+	_, ok := m.clearedFields[ipcevent.FieldDeletedAt]
+	return ok
+}
+
+// ResetDeletedAt resets all changes to the "deleted_at" field.
+func (m *IPCEventMutation) ResetDeletedAt() {
+	m.deleted_at = nil
+	delete(m.clearedFields, ipcevent.FieldDeletedAt)
+}
+
+// SetUpdatedBy sets the "updated_by" field.
+func (m *IPCEventMutation) SetUpdatedBy(i int) {
+	m.updater = &i
+}
+
+// UpdatedBy returns the value of the "updated_by" field in the mutation.
+func (m *IPCEventMutation) UpdatedBy() (r int, exists bool) {
+	v := m.updater
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldUpdatedBy returns the old "updated_by" field's value of the IPCEvent entity.
+// If the IPCEvent object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *IPCEventMutation) OldUpdatedBy(ctx context.Context) (v int, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldUpdatedBy is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldUpdatedBy requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldUpdatedBy: %w", err)
+	}
+	return oldValue.UpdatedBy, nil
+}
+
+// ResetUpdatedBy resets all changes to the "updated_by" field.
+func (m *IPCEventMutation) ResetUpdatedBy() {
+	m.updater = nil
+}
+
+// SetUpdatedAt sets the "updated_at" field.
+func (m *IPCEventMutation) SetUpdatedAt(t time.Time) {
+	m.updated_at = &t
+}
+
+// UpdatedAt returns the value of the "updated_at" field in the mutation.
+func (m *IPCEventMutation) UpdatedAt() (r time.Time, exists bool) {
+	v := m.updated_at
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldUpdatedAt returns the old "updated_at" field's value of the IPCEvent entity.
+// If the IPCEvent object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *IPCEventMutation) OldUpdatedAt(ctx context.Context) (v time.Time, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldUpdatedAt is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldUpdatedAt requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldUpdatedAt: %w", err)
+	}
+	return oldValue.UpdatedAt, nil
+}
+
+// ResetUpdatedAt resets all changes to the "updated_at" field.
+func (m *IPCEventMutation) ResetUpdatedAt() {
+	m.updated_at = nil
+}
+
+// SetDeviceID sets the "device_id" field.
+func (m *IPCEventMutation) SetDeviceID(i int) {
+	m.device = &i
+}
+
+// DeviceID returns the value of the "device_id" field in the mutation.
+func (m *IPCEventMutation) DeviceID() (r int, exists bool) {
+	v := m.device
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldDeviceID returns the old "device_id" field's value of the IPCEvent entity.
+// If the IPCEvent object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *IPCEventMutation) OldDeviceID(ctx context.Context) (v int, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldDeviceID is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldDeviceID requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldDeviceID: %w", err)
+	}
+	return oldValue.DeviceID, nil
+}
+
+// ResetDeviceID resets all changes to the "device_id" field.
+func (m *IPCEventMutation) ResetDeviceID() {
+	m.device = nil
+}
+
+// SetVideoID sets the "video_id" field.
+func (m *IPCEventMutation) SetVideoID(i int) {
+	m.video = &i
+}
+
+// VideoID returns the value of the "video_id" field in the mutation.
+func (m *IPCEventMutation) VideoID() (r int, exists bool) {
+	v := m.video
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldVideoID returns the old "video_id" field's value of the IPCEvent entity.
+// If the IPCEvent object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *IPCEventMutation) OldVideoID(ctx context.Context) (v int, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldVideoID is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldVideoID requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldVideoID: %w", err)
+	}
+	return oldValue.VideoID, nil
+}
+
+// ClearVideoID clears the value of the "video_id" field.
+func (m *IPCEventMutation) ClearVideoID() {
+	m.video = nil
+	m.clearedFields[ipcevent.FieldVideoID] = struct{}{}
+}
+
+// VideoIDCleared returns if the "video_id" field was cleared in this mutation.
+func (m *IPCEventMutation) VideoIDCleared() bool {
+	_, ok := m.clearedFields[ipcevent.FieldVideoID]
+	return ok
+}
+
+// ResetVideoID resets all changes to the "video_id" field.
+func (m *IPCEventMutation) ResetVideoID() {
+	m.video = nil
+	delete(m.clearedFields, ipcevent.FieldVideoID)
+}
+
+// SetEventTime sets the "event_time" field.
+func (m *IPCEventMutation) SetEventTime(t time.Time) {
+	m.event_time = &t
+}
+
+// EventTime returns the value of the "event_time" field in the mutation.
+func (m *IPCEventMutation) EventTime() (r time.Time, exists bool) {
+	v := m.event_time
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldEventTime returns the old "event_time" field's value of the IPCEvent entity.
+// If the IPCEvent object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *IPCEventMutation) OldEventTime(ctx context.Context) (v time.Time, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldEventTime is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldEventTime requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldEventTime: %w", err)
+	}
+	return oldValue.EventTime, nil
+}
+
+// ResetEventTime resets all changes to the "event_time" field.
+func (m *IPCEventMutation) ResetEventTime() {
+	m.event_time = nil
+}
+
+// SetEventType sets the "event_type" field.
+func (m *IPCEventMutation) SetEventType(et enums.EventType) {
+	m.event_type = &et
+	m.addevent_type = nil
+}
+
+// EventType returns the value of the "event_type" field in the mutation.
+func (m *IPCEventMutation) EventType() (r enums.EventType, exists bool) {
+	v := m.event_type
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldEventType returns the old "event_type" field's value of the IPCEvent entity.
+// If the IPCEvent object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *IPCEventMutation) OldEventType(ctx context.Context) (v enums.EventType, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldEventType is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldEventType requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldEventType: %w", err)
+	}
+	return oldValue.EventType, nil
+}
+
+// AddEventType adds et to the "event_type" field.
+func (m *IPCEventMutation) AddEventType(et enums.EventType) {
+	if m.addevent_type != nil {
+		*m.addevent_type += et
+	} else {
+		m.addevent_type = &et
+	}
+}
+
+// AddedEventType returns the value that was added to the "event_type" field in this mutation.
+func (m *IPCEventMutation) AddedEventType() (r enums.EventType, exists bool) {
+	v := m.addevent_type
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ResetEventType resets all changes to the "event_type" field.
+func (m *IPCEventMutation) ResetEventType() {
+	m.event_type = nil
+	m.addevent_type = nil
+}
+
+// SetEventStatus sets the "event_status" field.
+func (m *IPCEventMutation) SetEventStatus(es enums.EventStatus) {
+	m.event_status = &es
+	m.addevent_status = nil
+}
+
+// EventStatus returns the value of the "event_status" field in the mutation.
+func (m *IPCEventMutation) EventStatus() (r enums.EventStatus, exists bool) {
+	v := m.event_status
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldEventStatus returns the old "event_status" field's value of the IPCEvent entity.
+// If the IPCEvent object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *IPCEventMutation) OldEventStatus(ctx context.Context) (v enums.EventStatus, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldEventStatus is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldEventStatus requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldEventStatus: %w", err)
+	}
+	return oldValue.EventStatus, nil
+}
+
+// AddEventStatus adds es to the "event_status" field.
+func (m *IPCEventMutation) AddEventStatus(es enums.EventStatus) {
+	if m.addevent_status != nil {
+		*m.addevent_status += es
+	} else {
+		m.addevent_status = &es
+	}
+}
+
+// AddedEventStatus returns the value that was added to the "event_status" field in this mutation.
+func (m *IPCEventMutation) AddedEventStatus() (r enums.EventStatus, exists bool) {
+	v := m.addevent_status
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ResetEventStatus resets all changes to the "event_status" field.
+func (m *IPCEventMutation) ResetEventStatus() {
+	m.event_status = nil
+	m.addevent_status = nil
+}
+
+// SetImages sets the "images" field.
+func (m *IPCEventMutation) SetImages(ti []*types.UploadedImage) {
+	m.images = &ti
+	m.appendimages = nil
+}
+
+// Images returns the value of the "images" field in the mutation.
+func (m *IPCEventMutation) Images() (r []*types.UploadedImage, exists bool) {
+	v := m.images
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldImages returns the old "images" field's value of the IPCEvent entity.
+// If the IPCEvent object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *IPCEventMutation) OldImages(ctx context.Context) (v []*types.UploadedImage, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldImages is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldImages requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldImages: %w", err)
+	}
+	return oldValue.Images, nil
+}
+
+// AppendImages adds ti to the "images" field.
+func (m *IPCEventMutation) AppendImages(ti []*types.UploadedImage) {
+	m.appendimages = append(m.appendimages, ti...)
+}
+
+// AppendedImages returns the list of values that were appended to the "images" field in this mutation.
+func (m *IPCEventMutation) AppendedImages() ([]*types.UploadedImage, bool) {
+	if len(m.appendimages) == 0 {
+		return nil, false
+	}
+	return m.appendimages, true
+}
+
+// ClearImages clears the value of the "images" field.
+func (m *IPCEventMutation) ClearImages() {
+	m.images = nil
+	m.appendimages = nil
+	m.clearedFields[ipcevent.FieldImages] = struct{}{}
+}
+
+// ImagesCleared returns if the "images" field was cleared in this mutation.
+func (m *IPCEventMutation) ImagesCleared() bool {
+	_, ok := m.clearedFields[ipcevent.FieldImages]
+	return ok
+}
+
+// ResetImages resets all changes to the "images" field.
+func (m *IPCEventMutation) ResetImages() {
+	m.images = nil
+	m.appendimages = nil
+	delete(m.clearedFields, ipcevent.FieldImages)
+}
+
+// SetLabeledImages sets the "labeled_images" field.
+func (m *IPCEventMutation) SetLabeledImages(ti []*types.UploadedImage) {
+	m.labeled_images = &ti
+	m.appendlabeled_images = nil
+}
+
+// LabeledImages returns the value of the "labeled_images" field in the mutation.
+func (m *IPCEventMutation) LabeledImages() (r []*types.UploadedImage, exists bool) {
+	v := m.labeled_images
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldLabeledImages returns the old "labeled_images" field's value of the IPCEvent entity.
+// If the IPCEvent object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *IPCEventMutation) OldLabeledImages(ctx context.Context) (v []*types.UploadedImage, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldLabeledImages is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldLabeledImages requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldLabeledImages: %w", err)
+	}
+	return oldValue.LabeledImages, nil
+}
+
+// AppendLabeledImages adds ti to the "labeled_images" field.
+func (m *IPCEventMutation) AppendLabeledImages(ti []*types.UploadedImage) {
+	m.appendlabeled_images = append(m.appendlabeled_images, ti...)
+}
+
+// AppendedLabeledImages returns the list of values that were appended to the "labeled_images" field in this mutation.
+func (m *IPCEventMutation) AppendedLabeledImages() ([]*types.UploadedImage, bool) {
+	if len(m.appendlabeled_images) == 0 {
+		return nil, false
+	}
+	return m.appendlabeled_images, true
+}
+
+// ClearLabeledImages clears the value of the "labeled_images" field.
+func (m *IPCEventMutation) ClearLabeledImages() {
+	m.labeled_images = nil
+	m.appendlabeled_images = nil
+	m.clearedFields[ipcevent.FieldLabeledImages] = struct{}{}
+}
+
+// LabeledImagesCleared returns if the "labeled_images" field was cleared in this mutation.
+func (m *IPCEventMutation) LabeledImagesCleared() bool {
+	_, ok := m.clearedFields[ipcevent.FieldLabeledImages]
+	return ok
+}
+
+// ResetLabeledImages resets all changes to the "labeled_images" field.
+func (m *IPCEventMutation) ResetLabeledImages() {
+	m.labeled_images = nil
+	m.appendlabeled_images = nil
+	delete(m.clearedFields, ipcevent.FieldLabeledImages)
+}
+
+// SetEventID sets the "event_id" field.
+func (m *IPCEventMutation) SetEventID(s string) {
+	m.event_id = &s
+}
+
+// EventID returns the value of the "event_id" field in the mutation.
+func (m *IPCEventMutation) EventID() (r string, exists bool) {
+	v := m.event_id
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldEventID returns the old "event_id" field's value of the IPCEvent entity.
+// If the IPCEvent object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *IPCEventMutation) OldEventID(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldEventID is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldEventID requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldEventID: %w", err)
+	}
+	return oldValue.EventID, nil
+}
+
+// ResetEventID resets all changes to the "event_id" field.
+func (m *IPCEventMutation) ResetEventID() {
+	m.event_id = nil
+}
+
+// SetDescription sets the "description" field.
+func (m *IPCEventMutation) SetDescription(s string) {
+	m.description = &s
+}
+
+// Description returns the value of the "description" field in the mutation.
+func (m *IPCEventMutation) Description() (r string, exists bool) {
+	v := m.description
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldDescription returns the old "description" field's value of the IPCEvent entity.
+// If the IPCEvent object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *IPCEventMutation) OldDescription(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldDescription is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldDescription requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldDescription: %w", err)
+	}
+	return oldValue.Description, nil
+}
+
+// ClearDescription clears the value of the "description" field.
+func (m *IPCEventMutation) ClearDescription() {
+	m.description = nil
+	m.clearedFields[ipcevent.FieldDescription] = struct{}{}
+}
+
+// DescriptionCleared returns if the "description" field was cleared in this mutation.
+func (m *IPCEventMutation) DescriptionCleared() bool {
+	_, ok := m.clearedFields[ipcevent.FieldDescription]
+	return ok
+}
+
+// ResetDescription resets all changes to the "description" field.
+func (m *IPCEventMutation) ResetDescription() {
+	m.description = nil
+	delete(m.clearedFields, ipcevent.FieldDescription)
 }
 
 // SetRawData sets the "raw_data" field.
-func (m *IPCReportEventMutation) SetRawData(s string) {
+func (m *IPCEventMutation) SetRawData(s string) {
 	m.raw_data = &s
 }
 
 // RawData returns the value of the "raw_data" field in the mutation.
-func (m *IPCReportEventMutation) RawData() (r string, exists bool) {
+func (m *IPCEventMutation) RawData() (r string, exists bool) {
 	v := m.raw_data
 	if v == nil {
 		return
@@ -6809,10 +12098,10 @@ func (m *IPCReportEventMutation) RawData() (r string, exists bool) {
 	return *v, true
 }
 
-// OldRawData returns the old "raw_data" field's value of the IPCReportEvent entity.
-// If the IPCReportEvent object wasn't provided to the builder, the object is fetched from the database.
+// OldRawData returns the old "raw_data" field's value of the IPCEvent entity.
+// If the IPCEvent object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *IPCReportEventMutation) OldRawData(ctx context.Context) (v string, err error) {
+func (m *IPCEventMutation) OldRawData(ctx context.Context) (v string, err error) {
 	if !m.op.Is(OpUpdateOne) {
 		return v, errors.New("OldRawData is only allowed on UpdateOne operations")
 	}
@@ -6827,41 +12116,41 @@ func (m *IPCReportEventMutation) OldRawData(ctx context.Context) (v string, err 
 }
 
 // ClearRawData clears the value of the "raw_data" field.
-func (m *IPCReportEventMutation) ClearRawData() {
+func (m *IPCEventMutation) ClearRawData() {
 	m.raw_data = nil
-	m.clearedFields[ipcreportevent.FieldRawData] = struct{}{}
+	m.clearedFields[ipcevent.FieldRawData] = struct{}{}
 }
 
 // RawDataCleared returns if the "raw_data" field was cleared in this mutation.
-func (m *IPCReportEventMutation) RawDataCleared() bool {
-	_, ok := m.clearedFields[ipcreportevent.FieldRawData]
+func (m *IPCEventMutation) RawDataCleared() bool {
+	_, ok := m.clearedFields[ipcevent.FieldRawData]
 	return ok
 }
 
 // ResetRawData resets all changes to the "raw_data" field.
-func (m *IPCReportEventMutation) ResetRawData() {
+func (m *IPCEventMutation) ResetRawData() {
 	m.raw_data = nil
-	delete(m.clearedFields, ipcreportevent.FieldRawData)
+	delete(m.clearedFields, ipcevent.FieldRawData)
 }
 
 // SetCreatorID sets the "creator" edge to the Admin entity by id.
-func (m *IPCReportEventMutation) SetCreatorID(id int) {
+func (m *IPCEventMutation) SetCreatorID(id int) {
 	m.creator = &id
 }
 
 // ClearCreator clears the "creator" edge to the Admin entity.
-func (m *IPCReportEventMutation) ClearCreator() {
+func (m *IPCEventMutation) ClearCreator() {
 	m.clearedcreator = true
-	m.clearedFields[ipcreportevent.FieldCreatedBy] = struct{}{}
+	m.clearedFields[ipcevent.FieldCreatedBy] = struct{}{}
 }
 
 // CreatorCleared reports if the "creator" edge to the Admin entity was cleared.
-func (m *IPCReportEventMutation) CreatorCleared() bool {
+func (m *IPCEventMutation) CreatorCleared() bool {
 	return m.clearedcreator
 }
 
 // CreatorID returns the "creator" edge ID in the mutation.
-func (m *IPCReportEventMutation) CreatorID() (id int, exists bool) {
+func (m *IPCEventMutation) CreatorID() (id int, exists bool) {
 	if m.creator != nil {
 		return *m.creator, true
 	}
@@ -6871,7 +12160,7 @@ func (m *IPCReportEventMutation) CreatorID() (id int, exists bool) {
 // CreatorIDs returns the "creator" edge IDs in the mutation.
 // Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
 // CreatorID instead. It exists only for internal usage by the builders.
-func (m *IPCReportEventMutation) CreatorIDs() (ids []int) {
+func (m *IPCEventMutation) CreatorIDs() (ids []int) {
 	if id := m.creator; id != nil {
 		ids = append(ids, *id)
 	}
@@ -6879,29 +12168,29 @@ func (m *IPCReportEventMutation) CreatorIDs() (ids []int) {
 }
 
 // ResetCreator resets all changes to the "creator" edge.
-func (m *IPCReportEventMutation) ResetCreator() {
+func (m *IPCEventMutation) ResetCreator() {
 	m.creator = nil
 	m.clearedcreator = false
 }
 
 // SetUpdaterID sets the "updater" edge to the Admin entity by id.
-func (m *IPCReportEventMutation) SetUpdaterID(id int) {
+func (m *IPCEventMutation) SetUpdaterID(id int) {
 	m.updater = &id
 }
 
 // ClearUpdater clears the "updater" edge to the Admin entity.
-func (m *IPCReportEventMutation) ClearUpdater() {
+func (m *IPCEventMutation) ClearUpdater() {
 	m.clearedupdater = true
-	m.clearedFields[ipcreportevent.FieldUpdatedBy] = struct{}{}
+	m.clearedFields[ipcevent.FieldUpdatedBy] = struct{}{}
 }
 
 // UpdaterCleared reports if the "updater" edge to the Admin entity was cleared.
-func (m *IPCReportEventMutation) UpdaterCleared() bool {
+func (m *IPCEventMutation) UpdaterCleared() bool {
 	return m.clearedupdater
 }
 
 // UpdaterID returns the "updater" edge ID in the mutation.
-func (m *IPCReportEventMutation) UpdaterID() (id int, exists bool) {
+func (m *IPCEventMutation) UpdaterID() (id int, exists bool) {
 	if m.updater != nil {
 		return *m.updater, true
 	}
@@ -6911,7 +12200,7 @@ func (m *IPCReportEventMutation) UpdaterID() (id int, exists bool) {
 // UpdaterIDs returns the "updater" edge IDs in the mutation.
 // Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
 // UpdaterID instead. It exists only for internal usage by the builders.
-func (m *IPCReportEventMutation) UpdaterIDs() (ids []int) {
+func (m *IPCEventMutation) UpdaterIDs() (ids []int) {
 	if id := m.updater; id != nil {
 		ids = append(ids, *id)
 	}
@@ -6919,26 +12208,26 @@ func (m *IPCReportEventMutation) UpdaterIDs() (ids []int) {
 }
 
 // ResetUpdater resets all changes to the "updater" edge.
-func (m *IPCReportEventMutation) ResetUpdater() {
+func (m *IPCEventMutation) ResetUpdater() {
 	m.updater = nil
 	m.clearedupdater = false
 }
 
 // ClearVideo clears the "video" edge to the Video entity.
-func (m *IPCReportEventMutation) ClearVideo() {
+func (m *IPCEventMutation) ClearVideo() {
 	m.clearedvideo = true
-	m.clearedFields[ipcreportevent.FieldVideoID] = struct{}{}
+	m.clearedFields[ipcevent.FieldVideoID] = struct{}{}
 }
 
 // VideoCleared reports if the "video" edge to the Video entity was cleared.
-func (m *IPCReportEventMutation) VideoCleared() bool {
+func (m *IPCEventMutation) VideoCleared() bool {
 	return m.VideoIDCleared() || m.clearedvideo
 }
 
 // VideoIDs returns the "video" edge IDs in the mutation.
 // Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
 // VideoID instead. It exists only for internal usage by the builders.
-func (m *IPCReportEventMutation) VideoIDs() (ids []int) {
+func (m *IPCEventMutation) VideoIDs() (ids []int) {
 	if id := m.video; id != nil {
 		ids = append(ids, *id)
 	}
@@ -6946,20 +12235,101 @@ func (m *IPCReportEventMutation) VideoIDs() (ids []int) {
 }
 
 // ResetVideo resets all changes to the "video" edge.
-func (m *IPCReportEventMutation) ResetVideo() {
+func (m *IPCEventMutation) ResetVideo() {
 	m.video = nil
 	m.clearedvideo = false
 }
 
-// Where appends a list predicates to the IPCReportEventMutation builder.
-func (m *IPCReportEventMutation) Where(ps ...predicate.IPCReportEvent) {
+// ClearDevice clears the "device" edge to the Device entity.
+func (m *IPCEventMutation) ClearDevice() {
+	m.cleareddevice = true
+	m.clearedFields[ipcevent.FieldDeviceID] = struct{}{}
+}
+
+// DeviceCleared reports if the "device" edge to the Device entity was cleared.
+func (m *IPCEventMutation) DeviceCleared() bool {
+	return m.cleareddevice
+}
+
+// DeviceIDs returns the "device" edge IDs in the mutation.
+// Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
+// DeviceID instead. It exists only for internal usage by the builders.
+func (m *IPCEventMutation) DeviceIDs() (ids []int) {
+	if id := m.device; id != nil {
+		ids = append(ids, *id)
+	}
+	return
+}
+
+// ResetDevice resets all changes to the "device" edge.
+func (m *IPCEventMutation) ResetDevice() {
+	m.device = nil
+	m.cleareddevice = false
+}
+
+// AddFixerIDs adds the "fixers" edge to the Employee entity by ids.
+func (m *IPCEventMutation) AddFixerIDs(ids ...int) {
+	if m.fixers == nil {
+		m.fixers = make(map[int]struct{})
+	}
+	for i := range ids {
+		m.fixers[ids[i]] = struct{}{}
+	}
+}
+
+// ClearFixers clears the "fixers" edge to the Employee entity.
+func (m *IPCEventMutation) ClearFixers() {
+	m.clearedfixers = true
+}
+
+// FixersCleared reports if the "fixers" edge to the Employee entity was cleared.
+func (m *IPCEventMutation) FixersCleared() bool {
+	return m.clearedfixers
+}
+
+// RemoveFixerIDs removes the "fixers" edge to the Employee entity by IDs.
+func (m *IPCEventMutation) RemoveFixerIDs(ids ...int) {
+	if m.removedfixers == nil {
+		m.removedfixers = make(map[int]struct{})
+	}
+	for i := range ids {
+		delete(m.fixers, ids[i])
+		m.removedfixers[ids[i]] = struct{}{}
+	}
+}
+
+// RemovedFixers returns the removed IDs of the "fixers" edge to the Employee entity.
+func (m *IPCEventMutation) RemovedFixersIDs() (ids []int) {
+	for id := range m.removedfixers {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// FixersIDs returns the "fixers" edge IDs in the mutation.
+func (m *IPCEventMutation) FixersIDs() (ids []int) {
+	for id := range m.fixers {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// ResetFixers resets all changes to the "fixers" edge.
+func (m *IPCEventMutation) ResetFixers() {
+	m.fixers = nil
+	m.clearedfixers = false
+	m.removedfixers = nil
+}
+
+// Where appends a list predicates to the IPCEventMutation builder.
+func (m *IPCEventMutation) Where(ps ...predicate.IPCEvent) {
 	m.predicates = append(m.predicates, ps...)
 }
 
-// WhereP appends storage-level predicates to the IPCReportEventMutation builder. Using this method,
+// WhereP appends storage-level predicates to the IPCEventMutation builder. Using this method,
 // users can use type-assertion to append predicates that do not depend on any generated package.
-func (m *IPCReportEventMutation) WhereP(ps ...func(*sql.Selector)) {
-	p := make([]predicate.IPCReportEvent, len(ps))
+func (m *IPCEventMutation) WhereP(ps ...func(*sql.Selector)) {
+	p := make([]predicate.IPCEvent, len(ps))
 	for i := range ps {
 		p[i] = ps[i]
 	}
@@ -6967,75 +12337,69 @@ func (m *IPCReportEventMutation) WhereP(ps ...func(*sql.Selector)) {
 }
 
 // Op returns the operation name.
-func (m *IPCReportEventMutation) Op() Op {
+func (m *IPCEventMutation) Op() Op {
 	return m.op
 }
 
 // SetOp allows setting the mutation operation.
-func (m *IPCReportEventMutation) SetOp(op Op) {
+func (m *IPCEventMutation) SetOp(op Op) {
 	m.op = op
 }
 
-// Type returns the node type of this mutation (IPCReportEvent).
-func (m *IPCReportEventMutation) Type() string {
+// Type returns the node type of this mutation (IPCEvent).
+func (m *IPCEventMutation) Type() string {
 	return m.typ
 }
 
 // Fields returns all fields that were changed during this mutation. Note that in
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
-func (m *IPCReportEventMutation) Fields() []string {
-	fields := make([]string, 0, 17)
+func (m *IPCEventMutation) Fields() []string {
+	fields := make([]string, 0, 15)
 	if m.created_at != nil {
-		fields = append(fields, ipcreportevent.FieldCreatedAt)
+		fields = append(fields, ipcevent.FieldCreatedAt)
 	}
 	if m.creator != nil {
-		fields = append(fields, ipcreportevent.FieldCreatedBy)
+		fields = append(fields, ipcevent.FieldCreatedBy)
 	}
 	if m.deleted_at != nil {
-		fields = append(fields, ipcreportevent.FieldDeletedAt)
+		fields = append(fields, ipcevent.FieldDeletedAt)
 	}
 	if m.updater != nil {
-		fields = append(fields, ipcreportevent.FieldUpdatedBy)
+		fields = append(fields, ipcevent.FieldUpdatedBy)
 	}
 	if m.updated_at != nil {
-		fields = append(fields, ipcreportevent.FieldUpdatedAt)
+		fields = append(fields, ipcevent.FieldUpdatedAt)
 	}
-	if m.device_brand != nil {
-		fields = append(fields, ipcreportevent.FieldDeviceBrand)
-	}
-	if m.device_model != nil {
-		fields = append(fields, ipcreportevent.FieldDeviceModel)
-	}
-	if m.device_id != nil {
-		fields = append(fields, ipcreportevent.FieldDeviceID)
-	}
-	if m.event_id != nil {
-		fields = append(fields, ipcreportevent.FieldEventID)
-	}
-	if m.event_time != nil {
-		fields = append(fields, ipcreportevent.FieldEventTime)
-	}
-	if m.event_type != nil {
-		fields = append(fields, ipcreportevent.FieldEventType)
-	}
-	if m.event_status != nil {
-		fields = append(fields, ipcreportevent.FieldEventStatus)
-	}
-	if m.images != nil {
-		fields = append(fields, ipcreportevent.FieldImages)
-	}
-	if m.labeled_images != nil {
-		fields = append(fields, ipcreportevent.FieldLabeledImages)
+	if m.device != nil {
+		fields = append(fields, ipcevent.FieldDeviceID)
 	}
 	if m.video != nil {
-		fields = append(fields, ipcreportevent.FieldVideoID)
+		fields = append(fields, ipcevent.FieldVideoID)
+	}
+	if m.event_time != nil {
+		fields = append(fields, ipcevent.FieldEventTime)
+	}
+	if m.event_type != nil {
+		fields = append(fields, ipcevent.FieldEventType)
+	}
+	if m.event_status != nil {
+		fields = append(fields, ipcevent.FieldEventStatus)
+	}
+	if m.images != nil {
+		fields = append(fields, ipcevent.FieldImages)
+	}
+	if m.labeled_images != nil {
+		fields = append(fields, ipcevent.FieldLabeledImages)
+	}
+	if m.event_id != nil {
+		fields = append(fields, ipcevent.FieldEventID)
 	}
 	if m.description != nil {
-		fields = append(fields, ipcreportevent.FieldDescription)
+		fields = append(fields, ipcevent.FieldDescription)
 	}
 	if m.raw_data != nil {
-		fields = append(fields, ipcreportevent.FieldRawData)
+		fields = append(fields, ipcevent.FieldRawData)
 	}
 	return fields
 }
@@ -7043,41 +12407,37 @@ func (m *IPCReportEventMutation) Fields() []string {
 // Field returns the value of a field with the given name. The second boolean
 // return value indicates that this field was not set, or was not defined in the
 // schema.
-func (m *IPCReportEventMutation) Field(name string) (ent.Value, bool) {
+func (m *IPCEventMutation) Field(name string) (ent.Value, bool) {
 	switch name {
-	case ipcreportevent.FieldCreatedAt:
+	case ipcevent.FieldCreatedAt:
 		return m.CreatedAt()
-	case ipcreportevent.FieldCreatedBy:
+	case ipcevent.FieldCreatedBy:
 		return m.CreatedBy()
-	case ipcreportevent.FieldDeletedAt:
+	case ipcevent.FieldDeletedAt:
 		return m.DeletedAt()
-	case ipcreportevent.FieldUpdatedBy:
+	case ipcevent.FieldUpdatedBy:
 		return m.UpdatedBy()
-	case ipcreportevent.FieldUpdatedAt:
+	case ipcevent.FieldUpdatedAt:
 		return m.UpdatedAt()
-	case ipcreportevent.FieldDeviceBrand:
-		return m.DeviceBrand()
-	case ipcreportevent.FieldDeviceModel:
-		return m.DeviceModel()
-	case ipcreportevent.FieldDeviceID:
+	case ipcevent.FieldDeviceID:
 		return m.DeviceID()
-	case ipcreportevent.FieldEventID:
-		return m.EventID()
-	case ipcreportevent.FieldEventTime:
-		return m.EventTime()
-	case ipcreportevent.FieldEventType:
-		return m.EventType()
-	case ipcreportevent.FieldEventStatus:
-		return m.EventStatus()
-	case ipcreportevent.FieldImages:
-		return m.Images()
-	case ipcreportevent.FieldLabeledImages:
-		return m.LabeledImages()
-	case ipcreportevent.FieldVideoID:
+	case ipcevent.FieldVideoID:
 		return m.VideoID()
-	case ipcreportevent.FieldDescription:
+	case ipcevent.FieldEventTime:
+		return m.EventTime()
+	case ipcevent.FieldEventType:
+		return m.EventType()
+	case ipcevent.FieldEventStatus:
+		return m.EventStatus()
+	case ipcevent.FieldImages:
+		return m.Images()
+	case ipcevent.FieldLabeledImages:
+		return m.LabeledImages()
+	case ipcevent.FieldEventID:
+		return m.EventID()
+	case ipcevent.FieldDescription:
 		return m.Description()
-	case ipcreportevent.FieldRawData:
+	case ipcevent.FieldRawData:
 		return m.RawData()
 	}
 	return nil, false
@@ -7086,164 +12446,146 @@ func (m *IPCReportEventMutation) Field(name string) (ent.Value, bool) {
 // OldField returns the old value of the field from the database. An error is
 // returned if the mutation operation is not UpdateOne, or the query to the
 // database failed.
-func (m *IPCReportEventMutation) OldField(ctx context.Context, name string) (ent.Value, error) {
+func (m *IPCEventMutation) OldField(ctx context.Context, name string) (ent.Value, error) {
 	switch name {
-	case ipcreportevent.FieldCreatedAt:
+	case ipcevent.FieldCreatedAt:
 		return m.OldCreatedAt(ctx)
-	case ipcreportevent.FieldCreatedBy:
+	case ipcevent.FieldCreatedBy:
 		return m.OldCreatedBy(ctx)
-	case ipcreportevent.FieldDeletedAt:
+	case ipcevent.FieldDeletedAt:
 		return m.OldDeletedAt(ctx)
-	case ipcreportevent.FieldUpdatedBy:
+	case ipcevent.FieldUpdatedBy:
 		return m.OldUpdatedBy(ctx)
-	case ipcreportevent.FieldUpdatedAt:
+	case ipcevent.FieldUpdatedAt:
 		return m.OldUpdatedAt(ctx)
-	case ipcreportevent.FieldDeviceBrand:
-		return m.OldDeviceBrand(ctx)
-	case ipcreportevent.FieldDeviceModel:
-		return m.OldDeviceModel(ctx)
-	case ipcreportevent.FieldDeviceID:
+	case ipcevent.FieldDeviceID:
 		return m.OldDeviceID(ctx)
-	case ipcreportevent.FieldEventID:
-		return m.OldEventID(ctx)
-	case ipcreportevent.FieldEventTime:
-		return m.OldEventTime(ctx)
-	case ipcreportevent.FieldEventType:
-		return m.OldEventType(ctx)
-	case ipcreportevent.FieldEventStatus:
-		return m.OldEventStatus(ctx)
-	case ipcreportevent.FieldImages:
-		return m.OldImages(ctx)
-	case ipcreportevent.FieldLabeledImages:
-		return m.OldLabeledImages(ctx)
-	case ipcreportevent.FieldVideoID:
+	case ipcevent.FieldVideoID:
 		return m.OldVideoID(ctx)
-	case ipcreportevent.FieldDescription:
+	case ipcevent.FieldEventTime:
+		return m.OldEventTime(ctx)
+	case ipcevent.FieldEventType:
+		return m.OldEventType(ctx)
+	case ipcevent.FieldEventStatus:
+		return m.OldEventStatus(ctx)
+	case ipcevent.FieldImages:
+		return m.OldImages(ctx)
+	case ipcevent.FieldLabeledImages:
+		return m.OldLabeledImages(ctx)
+	case ipcevent.FieldEventID:
+		return m.OldEventID(ctx)
+	case ipcevent.FieldDescription:
 		return m.OldDescription(ctx)
-	case ipcreportevent.FieldRawData:
+	case ipcevent.FieldRawData:
 		return m.OldRawData(ctx)
 	}
-	return nil, fmt.Errorf("unknown IPCReportEvent field %s", name)
+	return nil, fmt.Errorf("unknown IPCEvent field %s", name)
 }
 
 // SetField sets the value of a field with the given name. It returns an error if
 // the field is not defined in the schema, or if the type mismatched the field
 // type.
-func (m *IPCReportEventMutation) SetField(name string, value ent.Value) error {
+func (m *IPCEventMutation) SetField(name string, value ent.Value) error {
 	switch name {
-	case ipcreportevent.FieldCreatedAt:
+	case ipcevent.FieldCreatedAt:
 		v, ok := value.(time.Time)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetCreatedAt(v)
 		return nil
-	case ipcreportevent.FieldCreatedBy:
+	case ipcevent.FieldCreatedBy:
 		v, ok := value.(int)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetCreatedBy(v)
 		return nil
-	case ipcreportevent.FieldDeletedAt:
+	case ipcevent.FieldDeletedAt:
 		v, ok := value.(time.Time)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetDeletedAt(v)
 		return nil
-	case ipcreportevent.FieldUpdatedBy:
+	case ipcevent.FieldUpdatedBy:
 		v, ok := value.(int)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetUpdatedBy(v)
 		return nil
-	case ipcreportevent.FieldUpdatedAt:
+	case ipcevent.FieldUpdatedAt:
 		v, ok := value.(time.Time)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetUpdatedAt(v)
 		return nil
-	case ipcreportevent.FieldDeviceBrand:
-		v, ok := value.(enums.IPCReportEventDeviceBrand)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.SetDeviceBrand(v)
-		return nil
-	case ipcreportevent.FieldDeviceModel:
-		v, ok := value.(enums.IPCReportEventDeviceModel)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.SetDeviceModel(v)
-		return nil
-	case ipcreportevent.FieldDeviceID:
-		v, ok := value.(string)
+	case ipcevent.FieldDeviceID:
+		v, ok := value.(int)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetDeviceID(v)
 		return nil
-	case ipcreportevent.FieldEventID:
-		v, ok := value.(string)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.SetEventID(v)
-		return nil
-	case ipcreportevent.FieldEventTime:
-		v, ok := value.(time.Time)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.SetEventTime(v)
-		return nil
-	case ipcreportevent.FieldEventType:
-		v, ok := value.(enums.IPCReportEventType)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.SetEventType(v)
-		return nil
-	case ipcreportevent.FieldEventStatus:
-		v, ok := value.(enums.IPCReportEventStatus)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.SetEventStatus(v)
-		return nil
-	case ipcreportevent.FieldImages:
-		v, ok := value.([]*types.UploadedImage)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.SetImages(v)
-		return nil
-	case ipcreportevent.FieldLabeledImages:
-		v, ok := value.([]*types.UploadedImage)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.SetLabeledImages(v)
-		return nil
-	case ipcreportevent.FieldVideoID:
+	case ipcevent.FieldVideoID:
 		v, ok := value.(int)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetVideoID(v)
 		return nil
-	case ipcreportevent.FieldDescription:
+	case ipcevent.FieldEventTime:
+		v, ok := value.(time.Time)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetEventTime(v)
+		return nil
+	case ipcevent.FieldEventType:
+		v, ok := value.(enums.EventType)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetEventType(v)
+		return nil
+	case ipcevent.FieldEventStatus:
+		v, ok := value.(enums.EventStatus)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetEventStatus(v)
+		return nil
+	case ipcevent.FieldImages:
+		v, ok := value.([]*types.UploadedImage)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetImages(v)
+		return nil
+	case ipcevent.FieldLabeledImages:
+		v, ok := value.([]*types.UploadedImage)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetLabeledImages(v)
+		return nil
+	case ipcevent.FieldEventID:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetEventID(v)
+		return nil
+	case ipcevent.FieldDescription:
 		v, ok := value.(string)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetDescription(v)
 		return nil
-	case ipcreportevent.FieldRawData:
+	case ipcevent.FieldRawData:
 		v, ok := value.(string)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
@@ -7251,24 +12593,18 @@ func (m *IPCReportEventMutation) SetField(name string, value ent.Value) error {
 		m.SetRawData(v)
 		return nil
 	}
-	return fmt.Errorf("unknown IPCReportEvent field %s", name)
+	return fmt.Errorf("unknown IPCEvent field %s", name)
 }
 
 // AddedFields returns all numeric fields that were incremented/decremented during
 // this mutation.
-func (m *IPCReportEventMutation) AddedFields() []string {
+func (m *IPCEventMutation) AddedFields() []string {
 	var fields []string
-	if m.adddevice_brand != nil {
-		fields = append(fields, ipcreportevent.FieldDeviceBrand)
-	}
-	if m.adddevice_model != nil {
-		fields = append(fields, ipcreportevent.FieldDeviceModel)
-	}
 	if m.addevent_type != nil {
-		fields = append(fields, ipcreportevent.FieldEventType)
+		fields = append(fields, ipcevent.FieldEventType)
 	}
 	if m.addevent_status != nil {
-		fields = append(fields, ipcreportevent.FieldEventStatus)
+		fields = append(fields, ipcevent.FieldEventStatus)
 	}
 	return fields
 }
@@ -7276,15 +12612,11 @@ func (m *IPCReportEventMutation) AddedFields() []string {
 // AddedField returns the numeric value that was incremented/decremented on a field
 // with the given name. The second boolean return value indicates that this field
 // was not set, or was not defined in the schema.
-func (m *IPCReportEventMutation) AddedField(name string) (ent.Value, bool) {
+func (m *IPCEventMutation) AddedField(name string) (ent.Value, bool) {
 	switch name {
-	case ipcreportevent.FieldDeviceBrand:
-		return m.AddedDeviceBrand()
-	case ipcreportevent.FieldDeviceModel:
-		return m.AddedDeviceModel()
-	case ipcreportevent.FieldEventType:
+	case ipcevent.FieldEventType:
 		return m.AddedEventType()
-	case ipcreportevent.FieldEventStatus:
+	case ipcevent.FieldEventStatus:
 		return m.AddedEventStatus()
 	}
 	return nil, false
@@ -7293,265 +12625,291 @@ func (m *IPCReportEventMutation) AddedField(name string) (ent.Value, bool) {
 // AddField adds the value to the field with the given name. It returns an error if
 // the field is not defined in the schema, or if the type mismatched the field
 // type.
-func (m *IPCReportEventMutation) AddField(name string, value ent.Value) error {
+func (m *IPCEventMutation) AddField(name string, value ent.Value) error {
 	switch name {
-	case ipcreportevent.FieldDeviceBrand:
-		v, ok := value.(enums.IPCReportEventDeviceBrand)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.AddDeviceBrand(v)
-		return nil
-	case ipcreportevent.FieldDeviceModel:
-		v, ok := value.(enums.IPCReportEventDeviceModel)
-		if !ok {
-			return fmt.Errorf("unexpected type %T for field %s", value, name)
-		}
-		m.AddDeviceModel(v)
-		return nil
-	case ipcreportevent.FieldEventType:
-		v, ok := value.(enums.IPCReportEventType)
+	case ipcevent.FieldEventType:
+		v, ok := value.(enums.EventType)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.AddEventType(v)
 		return nil
-	case ipcreportevent.FieldEventStatus:
-		v, ok := value.(enums.IPCReportEventStatus)
+	case ipcevent.FieldEventStatus:
+		v, ok := value.(enums.EventStatus)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.AddEventStatus(v)
 		return nil
 	}
-	return fmt.Errorf("unknown IPCReportEvent numeric field %s", name)
+	return fmt.Errorf("unknown IPCEvent numeric field %s", name)
 }
 
 // ClearedFields returns all nullable fields that were cleared during this
 // mutation.
-func (m *IPCReportEventMutation) ClearedFields() []string {
+func (m *IPCEventMutation) ClearedFields() []string {
 	var fields []string
-	if m.FieldCleared(ipcreportevent.FieldDeletedAt) {
-		fields = append(fields, ipcreportevent.FieldDeletedAt)
+	if m.FieldCleared(ipcevent.FieldDeletedAt) {
+		fields = append(fields, ipcevent.FieldDeletedAt)
 	}
-	if m.FieldCleared(ipcreportevent.FieldImages) {
-		fields = append(fields, ipcreportevent.FieldImages)
+	if m.FieldCleared(ipcevent.FieldVideoID) {
+		fields = append(fields, ipcevent.FieldVideoID)
 	}
-	if m.FieldCleared(ipcreportevent.FieldLabeledImages) {
-		fields = append(fields, ipcreportevent.FieldLabeledImages)
+	if m.FieldCleared(ipcevent.FieldImages) {
+		fields = append(fields, ipcevent.FieldImages)
 	}
-	if m.FieldCleared(ipcreportevent.FieldVideoID) {
-		fields = append(fields, ipcreportevent.FieldVideoID)
+	if m.FieldCleared(ipcevent.FieldLabeledImages) {
+		fields = append(fields, ipcevent.FieldLabeledImages)
 	}
-	if m.FieldCleared(ipcreportevent.FieldDescription) {
-		fields = append(fields, ipcreportevent.FieldDescription)
+	if m.FieldCleared(ipcevent.FieldDescription) {
+		fields = append(fields, ipcevent.FieldDescription)
 	}
-	if m.FieldCleared(ipcreportevent.FieldRawData) {
-		fields = append(fields, ipcreportevent.FieldRawData)
+	if m.FieldCleared(ipcevent.FieldRawData) {
+		fields = append(fields, ipcevent.FieldRawData)
 	}
 	return fields
 }
 
 // FieldCleared returns a boolean indicating if a field with the given name was
 // cleared in this mutation.
-func (m *IPCReportEventMutation) FieldCleared(name string) bool {
+func (m *IPCEventMutation) FieldCleared(name string) bool {
 	_, ok := m.clearedFields[name]
 	return ok
 }
 
 // ClearField clears the value of the field with the given name. It returns an
 // error if the field is not defined in the schema.
-func (m *IPCReportEventMutation) ClearField(name string) error {
+func (m *IPCEventMutation) ClearField(name string) error {
 	switch name {
-	case ipcreportevent.FieldDeletedAt:
+	case ipcevent.FieldDeletedAt:
 		m.ClearDeletedAt()
 		return nil
-	case ipcreportevent.FieldImages:
-		m.ClearImages()
-		return nil
-	case ipcreportevent.FieldLabeledImages:
-		m.ClearLabeledImages()
-		return nil
-	case ipcreportevent.FieldVideoID:
+	case ipcevent.FieldVideoID:
 		m.ClearVideoID()
 		return nil
-	case ipcreportevent.FieldDescription:
+	case ipcevent.FieldImages:
+		m.ClearImages()
+		return nil
+	case ipcevent.FieldLabeledImages:
+		m.ClearLabeledImages()
+		return nil
+	case ipcevent.FieldDescription:
 		m.ClearDescription()
 		return nil
-	case ipcreportevent.FieldRawData:
+	case ipcevent.FieldRawData:
 		m.ClearRawData()
 		return nil
 	}
-	return fmt.Errorf("unknown IPCReportEvent nullable field %s", name)
+	return fmt.Errorf("unknown IPCEvent nullable field %s", name)
 }
 
 // ResetField resets all changes in the mutation for the field with the given name.
 // It returns an error if the field is not defined in the schema.
-func (m *IPCReportEventMutation) ResetField(name string) error {
+func (m *IPCEventMutation) ResetField(name string) error {
 	switch name {
-	case ipcreportevent.FieldCreatedAt:
+	case ipcevent.FieldCreatedAt:
 		m.ResetCreatedAt()
 		return nil
-	case ipcreportevent.FieldCreatedBy:
+	case ipcevent.FieldCreatedBy:
 		m.ResetCreatedBy()
 		return nil
-	case ipcreportevent.FieldDeletedAt:
+	case ipcevent.FieldDeletedAt:
 		m.ResetDeletedAt()
 		return nil
-	case ipcreportevent.FieldUpdatedBy:
+	case ipcevent.FieldUpdatedBy:
 		m.ResetUpdatedBy()
 		return nil
-	case ipcreportevent.FieldUpdatedAt:
+	case ipcevent.FieldUpdatedAt:
 		m.ResetUpdatedAt()
 		return nil
-	case ipcreportevent.FieldDeviceBrand:
-		m.ResetDeviceBrand()
-		return nil
-	case ipcreportevent.FieldDeviceModel:
-		m.ResetDeviceModel()
-		return nil
-	case ipcreportevent.FieldDeviceID:
+	case ipcevent.FieldDeviceID:
 		m.ResetDeviceID()
 		return nil
-	case ipcreportevent.FieldEventID:
-		m.ResetEventID()
-		return nil
-	case ipcreportevent.FieldEventTime:
-		m.ResetEventTime()
-		return nil
-	case ipcreportevent.FieldEventType:
-		m.ResetEventType()
-		return nil
-	case ipcreportevent.FieldEventStatus:
-		m.ResetEventStatus()
-		return nil
-	case ipcreportevent.FieldImages:
-		m.ResetImages()
-		return nil
-	case ipcreportevent.FieldLabeledImages:
-		m.ResetLabeledImages()
-		return nil
-	case ipcreportevent.FieldVideoID:
+	case ipcevent.FieldVideoID:
 		m.ResetVideoID()
 		return nil
-	case ipcreportevent.FieldDescription:
+	case ipcevent.FieldEventTime:
+		m.ResetEventTime()
+		return nil
+	case ipcevent.FieldEventType:
+		m.ResetEventType()
+		return nil
+	case ipcevent.FieldEventStatus:
+		m.ResetEventStatus()
+		return nil
+	case ipcevent.FieldImages:
+		m.ResetImages()
+		return nil
+	case ipcevent.FieldLabeledImages:
+		m.ResetLabeledImages()
+		return nil
+	case ipcevent.FieldEventID:
+		m.ResetEventID()
+		return nil
+	case ipcevent.FieldDescription:
 		m.ResetDescription()
 		return nil
-	case ipcreportevent.FieldRawData:
+	case ipcevent.FieldRawData:
 		m.ResetRawData()
 		return nil
 	}
-	return fmt.Errorf("unknown IPCReportEvent field %s", name)
+	return fmt.Errorf("unknown IPCEvent field %s", name)
 }
 
 // AddedEdges returns all edge names that were set/added in this mutation.
-func (m *IPCReportEventMutation) AddedEdges() []string {
-	edges := make([]string, 0, 3)
+func (m *IPCEventMutation) AddedEdges() []string {
+	edges := make([]string, 0, 5)
 	if m.creator != nil {
-		edges = append(edges, ipcreportevent.EdgeCreator)
+		edges = append(edges, ipcevent.EdgeCreator)
 	}
 	if m.updater != nil {
-		edges = append(edges, ipcreportevent.EdgeUpdater)
+		edges = append(edges, ipcevent.EdgeUpdater)
 	}
 	if m.video != nil {
-		edges = append(edges, ipcreportevent.EdgeVideo)
+		edges = append(edges, ipcevent.EdgeVideo)
+	}
+	if m.device != nil {
+		edges = append(edges, ipcevent.EdgeDevice)
+	}
+	if m.fixers != nil {
+		edges = append(edges, ipcevent.EdgeFixers)
 	}
 	return edges
 }
 
 // AddedIDs returns all IDs (to other nodes) that were added for the given edge
 // name in this mutation.
-func (m *IPCReportEventMutation) AddedIDs(name string) []ent.Value {
+func (m *IPCEventMutation) AddedIDs(name string) []ent.Value {
 	switch name {
-	case ipcreportevent.EdgeCreator:
+	case ipcevent.EdgeCreator:
 		if id := m.creator; id != nil {
 			return []ent.Value{*id}
 		}
-	case ipcreportevent.EdgeUpdater:
+	case ipcevent.EdgeUpdater:
 		if id := m.updater; id != nil {
 			return []ent.Value{*id}
 		}
-	case ipcreportevent.EdgeVideo:
+	case ipcevent.EdgeVideo:
 		if id := m.video; id != nil {
 			return []ent.Value{*id}
 		}
+	case ipcevent.EdgeDevice:
+		if id := m.device; id != nil {
+			return []ent.Value{*id}
+		}
+	case ipcevent.EdgeFixers:
+		ids := make([]ent.Value, 0, len(m.fixers))
+		for id := range m.fixers {
+			ids = append(ids, id)
+		}
+		return ids
 	}
 	return nil
 }
 
 // RemovedEdges returns all edge names that were removed in this mutation.
-func (m *IPCReportEventMutation) RemovedEdges() []string {
-	edges := make([]string, 0, 3)
+func (m *IPCEventMutation) RemovedEdges() []string {
+	edges := make([]string, 0, 5)
+	if m.removedfixers != nil {
+		edges = append(edges, ipcevent.EdgeFixers)
+	}
 	return edges
 }
 
 // RemovedIDs returns all IDs (to other nodes) that were removed for the edge with
 // the given name in this mutation.
-func (m *IPCReportEventMutation) RemovedIDs(name string) []ent.Value {
+func (m *IPCEventMutation) RemovedIDs(name string) []ent.Value {
+	switch name {
+	case ipcevent.EdgeFixers:
+		ids := make([]ent.Value, 0, len(m.removedfixers))
+		for id := range m.removedfixers {
+			ids = append(ids, id)
+		}
+		return ids
+	}
 	return nil
 }
 
 // ClearedEdges returns all edge names that were cleared in this mutation.
-func (m *IPCReportEventMutation) ClearedEdges() []string {
-	edges := make([]string, 0, 3)
+func (m *IPCEventMutation) ClearedEdges() []string {
+	edges := make([]string, 0, 5)
 	if m.clearedcreator {
-		edges = append(edges, ipcreportevent.EdgeCreator)
+		edges = append(edges, ipcevent.EdgeCreator)
 	}
 	if m.clearedupdater {
-		edges = append(edges, ipcreportevent.EdgeUpdater)
+		edges = append(edges, ipcevent.EdgeUpdater)
 	}
 	if m.clearedvideo {
-		edges = append(edges, ipcreportevent.EdgeVideo)
+		edges = append(edges, ipcevent.EdgeVideo)
+	}
+	if m.cleareddevice {
+		edges = append(edges, ipcevent.EdgeDevice)
+	}
+	if m.clearedfixers {
+		edges = append(edges, ipcevent.EdgeFixers)
 	}
 	return edges
 }
 
 // EdgeCleared returns a boolean which indicates if the edge with the given name
 // was cleared in this mutation.
-func (m *IPCReportEventMutation) EdgeCleared(name string) bool {
+func (m *IPCEventMutation) EdgeCleared(name string) bool {
 	switch name {
-	case ipcreportevent.EdgeCreator:
+	case ipcevent.EdgeCreator:
 		return m.clearedcreator
-	case ipcreportevent.EdgeUpdater:
+	case ipcevent.EdgeUpdater:
 		return m.clearedupdater
-	case ipcreportevent.EdgeVideo:
+	case ipcevent.EdgeVideo:
 		return m.clearedvideo
+	case ipcevent.EdgeDevice:
+		return m.cleareddevice
+	case ipcevent.EdgeFixers:
+		return m.clearedfixers
 	}
 	return false
 }
 
 // ClearEdge clears the value of the edge with the given name. It returns an error
 // if that edge is not defined in the schema.
-func (m *IPCReportEventMutation) ClearEdge(name string) error {
+func (m *IPCEventMutation) ClearEdge(name string) error {
 	switch name {
-	case ipcreportevent.EdgeCreator:
+	case ipcevent.EdgeCreator:
 		m.ClearCreator()
 		return nil
-	case ipcreportevent.EdgeUpdater:
+	case ipcevent.EdgeUpdater:
 		m.ClearUpdater()
 		return nil
-	case ipcreportevent.EdgeVideo:
+	case ipcevent.EdgeVideo:
 		m.ClearVideo()
 		return nil
+	case ipcevent.EdgeDevice:
+		m.ClearDevice()
+		return nil
 	}
-	return fmt.Errorf("unknown IPCReportEvent unique edge %s", name)
+	return fmt.Errorf("unknown IPCEvent unique edge %s", name)
 }
 
 // ResetEdge resets all changes to the edge with the given name in this mutation.
 // It returns an error if the edge is not defined in the schema.
-func (m *IPCReportEventMutation) ResetEdge(name string) error {
+func (m *IPCEventMutation) ResetEdge(name string) error {
 	switch name {
-	case ipcreportevent.EdgeCreator:
+	case ipcevent.EdgeCreator:
 		m.ResetCreator()
 		return nil
-	case ipcreportevent.EdgeUpdater:
+	case ipcevent.EdgeUpdater:
 		m.ResetUpdater()
 		return nil
-	case ipcreportevent.EdgeVideo:
+	case ipcevent.EdgeVideo:
 		m.ResetVideo()
 		return nil
+	case ipcevent.EdgeDevice:
+		m.ResetDevice()
+		return nil
+	case ipcevent.EdgeFixers:
+		m.ResetFixers()
+		return nil
 	}
-	return fmt.Errorf("unknown IPCReportEvent edge %s", name)
+	return fmt.Errorf("unknown IPCEvent edge %s", name)
 }
 
 // OccupationMutation represents an operation that mutates the Occupation nodes in the graph.
@@ -11650,29 +17008,30 @@ func (m *RiskLocationMutation) ResetEdge(name string) error {
 // VideoMutation represents an operation that mutates the Video nodes in the graph.
 type VideoMutation struct {
 	config
-	op                            Op
-	typ                           string
-	id                            *int
-	created_at                    *time.Time
-	deleted_at                    *time.Time
-	updated_at                    *time.Time
-	name                          *string
-	url                           *string
-	size                          *int64
-	addsize                       *int64
-	duration                      *string
-	uploaded_at                   *time.Time
-	clearedFields                 map[string]struct{}
-	creator                       *int
-	clearedcreator                bool
-	updater                       *int
-	clearedupdater                bool
-	ipc_report_event_video        map[int]struct{}
-	removedipc_report_event_video map[int]struct{}
-	clearedipc_report_event_video bool
-	done                          bool
-	oldValue                      func(context.Context) (*Video, error)
-	predicates                    []predicate.Video
+	op                     Op
+	typ                    string
+	id                     *int
+	created_at             *time.Time
+	deleted_at             *time.Time
+	updated_at             *time.Time
+	name                   *string
+	url                    *string
+	size                   *int64
+	addsize                *int64
+	duration               *string
+	uploaded_at            *time.Time
+	uploaded_at2           *time.Time
+	clearedFields          map[string]struct{}
+	creator                *int
+	clearedcreator         bool
+	updater                *int
+	clearedupdater         bool
+	ipc_event_video        map[int]struct{}
+	removedipc_event_video map[int]struct{}
+	clearedipc_event_video bool
+	done                   bool
+	oldValue               func(context.Context) (*Video, error)
+	predicates             []predicate.Video
 }
 
 var _ ent.Mutation = (*VideoMutation)(nil)
@@ -12218,6 +17577,55 @@ func (m *VideoMutation) ResetUploadedAt() {
 	delete(m.clearedFields, video.FieldUploadedAt)
 }
 
+// SetUploadedAt2 sets the "uploaded_at2" field.
+func (m *VideoMutation) SetUploadedAt2(t time.Time) {
+	m.uploaded_at2 = &t
+}
+
+// UploadedAt2 returns the value of the "uploaded_at2" field in the mutation.
+func (m *VideoMutation) UploadedAt2() (r time.Time, exists bool) {
+	v := m.uploaded_at2
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldUploadedAt2 returns the old "uploaded_at2" field's value of the Video entity.
+// If the Video object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *VideoMutation) OldUploadedAt2(ctx context.Context) (v *time.Time, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldUploadedAt2 is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldUploadedAt2 requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldUploadedAt2: %w", err)
+	}
+	return oldValue.UploadedAt2, nil
+}
+
+// ClearUploadedAt2 clears the value of the "uploaded_at2" field.
+func (m *VideoMutation) ClearUploadedAt2() {
+	m.uploaded_at2 = nil
+	m.clearedFields[video.FieldUploadedAt2] = struct{}{}
+}
+
+// UploadedAt2Cleared returns if the "uploaded_at2" field was cleared in this mutation.
+func (m *VideoMutation) UploadedAt2Cleared() bool {
+	_, ok := m.clearedFields[video.FieldUploadedAt2]
+	return ok
+}
+
+// ResetUploadedAt2 resets all changes to the "uploaded_at2" field.
+func (m *VideoMutation) ResetUploadedAt2() {
+	m.uploaded_at2 = nil
+	delete(m.clearedFields, video.FieldUploadedAt2)
+}
+
 // SetCreatorID sets the "creator" edge to the Admin entity by id.
 func (m *VideoMutation) SetCreatorID(id int) {
 	m.creator = &id
@@ -12298,58 +17706,58 @@ func (m *VideoMutation) ResetUpdater() {
 	m.clearedupdater = false
 }
 
-// AddIpcReportEventVideoIDs adds the "ipc_report_event_video" edge to the IPCReportEvent entity by ids.
-func (m *VideoMutation) AddIpcReportEventVideoIDs(ids ...int) {
-	if m.ipc_report_event_video == nil {
-		m.ipc_report_event_video = make(map[int]struct{})
+// AddIpcEventVideoIDs adds the "ipc_event_video" edge to the IPCEvent entity by ids.
+func (m *VideoMutation) AddIpcEventVideoIDs(ids ...int) {
+	if m.ipc_event_video == nil {
+		m.ipc_event_video = make(map[int]struct{})
 	}
 	for i := range ids {
-		m.ipc_report_event_video[ids[i]] = struct{}{}
+		m.ipc_event_video[ids[i]] = struct{}{}
 	}
 }
 
-// ClearIpcReportEventVideo clears the "ipc_report_event_video" edge to the IPCReportEvent entity.
-func (m *VideoMutation) ClearIpcReportEventVideo() {
-	m.clearedipc_report_event_video = true
+// ClearIpcEventVideo clears the "ipc_event_video" edge to the IPCEvent entity.
+func (m *VideoMutation) ClearIpcEventVideo() {
+	m.clearedipc_event_video = true
 }
 
-// IpcReportEventVideoCleared reports if the "ipc_report_event_video" edge to the IPCReportEvent entity was cleared.
-func (m *VideoMutation) IpcReportEventVideoCleared() bool {
-	return m.clearedipc_report_event_video
+// IpcEventVideoCleared reports if the "ipc_event_video" edge to the IPCEvent entity was cleared.
+func (m *VideoMutation) IpcEventVideoCleared() bool {
+	return m.clearedipc_event_video
 }
 
-// RemoveIpcReportEventVideoIDs removes the "ipc_report_event_video" edge to the IPCReportEvent entity by IDs.
-func (m *VideoMutation) RemoveIpcReportEventVideoIDs(ids ...int) {
-	if m.removedipc_report_event_video == nil {
-		m.removedipc_report_event_video = make(map[int]struct{})
+// RemoveIpcEventVideoIDs removes the "ipc_event_video" edge to the IPCEvent entity by IDs.
+func (m *VideoMutation) RemoveIpcEventVideoIDs(ids ...int) {
+	if m.removedipc_event_video == nil {
+		m.removedipc_event_video = make(map[int]struct{})
 	}
 	for i := range ids {
-		delete(m.ipc_report_event_video, ids[i])
-		m.removedipc_report_event_video[ids[i]] = struct{}{}
+		delete(m.ipc_event_video, ids[i])
+		m.removedipc_event_video[ids[i]] = struct{}{}
 	}
 }
 
-// RemovedIpcReportEventVideo returns the removed IDs of the "ipc_report_event_video" edge to the IPCReportEvent entity.
-func (m *VideoMutation) RemovedIpcReportEventVideoIDs() (ids []int) {
-	for id := range m.removedipc_report_event_video {
+// RemovedIpcEventVideo returns the removed IDs of the "ipc_event_video" edge to the IPCEvent entity.
+func (m *VideoMutation) RemovedIpcEventVideoIDs() (ids []int) {
+	for id := range m.removedipc_event_video {
 		ids = append(ids, id)
 	}
 	return
 }
 
-// IpcReportEventVideoIDs returns the "ipc_report_event_video" edge IDs in the mutation.
-func (m *VideoMutation) IpcReportEventVideoIDs() (ids []int) {
-	for id := range m.ipc_report_event_video {
+// IpcEventVideoIDs returns the "ipc_event_video" edge IDs in the mutation.
+func (m *VideoMutation) IpcEventVideoIDs() (ids []int) {
+	for id := range m.ipc_event_video {
 		ids = append(ids, id)
 	}
 	return
 }
 
-// ResetIpcReportEventVideo resets all changes to the "ipc_report_event_video" edge.
-func (m *VideoMutation) ResetIpcReportEventVideo() {
-	m.ipc_report_event_video = nil
-	m.clearedipc_report_event_video = false
-	m.removedipc_report_event_video = nil
+// ResetIpcEventVideo resets all changes to the "ipc_event_video" edge.
+func (m *VideoMutation) ResetIpcEventVideo() {
+	m.ipc_event_video = nil
+	m.clearedipc_event_video = false
+	m.removedipc_event_video = nil
 }
 
 // Where appends a list predicates to the VideoMutation builder.
@@ -12386,7 +17794,7 @@ func (m *VideoMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *VideoMutation) Fields() []string {
-	fields := make([]string, 0, 10)
+	fields := make([]string, 0, 11)
 	if m.created_at != nil {
 		fields = append(fields, video.FieldCreatedAt)
 	}
@@ -12417,6 +17825,9 @@ func (m *VideoMutation) Fields() []string {
 	if m.uploaded_at != nil {
 		fields = append(fields, video.FieldUploadedAt)
 	}
+	if m.uploaded_at2 != nil {
+		fields = append(fields, video.FieldUploadedAt2)
+	}
 	return fields
 }
 
@@ -12445,6 +17856,8 @@ func (m *VideoMutation) Field(name string) (ent.Value, bool) {
 		return m.Duration()
 	case video.FieldUploadedAt:
 		return m.UploadedAt()
+	case video.FieldUploadedAt2:
+		return m.UploadedAt2()
 	}
 	return nil, false
 }
@@ -12474,6 +17887,8 @@ func (m *VideoMutation) OldField(ctx context.Context, name string) (ent.Value, e
 		return m.OldDuration(ctx)
 	case video.FieldUploadedAt:
 		return m.OldUploadedAt(ctx)
+	case video.FieldUploadedAt2:
+		return m.OldUploadedAt2(ctx)
 	}
 	return nil, fmt.Errorf("unknown Video field %s", name)
 }
@@ -12553,6 +17968,13 @@ func (m *VideoMutation) SetField(name string, value ent.Value) error {
 		}
 		m.SetUploadedAt(v)
 		return nil
+	case video.FieldUploadedAt2:
+		v, ok := value.(time.Time)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetUploadedAt2(v)
+		return nil
 	}
 	return fmt.Errorf("unknown Video field %s", name)
 }
@@ -12613,6 +18035,9 @@ func (m *VideoMutation) ClearedFields() []string {
 	if m.FieldCleared(video.FieldUploadedAt) {
 		fields = append(fields, video.FieldUploadedAt)
 	}
+	if m.FieldCleared(video.FieldUploadedAt2) {
+		fields = append(fields, video.FieldUploadedAt2)
+	}
 	return fields
 }
 
@@ -12641,6 +18066,9 @@ func (m *VideoMutation) ClearField(name string) error {
 		return nil
 	case video.FieldUploadedAt:
 		m.ClearUploadedAt()
+		return nil
+	case video.FieldUploadedAt2:
+		m.ClearUploadedAt2()
 		return nil
 	}
 	return fmt.Errorf("unknown Video nullable field %s", name)
@@ -12680,6 +18108,9 @@ func (m *VideoMutation) ResetField(name string) error {
 	case video.FieldUploadedAt:
 		m.ResetUploadedAt()
 		return nil
+	case video.FieldUploadedAt2:
+		m.ResetUploadedAt2()
+		return nil
 	}
 	return fmt.Errorf("unknown Video field %s", name)
 }
@@ -12693,8 +18124,8 @@ func (m *VideoMutation) AddedEdges() []string {
 	if m.updater != nil {
 		edges = append(edges, video.EdgeUpdater)
 	}
-	if m.ipc_report_event_video != nil {
-		edges = append(edges, video.EdgeIpcReportEventVideo)
+	if m.ipc_event_video != nil {
+		edges = append(edges, video.EdgeIpcEventVideo)
 	}
 	return edges
 }
@@ -12711,9 +18142,9 @@ func (m *VideoMutation) AddedIDs(name string) []ent.Value {
 		if id := m.updater; id != nil {
 			return []ent.Value{*id}
 		}
-	case video.EdgeIpcReportEventVideo:
-		ids := make([]ent.Value, 0, len(m.ipc_report_event_video))
-		for id := range m.ipc_report_event_video {
+	case video.EdgeIpcEventVideo:
+		ids := make([]ent.Value, 0, len(m.ipc_event_video))
+		for id := range m.ipc_event_video {
 			ids = append(ids, id)
 		}
 		return ids
@@ -12724,8 +18155,8 @@ func (m *VideoMutation) AddedIDs(name string) []ent.Value {
 // RemovedEdges returns all edge names that were removed in this mutation.
 func (m *VideoMutation) RemovedEdges() []string {
 	edges := make([]string, 0, 3)
-	if m.removedipc_report_event_video != nil {
-		edges = append(edges, video.EdgeIpcReportEventVideo)
+	if m.removedipc_event_video != nil {
+		edges = append(edges, video.EdgeIpcEventVideo)
 	}
 	return edges
 }
@@ -12734,9 +18165,9 @@ func (m *VideoMutation) RemovedEdges() []string {
 // the given name in this mutation.
 func (m *VideoMutation) RemovedIDs(name string) []ent.Value {
 	switch name {
-	case video.EdgeIpcReportEventVideo:
-		ids := make([]ent.Value, 0, len(m.removedipc_report_event_video))
-		for id := range m.removedipc_report_event_video {
+	case video.EdgeIpcEventVideo:
+		ids := make([]ent.Value, 0, len(m.removedipc_event_video))
+		for id := range m.removedipc_event_video {
 			ids = append(ids, id)
 		}
 		return ids
@@ -12753,8 +18184,8 @@ func (m *VideoMutation) ClearedEdges() []string {
 	if m.clearedupdater {
 		edges = append(edges, video.EdgeUpdater)
 	}
-	if m.clearedipc_report_event_video {
-		edges = append(edges, video.EdgeIpcReportEventVideo)
+	if m.clearedipc_event_video {
+		edges = append(edges, video.EdgeIpcEventVideo)
 	}
 	return edges
 }
@@ -12767,8 +18198,8 @@ func (m *VideoMutation) EdgeCleared(name string) bool {
 		return m.clearedcreator
 	case video.EdgeUpdater:
 		return m.clearedupdater
-	case video.EdgeIpcReportEventVideo:
-		return m.clearedipc_report_event_video
+	case video.EdgeIpcEventVideo:
+		return m.clearedipc_event_video
 	}
 	return false
 }
@@ -12797,8 +18228,8 @@ func (m *VideoMutation) ResetEdge(name string) error {
 	case video.EdgeUpdater:
 		m.ResetUpdater()
 		return nil
-	case video.EdgeIpcReportEventVideo:
-		m.ResetIpcReportEventVideo()
+	case video.EdgeIpcEventVideo:
+		m.ResetIpcEventVideo()
 		return nil
 	}
 	return fmt.Errorf("unknown Video edge %s", name)

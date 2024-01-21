@@ -11,7 +11,6 @@ import (
 	"aisecurity/structs/types"
 	"aisecurity/utils"
 	"aisecurity/utils/db"
-	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/gogf/gf/v2/util/gconv"
 	"go.uber.org/zap"
@@ -154,8 +153,6 @@ func (s *RiskService) query(fit structs.IFilter) *dao.RiskQuery {
 }
 
 func (s *RiskService) GetTotal(fit structs.IFilter) (int, error) {
-	// total
-	fmt.Println("risk get total", fit)
 	total, err := s.query(fit).Count(s.Ctx)
 	if err != nil {
 		return 0, utils.ErrorWithStack(err)

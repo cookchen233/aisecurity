@@ -5,9 +5,13 @@ package dao
 import (
 	"aisecurity/ent/dao/admin"
 	"aisecurity/ent/dao/adminrole"
+	"aisecurity/ent/dao/area"
 	"aisecurity/ent/dao/department"
+	"aisecurity/ent/dao/device"
+	"aisecurity/ent/dao/deviceinstallation"
 	"aisecurity/ent/dao/employee"
-	"aisecurity/ent/dao/ipcreportevent"
+	"aisecurity/ent/dao/eventlevel"
+	"aisecurity/ent/dao/ipcevent"
 	"aisecurity/ent/dao/occupation"
 	"aisecurity/ent/dao/predicate"
 	"aisecurity/ent/dao/risk"
@@ -23,7 +27,7 @@ import (
 
 // schemaGraph holds a representation of ent/schema at runtime.
 var schemaGraph = func() *sqlgraph.Schema {
-	graph := &sqlgraph.Schema{Nodes: make([]*sqlgraph.Node, 10)}
+	graph := &sqlgraph.Schema{Nodes: make([]*sqlgraph.Node, 14)}
 	graph.Nodes[0] = &sqlgraph.Node{
 		NodeSpec: sqlgraph.NodeSpec{
 			Table:   admin.Table,
@@ -68,6 +72,26 @@ var schemaGraph = func() *sqlgraph.Schema {
 	}
 	graph.Nodes[2] = &sqlgraph.Node{
 		NodeSpec: sqlgraph.NodeSpec{
+			Table:   area.Table,
+			Columns: area.Columns,
+			ID: &sqlgraph.FieldSpec{
+				Type:   field.TypeInt,
+				Column: area.FieldID,
+			},
+		},
+		Type: "Area",
+		Fields: map[string]*sqlgraph.FieldSpec{
+			area.FieldCreatedAt:   {Type: field.TypeTime, Column: area.FieldCreatedAt},
+			area.FieldCreatedBy:   {Type: field.TypeInt, Column: area.FieldCreatedBy},
+			area.FieldDeletedAt:   {Type: field.TypeTime, Column: area.FieldDeletedAt},
+			area.FieldUpdatedBy:   {Type: field.TypeInt, Column: area.FieldUpdatedBy},
+			area.FieldUpdatedAt:   {Type: field.TypeTime, Column: area.FieldUpdatedAt},
+			area.FieldName:        {Type: field.TypeString, Column: area.FieldName},
+			area.FieldDescription: {Type: field.TypeString, Column: area.FieldDescription},
+		},
+	}
+	graph.Nodes[3] = &sqlgraph.Node{
+		NodeSpec: sqlgraph.NodeSpec{
 			Table:   department.Table,
 			Columns: department.Columns,
 			ID: &sqlgraph.FieldSpec{
@@ -86,7 +110,57 @@ var schemaGraph = func() *sqlgraph.Schema {
 			department.FieldParentID:  {Type: field.TypeInt, Column: department.FieldParentID},
 		},
 	}
-	graph.Nodes[3] = &sqlgraph.Node{
+	graph.Nodes[4] = &sqlgraph.Node{
+		NodeSpec: sqlgraph.NodeSpec{
+			Table:   device.Table,
+			Columns: device.Columns,
+			ID: &sqlgraph.FieldSpec{
+				Type:   field.TypeInt,
+				Column: device.FieldID,
+			},
+		},
+		Type: "Device",
+		Fields: map[string]*sqlgraph.FieldSpec{
+			device.FieldCreatedAt:  {Type: field.TypeTime, Column: device.FieldCreatedAt},
+			device.FieldCreatedBy:  {Type: field.TypeInt, Column: device.FieldCreatedBy},
+			device.FieldDeletedAt:  {Type: field.TypeTime, Column: device.FieldDeletedAt},
+			device.FieldUpdatedBy:  {Type: field.TypeInt, Column: device.FieldUpdatedBy},
+			device.FieldUpdatedAt:  {Type: field.TypeTime, Column: device.FieldUpdatedAt},
+			device.FieldBrand:      {Type: field.TypeInt, Column: device.FieldBrand},
+			device.FieldModel:      {Type: field.TypeInt, Column: device.FieldModel},
+			device.FieldName:       {Type: field.TypeString, Column: device.FieldName},
+			device.FieldSn:         {Type: field.TypeString, Column: device.FieldSn},
+			device.FieldDeviceType: {Type: field.TypeInt, Column: device.FieldDeviceType},
+		},
+	}
+	graph.Nodes[5] = &sqlgraph.Node{
+		NodeSpec: sqlgraph.NodeSpec{
+			Table:   deviceinstallation.Table,
+			Columns: deviceinstallation.Columns,
+			ID: &sqlgraph.FieldSpec{
+				Type:   field.TypeInt,
+				Column: deviceinstallation.FieldID,
+			},
+		},
+		Type: "DeviceInstallation",
+		Fields: map[string]*sqlgraph.FieldSpec{
+			deviceinstallation.FieldCreatedAt:    {Type: field.TypeTime, Column: deviceinstallation.FieldCreatedAt},
+			deviceinstallation.FieldCreatedBy:    {Type: field.TypeInt, Column: deviceinstallation.FieldCreatedBy},
+			deviceinstallation.FieldDeletedAt:    {Type: field.TypeTime, Column: deviceinstallation.FieldDeletedAt},
+			deviceinstallation.FieldUpdatedBy:    {Type: field.TypeInt, Column: deviceinstallation.FieldUpdatedBy},
+			deviceinstallation.FieldUpdatedAt:    {Type: field.TypeTime, Column: deviceinstallation.FieldUpdatedAt},
+			deviceinstallation.FieldDeviceID:     {Type: field.TypeInt, Column: deviceinstallation.FieldDeviceID},
+			deviceinstallation.FieldAreaID:       {Type: field.TypeInt, Column: deviceinstallation.FieldAreaID},
+			deviceinstallation.FieldAliasName:    {Type: field.TypeString, Column: deviceinstallation.FieldAliasName},
+			deviceinstallation.FieldLongitude:    {Type: field.TypeFloat64, Column: deviceinstallation.FieldLongitude},
+			deviceinstallation.FieldLatitude:     {Type: field.TypeFloat64, Column: deviceinstallation.FieldLatitude},
+			deviceinstallation.FieldLocationData: {Type: field.TypeString, Column: deviceinstallation.FieldLocationData},
+			deviceinstallation.FieldLocation:     {Type: field.TypeString, Column: deviceinstallation.FieldLocation},
+			deviceinstallation.FieldInstaller:    {Type: field.TypeString, Column: deviceinstallation.FieldInstaller},
+			deviceinstallation.FieldInstallTime:  {Type: field.TypeTime, Column: deviceinstallation.FieldInstallTime},
+		},
+	}
+	graph.Nodes[6] = &sqlgraph.Node{
 		NodeSpec: sqlgraph.NodeSpec{
 			Table:   employee.Table,
 			Columns: employee.Columns,
@@ -106,37 +180,57 @@ var schemaGraph = func() *sqlgraph.Schema {
 			employee.FieldDepartmentID: {Type: field.TypeInt, Column: employee.FieldDepartmentID},
 		},
 	}
-	graph.Nodes[4] = &sqlgraph.Node{
+	graph.Nodes[7] = &sqlgraph.Node{
 		NodeSpec: sqlgraph.NodeSpec{
-			Table:   ipcreportevent.Table,
-			Columns: ipcreportevent.Columns,
+			Table:   eventlevel.Table,
+			Columns: eventlevel.Columns,
 			ID: &sqlgraph.FieldSpec{
 				Type:   field.TypeInt,
-				Column: ipcreportevent.FieldID,
+				Column: eventlevel.FieldID,
 			},
 		},
-		Type: "IPCReportEvent",
+		Type: "EventLevel",
 		Fields: map[string]*sqlgraph.FieldSpec{
-			ipcreportevent.FieldCreatedAt:     {Type: field.TypeTime, Column: ipcreportevent.FieldCreatedAt},
-			ipcreportevent.FieldCreatedBy:     {Type: field.TypeInt, Column: ipcreportevent.FieldCreatedBy},
-			ipcreportevent.FieldDeletedAt:     {Type: field.TypeTime, Column: ipcreportevent.FieldDeletedAt},
-			ipcreportevent.FieldUpdatedBy:     {Type: field.TypeInt, Column: ipcreportevent.FieldUpdatedBy},
-			ipcreportevent.FieldUpdatedAt:     {Type: field.TypeTime, Column: ipcreportevent.FieldUpdatedAt},
-			ipcreportevent.FieldDeviceBrand:   {Type: field.TypeInt, Column: ipcreportevent.FieldDeviceBrand},
-			ipcreportevent.FieldDeviceModel:   {Type: field.TypeInt, Column: ipcreportevent.FieldDeviceModel},
-			ipcreportevent.FieldDeviceID:      {Type: field.TypeString, Column: ipcreportevent.FieldDeviceID},
-			ipcreportevent.FieldEventID:       {Type: field.TypeString, Column: ipcreportevent.FieldEventID},
-			ipcreportevent.FieldEventTime:     {Type: field.TypeTime, Column: ipcreportevent.FieldEventTime},
-			ipcreportevent.FieldEventType:     {Type: field.TypeInt, Column: ipcreportevent.FieldEventType},
-			ipcreportevent.FieldEventStatus:   {Type: field.TypeInt, Column: ipcreportevent.FieldEventStatus},
-			ipcreportevent.FieldImages:        {Type: field.TypeJSON, Column: ipcreportevent.FieldImages},
-			ipcreportevent.FieldLabeledImages: {Type: field.TypeJSON, Column: ipcreportevent.FieldLabeledImages},
-			ipcreportevent.FieldVideoID:       {Type: field.TypeInt, Column: ipcreportevent.FieldVideoID},
-			ipcreportevent.FieldDescription:   {Type: field.TypeString, Column: ipcreportevent.FieldDescription},
-			ipcreportevent.FieldRawData:       {Type: field.TypeString, Column: ipcreportevent.FieldRawData},
+			eventlevel.FieldCreatedAt:   {Type: field.TypeTime, Column: eventlevel.FieldCreatedAt},
+			eventlevel.FieldCreatedBy:   {Type: field.TypeInt, Column: eventlevel.FieldCreatedBy},
+			eventlevel.FieldDeletedAt:   {Type: field.TypeTime, Column: eventlevel.FieldDeletedAt},
+			eventlevel.FieldUpdatedBy:   {Type: field.TypeInt, Column: eventlevel.FieldUpdatedBy},
+			eventlevel.FieldUpdatedAt:   {Type: field.TypeTime, Column: eventlevel.FieldUpdatedAt},
+			eventlevel.FieldName:        {Type: field.TypeString, Column: eventlevel.FieldName},
+			eventlevel.FieldEventTypes:  {Type: field.TypeJSON, Column: eventlevel.FieldEventTypes},
+			eventlevel.FieldDescription: {Type: field.TypeString, Column: eventlevel.FieldDescription},
+			eventlevel.FieldIsReport:    {Type: field.TypeBool, Column: eventlevel.FieldIsReport},
 		},
 	}
-	graph.Nodes[5] = &sqlgraph.Node{
+	graph.Nodes[8] = &sqlgraph.Node{
+		NodeSpec: sqlgraph.NodeSpec{
+			Table:   ipcevent.Table,
+			Columns: ipcevent.Columns,
+			ID: &sqlgraph.FieldSpec{
+				Type:   field.TypeInt,
+				Column: ipcevent.FieldID,
+			},
+		},
+		Type: "IPCEvent",
+		Fields: map[string]*sqlgraph.FieldSpec{
+			ipcevent.FieldCreatedAt:     {Type: field.TypeTime, Column: ipcevent.FieldCreatedAt},
+			ipcevent.FieldCreatedBy:     {Type: field.TypeInt, Column: ipcevent.FieldCreatedBy},
+			ipcevent.FieldDeletedAt:     {Type: field.TypeTime, Column: ipcevent.FieldDeletedAt},
+			ipcevent.FieldUpdatedBy:     {Type: field.TypeInt, Column: ipcevent.FieldUpdatedBy},
+			ipcevent.FieldUpdatedAt:     {Type: field.TypeTime, Column: ipcevent.FieldUpdatedAt},
+			ipcevent.FieldDeviceID:      {Type: field.TypeInt, Column: ipcevent.FieldDeviceID},
+			ipcevent.FieldVideoID:       {Type: field.TypeInt, Column: ipcevent.FieldVideoID},
+			ipcevent.FieldEventTime:     {Type: field.TypeTime, Column: ipcevent.FieldEventTime},
+			ipcevent.FieldEventType:     {Type: field.TypeInt, Column: ipcevent.FieldEventType},
+			ipcevent.FieldEventStatus:   {Type: field.TypeInt, Column: ipcevent.FieldEventStatus},
+			ipcevent.FieldImages:        {Type: field.TypeJSON, Column: ipcevent.FieldImages},
+			ipcevent.FieldLabeledImages: {Type: field.TypeJSON, Column: ipcevent.FieldLabeledImages},
+			ipcevent.FieldEventID:       {Type: field.TypeString, Column: ipcevent.FieldEventID},
+			ipcevent.FieldDescription:   {Type: field.TypeString, Column: ipcevent.FieldDescription},
+			ipcevent.FieldRawData:       {Type: field.TypeString, Column: ipcevent.FieldRawData},
+		},
+	}
+	graph.Nodes[9] = &sqlgraph.Node{
 		NodeSpec: sqlgraph.NodeSpec{
 			Table:   occupation.Table,
 			Columns: occupation.Columns,
@@ -156,7 +250,7 @@ var schemaGraph = func() *sqlgraph.Schema {
 			occupation.FieldDescription: {Type: field.TypeString, Column: occupation.FieldDescription},
 		},
 	}
-	graph.Nodes[6] = &sqlgraph.Node{
+	graph.Nodes[10] = &sqlgraph.Node{
 		NodeSpec: sqlgraph.NodeSpec{
 			Table:   risk.Table,
 			Columns: risk.Columns,
@@ -184,7 +278,7 @@ var schemaGraph = func() *sqlgraph.Schema {
 			risk.FieldDueTime:        {Type: field.TypeTime, Column: risk.FieldDueTime},
 		},
 	}
-	graph.Nodes[7] = &sqlgraph.Node{
+	graph.Nodes[11] = &sqlgraph.Node{
 		NodeSpec: sqlgraph.NodeSpec{
 			Table:   riskcategory.Table,
 			Columns: riskcategory.Columns,
@@ -203,7 +297,7 @@ var schemaGraph = func() *sqlgraph.Schema {
 			riskcategory.FieldName:      {Type: field.TypeString, Column: riskcategory.FieldName},
 		},
 	}
-	graph.Nodes[8] = &sqlgraph.Node{
+	graph.Nodes[12] = &sqlgraph.Node{
 		NodeSpec: sqlgraph.NodeSpec{
 			Table:   risklocation.Table,
 			Columns: risklocation.Columns,
@@ -222,7 +316,7 @@ var schemaGraph = func() *sqlgraph.Schema {
 			risklocation.FieldName:      {Type: field.TypeString, Column: risklocation.FieldName},
 		},
 	}
-	graph.Nodes[9] = &sqlgraph.Node{
+	graph.Nodes[13] = &sqlgraph.Node{
 		NodeSpec: sqlgraph.NodeSpec{
 			Table:   video.Table,
 			Columns: video.Columns,
@@ -233,16 +327,17 @@ var schemaGraph = func() *sqlgraph.Schema {
 		},
 		Type: "Video",
 		Fields: map[string]*sqlgraph.FieldSpec{
-			video.FieldCreatedAt:  {Type: field.TypeTime, Column: video.FieldCreatedAt},
-			video.FieldCreatedBy:  {Type: field.TypeInt, Column: video.FieldCreatedBy},
-			video.FieldDeletedAt:  {Type: field.TypeTime, Column: video.FieldDeletedAt},
-			video.FieldUpdatedBy:  {Type: field.TypeInt, Column: video.FieldUpdatedBy},
-			video.FieldUpdatedAt:  {Type: field.TypeTime, Column: video.FieldUpdatedAt},
-			video.FieldName:       {Type: field.TypeString, Column: video.FieldName},
-			video.FieldURL:        {Type: field.TypeString, Column: video.FieldURL},
-			video.FieldSize:       {Type: field.TypeInt64, Column: video.FieldSize},
-			video.FieldDuration:   {Type: field.TypeString, Column: video.FieldDuration},
-			video.FieldUploadedAt: {Type: field.TypeTime, Column: video.FieldUploadedAt},
+			video.FieldCreatedAt:   {Type: field.TypeTime, Column: video.FieldCreatedAt},
+			video.FieldCreatedBy:   {Type: field.TypeInt, Column: video.FieldCreatedBy},
+			video.FieldDeletedAt:   {Type: field.TypeTime, Column: video.FieldDeletedAt},
+			video.FieldUpdatedBy:   {Type: field.TypeInt, Column: video.FieldUpdatedBy},
+			video.FieldUpdatedAt:   {Type: field.TypeTime, Column: video.FieldUpdatedAt},
+			video.FieldName:        {Type: field.TypeString, Column: video.FieldName},
+			video.FieldURL:         {Type: field.TypeString, Column: video.FieldURL},
+			video.FieldSize:        {Type: field.TypeInt64, Column: video.FieldSize},
+			video.FieldDuration:    {Type: field.TypeString, Column: video.FieldDuration},
+			video.FieldUploadedAt:  {Type: field.TypeTime, Column: video.FieldUploadedAt},
+			video.FieldUploadedAt2: {Type: field.TypeTime, Column: video.FieldUploadedAt2},
 		},
 	}
 	graph.MustAddE(
@@ -486,28 +581,28 @@ var schemaGraph = func() *sqlgraph.Schema {
 		"Occupation",
 	)
 	graph.MustAddE(
-		"ipc_report_event_creator",
+		"ipc_event_creator",
 		&sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
-			Table:   admin.IpcReportEventCreatorTable,
-			Columns: []string{admin.IpcReportEventCreatorColumn},
+			Table:   admin.IpcEventCreatorTable,
+			Columns: []string{admin.IpcEventCreatorColumn},
 			Bidi:    false,
 		},
 		"Admin",
-		"IPCReportEvent",
+		"IPCEvent",
 	)
 	graph.MustAddE(
-		"ipc_report_event_updater",
+		"ipc_event_updater",
 		&sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
-			Table:   admin.IpcReportEventUpdaterTable,
-			Columns: []string{admin.IpcReportEventUpdaterColumn},
+			Table:   admin.IpcEventUpdaterTable,
+			Columns: []string{admin.IpcEventUpdaterColumn},
 			Bidi:    false,
 		},
 		"Admin",
-		"IPCReportEvent",
+		"IPCEvent",
 	)
 	graph.MustAddE(
 		"video_creator",
@@ -532,6 +627,102 @@ var schemaGraph = func() *sqlgraph.Schema {
 		},
 		"Admin",
 		"Video",
+	)
+	graph.MustAddE(
+		"area_creator",
+		&sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   admin.AreaCreatorTable,
+			Columns: []string{admin.AreaCreatorColumn},
+			Bidi:    false,
+		},
+		"Admin",
+		"Area",
+	)
+	graph.MustAddE(
+		"area_updater",
+		&sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   admin.AreaUpdaterTable,
+			Columns: []string{admin.AreaUpdaterColumn},
+			Bidi:    false,
+		},
+		"Admin",
+		"Area",
+	)
+	graph.MustAddE(
+		"device_creator",
+		&sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   admin.DeviceCreatorTable,
+			Columns: []string{admin.DeviceCreatorColumn},
+			Bidi:    false,
+		},
+		"Admin",
+		"Device",
+	)
+	graph.MustAddE(
+		"device_updater",
+		&sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   admin.DeviceUpdaterTable,
+			Columns: []string{admin.DeviceUpdaterColumn},
+			Bidi:    false,
+		},
+		"Admin",
+		"Device",
+	)
+	graph.MustAddE(
+		"device_installation_creator",
+		&sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   admin.DeviceInstallationCreatorTable,
+			Columns: []string{admin.DeviceInstallationCreatorColumn},
+			Bidi:    false,
+		},
+		"Admin",
+		"DeviceInstallation",
+	)
+	graph.MustAddE(
+		"device_installation_updater",
+		&sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   admin.DeviceInstallationUpdaterTable,
+			Columns: []string{admin.DeviceInstallationUpdaterColumn},
+			Bidi:    false,
+		},
+		"Admin",
+		"DeviceInstallation",
+	)
+	graph.MustAddE(
+		"event_level_creator",
+		&sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   admin.EventLevelCreatorTable,
+			Columns: []string{admin.EventLevelCreatorColumn},
+			Bidi:    false,
+		},
+		"Admin",
+		"EventLevel",
+	)
+	graph.MustAddE(
+		"event_level_updater",
+		&sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   admin.EventLevelUpdaterTable,
+			Columns: []string{admin.EventLevelUpdaterColumn},
+			Bidi:    false,
+		},
+		"Admin",
+		"EventLevel",
 	)
 	graph.MustAddE(
 		"creator",
@@ -568,6 +759,42 @@ var schemaGraph = func() *sqlgraph.Schema {
 		},
 		"AdminRole",
 		"Admin",
+	)
+	graph.MustAddE(
+		"creator",
+		&sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   area.CreatorTable,
+			Columns: []string{area.CreatorColumn},
+			Bidi:    false,
+		},
+		"Area",
+		"Admin",
+	)
+	graph.MustAddE(
+		"updater",
+		&sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   area.UpdaterTable,
+			Columns: []string{area.UpdaterColumn},
+			Bidi:    false,
+		},
+		"Area",
+		"Admin",
+	)
+	graph.MustAddE(
+		"device_installation_area",
+		&sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   area.DeviceInstallationAreaTable,
+			Columns: []string{area.DeviceInstallationAreaColumn},
+			Bidi:    false,
+		},
+		"Area",
+		"DeviceInstallation",
 	)
 	graph.MustAddE(
 		"creator",
@@ -634,6 +861,102 @@ var schemaGraph = func() *sqlgraph.Schema {
 		&sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: true,
+			Table:   device.CreatorTable,
+			Columns: []string{device.CreatorColumn},
+			Bidi:    false,
+		},
+		"Device",
+		"Admin",
+	)
+	graph.MustAddE(
+		"updater",
+		&sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   device.UpdaterTable,
+			Columns: []string{device.UpdaterColumn},
+			Bidi:    false,
+		},
+		"Device",
+		"Admin",
+	)
+	graph.MustAddE(
+		"ipc_event_device",
+		&sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   device.IpcEventDeviceTable,
+			Columns: []string{device.IpcEventDeviceColumn},
+			Bidi:    false,
+		},
+		"Device",
+		"IPCEvent",
+	)
+	graph.MustAddE(
+		"device_installation_device",
+		&sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   device.DeviceInstallationDeviceTable,
+			Columns: []string{device.DeviceInstallationDeviceColumn},
+			Bidi:    false,
+		},
+		"Device",
+		"DeviceInstallation",
+	)
+	graph.MustAddE(
+		"creator",
+		&sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   deviceinstallation.CreatorTable,
+			Columns: []string{deviceinstallation.CreatorColumn},
+			Bidi:    false,
+		},
+		"DeviceInstallation",
+		"Admin",
+	)
+	graph.MustAddE(
+		"updater",
+		&sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   deviceinstallation.UpdaterTable,
+			Columns: []string{deviceinstallation.UpdaterColumn},
+			Bidi:    false,
+		},
+		"DeviceInstallation",
+		"Admin",
+	)
+	graph.MustAddE(
+		"area",
+		&sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   deviceinstallation.AreaTable,
+			Columns: []string{deviceinstallation.AreaColumn},
+			Bidi:    false,
+		},
+		"DeviceInstallation",
+		"Area",
+	)
+	graph.MustAddE(
+		"device",
+		&sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   deviceinstallation.DeviceTable,
+			Columns: []string{deviceinstallation.DeviceColumn},
+			Bidi:    false,
+		},
+		"DeviceInstallation",
+		"Device",
+	)
+	graph.MustAddE(
+		"creator",
+		&sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
 			Table:   employee.CreatorTable,
 			Columns: []string{employee.CreatorColumn},
 			Bidi:    false,
@@ -690,6 +1013,18 @@ var schemaGraph = func() *sqlgraph.Schema {
 		"Occupation",
 	)
 	graph.MustAddE(
+		"ipc_events",
+		&sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: true,
+			Table:   employee.IpcEventsTable,
+			Columns: employee.IpcEventsPrimaryKey,
+			Bidi:    false,
+		},
+		"Employee",
+		"IPCEvent",
+	)
+	graph.MustAddE(
 		"risk_reporter",
 		&sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
@@ -718,11 +1053,11 @@ var schemaGraph = func() *sqlgraph.Schema {
 		&sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: true,
-			Table:   ipcreportevent.CreatorTable,
-			Columns: []string{ipcreportevent.CreatorColumn},
+			Table:   eventlevel.CreatorTable,
+			Columns: []string{eventlevel.CreatorColumn},
 			Bidi:    false,
 		},
-		"IPCReportEvent",
+		"EventLevel",
 		"Admin",
 	)
 	graph.MustAddE(
@@ -730,11 +1065,35 @@ var schemaGraph = func() *sqlgraph.Schema {
 		&sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: true,
-			Table:   ipcreportevent.UpdaterTable,
-			Columns: []string{ipcreportevent.UpdaterColumn},
+			Table:   eventlevel.UpdaterTable,
+			Columns: []string{eventlevel.UpdaterColumn},
 			Bidi:    false,
 		},
-		"IPCReportEvent",
+		"EventLevel",
+		"Admin",
+	)
+	graph.MustAddE(
+		"creator",
+		&sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   ipcevent.CreatorTable,
+			Columns: []string{ipcevent.CreatorColumn},
+			Bidi:    false,
+		},
+		"IPCEvent",
+		"Admin",
+	)
+	graph.MustAddE(
+		"updater",
+		&sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   ipcevent.UpdaterTable,
+			Columns: []string{ipcevent.UpdaterColumn},
+			Bidi:    false,
+		},
+		"IPCEvent",
 		"Admin",
 	)
 	graph.MustAddE(
@@ -742,12 +1101,36 @@ var schemaGraph = func() *sqlgraph.Schema {
 		&sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: true,
-			Table:   ipcreportevent.VideoTable,
-			Columns: []string{ipcreportevent.VideoColumn},
+			Table:   ipcevent.VideoTable,
+			Columns: []string{ipcevent.VideoColumn},
 			Bidi:    false,
 		},
-		"IPCReportEvent",
+		"IPCEvent",
 		"Video",
+	)
+	graph.MustAddE(
+		"device",
+		&sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   ipcevent.DeviceTable,
+			Columns: []string{ipcevent.DeviceColumn},
+			Bidi:    false,
+		},
+		"IPCEvent",
+		"Device",
+	)
+	graph.MustAddE(
+		"fixers",
+		&sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: false,
+			Table:   ipcevent.FixersTable,
+			Columns: ipcevent.FixersPrimaryKey,
+			Bidi:    false,
+		},
+		"IPCEvent",
+		"Employee",
 	)
 	graph.MustAddE(
 		"creator",
@@ -954,16 +1337,16 @@ var schemaGraph = func() *sqlgraph.Schema {
 		"Admin",
 	)
 	graph.MustAddE(
-		"ipc_report_event_video",
+		"ipc_event_video",
 		&sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
-			Table:   video.IpcReportEventVideoTable,
-			Columns: []string{video.IpcReportEventVideoColumn},
+			Table:   video.IpcEventVideoTable,
+			Columns: []string{video.IpcEventVideoColumn},
 			Bidi:    false,
 		},
 		"Video",
-		"IPCReportEvent",
+		"IPCEvent",
 	)
 	return graph
 }()
@@ -1344,28 +1727,28 @@ func (f *AdminFilter) WhereHasOccupationUpdaterWith(preds ...predicate.Occupatio
 	})))
 }
 
-// WhereHasIpcReportEventCreator applies a predicate to check if query has an edge ipc_report_event_creator.
-func (f *AdminFilter) WhereHasIpcReportEventCreator() {
-	f.Where(entql.HasEdge("ipc_report_event_creator"))
+// WhereHasIpcEventCreator applies a predicate to check if query has an edge ipc_event_creator.
+func (f *AdminFilter) WhereHasIpcEventCreator() {
+	f.Where(entql.HasEdge("ipc_event_creator"))
 }
 
-// WhereHasIpcReportEventCreatorWith applies a predicate to check if query has an edge ipc_report_event_creator with a given conditions (other predicates).
-func (f *AdminFilter) WhereHasIpcReportEventCreatorWith(preds ...predicate.IPCReportEvent) {
-	f.Where(entql.HasEdgeWith("ipc_report_event_creator", sqlgraph.WrapFunc(func(s *sql.Selector) {
+// WhereHasIpcEventCreatorWith applies a predicate to check if query has an edge ipc_event_creator with a given conditions (other predicates).
+func (f *AdminFilter) WhereHasIpcEventCreatorWith(preds ...predicate.IPCEvent) {
+	f.Where(entql.HasEdgeWith("ipc_event_creator", sqlgraph.WrapFunc(func(s *sql.Selector) {
 		for _, p := range preds {
 			p(s)
 		}
 	})))
 }
 
-// WhereHasIpcReportEventUpdater applies a predicate to check if query has an edge ipc_report_event_updater.
-func (f *AdminFilter) WhereHasIpcReportEventUpdater() {
-	f.Where(entql.HasEdge("ipc_report_event_updater"))
+// WhereHasIpcEventUpdater applies a predicate to check if query has an edge ipc_event_updater.
+func (f *AdminFilter) WhereHasIpcEventUpdater() {
+	f.Where(entql.HasEdge("ipc_event_updater"))
 }
 
-// WhereHasIpcReportEventUpdaterWith applies a predicate to check if query has an edge ipc_report_event_updater with a given conditions (other predicates).
-func (f *AdminFilter) WhereHasIpcReportEventUpdaterWith(preds ...predicate.IPCReportEvent) {
-	f.Where(entql.HasEdgeWith("ipc_report_event_updater", sqlgraph.WrapFunc(func(s *sql.Selector) {
+// WhereHasIpcEventUpdaterWith applies a predicate to check if query has an edge ipc_event_updater with a given conditions (other predicates).
+func (f *AdminFilter) WhereHasIpcEventUpdaterWith(preds ...predicate.IPCEvent) {
+	f.Where(entql.HasEdgeWith("ipc_event_updater", sqlgraph.WrapFunc(func(s *sql.Selector) {
 		for _, p := range preds {
 			p(s)
 		}
@@ -1394,6 +1777,118 @@ func (f *AdminFilter) WhereHasVideoUpdater() {
 // WhereHasVideoUpdaterWith applies a predicate to check if query has an edge video_updater with a given conditions (other predicates).
 func (f *AdminFilter) WhereHasVideoUpdaterWith(preds ...predicate.Video) {
 	f.Where(entql.HasEdgeWith("video_updater", sqlgraph.WrapFunc(func(s *sql.Selector) {
+		for _, p := range preds {
+			p(s)
+		}
+	})))
+}
+
+// WhereHasAreaCreator applies a predicate to check if query has an edge area_creator.
+func (f *AdminFilter) WhereHasAreaCreator() {
+	f.Where(entql.HasEdge("area_creator"))
+}
+
+// WhereHasAreaCreatorWith applies a predicate to check if query has an edge area_creator with a given conditions (other predicates).
+func (f *AdminFilter) WhereHasAreaCreatorWith(preds ...predicate.Area) {
+	f.Where(entql.HasEdgeWith("area_creator", sqlgraph.WrapFunc(func(s *sql.Selector) {
+		for _, p := range preds {
+			p(s)
+		}
+	})))
+}
+
+// WhereHasAreaUpdater applies a predicate to check if query has an edge area_updater.
+func (f *AdminFilter) WhereHasAreaUpdater() {
+	f.Where(entql.HasEdge("area_updater"))
+}
+
+// WhereHasAreaUpdaterWith applies a predicate to check if query has an edge area_updater with a given conditions (other predicates).
+func (f *AdminFilter) WhereHasAreaUpdaterWith(preds ...predicate.Area) {
+	f.Where(entql.HasEdgeWith("area_updater", sqlgraph.WrapFunc(func(s *sql.Selector) {
+		for _, p := range preds {
+			p(s)
+		}
+	})))
+}
+
+// WhereHasDeviceCreator applies a predicate to check if query has an edge device_creator.
+func (f *AdminFilter) WhereHasDeviceCreator() {
+	f.Where(entql.HasEdge("device_creator"))
+}
+
+// WhereHasDeviceCreatorWith applies a predicate to check if query has an edge device_creator with a given conditions (other predicates).
+func (f *AdminFilter) WhereHasDeviceCreatorWith(preds ...predicate.Device) {
+	f.Where(entql.HasEdgeWith("device_creator", sqlgraph.WrapFunc(func(s *sql.Selector) {
+		for _, p := range preds {
+			p(s)
+		}
+	})))
+}
+
+// WhereHasDeviceUpdater applies a predicate to check if query has an edge device_updater.
+func (f *AdminFilter) WhereHasDeviceUpdater() {
+	f.Where(entql.HasEdge("device_updater"))
+}
+
+// WhereHasDeviceUpdaterWith applies a predicate to check if query has an edge device_updater with a given conditions (other predicates).
+func (f *AdminFilter) WhereHasDeviceUpdaterWith(preds ...predicate.Device) {
+	f.Where(entql.HasEdgeWith("device_updater", sqlgraph.WrapFunc(func(s *sql.Selector) {
+		for _, p := range preds {
+			p(s)
+		}
+	})))
+}
+
+// WhereHasDeviceInstallationCreator applies a predicate to check if query has an edge device_installation_creator.
+func (f *AdminFilter) WhereHasDeviceInstallationCreator() {
+	f.Where(entql.HasEdge("device_installation_creator"))
+}
+
+// WhereHasDeviceInstallationCreatorWith applies a predicate to check if query has an edge device_installation_creator with a given conditions (other predicates).
+func (f *AdminFilter) WhereHasDeviceInstallationCreatorWith(preds ...predicate.DeviceInstallation) {
+	f.Where(entql.HasEdgeWith("device_installation_creator", sqlgraph.WrapFunc(func(s *sql.Selector) {
+		for _, p := range preds {
+			p(s)
+		}
+	})))
+}
+
+// WhereHasDeviceInstallationUpdater applies a predicate to check if query has an edge device_installation_updater.
+func (f *AdminFilter) WhereHasDeviceInstallationUpdater() {
+	f.Where(entql.HasEdge("device_installation_updater"))
+}
+
+// WhereHasDeviceInstallationUpdaterWith applies a predicate to check if query has an edge device_installation_updater with a given conditions (other predicates).
+func (f *AdminFilter) WhereHasDeviceInstallationUpdaterWith(preds ...predicate.DeviceInstallation) {
+	f.Where(entql.HasEdgeWith("device_installation_updater", sqlgraph.WrapFunc(func(s *sql.Selector) {
+		for _, p := range preds {
+			p(s)
+		}
+	})))
+}
+
+// WhereHasEventLevelCreator applies a predicate to check if query has an edge event_level_creator.
+func (f *AdminFilter) WhereHasEventLevelCreator() {
+	f.Where(entql.HasEdge("event_level_creator"))
+}
+
+// WhereHasEventLevelCreatorWith applies a predicate to check if query has an edge event_level_creator with a given conditions (other predicates).
+func (f *AdminFilter) WhereHasEventLevelCreatorWith(preds ...predicate.EventLevel) {
+	f.Where(entql.HasEdgeWith("event_level_creator", sqlgraph.WrapFunc(func(s *sql.Selector) {
+		for _, p := range preds {
+			p(s)
+		}
+	})))
+}
+
+// WhereHasEventLevelUpdater applies a predicate to check if query has an edge event_level_updater.
+func (f *AdminFilter) WhereHasEventLevelUpdater() {
+	f.Where(entql.HasEdge("event_level_updater"))
+}
+
+// WhereHasEventLevelUpdaterWith applies a predicate to check if query has an edge event_level_updater with a given conditions (other predicates).
+func (f *AdminFilter) WhereHasEventLevelUpdaterWith(preds ...predicate.EventLevel) {
+	f.Where(entql.HasEdgeWith("event_level_updater", sqlgraph.WrapFunc(func(s *sql.Selector) {
 		for _, p := range preds {
 			p(s)
 		}
@@ -1513,6 +2008,123 @@ func (f *AdminRoleFilter) WhereHasAdminsWith(preds ...predicate.Admin) {
 }
 
 // addPredicate implements the predicateAdder interface.
+func (aq *AreaQuery) addPredicate(pred func(s *sql.Selector)) {
+	aq.predicates = append(aq.predicates, pred)
+}
+
+// Filter returns a Filter implementation to apply filters on the AreaQuery builder.
+func (aq *AreaQuery) Filter() *AreaFilter {
+	return &AreaFilter{config: aq.config, predicateAdder: aq}
+}
+
+// addPredicate implements the predicateAdder interface.
+func (m *AreaMutation) addPredicate(pred func(s *sql.Selector)) {
+	m.predicates = append(m.predicates, pred)
+}
+
+// Filter returns an entql.Where implementation to apply filters on the AreaMutation builder.
+func (m *AreaMutation) Filter() *AreaFilter {
+	return &AreaFilter{config: m.config, predicateAdder: m}
+}
+
+// AreaFilter provides a generic filtering capability at runtime for AreaQuery.
+type AreaFilter struct {
+	predicateAdder
+	config
+}
+
+// Where applies the entql predicate on the query filter.
+func (f *AreaFilter) Where(p entql.P) {
+	f.addPredicate(func(s *sql.Selector) {
+		if err := schemaGraph.EvalP(schemaGraph.Nodes[2].Type, p, s); err != nil {
+			s.AddError(err)
+		}
+	})
+}
+
+// WhereID applies the entql int predicate on the id field.
+func (f *AreaFilter) WhereID(p entql.IntP) {
+	f.Where(p.Field(area.FieldID))
+}
+
+// WhereCreatedAt applies the entql time.Time predicate on the created_at field.
+func (f *AreaFilter) WhereCreatedAt(p entql.TimeP) {
+	f.Where(p.Field(area.FieldCreatedAt))
+}
+
+// WhereCreatedBy applies the entql int predicate on the created_by field.
+func (f *AreaFilter) WhereCreatedBy(p entql.IntP) {
+	f.Where(p.Field(area.FieldCreatedBy))
+}
+
+// WhereDeletedAt applies the entql time.Time predicate on the deleted_at field.
+func (f *AreaFilter) WhereDeletedAt(p entql.TimeP) {
+	f.Where(p.Field(area.FieldDeletedAt))
+}
+
+// WhereUpdatedBy applies the entql int predicate on the updated_by field.
+func (f *AreaFilter) WhereUpdatedBy(p entql.IntP) {
+	f.Where(p.Field(area.FieldUpdatedBy))
+}
+
+// WhereUpdatedAt applies the entql time.Time predicate on the updated_at field.
+func (f *AreaFilter) WhereUpdatedAt(p entql.TimeP) {
+	f.Where(p.Field(area.FieldUpdatedAt))
+}
+
+// WhereName applies the entql string predicate on the name field.
+func (f *AreaFilter) WhereName(p entql.StringP) {
+	f.Where(p.Field(area.FieldName))
+}
+
+// WhereDescription applies the entql string predicate on the description field.
+func (f *AreaFilter) WhereDescription(p entql.StringP) {
+	f.Where(p.Field(area.FieldDescription))
+}
+
+// WhereHasCreator applies a predicate to check if query has an edge creator.
+func (f *AreaFilter) WhereHasCreator() {
+	f.Where(entql.HasEdge("creator"))
+}
+
+// WhereHasCreatorWith applies a predicate to check if query has an edge creator with a given conditions (other predicates).
+func (f *AreaFilter) WhereHasCreatorWith(preds ...predicate.Admin) {
+	f.Where(entql.HasEdgeWith("creator", sqlgraph.WrapFunc(func(s *sql.Selector) {
+		for _, p := range preds {
+			p(s)
+		}
+	})))
+}
+
+// WhereHasUpdater applies a predicate to check if query has an edge updater.
+func (f *AreaFilter) WhereHasUpdater() {
+	f.Where(entql.HasEdge("updater"))
+}
+
+// WhereHasUpdaterWith applies a predicate to check if query has an edge updater with a given conditions (other predicates).
+func (f *AreaFilter) WhereHasUpdaterWith(preds ...predicate.Admin) {
+	f.Where(entql.HasEdgeWith("updater", sqlgraph.WrapFunc(func(s *sql.Selector) {
+		for _, p := range preds {
+			p(s)
+		}
+	})))
+}
+
+// WhereHasDeviceInstallationArea applies a predicate to check if query has an edge device_installation_area.
+func (f *AreaFilter) WhereHasDeviceInstallationArea() {
+	f.Where(entql.HasEdge("device_installation_area"))
+}
+
+// WhereHasDeviceInstallationAreaWith applies a predicate to check if query has an edge device_installation_area with a given conditions (other predicates).
+func (f *AreaFilter) WhereHasDeviceInstallationAreaWith(preds ...predicate.DeviceInstallation) {
+	f.Where(entql.HasEdgeWith("device_installation_area", sqlgraph.WrapFunc(func(s *sql.Selector) {
+		for _, p := range preds {
+			p(s)
+		}
+	})))
+}
+
+// addPredicate implements the predicateAdder interface.
 func (dq *DepartmentQuery) addPredicate(pred func(s *sql.Selector)) {
 	dq.predicates = append(dq.predicates, pred)
 }
@@ -1541,7 +2153,7 @@ type DepartmentFilter struct {
 // Where applies the entql predicate on the query filter.
 func (f *DepartmentFilter) Where(p entql.P) {
 	f.addPredicate(func(s *sql.Selector) {
-		if err := schemaGraph.EvalP(schemaGraph.Nodes[2].Type, p, s); err != nil {
+		if err := schemaGraph.EvalP(schemaGraph.Nodes[3].Type, p, s); err != nil {
 			s.AddError(err)
 		}
 	})
@@ -1658,6 +2270,318 @@ func (f *DepartmentFilter) WhereHasChildrenWith(preds ...predicate.Department) {
 }
 
 // addPredicate implements the predicateAdder interface.
+func (dq *DeviceQuery) addPredicate(pred func(s *sql.Selector)) {
+	dq.predicates = append(dq.predicates, pred)
+}
+
+// Filter returns a Filter implementation to apply filters on the DeviceQuery builder.
+func (dq *DeviceQuery) Filter() *DeviceFilter {
+	return &DeviceFilter{config: dq.config, predicateAdder: dq}
+}
+
+// addPredicate implements the predicateAdder interface.
+func (m *DeviceMutation) addPredicate(pred func(s *sql.Selector)) {
+	m.predicates = append(m.predicates, pred)
+}
+
+// Filter returns an entql.Where implementation to apply filters on the DeviceMutation builder.
+func (m *DeviceMutation) Filter() *DeviceFilter {
+	return &DeviceFilter{config: m.config, predicateAdder: m}
+}
+
+// DeviceFilter provides a generic filtering capability at runtime for DeviceQuery.
+type DeviceFilter struct {
+	predicateAdder
+	config
+}
+
+// Where applies the entql predicate on the query filter.
+func (f *DeviceFilter) Where(p entql.P) {
+	f.addPredicate(func(s *sql.Selector) {
+		if err := schemaGraph.EvalP(schemaGraph.Nodes[4].Type, p, s); err != nil {
+			s.AddError(err)
+		}
+	})
+}
+
+// WhereID applies the entql int predicate on the id field.
+func (f *DeviceFilter) WhereID(p entql.IntP) {
+	f.Where(p.Field(device.FieldID))
+}
+
+// WhereCreatedAt applies the entql time.Time predicate on the created_at field.
+func (f *DeviceFilter) WhereCreatedAt(p entql.TimeP) {
+	f.Where(p.Field(device.FieldCreatedAt))
+}
+
+// WhereCreatedBy applies the entql int predicate on the created_by field.
+func (f *DeviceFilter) WhereCreatedBy(p entql.IntP) {
+	f.Where(p.Field(device.FieldCreatedBy))
+}
+
+// WhereDeletedAt applies the entql time.Time predicate on the deleted_at field.
+func (f *DeviceFilter) WhereDeletedAt(p entql.TimeP) {
+	f.Where(p.Field(device.FieldDeletedAt))
+}
+
+// WhereUpdatedBy applies the entql int predicate on the updated_by field.
+func (f *DeviceFilter) WhereUpdatedBy(p entql.IntP) {
+	f.Where(p.Field(device.FieldUpdatedBy))
+}
+
+// WhereUpdatedAt applies the entql time.Time predicate on the updated_at field.
+func (f *DeviceFilter) WhereUpdatedAt(p entql.TimeP) {
+	f.Where(p.Field(device.FieldUpdatedAt))
+}
+
+// WhereBrand applies the entql int predicate on the brand field.
+func (f *DeviceFilter) WhereBrand(p entql.IntP) {
+	f.Where(p.Field(device.FieldBrand))
+}
+
+// WhereModel applies the entql int predicate on the model field.
+func (f *DeviceFilter) WhereModel(p entql.IntP) {
+	f.Where(p.Field(device.FieldModel))
+}
+
+// WhereName applies the entql string predicate on the name field.
+func (f *DeviceFilter) WhereName(p entql.StringP) {
+	f.Where(p.Field(device.FieldName))
+}
+
+// WhereSn applies the entql string predicate on the sn field.
+func (f *DeviceFilter) WhereSn(p entql.StringP) {
+	f.Where(p.Field(device.FieldSn))
+}
+
+// WhereDeviceType applies the entql int predicate on the device_type field.
+func (f *DeviceFilter) WhereDeviceType(p entql.IntP) {
+	f.Where(p.Field(device.FieldDeviceType))
+}
+
+// WhereHasCreator applies a predicate to check if query has an edge creator.
+func (f *DeviceFilter) WhereHasCreator() {
+	f.Where(entql.HasEdge("creator"))
+}
+
+// WhereHasCreatorWith applies a predicate to check if query has an edge creator with a given conditions (other predicates).
+func (f *DeviceFilter) WhereHasCreatorWith(preds ...predicate.Admin) {
+	f.Where(entql.HasEdgeWith("creator", sqlgraph.WrapFunc(func(s *sql.Selector) {
+		for _, p := range preds {
+			p(s)
+		}
+	})))
+}
+
+// WhereHasUpdater applies a predicate to check if query has an edge updater.
+func (f *DeviceFilter) WhereHasUpdater() {
+	f.Where(entql.HasEdge("updater"))
+}
+
+// WhereHasUpdaterWith applies a predicate to check if query has an edge updater with a given conditions (other predicates).
+func (f *DeviceFilter) WhereHasUpdaterWith(preds ...predicate.Admin) {
+	f.Where(entql.HasEdgeWith("updater", sqlgraph.WrapFunc(func(s *sql.Selector) {
+		for _, p := range preds {
+			p(s)
+		}
+	})))
+}
+
+// WhereHasIpcEventDevice applies a predicate to check if query has an edge ipc_event_device.
+func (f *DeviceFilter) WhereHasIpcEventDevice() {
+	f.Where(entql.HasEdge("ipc_event_device"))
+}
+
+// WhereHasIpcEventDeviceWith applies a predicate to check if query has an edge ipc_event_device with a given conditions (other predicates).
+func (f *DeviceFilter) WhereHasIpcEventDeviceWith(preds ...predicate.IPCEvent) {
+	f.Where(entql.HasEdgeWith("ipc_event_device", sqlgraph.WrapFunc(func(s *sql.Selector) {
+		for _, p := range preds {
+			p(s)
+		}
+	})))
+}
+
+// WhereHasDeviceInstallationDevice applies a predicate to check if query has an edge device_installation_device.
+func (f *DeviceFilter) WhereHasDeviceInstallationDevice() {
+	f.Where(entql.HasEdge("device_installation_device"))
+}
+
+// WhereHasDeviceInstallationDeviceWith applies a predicate to check if query has an edge device_installation_device with a given conditions (other predicates).
+func (f *DeviceFilter) WhereHasDeviceInstallationDeviceWith(preds ...predicate.DeviceInstallation) {
+	f.Where(entql.HasEdgeWith("device_installation_device", sqlgraph.WrapFunc(func(s *sql.Selector) {
+		for _, p := range preds {
+			p(s)
+		}
+	})))
+}
+
+// addPredicate implements the predicateAdder interface.
+func (diq *DeviceInstallationQuery) addPredicate(pred func(s *sql.Selector)) {
+	diq.predicates = append(diq.predicates, pred)
+}
+
+// Filter returns a Filter implementation to apply filters on the DeviceInstallationQuery builder.
+func (diq *DeviceInstallationQuery) Filter() *DeviceInstallationFilter {
+	return &DeviceInstallationFilter{config: diq.config, predicateAdder: diq}
+}
+
+// addPredicate implements the predicateAdder interface.
+func (m *DeviceInstallationMutation) addPredicate(pred func(s *sql.Selector)) {
+	m.predicates = append(m.predicates, pred)
+}
+
+// Filter returns an entql.Where implementation to apply filters on the DeviceInstallationMutation builder.
+func (m *DeviceInstallationMutation) Filter() *DeviceInstallationFilter {
+	return &DeviceInstallationFilter{config: m.config, predicateAdder: m}
+}
+
+// DeviceInstallationFilter provides a generic filtering capability at runtime for DeviceInstallationQuery.
+type DeviceInstallationFilter struct {
+	predicateAdder
+	config
+}
+
+// Where applies the entql predicate on the query filter.
+func (f *DeviceInstallationFilter) Where(p entql.P) {
+	f.addPredicate(func(s *sql.Selector) {
+		if err := schemaGraph.EvalP(schemaGraph.Nodes[5].Type, p, s); err != nil {
+			s.AddError(err)
+		}
+	})
+}
+
+// WhereID applies the entql int predicate on the id field.
+func (f *DeviceInstallationFilter) WhereID(p entql.IntP) {
+	f.Where(p.Field(deviceinstallation.FieldID))
+}
+
+// WhereCreatedAt applies the entql time.Time predicate on the created_at field.
+func (f *DeviceInstallationFilter) WhereCreatedAt(p entql.TimeP) {
+	f.Where(p.Field(deviceinstallation.FieldCreatedAt))
+}
+
+// WhereCreatedBy applies the entql int predicate on the created_by field.
+func (f *DeviceInstallationFilter) WhereCreatedBy(p entql.IntP) {
+	f.Where(p.Field(deviceinstallation.FieldCreatedBy))
+}
+
+// WhereDeletedAt applies the entql time.Time predicate on the deleted_at field.
+func (f *DeviceInstallationFilter) WhereDeletedAt(p entql.TimeP) {
+	f.Where(p.Field(deviceinstallation.FieldDeletedAt))
+}
+
+// WhereUpdatedBy applies the entql int predicate on the updated_by field.
+func (f *DeviceInstallationFilter) WhereUpdatedBy(p entql.IntP) {
+	f.Where(p.Field(deviceinstallation.FieldUpdatedBy))
+}
+
+// WhereUpdatedAt applies the entql time.Time predicate on the updated_at field.
+func (f *DeviceInstallationFilter) WhereUpdatedAt(p entql.TimeP) {
+	f.Where(p.Field(deviceinstallation.FieldUpdatedAt))
+}
+
+// WhereDeviceID applies the entql int predicate on the device_id field.
+func (f *DeviceInstallationFilter) WhereDeviceID(p entql.IntP) {
+	f.Where(p.Field(deviceinstallation.FieldDeviceID))
+}
+
+// WhereAreaID applies the entql int predicate on the area_id field.
+func (f *DeviceInstallationFilter) WhereAreaID(p entql.IntP) {
+	f.Where(p.Field(deviceinstallation.FieldAreaID))
+}
+
+// WhereAliasName applies the entql string predicate on the alias_name field.
+func (f *DeviceInstallationFilter) WhereAliasName(p entql.StringP) {
+	f.Where(p.Field(deviceinstallation.FieldAliasName))
+}
+
+// WhereLongitude applies the entql float64 predicate on the longitude field.
+func (f *DeviceInstallationFilter) WhereLongitude(p entql.Float64P) {
+	f.Where(p.Field(deviceinstallation.FieldLongitude))
+}
+
+// WhereLatitude applies the entql float64 predicate on the latitude field.
+func (f *DeviceInstallationFilter) WhereLatitude(p entql.Float64P) {
+	f.Where(p.Field(deviceinstallation.FieldLatitude))
+}
+
+// WhereLocationData applies the entql string predicate on the location_data field.
+func (f *DeviceInstallationFilter) WhereLocationData(p entql.StringP) {
+	f.Where(p.Field(deviceinstallation.FieldLocationData))
+}
+
+// WhereLocation applies the entql string predicate on the location field.
+func (f *DeviceInstallationFilter) WhereLocation(p entql.StringP) {
+	f.Where(p.Field(deviceinstallation.FieldLocation))
+}
+
+// WhereInstaller applies the entql string predicate on the installer field.
+func (f *DeviceInstallationFilter) WhereInstaller(p entql.StringP) {
+	f.Where(p.Field(deviceinstallation.FieldInstaller))
+}
+
+// WhereInstallTime applies the entql time.Time predicate on the install_time field.
+func (f *DeviceInstallationFilter) WhereInstallTime(p entql.TimeP) {
+	f.Where(p.Field(deviceinstallation.FieldInstallTime))
+}
+
+// WhereHasCreator applies a predicate to check if query has an edge creator.
+func (f *DeviceInstallationFilter) WhereHasCreator() {
+	f.Where(entql.HasEdge("creator"))
+}
+
+// WhereHasCreatorWith applies a predicate to check if query has an edge creator with a given conditions (other predicates).
+func (f *DeviceInstallationFilter) WhereHasCreatorWith(preds ...predicate.Admin) {
+	f.Where(entql.HasEdgeWith("creator", sqlgraph.WrapFunc(func(s *sql.Selector) {
+		for _, p := range preds {
+			p(s)
+		}
+	})))
+}
+
+// WhereHasUpdater applies a predicate to check if query has an edge updater.
+func (f *DeviceInstallationFilter) WhereHasUpdater() {
+	f.Where(entql.HasEdge("updater"))
+}
+
+// WhereHasUpdaterWith applies a predicate to check if query has an edge updater with a given conditions (other predicates).
+func (f *DeviceInstallationFilter) WhereHasUpdaterWith(preds ...predicate.Admin) {
+	f.Where(entql.HasEdgeWith("updater", sqlgraph.WrapFunc(func(s *sql.Selector) {
+		for _, p := range preds {
+			p(s)
+		}
+	})))
+}
+
+// WhereHasArea applies a predicate to check if query has an edge area.
+func (f *DeviceInstallationFilter) WhereHasArea() {
+	f.Where(entql.HasEdge("area"))
+}
+
+// WhereHasAreaWith applies a predicate to check if query has an edge area with a given conditions (other predicates).
+func (f *DeviceInstallationFilter) WhereHasAreaWith(preds ...predicate.Area) {
+	f.Where(entql.HasEdgeWith("area", sqlgraph.WrapFunc(func(s *sql.Selector) {
+		for _, p := range preds {
+			p(s)
+		}
+	})))
+}
+
+// WhereHasDevice applies a predicate to check if query has an edge device.
+func (f *DeviceInstallationFilter) WhereHasDevice() {
+	f.Where(entql.HasEdge("device"))
+}
+
+// WhereHasDeviceWith applies a predicate to check if query has an edge device with a given conditions (other predicates).
+func (f *DeviceInstallationFilter) WhereHasDeviceWith(preds ...predicate.Device) {
+	f.Where(entql.HasEdgeWith("device", sqlgraph.WrapFunc(func(s *sql.Selector) {
+		for _, p := range preds {
+			p(s)
+		}
+	})))
+}
+
+// addPredicate implements the predicateAdder interface.
 func (eq *EmployeeQuery) addPredicate(pred func(s *sql.Selector)) {
 	eq.predicates = append(eq.predicates, pred)
 }
@@ -1686,7 +2610,7 @@ type EmployeeFilter struct {
 // Where applies the entql predicate on the query filter.
 func (f *EmployeeFilter) Where(p entql.P) {
 	f.addPredicate(func(s *sql.Selector) {
-		if err := schemaGraph.EvalP(schemaGraph.Nodes[3].Type, p, s); err != nil {
+		if err := schemaGraph.EvalP(schemaGraph.Nodes[6].Type, p, s); err != nil {
 			s.AddError(err)
 		}
 	})
@@ -1802,6 +2726,20 @@ func (f *EmployeeFilter) WhereHasOccupationsWith(preds ...predicate.Occupation) 
 	})))
 }
 
+// WhereHasIpcEvents applies a predicate to check if query has an edge ipc_events.
+func (f *EmployeeFilter) WhereHasIpcEvents() {
+	f.Where(entql.HasEdge("ipc_events"))
+}
+
+// WhereHasIpcEventsWith applies a predicate to check if query has an edge ipc_events with a given conditions (other predicates).
+func (f *EmployeeFilter) WhereHasIpcEventsWith(preds ...predicate.IPCEvent) {
+	f.Where(entql.HasEdgeWith("ipc_events", sqlgraph.WrapFunc(func(s *sql.Selector) {
+		for _, p := range preds {
+			p(s)
+		}
+	})))
+}
+
 // WhereHasRiskReporter applies a predicate to check if query has an edge risk_reporter.
 func (f *EmployeeFilter) WhereHasRiskReporter() {
 	f.Where(entql.HasEdge("risk_reporter"))
@@ -1831,137 +2769,97 @@ func (f *EmployeeFilter) WhereHasRiskMaintainerWith(preds ...predicate.Risk) {
 }
 
 // addPredicate implements the predicateAdder interface.
-func (ireq *IPCReportEventQuery) addPredicate(pred func(s *sql.Selector)) {
-	ireq.predicates = append(ireq.predicates, pred)
+func (elq *EventLevelQuery) addPredicate(pred func(s *sql.Selector)) {
+	elq.predicates = append(elq.predicates, pred)
 }
 
-// Filter returns a Filter implementation to apply filters on the IPCReportEventQuery builder.
-func (ireq *IPCReportEventQuery) Filter() *IPCReportEventFilter {
-	return &IPCReportEventFilter{config: ireq.config, predicateAdder: ireq}
+// Filter returns a Filter implementation to apply filters on the EventLevelQuery builder.
+func (elq *EventLevelQuery) Filter() *EventLevelFilter {
+	return &EventLevelFilter{config: elq.config, predicateAdder: elq}
 }
 
 // addPredicate implements the predicateAdder interface.
-func (m *IPCReportEventMutation) addPredicate(pred func(s *sql.Selector)) {
+func (m *EventLevelMutation) addPredicate(pred func(s *sql.Selector)) {
 	m.predicates = append(m.predicates, pred)
 }
 
-// Filter returns an entql.Where implementation to apply filters on the IPCReportEventMutation builder.
-func (m *IPCReportEventMutation) Filter() *IPCReportEventFilter {
-	return &IPCReportEventFilter{config: m.config, predicateAdder: m}
+// Filter returns an entql.Where implementation to apply filters on the EventLevelMutation builder.
+func (m *EventLevelMutation) Filter() *EventLevelFilter {
+	return &EventLevelFilter{config: m.config, predicateAdder: m}
 }
 
-// IPCReportEventFilter provides a generic filtering capability at runtime for IPCReportEventQuery.
-type IPCReportEventFilter struct {
+// EventLevelFilter provides a generic filtering capability at runtime for EventLevelQuery.
+type EventLevelFilter struct {
 	predicateAdder
 	config
 }
 
 // Where applies the entql predicate on the query filter.
-func (f *IPCReportEventFilter) Where(p entql.P) {
+func (f *EventLevelFilter) Where(p entql.P) {
 	f.addPredicate(func(s *sql.Selector) {
-		if err := schemaGraph.EvalP(schemaGraph.Nodes[4].Type, p, s); err != nil {
+		if err := schemaGraph.EvalP(schemaGraph.Nodes[7].Type, p, s); err != nil {
 			s.AddError(err)
 		}
 	})
 }
 
 // WhereID applies the entql int predicate on the id field.
-func (f *IPCReportEventFilter) WhereID(p entql.IntP) {
-	f.Where(p.Field(ipcreportevent.FieldID))
+func (f *EventLevelFilter) WhereID(p entql.IntP) {
+	f.Where(p.Field(eventlevel.FieldID))
 }
 
 // WhereCreatedAt applies the entql time.Time predicate on the created_at field.
-func (f *IPCReportEventFilter) WhereCreatedAt(p entql.TimeP) {
-	f.Where(p.Field(ipcreportevent.FieldCreatedAt))
+func (f *EventLevelFilter) WhereCreatedAt(p entql.TimeP) {
+	f.Where(p.Field(eventlevel.FieldCreatedAt))
 }
 
 // WhereCreatedBy applies the entql int predicate on the created_by field.
-func (f *IPCReportEventFilter) WhereCreatedBy(p entql.IntP) {
-	f.Where(p.Field(ipcreportevent.FieldCreatedBy))
+func (f *EventLevelFilter) WhereCreatedBy(p entql.IntP) {
+	f.Where(p.Field(eventlevel.FieldCreatedBy))
 }
 
 // WhereDeletedAt applies the entql time.Time predicate on the deleted_at field.
-func (f *IPCReportEventFilter) WhereDeletedAt(p entql.TimeP) {
-	f.Where(p.Field(ipcreportevent.FieldDeletedAt))
+func (f *EventLevelFilter) WhereDeletedAt(p entql.TimeP) {
+	f.Where(p.Field(eventlevel.FieldDeletedAt))
 }
 
 // WhereUpdatedBy applies the entql int predicate on the updated_by field.
-func (f *IPCReportEventFilter) WhereUpdatedBy(p entql.IntP) {
-	f.Where(p.Field(ipcreportevent.FieldUpdatedBy))
+func (f *EventLevelFilter) WhereUpdatedBy(p entql.IntP) {
+	f.Where(p.Field(eventlevel.FieldUpdatedBy))
 }
 
 // WhereUpdatedAt applies the entql time.Time predicate on the updated_at field.
-func (f *IPCReportEventFilter) WhereUpdatedAt(p entql.TimeP) {
-	f.Where(p.Field(ipcreportevent.FieldUpdatedAt))
+func (f *EventLevelFilter) WhereUpdatedAt(p entql.TimeP) {
+	f.Where(p.Field(eventlevel.FieldUpdatedAt))
 }
 
-// WhereDeviceBrand applies the entql int predicate on the device_brand field.
-func (f *IPCReportEventFilter) WhereDeviceBrand(p entql.IntP) {
-	f.Where(p.Field(ipcreportevent.FieldDeviceBrand))
+// WhereName applies the entql string predicate on the name field.
+func (f *EventLevelFilter) WhereName(p entql.StringP) {
+	f.Where(p.Field(eventlevel.FieldName))
 }
 
-// WhereDeviceModel applies the entql int predicate on the device_model field.
-func (f *IPCReportEventFilter) WhereDeviceModel(p entql.IntP) {
-	f.Where(p.Field(ipcreportevent.FieldDeviceModel))
-}
-
-// WhereDeviceID applies the entql string predicate on the device_id field.
-func (f *IPCReportEventFilter) WhereDeviceID(p entql.StringP) {
-	f.Where(p.Field(ipcreportevent.FieldDeviceID))
-}
-
-// WhereEventID applies the entql string predicate on the event_id field.
-func (f *IPCReportEventFilter) WhereEventID(p entql.StringP) {
-	f.Where(p.Field(ipcreportevent.FieldEventID))
-}
-
-// WhereEventTime applies the entql time.Time predicate on the event_time field.
-func (f *IPCReportEventFilter) WhereEventTime(p entql.TimeP) {
-	f.Where(p.Field(ipcreportevent.FieldEventTime))
-}
-
-// WhereEventType applies the entql int predicate on the event_type field.
-func (f *IPCReportEventFilter) WhereEventType(p entql.IntP) {
-	f.Where(p.Field(ipcreportevent.FieldEventType))
-}
-
-// WhereEventStatus applies the entql int predicate on the event_status field.
-func (f *IPCReportEventFilter) WhereEventStatus(p entql.IntP) {
-	f.Where(p.Field(ipcreportevent.FieldEventStatus))
-}
-
-// WhereImages applies the entql json.RawMessage predicate on the images field.
-func (f *IPCReportEventFilter) WhereImages(p entql.BytesP) {
-	f.Where(p.Field(ipcreportevent.FieldImages))
-}
-
-// WhereLabeledImages applies the entql json.RawMessage predicate on the labeled_images field.
-func (f *IPCReportEventFilter) WhereLabeledImages(p entql.BytesP) {
-	f.Where(p.Field(ipcreportevent.FieldLabeledImages))
-}
-
-// WhereVideoID applies the entql int predicate on the video_id field.
-func (f *IPCReportEventFilter) WhereVideoID(p entql.IntP) {
-	f.Where(p.Field(ipcreportevent.FieldVideoID))
+// WhereEventTypes applies the entql json.RawMessage predicate on the event_types field.
+func (f *EventLevelFilter) WhereEventTypes(p entql.BytesP) {
+	f.Where(p.Field(eventlevel.FieldEventTypes))
 }
 
 // WhereDescription applies the entql string predicate on the description field.
-func (f *IPCReportEventFilter) WhereDescription(p entql.StringP) {
-	f.Where(p.Field(ipcreportevent.FieldDescription))
+func (f *EventLevelFilter) WhereDescription(p entql.StringP) {
+	f.Where(p.Field(eventlevel.FieldDescription))
 }
 
-// WhereRawData applies the entql string predicate on the raw_data field.
-func (f *IPCReportEventFilter) WhereRawData(p entql.StringP) {
-	f.Where(p.Field(ipcreportevent.FieldRawData))
+// WhereIsReport applies the entql bool predicate on the is_report field.
+func (f *EventLevelFilter) WhereIsReport(p entql.BoolP) {
+	f.Where(p.Field(eventlevel.FieldIsReport))
 }
 
 // WhereHasCreator applies a predicate to check if query has an edge creator.
-func (f *IPCReportEventFilter) WhereHasCreator() {
+func (f *EventLevelFilter) WhereHasCreator() {
 	f.Where(entql.HasEdge("creator"))
 }
 
 // WhereHasCreatorWith applies a predicate to check if query has an edge creator with a given conditions (other predicates).
-func (f *IPCReportEventFilter) WhereHasCreatorWith(preds ...predicate.Admin) {
+func (f *EventLevelFilter) WhereHasCreatorWith(preds ...predicate.Admin) {
 	f.Where(entql.HasEdgeWith("creator", sqlgraph.WrapFunc(func(s *sql.Selector) {
 		for _, p := range preds {
 			p(s)
@@ -1970,12 +2868,155 @@ func (f *IPCReportEventFilter) WhereHasCreatorWith(preds ...predicate.Admin) {
 }
 
 // WhereHasUpdater applies a predicate to check if query has an edge updater.
-func (f *IPCReportEventFilter) WhereHasUpdater() {
+func (f *EventLevelFilter) WhereHasUpdater() {
 	f.Where(entql.HasEdge("updater"))
 }
 
 // WhereHasUpdaterWith applies a predicate to check if query has an edge updater with a given conditions (other predicates).
-func (f *IPCReportEventFilter) WhereHasUpdaterWith(preds ...predicate.Admin) {
+func (f *EventLevelFilter) WhereHasUpdaterWith(preds ...predicate.Admin) {
+	f.Where(entql.HasEdgeWith("updater", sqlgraph.WrapFunc(func(s *sql.Selector) {
+		for _, p := range preds {
+			p(s)
+		}
+	})))
+}
+
+// addPredicate implements the predicateAdder interface.
+func (ieq *IPCEventQuery) addPredicate(pred func(s *sql.Selector)) {
+	ieq.predicates = append(ieq.predicates, pred)
+}
+
+// Filter returns a Filter implementation to apply filters on the IPCEventQuery builder.
+func (ieq *IPCEventQuery) Filter() *IPCEventFilter {
+	return &IPCEventFilter{config: ieq.config, predicateAdder: ieq}
+}
+
+// addPredicate implements the predicateAdder interface.
+func (m *IPCEventMutation) addPredicate(pred func(s *sql.Selector)) {
+	m.predicates = append(m.predicates, pred)
+}
+
+// Filter returns an entql.Where implementation to apply filters on the IPCEventMutation builder.
+func (m *IPCEventMutation) Filter() *IPCEventFilter {
+	return &IPCEventFilter{config: m.config, predicateAdder: m}
+}
+
+// IPCEventFilter provides a generic filtering capability at runtime for IPCEventQuery.
+type IPCEventFilter struct {
+	predicateAdder
+	config
+}
+
+// Where applies the entql predicate on the query filter.
+func (f *IPCEventFilter) Where(p entql.P) {
+	f.addPredicate(func(s *sql.Selector) {
+		if err := schemaGraph.EvalP(schemaGraph.Nodes[8].Type, p, s); err != nil {
+			s.AddError(err)
+		}
+	})
+}
+
+// WhereID applies the entql int predicate on the id field.
+func (f *IPCEventFilter) WhereID(p entql.IntP) {
+	f.Where(p.Field(ipcevent.FieldID))
+}
+
+// WhereCreatedAt applies the entql time.Time predicate on the created_at field.
+func (f *IPCEventFilter) WhereCreatedAt(p entql.TimeP) {
+	f.Where(p.Field(ipcevent.FieldCreatedAt))
+}
+
+// WhereCreatedBy applies the entql int predicate on the created_by field.
+func (f *IPCEventFilter) WhereCreatedBy(p entql.IntP) {
+	f.Where(p.Field(ipcevent.FieldCreatedBy))
+}
+
+// WhereDeletedAt applies the entql time.Time predicate on the deleted_at field.
+func (f *IPCEventFilter) WhereDeletedAt(p entql.TimeP) {
+	f.Where(p.Field(ipcevent.FieldDeletedAt))
+}
+
+// WhereUpdatedBy applies the entql int predicate on the updated_by field.
+func (f *IPCEventFilter) WhereUpdatedBy(p entql.IntP) {
+	f.Where(p.Field(ipcevent.FieldUpdatedBy))
+}
+
+// WhereUpdatedAt applies the entql time.Time predicate on the updated_at field.
+func (f *IPCEventFilter) WhereUpdatedAt(p entql.TimeP) {
+	f.Where(p.Field(ipcevent.FieldUpdatedAt))
+}
+
+// WhereDeviceID applies the entql int predicate on the device_id field.
+func (f *IPCEventFilter) WhereDeviceID(p entql.IntP) {
+	f.Where(p.Field(ipcevent.FieldDeviceID))
+}
+
+// WhereVideoID applies the entql int predicate on the video_id field.
+func (f *IPCEventFilter) WhereVideoID(p entql.IntP) {
+	f.Where(p.Field(ipcevent.FieldVideoID))
+}
+
+// WhereEventTime applies the entql time.Time predicate on the event_time field.
+func (f *IPCEventFilter) WhereEventTime(p entql.TimeP) {
+	f.Where(p.Field(ipcevent.FieldEventTime))
+}
+
+// WhereEventType applies the entql int predicate on the event_type field.
+func (f *IPCEventFilter) WhereEventType(p entql.IntP) {
+	f.Where(p.Field(ipcevent.FieldEventType))
+}
+
+// WhereEventStatus applies the entql int predicate on the event_status field.
+func (f *IPCEventFilter) WhereEventStatus(p entql.IntP) {
+	f.Where(p.Field(ipcevent.FieldEventStatus))
+}
+
+// WhereImages applies the entql json.RawMessage predicate on the images field.
+func (f *IPCEventFilter) WhereImages(p entql.BytesP) {
+	f.Where(p.Field(ipcevent.FieldImages))
+}
+
+// WhereLabeledImages applies the entql json.RawMessage predicate on the labeled_images field.
+func (f *IPCEventFilter) WhereLabeledImages(p entql.BytesP) {
+	f.Where(p.Field(ipcevent.FieldLabeledImages))
+}
+
+// WhereEventID applies the entql string predicate on the event_id field.
+func (f *IPCEventFilter) WhereEventID(p entql.StringP) {
+	f.Where(p.Field(ipcevent.FieldEventID))
+}
+
+// WhereDescription applies the entql string predicate on the description field.
+func (f *IPCEventFilter) WhereDescription(p entql.StringP) {
+	f.Where(p.Field(ipcevent.FieldDescription))
+}
+
+// WhereRawData applies the entql string predicate on the raw_data field.
+func (f *IPCEventFilter) WhereRawData(p entql.StringP) {
+	f.Where(p.Field(ipcevent.FieldRawData))
+}
+
+// WhereHasCreator applies a predicate to check if query has an edge creator.
+func (f *IPCEventFilter) WhereHasCreator() {
+	f.Where(entql.HasEdge("creator"))
+}
+
+// WhereHasCreatorWith applies a predicate to check if query has an edge creator with a given conditions (other predicates).
+func (f *IPCEventFilter) WhereHasCreatorWith(preds ...predicate.Admin) {
+	f.Where(entql.HasEdgeWith("creator", sqlgraph.WrapFunc(func(s *sql.Selector) {
+		for _, p := range preds {
+			p(s)
+		}
+	})))
+}
+
+// WhereHasUpdater applies a predicate to check if query has an edge updater.
+func (f *IPCEventFilter) WhereHasUpdater() {
+	f.Where(entql.HasEdge("updater"))
+}
+
+// WhereHasUpdaterWith applies a predicate to check if query has an edge updater with a given conditions (other predicates).
+func (f *IPCEventFilter) WhereHasUpdaterWith(preds ...predicate.Admin) {
 	f.Where(entql.HasEdgeWith("updater", sqlgraph.WrapFunc(func(s *sql.Selector) {
 		for _, p := range preds {
 			p(s)
@@ -1984,13 +3025,41 @@ func (f *IPCReportEventFilter) WhereHasUpdaterWith(preds ...predicate.Admin) {
 }
 
 // WhereHasVideo applies a predicate to check if query has an edge video.
-func (f *IPCReportEventFilter) WhereHasVideo() {
+func (f *IPCEventFilter) WhereHasVideo() {
 	f.Where(entql.HasEdge("video"))
 }
 
 // WhereHasVideoWith applies a predicate to check if query has an edge video with a given conditions (other predicates).
-func (f *IPCReportEventFilter) WhereHasVideoWith(preds ...predicate.Video) {
+func (f *IPCEventFilter) WhereHasVideoWith(preds ...predicate.Video) {
 	f.Where(entql.HasEdgeWith("video", sqlgraph.WrapFunc(func(s *sql.Selector) {
+		for _, p := range preds {
+			p(s)
+		}
+	})))
+}
+
+// WhereHasDevice applies a predicate to check if query has an edge device.
+func (f *IPCEventFilter) WhereHasDevice() {
+	f.Where(entql.HasEdge("device"))
+}
+
+// WhereHasDeviceWith applies a predicate to check if query has an edge device with a given conditions (other predicates).
+func (f *IPCEventFilter) WhereHasDeviceWith(preds ...predicate.Device) {
+	f.Where(entql.HasEdgeWith("device", sqlgraph.WrapFunc(func(s *sql.Selector) {
+		for _, p := range preds {
+			p(s)
+		}
+	})))
+}
+
+// WhereHasFixers applies a predicate to check if query has an edge fixers.
+func (f *IPCEventFilter) WhereHasFixers() {
+	f.Where(entql.HasEdge("fixers"))
+}
+
+// WhereHasFixersWith applies a predicate to check if query has an edge fixers with a given conditions (other predicates).
+func (f *IPCEventFilter) WhereHasFixersWith(preds ...predicate.Employee) {
+	f.Where(entql.HasEdgeWith("fixers", sqlgraph.WrapFunc(func(s *sql.Selector) {
 		for _, p := range preds {
 			p(s)
 		}
@@ -2026,7 +3095,7 @@ type OccupationFilter struct {
 // Where applies the entql predicate on the query filter.
 func (f *OccupationFilter) Where(p entql.P) {
 	f.addPredicate(func(s *sql.Selector) {
-		if err := schemaGraph.EvalP(schemaGraph.Nodes[5].Type, p, s); err != nil {
+		if err := schemaGraph.EvalP(schemaGraph.Nodes[9].Type, p, s); err != nil {
 			s.AddError(err)
 		}
 	})
@@ -2143,7 +3212,7 @@ type RiskFilter struct {
 // Where applies the entql predicate on the query filter.
 func (f *RiskFilter) Where(p entql.P) {
 	f.addPredicate(func(s *sql.Selector) {
-		if err := schemaGraph.EvalP(schemaGraph.Nodes[6].Type, p, s); err != nil {
+		if err := schemaGraph.EvalP(schemaGraph.Nodes[10].Type, p, s); err != nil {
 			s.AddError(err)
 		}
 	})
@@ -2342,7 +3411,7 @@ type RiskCategoryFilter struct {
 // Where applies the entql predicate on the query filter.
 func (f *RiskCategoryFilter) Where(p entql.P) {
 	f.addPredicate(func(s *sql.Selector) {
-		if err := schemaGraph.EvalP(schemaGraph.Nodes[7].Type, p, s); err != nil {
+		if err := schemaGraph.EvalP(schemaGraph.Nodes[11].Type, p, s); err != nil {
 			s.AddError(err)
 		}
 	})
@@ -2454,7 +3523,7 @@ type RiskLocationFilter struct {
 // Where applies the entql predicate on the query filter.
 func (f *RiskLocationFilter) Where(p entql.P) {
 	f.addPredicate(func(s *sql.Selector) {
-		if err := schemaGraph.EvalP(schemaGraph.Nodes[8].Type, p, s); err != nil {
+		if err := schemaGraph.EvalP(schemaGraph.Nodes[12].Type, p, s); err != nil {
 			s.AddError(err)
 		}
 	})
@@ -2566,7 +3635,7 @@ type VideoFilter struct {
 // Where applies the entql predicate on the query filter.
 func (f *VideoFilter) Where(p entql.P) {
 	f.addPredicate(func(s *sql.Selector) {
-		if err := schemaGraph.EvalP(schemaGraph.Nodes[9].Type, p, s); err != nil {
+		if err := schemaGraph.EvalP(schemaGraph.Nodes[13].Type, p, s); err != nil {
 			s.AddError(err)
 		}
 	})
@@ -2627,6 +3696,11 @@ func (f *VideoFilter) WhereUploadedAt(p entql.TimeP) {
 	f.Where(p.Field(video.FieldUploadedAt))
 }
 
+// WhereUploadedAt2 applies the entql time.Time predicate on the uploaded_at2 field.
+func (f *VideoFilter) WhereUploadedAt2(p entql.TimeP) {
+	f.Where(p.Field(video.FieldUploadedAt2))
+}
+
 // WhereHasCreator applies a predicate to check if query has an edge creator.
 func (f *VideoFilter) WhereHasCreator() {
 	f.Where(entql.HasEdge("creator"))
@@ -2655,14 +3729,14 @@ func (f *VideoFilter) WhereHasUpdaterWith(preds ...predicate.Admin) {
 	})))
 }
 
-// WhereHasIpcReportEventVideo applies a predicate to check if query has an edge ipc_report_event_video.
-func (f *VideoFilter) WhereHasIpcReportEventVideo() {
-	f.Where(entql.HasEdge("ipc_report_event_video"))
+// WhereHasIpcEventVideo applies a predicate to check if query has an edge ipc_event_video.
+func (f *VideoFilter) WhereHasIpcEventVideo() {
+	f.Where(entql.HasEdge("ipc_event_video"))
 }
 
-// WhereHasIpcReportEventVideoWith applies a predicate to check if query has an edge ipc_report_event_video with a given conditions (other predicates).
-func (f *VideoFilter) WhereHasIpcReportEventVideoWith(preds ...predicate.IPCReportEvent) {
-	f.Where(entql.HasEdgeWith("ipc_report_event_video", sqlgraph.WrapFunc(func(s *sql.Selector) {
+// WhereHasIpcEventVideoWith applies a predicate to check if query has an edge ipc_event_video with a given conditions (other predicates).
+func (f *VideoFilter) WhereHasIpcEventVideoWith(preds ...predicate.IPCEvent) {
+	f.Where(entql.HasEdgeWith("ipc_event_video", sqlgraph.WrapFunc(func(s *sql.Selector) {
 		for _, p := range preds {
 			p(s)
 		}

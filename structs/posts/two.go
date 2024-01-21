@@ -1,6 +1,6 @@
 package posts
 
-type TwoIPCReportEvent struct {
+type TwoIPCEvent struct {
 	Addition    any    `json:"Addition"`
 	AlarmID     string `json:"AlarmId"`
 	BoardID     string `json:"BoardId"`
@@ -8,7 +8,7 @@ type TwoIPCReportEvent struct {
 	DataID      int    `json:"DataId"`
 	GBDeviceID  string `json:"GBDeviceId"`
 	GBTaskChnID string `json:"GBTaskChnId"`
-	Gps         struct {
+	GPS         struct {
 		AngleCourse float64 `json:"angleCourse"`
 		Available   bool    `json:"available"`
 		KSpeed      float64 `json:"kSpeed"`

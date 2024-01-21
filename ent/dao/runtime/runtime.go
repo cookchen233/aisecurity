@@ -5,9 +5,13 @@ package runtime
 import (
 	"aisecurity/ent/dao/admin"
 	"aisecurity/ent/dao/adminrole"
+	"aisecurity/ent/dao/area"
 	"aisecurity/ent/dao/department"
+	"aisecurity/ent/dao/device"
+	"aisecurity/ent/dao/deviceinstallation"
 	"aisecurity/ent/dao/employee"
-	"aisecurity/ent/dao/ipcreportevent"
+	"aisecurity/ent/dao/eventlevel"
+	"aisecurity/ent/dao/ipcevent"
 	"aisecurity/ent/dao/occupation"
 	"aisecurity/ent/dao/risk"
 	"aisecurity/ent/dao/riskcategory"
@@ -149,6 +153,37 @@ func init() {
 	adminrole.DefaultUpdatedAt = adminroleDescUpdatedAt.Default.(func() time.Time)
 	// adminrole.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
 	adminrole.UpdateDefaultUpdatedAt = adminroleDescUpdatedAt.UpdateDefault.(func() time.Time)
+	areaMixin := schema.Area{}.Mixin()
+	areaMixinHooks0 := areaMixin[0].Hooks()
+	area.Hooks[0] = areaMixinHooks0[0]
+	areaMixinFields0 := areaMixin[0].Fields()
+	_ = areaMixinFields0
+	areaFields := schema.Area{}.Fields()
+	_ = areaFields
+	// areaDescCreatedAt is the schema descriptor for created_at field.
+	areaDescCreatedAt := areaMixinFields0[0].Descriptor()
+	// area.DefaultCreatedAt holds the default value on creation for the created_at field.
+	area.DefaultCreatedAt = areaDescCreatedAt.Default.(func() time.Time)
+	// areaDescCreatedBy is the schema descriptor for created_by field.
+	areaDescCreatedBy := areaMixinFields0[1].Descriptor()
+	// area.CreatedByValidator is a validator for the "created_by" field. It is called by the builders before save.
+	area.CreatedByValidator = areaDescCreatedBy.Validators[0].(func(int) error)
+	// areaDescUpdatedBy is the schema descriptor for updated_by field.
+	areaDescUpdatedBy := areaMixinFields0[3].Descriptor()
+	// area.UpdatedByValidator is a validator for the "updated_by" field. It is called by the builders before save.
+	area.UpdatedByValidator = areaDescUpdatedBy.Validators[0].(func(int) error)
+	// areaDescUpdatedAt is the schema descriptor for updated_at field.
+	areaDescUpdatedAt := areaMixinFields0[4].Descriptor()
+	// area.DefaultUpdatedAt holds the default value on creation for the updated_at field.
+	area.DefaultUpdatedAt = areaDescUpdatedAt.Default.(func() time.Time)
+	// area.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
+	area.UpdateDefaultUpdatedAt = areaDescUpdatedAt.UpdateDefault.(func() time.Time)
+	// areaDescName is the schema descriptor for name field.
+	areaDescName := areaFields[0].Descriptor()
+	// area.DefaultName holds the default value on creation for the name field.
+	area.DefaultName = areaDescName.Default.(string)
+	// area.NameValidator is a validator for the "name" field. It is called by the builders before save.
+	area.NameValidator = areaDescName.Validators[0].(func(string) error)
 	departmentMixin := schema.Department{}.Mixin()
 	departmentMixinHooks0 := departmentMixin[0].Hooks()
 	department.Hooks[0] = departmentMixinHooks0[0]
@@ -196,6 +231,96 @@ func init() {
 	departmentDescParentID := departmentFields[1].Descriptor()
 	// department.ParentIDValidator is a validator for the "parent_id" field. It is called by the builders before save.
 	department.ParentIDValidator = departmentDescParentID.Validators[0].(func(int) error)
+	deviceMixin := schema.Device{}.Mixin()
+	deviceMixinHooks0 := deviceMixin[0].Hooks()
+	device.Hooks[0] = deviceMixinHooks0[0]
+	deviceMixinFields0 := deviceMixin[0].Fields()
+	_ = deviceMixinFields0
+	deviceFields := schema.Device{}.Fields()
+	_ = deviceFields
+	// deviceDescCreatedAt is the schema descriptor for created_at field.
+	deviceDescCreatedAt := deviceMixinFields0[0].Descriptor()
+	// device.DefaultCreatedAt holds the default value on creation for the created_at field.
+	device.DefaultCreatedAt = deviceDescCreatedAt.Default.(func() time.Time)
+	// deviceDescCreatedBy is the schema descriptor for created_by field.
+	deviceDescCreatedBy := deviceMixinFields0[1].Descriptor()
+	// device.CreatedByValidator is a validator for the "created_by" field. It is called by the builders before save.
+	device.CreatedByValidator = deviceDescCreatedBy.Validators[0].(func(int) error)
+	// deviceDescUpdatedBy is the schema descriptor for updated_by field.
+	deviceDescUpdatedBy := deviceMixinFields0[3].Descriptor()
+	// device.UpdatedByValidator is a validator for the "updated_by" field. It is called by the builders before save.
+	device.UpdatedByValidator = deviceDescUpdatedBy.Validators[0].(func(int) error)
+	// deviceDescUpdatedAt is the schema descriptor for updated_at field.
+	deviceDescUpdatedAt := deviceMixinFields0[4].Descriptor()
+	// device.DefaultUpdatedAt holds the default value on creation for the updated_at field.
+	device.DefaultUpdatedAt = deviceDescUpdatedAt.Default.(func() time.Time)
+	// device.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
+	device.UpdateDefaultUpdatedAt = deviceDescUpdatedAt.UpdateDefault.(func() time.Time)
+	// deviceDescBrand is the schema descriptor for brand field.
+	deviceDescBrand := deviceFields[0].Descriptor()
+	// device.DefaultBrand holds the default value on creation for the brand field.
+	device.DefaultBrand = enums.DeviceBrand(deviceDescBrand.Default.(int))
+	// device.BrandValidator is a validator for the "brand" field. It is called by the builders before save.
+	device.BrandValidator = deviceDescBrand.Validators[0].(func(int) error)
+	// deviceDescModel is the schema descriptor for model field.
+	deviceDescModel := deviceFields[1].Descriptor()
+	// device.DefaultModel holds the default value on creation for the model field.
+	device.DefaultModel = enums.DeviceModel(deviceDescModel.Default.(int))
+	// device.ModelValidator is a validator for the "model" field. It is called by the builders before save.
+	device.ModelValidator = deviceDescModel.Validators[0].(func(int) error)
+	// deviceDescName is the schema descriptor for name field.
+	deviceDescName := deviceFields[2].Descriptor()
+	// device.DefaultName holds the default value on creation for the name field.
+	device.DefaultName = deviceDescName.Default.(string)
+	// device.NameValidator is a validator for the "name" field. It is called by the builders before save.
+	device.NameValidator = deviceDescName.Validators[0].(func(string) error)
+	// deviceDescSn is the schema descriptor for sn field.
+	deviceDescSn := deviceFields[3].Descriptor()
+	// device.SnValidator is a validator for the "sn" field. It is called by the builders before save.
+	device.SnValidator = deviceDescSn.Validators[0].(func(string) error)
+	// deviceDescDeviceType is the schema descriptor for device_type field.
+	deviceDescDeviceType := deviceFields[4].Descriptor()
+	// device.DefaultDeviceType holds the default value on creation for the device_type field.
+	device.DefaultDeviceType = enums.DeviceType(deviceDescDeviceType.Default.(int))
+	// device.DeviceTypeValidator is a validator for the "device_type" field. It is called by the builders before save.
+	device.DeviceTypeValidator = deviceDescDeviceType.Validators[0].(func(int) error)
+	deviceinstallationMixin := schema.DeviceInstallation{}.Mixin()
+	deviceinstallationMixinHooks0 := deviceinstallationMixin[0].Hooks()
+	deviceinstallation.Hooks[0] = deviceinstallationMixinHooks0[0]
+	deviceinstallationMixinFields0 := deviceinstallationMixin[0].Fields()
+	_ = deviceinstallationMixinFields0
+	deviceinstallationFields := schema.DeviceInstallation{}.Fields()
+	_ = deviceinstallationFields
+	// deviceinstallationDescCreatedAt is the schema descriptor for created_at field.
+	deviceinstallationDescCreatedAt := deviceinstallationMixinFields0[0].Descriptor()
+	// deviceinstallation.DefaultCreatedAt holds the default value on creation for the created_at field.
+	deviceinstallation.DefaultCreatedAt = deviceinstallationDescCreatedAt.Default.(func() time.Time)
+	// deviceinstallationDescCreatedBy is the schema descriptor for created_by field.
+	deviceinstallationDescCreatedBy := deviceinstallationMixinFields0[1].Descriptor()
+	// deviceinstallation.CreatedByValidator is a validator for the "created_by" field. It is called by the builders before save.
+	deviceinstallation.CreatedByValidator = deviceinstallationDescCreatedBy.Validators[0].(func(int) error)
+	// deviceinstallationDescUpdatedBy is the schema descriptor for updated_by field.
+	deviceinstallationDescUpdatedBy := deviceinstallationMixinFields0[3].Descriptor()
+	// deviceinstallation.UpdatedByValidator is a validator for the "updated_by" field. It is called by the builders before save.
+	deviceinstallation.UpdatedByValidator = deviceinstallationDescUpdatedBy.Validators[0].(func(int) error)
+	// deviceinstallationDescUpdatedAt is the schema descriptor for updated_at field.
+	deviceinstallationDescUpdatedAt := deviceinstallationMixinFields0[4].Descriptor()
+	// deviceinstallation.DefaultUpdatedAt holds the default value on creation for the updated_at field.
+	deviceinstallation.DefaultUpdatedAt = deviceinstallationDescUpdatedAt.Default.(func() time.Time)
+	// deviceinstallation.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
+	deviceinstallation.UpdateDefaultUpdatedAt = deviceinstallationDescUpdatedAt.UpdateDefault.(func() time.Time)
+	// deviceinstallationDescDeviceID is the schema descriptor for device_id field.
+	deviceinstallationDescDeviceID := deviceinstallationFields[0].Descriptor()
+	// deviceinstallation.DeviceIDValidator is a validator for the "device_id" field. It is called by the builders before save.
+	deviceinstallation.DeviceIDValidator = deviceinstallationDescDeviceID.Validators[0].(func(int) error)
+	// deviceinstallationDescAreaID is the schema descriptor for area_id field.
+	deviceinstallationDescAreaID := deviceinstallationFields[1].Descriptor()
+	// deviceinstallation.AreaIDValidator is a validator for the "area_id" field. It is called by the builders before save.
+	deviceinstallation.AreaIDValidator = deviceinstallationDescAreaID.Validators[0].(func(int) error)
+	// deviceinstallationDescAliasName is the schema descriptor for alias_name field.
+	deviceinstallationDescAliasName := deviceinstallationFields[2].Descriptor()
+	// deviceinstallation.AliasNameValidator is a validator for the "alias_name" field. It is called by the builders before save.
+	deviceinstallation.AliasNameValidator = deviceinstallationDescAliasName.Validators[0].(func(string) error)
 	employeeMixin := schema.Employee{}.Mixin()
 	employeeMixinHooks0 := employeeMixin[0].Hooks()
 	employee.Hooks[0] = employeeMixinHooks0[0]
@@ -229,79 +354,100 @@ func init() {
 	employeeDescDepartmentID := employeeFields[1].Descriptor()
 	// employee.DepartmentIDValidator is a validator for the "department_id" field. It is called by the builders before save.
 	employee.DepartmentIDValidator = employeeDescDepartmentID.Validators[0].(func(int) error)
-	ipcreporteventMixin := schema.IPCReportEvent{}.Mixin()
-	ipcreporteventMixinHooks0 := ipcreporteventMixin[0].Hooks()
-	ipcreportevent.Hooks[0] = ipcreporteventMixinHooks0[0]
-	ipcreporteventMixinFields0 := ipcreporteventMixin[0].Fields()
-	_ = ipcreporteventMixinFields0
-	ipcreporteventFields := schema.IPCReportEvent{}.Fields()
-	_ = ipcreporteventFields
-	// ipcreporteventDescCreatedAt is the schema descriptor for created_at field.
-	ipcreporteventDescCreatedAt := ipcreporteventMixinFields0[0].Descriptor()
-	// ipcreportevent.DefaultCreatedAt holds the default value on creation for the created_at field.
-	ipcreportevent.DefaultCreatedAt = ipcreporteventDescCreatedAt.Default.(func() time.Time)
-	// ipcreporteventDescCreatedBy is the schema descriptor for created_by field.
-	ipcreporteventDescCreatedBy := ipcreporteventMixinFields0[1].Descriptor()
-	// ipcreportevent.CreatedByValidator is a validator for the "created_by" field. It is called by the builders before save.
-	ipcreportevent.CreatedByValidator = ipcreporteventDescCreatedBy.Validators[0].(func(int) error)
-	// ipcreporteventDescUpdatedBy is the schema descriptor for updated_by field.
-	ipcreporteventDescUpdatedBy := ipcreporteventMixinFields0[3].Descriptor()
-	// ipcreportevent.UpdatedByValidator is a validator for the "updated_by" field. It is called by the builders before save.
-	ipcreportevent.UpdatedByValidator = ipcreporteventDescUpdatedBy.Validators[0].(func(int) error)
-	// ipcreporteventDescUpdatedAt is the schema descriptor for updated_at field.
-	ipcreporteventDescUpdatedAt := ipcreporteventMixinFields0[4].Descriptor()
-	// ipcreportevent.DefaultUpdatedAt holds the default value on creation for the updated_at field.
-	ipcreportevent.DefaultUpdatedAt = ipcreporteventDescUpdatedAt.Default.(func() time.Time)
-	// ipcreportevent.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
-	ipcreportevent.UpdateDefaultUpdatedAt = ipcreporteventDescUpdatedAt.UpdateDefault.(func() time.Time)
-	// ipcreporteventDescDeviceBrand is the schema descriptor for device_brand field.
-	ipcreporteventDescDeviceBrand := ipcreporteventFields[0].Descriptor()
-	// ipcreportevent.DefaultDeviceBrand holds the default value on creation for the device_brand field.
-	ipcreportevent.DefaultDeviceBrand = enums.IPCReportEventDeviceBrand(ipcreporteventDescDeviceBrand.Default.(int))
-	// ipcreportevent.DeviceBrandValidator is a validator for the "device_brand" field. It is called by the builders before save.
-	ipcreportevent.DeviceBrandValidator = ipcreporteventDescDeviceBrand.Validators[0].(func(int) error)
-	// ipcreporteventDescDeviceModel is the schema descriptor for device_model field.
-	ipcreporteventDescDeviceModel := ipcreporteventFields[1].Descriptor()
-	// ipcreportevent.DefaultDeviceModel holds the default value on creation for the device_model field.
-	ipcreportevent.DefaultDeviceModel = enums.IPCReportEventDeviceModel(ipcreporteventDescDeviceModel.Default.(int))
-	// ipcreportevent.DeviceModelValidator is a validator for the "device_model" field. It is called by the builders before save.
-	ipcreportevent.DeviceModelValidator = ipcreporteventDescDeviceModel.Validators[0].(func(int) error)
-	// ipcreporteventDescDeviceID is the schema descriptor for device_id field.
-	ipcreporteventDescDeviceID := ipcreporteventFields[2].Descriptor()
-	// ipcreportevent.DeviceIDValidator is a validator for the "device_id" field. It is called by the builders before save.
-	ipcreportevent.DeviceIDValidator = ipcreporteventDescDeviceID.Validators[0].(func(string) error)
-	// ipcreporteventDescEventID is the schema descriptor for event_id field.
-	ipcreporteventDescEventID := ipcreporteventFields[3].Descriptor()
-	// ipcreportevent.EventIDValidator is a validator for the "event_id" field. It is called by the builders before save.
-	ipcreportevent.EventIDValidator = ipcreporteventDescEventID.Validators[0].(func(string) error)
-	// ipcreporteventDescEventTime is the schema descriptor for event_time field.
-	ipcreporteventDescEventTime := ipcreporteventFields[4].Descriptor()
-	// ipcreportevent.DefaultEventTime holds the default value on creation for the event_time field.
-	ipcreportevent.DefaultEventTime = ipcreporteventDescEventTime.Default.(func() time.Time)
-	// ipcreporteventDescEventType is the schema descriptor for event_type field.
-	ipcreporteventDescEventType := ipcreporteventFields[5].Descriptor()
-	// ipcreportevent.DefaultEventType holds the default value on creation for the event_type field.
-	ipcreportevent.DefaultEventType = enums.IPCReportEventType(ipcreporteventDescEventType.Default.(int))
-	// ipcreportevent.EventTypeValidator is a validator for the "event_type" field. It is called by the builders before save.
-	ipcreportevent.EventTypeValidator = ipcreporteventDescEventType.Validators[0].(func(int) error)
-	// ipcreporteventDescEventStatus is the schema descriptor for event_status field.
-	ipcreporteventDescEventStatus := ipcreporteventFields[6].Descriptor()
-	// ipcreportevent.DefaultEventStatus holds the default value on creation for the event_status field.
-	ipcreportevent.DefaultEventStatus = enums.IPCReportEventStatus(ipcreporteventDescEventStatus.Default.(int))
-	// ipcreportevent.EventStatusValidator is a validator for the "event_status" field. It is called by the builders before save.
-	ipcreportevent.EventStatusValidator = ipcreporteventDescEventStatus.Validators[0].(func(int) error)
-	// ipcreporteventDescImages is the schema descriptor for images field.
-	ipcreporteventDescImages := ipcreporteventFields[7].Descriptor()
-	// ipcreportevent.DefaultImages holds the default value on creation for the images field.
-	ipcreportevent.DefaultImages = ipcreporteventDescImages.Default.([]*types.UploadedImage)
-	// ipcreporteventDescLabeledImages is the schema descriptor for labeled_images field.
-	ipcreporteventDescLabeledImages := ipcreporteventFields[8].Descriptor()
-	// ipcreportevent.DefaultLabeledImages holds the default value on creation for the labeled_images field.
-	ipcreportevent.DefaultLabeledImages = ipcreporteventDescLabeledImages.Default.([]*types.UploadedImage)
-	// ipcreporteventDescVideoID is the schema descriptor for video_id field.
-	ipcreporteventDescVideoID := ipcreporteventFields[9].Descriptor()
-	// ipcreportevent.VideoIDValidator is a validator for the "video_id" field. It is called by the builders before save.
-	ipcreportevent.VideoIDValidator = ipcreporteventDescVideoID.Validators[0].(func(int) error)
+	eventlevelMixin := schema.EventLevel{}.Mixin()
+	eventlevelMixinHooks0 := eventlevelMixin[0].Hooks()
+	eventlevel.Hooks[0] = eventlevelMixinHooks0[0]
+	eventlevelMixinFields0 := eventlevelMixin[0].Fields()
+	_ = eventlevelMixinFields0
+	eventlevelFields := schema.EventLevel{}.Fields()
+	_ = eventlevelFields
+	// eventlevelDescCreatedAt is the schema descriptor for created_at field.
+	eventlevelDescCreatedAt := eventlevelMixinFields0[0].Descriptor()
+	// eventlevel.DefaultCreatedAt holds the default value on creation for the created_at field.
+	eventlevel.DefaultCreatedAt = eventlevelDescCreatedAt.Default.(func() time.Time)
+	// eventlevelDescCreatedBy is the schema descriptor for created_by field.
+	eventlevelDescCreatedBy := eventlevelMixinFields0[1].Descriptor()
+	// eventlevel.CreatedByValidator is a validator for the "created_by" field. It is called by the builders before save.
+	eventlevel.CreatedByValidator = eventlevelDescCreatedBy.Validators[0].(func(int) error)
+	// eventlevelDescUpdatedBy is the schema descriptor for updated_by field.
+	eventlevelDescUpdatedBy := eventlevelMixinFields0[3].Descriptor()
+	// eventlevel.UpdatedByValidator is a validator for the "updated_by" field. It is called by the builders before save.
+	eventlevel.UpdatedByValidator = eventlevelDescUpdatedBy.Validators[0].(func(int) error)
+	// eventlevelDescUpdatedAt is the schema descriptor for updated_at field.
+	eventlevelDescUpdatedAt := eventlevelMixinFields0[4].Descriptor()
+	// eventlevel.DefaultUpdatedAt holds the default value on creation for the updated_at field.
+	eventlevel.DefaultUpdatedAt = eventlevelDescUpdatedAt.Default.(func() time.Time)
+	// eventlevel.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
+	eventlevel.UpdateDefaultUpdatedAt = eventlevelDescUpdatedAt.UpdateDefault.(func() time.Time)
+	// eventlevelDescName is the schema descriptor for name field.
+	eventlevelDescName := eventlevelFields[0].Descriptor()
+	// eventlevel.NameValidator is a validator for the "name" field. It is called by the builders before save.
+	eventlevel.NameValidator = eventlevelDescName.Validators[0].(func(string) error)
+	// eventlevelDescIsReport is the schema descriptor for is_report field.
+	eventlevelDescIsReport := eventlevelFields[3].Descriptor()
+	// eventlevel.DefaultIsReport holds the default value on creation for the is_report field.
+	eventlevel.DefaultIsReport = eventlevelDescIsReport.Default.(bool)
+	ipceventMixin := schema.IPCEvent{}.Mixin()
+	ipceventMixinHooks0 := ipceventMixin[0].Hooks()
+	ipcevent.Hooks[0] = ipceventMixinHooks0[0]
+	ipceventMixinFields0 := ipceventMixin[0].Fields()
+	_ = ipceventMixinFields0
+	ipceventFields := schema.IPCEvent{}.Fields()
+	_ = ipceventFields
+	// ipceventDescCreatedAt is the schema descriptor for created_at field.
+	ipceventDescCreatedAt := ipceventMixinFields0[0].Descriptor()
+	// ipcevent.DefaultCreatedAt holds the default value on creation for the created_at field.
+	ipcevent.DefaultCreatedAt = ipceventDescCreatedAt.Default.(func() time.Time)
+	// ipceventDescCreatedBy is the schema descriptor for created_by field.
+	ipceventDescCreatedBy := ipceventMixinFields0[1].Descriptor()
+	// ipcevent.CreatedByValidator is a validator for the "created_by" field. It is called by the builders before save.
+	ipcevent.CreatedByValidator = ipceventDescCreatedBy.Validators[0].(func(int) error)
+	// ipceventDescUpdatedBy is the schema descriptor for updated_by field.
+	ipceventDescUpdatedBy := ipceventMixinFields0[3].Descriptor()
+	// ipcevent.UpdatedByValidator is a validator for the "updated_by" field. It is called by the builders before save.
+	ipcevent.UpdatedByValidator = ipceventDescUpdatedBy.Validators[0].(func(int) error)
+	// ipceventDescUpdatedAt is the schema descriptor for updated_at field.
+	ipceventDescUpdatedAt := ipceventMixinFields0[4].Descriptor()
+	// ipcevent.DefaultUpdatedAt holds the default value on creation for the updated_at field.
+	ipcevent.DefaultUpdatedAt = ipceventDescUpdatedAt.Default.(func() time.Time)
+	// ipcevent.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
+	ipcevent.UpdateDefaultUpdatedAt = ipceventDescUpdatedAt.UpdateDefault.(func() time.Time)
+	// ipceventDescDeviceID is the schema descriptor for device_id field.
+	ipceventDescDeviceID := ipceventFields[0].Descriptor()
+	// ipcevent.DeviceIDValidator is a validator for the "device_id" field. It is called by the builders before save.
+	ipcevent.DeviceIDValidator = ipceventDescDeviceID.Validators[0].(func(int) error)
+	// ipceventDescVideoID is the schema descriptor for video_id field.
+	ipceventDescVideoID := ipceventFields[1].Descriptor()
+	// ipcevent.VideoIDValidator is a validator for the "video_id" field. It is called by the builders before save.
+	ipcevent.VideoIDValidator = ipceventDescVideoID.Validators[0].(func(int) error)
+	// ipceventDescEventTime is the schema descriptor for event_time field.
+	ipceventDescEventTime := ipceventFields[2].Descriptor()
+	// ipcevent.DefaultEventTime holds the default value on creation for the event_time field.
+	ipcevent.DefaultEventTime = ipceventDescEventTime.Default.(func() time.Time)
+	// ipceventDescEventType is the schema descriptor for event_type field.
+	ipceventDescEventType := ipceventFields[3].Descriptor()
+	// ipcevent.DefaultEventType holds the default value on creation for the event_type field.
+	ipcevent.DefaultEventType = enums.EventType(ipceventDescEventType.Default.(int))
+	// ipcevent.EventTypeValidator is a validator for the "event_type" field. It is called by the builders before save.
+	ipcevent.EventTypeValidator = ipceventDescEventType.Validators[0].(func(int) error)
+	// ipceventDescEventStatus is the schema descriptor for event_status field.
+	ipceventDescEventStatus := ipceventFields[4].Descriptor()
+	// ipcevent.DefaultEventStatus holds the default value on creation for the event_status field.
+	ipcevent.DefaultEventStatus = enums.EventStatus(ipceventDescEventStatus.Default.(int))
+	// ipcevent.EventStatusValidator is a validator for the "event_status" field. It is called by the builders before save.
+	ipcevent.EventStatusValidator = ipceventDescEventStatus.Validators[0].(func(int) error)
+	// ipceventDescImages is the schema descriptor for images field.
+	ipceventDescImages := ipceventFields[5].Descriptor()
+	// ipcevent.DefaultImages holds the default value on creation for the images field.
+	ipcevent.DefaultImages = ipceventDescImages.Default.([]*types.UploadedImage)
+	// ipceventDescLabeledImages is the schema descriptor for labeled_images field.
+	ipceventDescLabeledImages := ipceventFields[6].Descriptor()
+	// ipcevent.DefaultLabeledImages holds the default value on creation for the labeled_images field.
+	ipcevent.DefaultLabeledImages = ipceventDescLabeledImages.Default.([]*types.UploadedImage)
+	// ipceventDescEventID is the schema descriptor for event_id field.
+	ipceventDescEventID := ipceventFields[7].Descriptor()
+	// ipcevent.EventIDValidator is a validator for the "event_id" field. It is called by the builders before save.
+	ipcevent.EventIDValidator = ipceventDescEventID.Validators[0].(func(string) error)
 	occupationMixin := schema.Occupation{}.Mixin()
 	occupationMixinHooks0 := occupationMixin[0].Hooks()
 	occupation.Hooks[0] = occupationMixinHooks0[0]

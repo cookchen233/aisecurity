@@ -78,6 +78,19 @@ func (routes *DashboardRoutes) Setup() {
 		routes.RouterGroup.POST("/risk-location/update", handlers.Convert(riskLocationHandler, riskLocationHandler.Update))
 		routes.RouterGroup.GET("/risk-location/list", handlers.Convert(riskLocationHandler, riskLocationHandler.GetList))
 		routes.RouterGroup.POST("/risk-location/delete", handlers.Convert(riskLocationHandler, riskLocationHandler.Delete))
+	}
 
+	ipcEventHandler := dashboard.NewIPCEventHandler()
+	{
+		routes.RouterGroup.GET("/ipc-event/list", handlers.Convert(ipcEventHandler, ipcEventHandler.GetList))
+		routes.RouterGroup.GET("/ipc-event/details", handlers.Convert(ipcEventHandler, ipcEventHandler.GetDetails))
+	}
+
+	eventLevelHandler := dashboard.NewIEventLevelHandler()
+	{
+		routes.RouterGroup.POST("/event-level/create", handlers.Convert(eventLevelHandler, eventLevelHandler.Create))
+		routes.RouterGroup.POST("/event-level/update", handlers.Convert(eventLevelHandler, eventLevelHandler.Update))
+		routes.RouterGroup.GET("/event-level/list", handlers.Convert(eventLevelHandler, eventLevelHandler.GetList))
+		routes.RouterGroup.POST("/event-level/delete", handlers.Convert(eventLevelHandler, eventLevelHandler.Delete))
 	}
 }

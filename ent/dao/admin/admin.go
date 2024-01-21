@@ -75,14 +75,30 @@ const (
 	EdgeOccupationCreator = "occupation_creator"
 	// EdgeOccupationUpdater holds the string denoting the occupation_updater edge name in mutations.
 	EdgeOccupationUpdater = "occupation_updater"
-	// EdgeIpcReportEventCreator holds the string denoting the ipc_report_event_creator edge name in mutations.
-	EdgeIpcReportEventCreator = "ipc_report_event_creator"
-	// EdgeIpcReportEventUpdater holds the string denoting the ipc_report_event_updater edge name in mutations.
-	EdgeIpcReportEventUpdater = "ipc_report_event_updater"
+	// EdgeIpcEventCreator holds the string denoting the ipc_event_creator edge name in mutations.
+	EdgeIpcEventCreator = "ipc_event_creator"
+	// EdgeIpcEventUpdater holds the string denoting the ipc_event_updater edge name in mutations.
+	EdgeIpcEventUpdater = "ipc_event_updater"
 	// EdgeVideoCreator holds the string denoting the video_creator edge name in mutations.
 	EdgeVideoCreator = "video_creator"
 	// EdgeVideoUpdater holds the string denoting the video_updater edge name in mutations.
 	EdgeVideoUpdater = "video_updater"
+	// EdgeAreaCreator holds the string denoting the area_creator edge name in mutations.
+	EdgeAreaCreator = "area_creator"
+	// EdgeAreaUpdater holds the string denoting the area_updater edge name in mutations.
+	EdgeAreaUpdater = "area_updater"
+	// EdgeDeviceCreator holds the string denoting the device_creator edge name in mutations.
+	EdgeDeviceCreator = "device_creator"
+	// EdgeDeviceUpdater holds the string denoting the device_updater edge name in mutations.
+	EdgeDeviceUpdater = "device_updater"
+	// EdgeDeviceInstallationCreator holds the string denoting the device_installation_creator edge name in mutations.
+	EdgeDeviceInstallationCreator = "device_installation_creator"
+	// EdgeDeviceInstallationUpdater holds the string denoting the device_installation_updater edge name in mutations.
+	EdgeDeviceInstallationUpdater = "device_installation_updater"
+	// EdgeEventLevelCreator holds the string denoting the event_level_creator edge name in mutations.
+	EdgeEventLevelCreator = "event_level_creator"
+	// EdgeEventLevelUpdater holds the string denoting the event_level_updater edge name in mutations.
+	EdgeEventLevelUpdater = "event_level_updater"
 	// Table holds the table name of the admin in the database.
 	Table = "admins"
 	// CreatorTable is the table that holds the creator relation/edge.
@@ -211,20 +227,20 @@ const (
 	OccupationUpdaterInverseTable = "occupations"
 	// OccupationUpdaterColumn is the table column denoting the occupation_updater relation/edge.
 	OccupationUpdaterColumn = "updated_by"
-	// IpcReportEventCreatorTable is the table that holds the ipc_report_event_creator relation/edge.
-	IpcReportEventCreatorTable = "ipc_report_events"
-	// IpcReportEventCreatorInverseTable is the table name for the IPCReportEvent entity.
-	// It exists in this package in order to avoid circular dependency with the "ipcreportevent" package.
-	IpcReportEventCreatorInverseTable = "ipc_report_events"
-	// IpcReportEventCreatorColumn is the table column denoting the ipc_report_event_creator relation/edge.
-	IpcReportEventCreatorColumn = "created_by"
-	// IpcReportEventUpdaterTable is the table that holds the ipc_report_event_updater relation/edge.
-	IpcReportEventUpdaterTable = "ipc_report_events"
-	// IpcReportEventUpdaterInverseTable is the table name for the IPCReportEvent entity.
-	// It exists in this package in order to avoid circular dependency with the "ipcreportevent" package.
-	IpcReportEventUpdaterInverseTable = "ipc_report_events"
-	// IpcReportEventUpdaterColumn is the table column denoting the ipc_report_event_updater relation/edge.
-	IpcReportEventUpdaterColumn = "updated_by"
+	// IpcEventCreatorTable is the table that holds the ipc_event_creator relation/edge.
+	IpcEventCreatorTable = "ipc_events"
+	// IpcEventCreatorInverseTable is the table name for the IPCEvent entity.
+	// It exists in this package in order to avoid circular dependency with the "ipcevent" package.
+	IpcEventCreatorInverseTable = "ipc_events"
+	// IpcEventCreatorColumn is the table column denoting the ipc_event_creator relation/edge.
+	IpcEventCreatorColumn = "created_by"
+	// IpcEventUpdaterTable is the table that holds the ipc_event_updater relation/edge.
+	IpcEventUpdaterTable = "ipc_events"
+	// IpcEventUpdaterInverseTable is the table name for the IPCEvent entity.
+	// It exists in this package in order to avoid circular dependency with the "ipcevent" package.
+	IpcEventUpdaterInverseTable = "ipc_events"
+	// IpcEventUpdaterColumn is the table column denoting the ipc_event_updater relation/edge.
+	IpcEventUpdaterColumn = "updated_by"
 	// VideoCreatorTable is the table that holds the video_creator relation/edge.
 	VideoCreatorTable = "videos"
 	// VideoCreatorInverseTable is the table name for the Video entity.
@@ -239,6 +255,62 @@ const (
 	VideoUpdaterInverseTable = "videos"
 	// VideoUpdaterColumn is the table column denoting the video_updater relation/edge.
 	VideoUpdaterColumn = "updated_by"
+	// AreaCreatorTable is the table that holds the area_creator relation/edge.
+	AreaCreatorTable = "areas"
+	// AreaCreatorInverseTable is the table name for the Area entity.
+	// It exists in this package in order to avoid circular dependency with the "area" package.
+	AreaCreatorInverseTable = "areas"
+	// AreaCreatorColumn is the table column denoting the area_creator relation/edge.
+	AreaCreatorColumn = "created_by"
+	// AreaUpdaterTable is the table that holds the area_updater relation/edge.
+	AreaUpdaterTable = "areas"
+	// AreaUpdaterInverseTable is the table name for the Area entity.
+	// It exists in this package in order to avoid circular dependency with the "area" package.
+	AreaUpdaterInverseTable = "areas"
+	// AreaUpdaterColumn is the table column denoting the area_updater relation/edge.
+	AreaUpdaterColumn = "updated_by"
+	// DeviceCreatorTable is the table that holds the device_creator relation/edge.
+	DeviceCreatorTable = "devices"
+	// DeviceCreatorInverseTable is the table name for the Device entity.
+	// It exists in this package in order to avoid circular dependency with the "device" package.
+	DeviceCreatorInverseTable = "devices"
+	// DeviceCreatorColumn is the table column denoting the device_creator relation/edge.
+	DeviceCreatorColumn = "created_by"
+	// DeviceUpdaterTable is the table that holds the device_updater relation/edge.
+	DeviceUpdaterTable = "devices"
+	// DeviceUpdaterInverseTable is the table name for the Device entity.
+	// It exists in this package in order to avoid circular dependency with the "device" package.
+	DeviceUpdaterInverseTable = "devices"
+	// DeviceUpdaterColumn is the table column denoting the device_updater relation/edge.
+	DeviceUpdaterColumn = "updated_by"
+	// DeviceInstallationCreatorTable is the table that holds the device_installation_creator relation/edge.
+	DeviceInstallationCreatorTable = "device_installations"
+	// DeviceInstallationCreatorInverseTable is the table name for the DeviceInstallation entity.
+	// It exists in this package in order to avoid circular dependency with the "deviceinstallation" package.
+	DeviceInstallationCreatorInverseTable = "device_installations"
+	// DeviceInstallationCreatorColumn is the table column denoting the device_installation_creator relation/edge.
+	DeviceInstallationCreatorColumn = "created_by"
+	// DeviceInstallationUpdaterTable is the table that holds the device_installation_updater relation/edge.
+	DeviceInstallationUpdaterTable = "device_installations"
+	// DeviceInstallationUpdaterInverseTable is the table name for the DeviceInstallation entity.
+	// It exists in this package in order to avoid circular dependency with the "deviceinstallation" package.
+	DeviceInstallationUpdaterInverseTable = "device_installations"
+	// DeviceInstallationUpdaterColumn is the table column denoting the device_installation_updater relation/edge.
+	DeviceInstallationUpdaterColumn = "updated_by"
+	// EventLevelCreatorTable is the table that holds the event_level_creator relation/edge.
+	EventLevelCreatorTable = "event_levels"
+	// EventLevelCreatorInverseTable is the table name for the EventLevel entity.
+	// It exists in this package in order to avoid circular dependency with the "eventlevel" package.
+	EventLevelCreatorInverseTable = "event_levels"
+	// EventLevelCreatorColumn is the table column denoting the event_level_creator relation/edge.
+	EventLevelCreatorColumn = "created_by"
+	// EventLevelUpdaterTable is the table that holds the event_level_updater relation/edge.
+	EventLevelUpdaterTable = "event_levels"
+	// EventLevelUpdaterInverseTable is the table name for the EventLevel entity.
+	// It exists in this package in order to avoid circular dependency with the "eventlevel" package.
+	EventLevelUpdaterInverseTable = "event_levels"
+	// EventLevelUpdaterColumn is the table column denoting the event_level_updater relation/edge.
+	EventLevelUpdaterColumn = "updated_by"
 )
 
 // Columns holds all SQL columns for admin fields.
@@ -625,31 +697,31 @@ func ByOccupationUpdater(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption
 	}
 }
 
-// ByIpcReportEventCreatorCount orders the results by ipc_report_event_creator count.
-func ByIpcReportEventCreatorCount(opts ...sql.OrderTermOption) OrderOption {
+// ByIpcEventCreatorCount orders the results by ipc_event_creator count.
+func ByIpcEventCreatorCount(opts ...sql.OrderTermOption) OrderOption {
 	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborsCount(s, newIpcReportEventCreatorStep(), opts...)
+		sqlgraph.OrderByNeighborsCount(s, newIpcEventCreatorStep(), opts...)
 	}
 }
 
-// ByIpcReportEventCreator orders the results by ipc_report_event_creator terms.
-func ByIpcReportEventCreator(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+// ByIpcEventCreator orders the results by ipc_event_creator terms.
+func ByIpcEventCreator(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
 	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborTerms(s, newIpcReportEventCreatorStep(), append([]sql.OrderTerm{term}, terms...)...)
+		sqlgraph.OrderByNeighborTerms(s, newIpcEventCreatorStep(), append([]sql.OrderTerm{term}, terms...)...)
 	}
 }
 
-// ByIpcReportEventUpdaterCount orders the results by ipc_report_event_updater count.
-func ByIpcReportEventUpdaterCount(opts ...sql.OrderTermOption) OrderOption {
+// ByIpcEventUpdaterCount orders the results by ipc_event_updater count.
+func ByIpcEventUpdaterCount(opts ...sql.OrderTermOption) OrderOption {
 	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborsCount(s, newIpcReportEventUpdaterStep(), opts...)
+		sqlgraph.OrderByNeighborsCount(s, newIpcEventUpdaterStep(), opts...)
 	}
 }
 
-// ByIpcReportEventUpdater orders the results by ipc_report_event_updater terms.
-func ByIpcReportEventUpdater(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+// ByIpcEventUpdater orders the results by ipc_event_updater terms.
+func ByIpcEventUpdater(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
 	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborTerms(s, newIpcReportEventUpdaterStep(), append([]sql.OrderTerm{term}, terms...)...)
+		sqlgraph.OrderByNeighborTerms(s, newIpcEventUpdaterStep(), append([]sql.OrderTerm{term}, terms...)...)
 	}
 }
 
@@ -678,6 +750,118 @@ func ByVideoUpdaterCount(opts ...sql.OrderTermOption) OrderOption {
 func ByVideoUpdater(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
 	return func(s *sql.Selector) {
 		sqlgraph.OrderByNeighborTerms(s, newVideoUpdaterStep(), append([]sql.OrderTerm{term}, terms...)...)
+	}
+}
+
+// ByAreaCreatorCount orders the results by area_creator count.
+func ByAreaCreatorCount(opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborsCount(s, newAreaCreatorStep(), opts...)
+	}
+}
+
+// ByAreaCreator orders the results by area_creator terms.
+func ByAreaCreator(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newAreaCreatorStep(), append([]sql.OrderTerm{term}, terms...)...)
+	}
+}
+
+// ByAreaUpdaterCount orders the results by area_updater count.
+func ByAreaUpdaterCount(opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborsCount(s, newAreaUpdaterStep(), opts...)
+	}
+}
+
+// ByAreaUpdater orders the results by area_updater terms.
+func ByAreaUpdater(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newAreaUpdaterStep(), append([]sql.OrderTerm{term}, terms...)...)
+	}
+}
+
+// ByDeviceCreatorCount orders the results by device_creator count.
+func ByDeviceCreatorCount(opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborsCount(s, newDeviceCreatorStep(), opts...)
+	}
+}
+
+// ByDeviceCreator orders the results by device_creator terms.
+func ByDeviceCreator(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newDeviceCreatorStep(), append([]sql.OrderTerm{term}, terms...)...)
+	}
+}
+
+// ByDeviceUpdaterCount orders the results by device_updater count.
+func ByDeviceUpdaterCount(opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborsCount(s, newDeviceUpdaterStep(), opts...)
+	}
+}
+
+// ByDeviceUpdater orders the results by device_updater terms.
+func ByDeviceUpdater(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newDeviceUpdaterStep(), append([]sql.OrderTerm{term}, terms...)...)
+	}
+}
+
+// ByDeviceInstallationCreatorCount orders the results by device_installation_creator count.
+func ByDeviceInstallationCreatorCount(opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborsCount(s, newDeviceInstallationCreatorStep(), opts...)
+	}
+}
+
+// ByDeviceInstallationCreator orders the results by device_installation_creator terms.
+func ByDeviceInstallationCreator(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newDeviceInstallationCreatorStep(), append([]sql.OrderTerm{term}, terms...)...)
+	}
+}
+
+// ByDeviceInstallationUpdaterCount orders the results by device_installation_updater count.
+func ByDeviceInstallationUpdaterCount(opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborsCount(s, newDeviceInstallationUpdaterStep(), opts...)
+	}
+}
+
+// ByDeviceInstallationUpdater orders the results by device_installation_updater terms.
+func ByDeviceInstallationUpdater(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newDeviceInstallationUpdaterStep(), append([]sql.OrderTerm{term}, terms...)...)
+	}
+}
+
+// ByEventLevelCreatorCount orders the results by event_level_creator count.
+func ByEventLevelCreatorCount(opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborsCount(s, newEventLevelCreatorStep(), opts...)
+	}
+}
+
+// ByEventLevelCreator orders the results by event_level_creator terms.
+func ByEventLevelCreator(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newEventLevelCreatorStep(), append([]sql.OrderTerm{term}, terms...)...)
+	}
+}
+
+// ByEventLevelUpdaterCount orders the results by event_level_updater count.
+func ByEventLevelUpdaterCount(opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborsCount(s, newEventLevelUpdaterStep(), opts...)
+	}
+}
+
+// ByEventLevelUpdater orders the results by event_level_updater terms.
+func ByEventLevelUpdater(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newEventLevelUpdaterStep(), append([]sql.OrderTerm{term}, terms...)...)
 	}
 }
 func newCreatorStep() *sqlgraph.Step {
@@ -820,18 +1004,18 @@ func newOccupationUpdaterStep() *sqlgraph.Step {
 		sqlgraph.Edge(sqlgraph.O2M, false, OccupationUpdaterTable, OccupationUpdaterColumn),
 	)
 }
-func newIpcReportEventCreatorStep() *sqlgraph.Step {
+func newIpcEventCreatorStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
-		sqlgraph.To(IpcReportEventCreatorInverseTable, FieldID),
-		sqlgraph.Edge(sqlgraph.O2M, false, IpcReportEventCreatorTable, IpcReportEventCreatorColumn),
+		sqlgraph.To(IpcEventCreatorInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.O2M, false, IpcEventCreatorTable, IpcEventCreatorColumn),
 	)
 }
-func newIpcReportEventUpdaterStep() *sqlgraph.Step {
+func newIpcEventUpdaterStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
-		sqlgraph.To(IpcReportEventUpdaterInverseTable, FieldID),
-		sqlgraph.Edge(sqlgraph.O2M, false, IpcReportEventUpdaterTable, IpcReportEventUpdaterColumn),
+		sqlgraph.To(IpcEventUpdaterInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.O2M, false, IpcEventUpdaterTable, IpcEventUpdaterColumn),
 	)
 }
 func newVideoCreatorStep() *sqlgraph.Step {
@@ -846,5 +1030,61 @@ func newVideoUpdaterStep() *sqlgraph.Step {
 		sqlgraph.From(Table, FieldID),
 		sqlgraph.To(VideoUpdaterInverseTable, FieldID),
 		sqlgraph.Edge(sqlgraph.O2M, false, VideoUpdaterTable, VideoUpdaterColumn),
+	)
+}
+func newAreaCreatorStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(AreaCreatorInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.O2M, false, AreaCreatorTable, AreaCreatorColumn),
+	)
+}
+func newAreaUpdaterStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(AreaUpdaterInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.O2M, false, AreaUpdaterTable, AreaUpdaterColumn),
+	)
+}
+func newDeviceCreatorStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(DeviceCreatorInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.O2M, false, DeviceCreatorTable, DeviceCreatorColumn),
+	)
+}
+func newDeviceUpdaterStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(DeviceUpdaterInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.O2M, false, DeviceUpdaterTable, DeviceUpdaterColumn),
+	)
+}
+func newDeviceInstallationCreatorStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(DeviceInstallationCreatorInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.O2M, false, DeviceInstallationCreatorTable, DeviceInstallationCreatorColumn),
+	)
+}
+func newDeviceInstallationUpdaterStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(DeviceInstallationUpdaterInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.O2M, false, DeviceInstallationUpdaterTable, DeviceInstallationUpdaterColumn),
+	)
+}
+func newEventLevelCreatorStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(EventLevelCreatorInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.O2M, false, EventLevelCreatorTable, EventLevelCreatorColumn),
+	)
+}
+func newEventLevelUpdaterStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(EventLevelUpdaterInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.O2M, false, EventLevelUpdaterTable, EventLevelUpdaterColumn),
 	)
 }

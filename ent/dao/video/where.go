@@ -105,6 +105,11 @@ func UploadedAt(v time.Time) predicate.Video {
 	return predicate.Video(sql.FieldEQ(FieldUploadedAt, v))
 }
 
+// UploadedAt2 applies equality check predicate on the "uploaded_at2" field. It's identical to UploadedAt2EQ.
+func UploadedAt2(v time.Time) predicate.Video {
+	return predicate.Video(sql.FieldEQ(FieldUploadedAt2, v))
+}
+
 // CreatedAtEQ applies the EQ predicate on the "created_at" field.
 func CreatedAtEQ(v time.Time) predicate.Video {
 	return predicate.Video(sql.FieldEQ(FieldCreatedAt, v))
@@ -590,6 +595,56 @@ func UploadedAtNotNil() predicate.Video {
 	return predicate.Video(sql.FieldNotNull(FieldUploadedAt))
 }
 
+// UploadedAt2EQ applies the EQ predicate on the "uploaded_at2" field.
+func UploadedAt2EQ(v time.Time) predicate.Video {
+	return predicate.Video(sql.FieldEQ(FieldUploadedAt2, v))
+}
+
+// UploadedAt2NEQ applies the NEQ predicate on the "uploaded_at2" field.
+func UploadedAt2NEQ(v time.Time) predicate.Video {
+	return predicate.Video(sql.FieldNEQ(FieldUploadedAt2, v))
+}
+
+// UploadedAt2In applies the In predicate on the "uploaded_at2" field.
+func UploadedAt2In(vs ...time.Time) predicate.Video {
+	return predicate.Video(sql.FieldIn(FieldUploadedAt2, vs...))
+}
+
+// UploadedAt2NotIn applies the NotIn predicate on the "uploaded_at2" field.
+func UploadedAt2NotIn(vs ...time.Time) predicate.Video {
+	return predicate.Video(sql.FieldNotIn(FieldUploadedAt2, vs...))
+}
+
+// UploadedAt2GT applies the GT predicate on the "uploaded_at2" field.
+func UploadedAt2GT(v time.Time) predicate.Video {
+	return predicate.Video(sql.FieldGT(FieldUploadedAt2, v))
+}
+
+// UploadedAt2GTE applies the GTE predicate on the "uploaded_at2" field.
+func UploadedAt2GTE(v time.Time) predicate.Video {
+	return predicate.Video(sql.FieldGTE(FieldUploadedAt2, v))
+}
+
+// UploadedAt2LT applies the LT predicate on the "uploaded_at2" field.
+func UploadedAt2LT(v time.Time) predicate.Video {
+	return predicate.Video(sql.FieldLT(FieldUploadedAt2, v))
+}
+
+// UploadedAt2LTE applies the LTE predicate on the "uploaded_at2" field.
+func UploadedAt2LTE(v time.Time) predicate.Video {
+	return predicate.Video(sql.FieldLTE(FieldUploadedAt2, v))
+}
+
+// UploadedAt2IsNil applies the IsNil predicate on the "uploaded_at2" field.
+func UploadedAt2IsNil() predicate.Video {
+	return predicate.Video(sql.FieldIsNull(FieldUploadedAt2))
+}
+
+// UploadedAt2NotNil applies the NotNil predicate on the "uploaded_at2" field.
+func UploadedAt2NotNil() predicate.Video {
+	return predicate.Video(sql.FieldNotNull(FieldUploadedAt2))
+}
+
 // HasCreator applies the HasEdge predicate on the "creator" edge.
 func HasCreator() predicate.Video {
 	return predicate.Video(func(s *sql.Selector) {
@@ -636,21 +691,21 @@ func HasUpdaterWith(preds ...predicate.Admin) predicate.Video {
 	})
 }
 
-// HasIpcReportEventVideo applies the HasEdge predicate on the "ipc_report_event_video" edge.
-func HasIpcReportEventVideo() predicate.Video {
+// HasIpcEventVideo applies the HasEdge predicate on the "ipc_event_video" edge.
+func HasIpcEventVideo() predicate.Video {
 	return predicate.Video(func(s *sql.Selector) {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(Table, FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, false, IpcReportEventVideoTable, IpcReportEventVideoColumn),
+			sqlgraph.Edge(sqlgraph.O2M, false, IpcEventVideoTable, IpcEventVideoColumn),
 		)
 		sqlgraph.HasNeighbors(s, step)
 	})
 }
 
-// HasIpcReportEventVideoWith applies the HasEdge predicate on the "ipc_report_event_video" edge with a given conditions (other predicates).
-func HasIpcReportEventVideoWith(preds ...predicate.IPCReportEvent) predicate.Video {
+// HasIpcEventVideoWith applies the HasEdge predicate on the "ipc_event_video" edge with a given conditions (other predicates).
+func HasIpcEventVideoWith(preds ...predicate.IPCEvent) predicate.Video {
 	return predicate.Video(func(s *sql.Selector) {
-		step := newIpcReportEventVideoStep()
+		step := newIpcEventVideoStep()
 		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
 			for _, p := range preds {
 				p(s)

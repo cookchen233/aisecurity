@@ -5,9 +5,13 @@ package dao
 import (
 	"aisecurity/ent/dao/admin"
 	"aisecurity/ent/dao/adminrole"
+	"aisecurity/ent/dao/area"
 	"aisecurity/ent/dao/department"
+	"aisecurity/ent/dao/device"
+	"aisecurity/ent/dao/deviceinstallation"
 	"aisecurity/ent/dao/employee"
-	"aisecurity/ent/dao/ipcreportevent"
+	"aisecurity/ent/dao/eventlevel"
+	"aisecurity/ent/dao/ipcevent"
 	"aisecurity/ent/dao/occupation"
 	"aisecurity/ent/dao/predicate"
 	"aisecurity/ent/dao/risk"
@@ -434,34 +438,34 @@ func (au *AdminUpdate) AddOccupationUpdater(o ...*Occupation) *AdminUpdate {
 	return au.AddOccupationUpdaterIDs(ids...)
 }
 
-// AddIpcReportEventCreatorIDs adds the "ipc_report_event_creator" edge to the IPCReportEvent entity by IDs.
-func (au *AdminUpdate) AddIpcReportEventCreatorIDs(ids ...int) *AdminUpdate {
-	au.mutation.AddIpcReportEventCreatorIDs(ids...)
+// AddIpcEventCreatorIDs adds the "ipc_event_creator" edge to the IPCEvent entity by IDs.
+func (au *AdminUpdate) AddIpcEventCreatorIDs(ids ...int) *AdminUpdate {
+	au.mutation.AddIpcEventCreatorIDs(ids...)
 	return au
 }
 
-// AddIpcReportEventCreator adds the "ipc_report_event_creator" edges to the IPCReportEvent entity.
-func (au *AdminUpdate) AddIpcReportEventCreator(i ...*IPCReportEvent) *AdminUpdate {
+// AddIpcEventCreator adds the "ipc_event_creator" edges to the IPCEvent entity.
+func (au *AdminUpdate) AddIpcEventCreator(i ...*IPCEvent) *AdminUpdate {
 	ids := make([]int, len(i))
 	for j := range i {
 		ids[j] = i[j].ID
 	}
-	return au.AddIpcReportEventCreatorIDs(ids...)
+	return au.AddIpcEventCreatorIDs(ids...)
 }
 
-// AddIpcReportEventUpdaterIDs adds the "ipc_report_event_updater" edge to the IPCReportEvent entity by IDs.
-func (au *AdminUpdate) AddIpcReportEventUpdaterIDs(ids ...int) *AdminUpdate {
-	au.mutation.AddIpcReportEventUpdaterIDs(ids...)
+// AddIpcEventUpdaterIDs adds the "ipc_event_updater" edge to the IPCEvent entity by IDs.
+func (au *AdminUpdate) AddIpcEventUpdaterIDs(ids ...int) *AdminUpdate {
+	au.mutation.AddIpcEventUpdaterIDs(ids...)
 	return au
 }
 
-// AddIpcReportEventUpdater adds the "ipc_report_event_updater" edges to the IPCReportEvent entity.
-func (au *AdminUpdate) AddIpcReportEventUpdater(i ...*IPCReportEvent) *AdminUpdate {
+// AddIpcEventUpdater adds the "ipc_event_updater" edges to the IPCEvent entity.
+func (au *AdminUpdate) AddIpcEventUpdater(i ...*IPCEvent) *AdminUpdate {
 	ids := make([]int, len(i))
 	for j := range i {
 		ids[j] = i[j].ID
 	}
-	return au.AddIpcReportEventUpdaterIDs(ids...)
+	return au.AddIpcEventUpdaterIDs(ids...)
 }
 
 // AddVideoCreatorIDs adds the "video_creator" edge to the Video entity by IDs.
@@ -492,6 +496,126 @@ func (au *AdminUpdate) AddVideoUpdater(v ...*Video) *AdminUpdate {
 		ids[i] = v[i].ID
 	}
 	return au.AddVideoUpdaterIDs(ids...)
+}
+
+// AddAreaCreatorIDs adds the "area_creator" edge to the Area entity by IDs.
+func (au *AdminUpdate) AddAreaCreatorIDs(ids ...int) *AdminUpdate {
+	au.mutation.AddAreaCreatorIDs(ids...)
+	return au
+}
+
+// AddAreaCreator adds the "area_creator" edges to the Area entity.
+func (au *AdminUpdate) AddAreaCreator(a ...*Area) *AdminUpdate {
+	ids := make([]int, len(a))
+	for i := range a {
+		ids[i] = a[i].ID
+	}
+	return au.AddAreaCreatorIDs(ids...)
+}
+
+// AddAreaUpdaterIDs adds the "area_updater" edge to the Area entity by IDs.
+func (au *AdminUpdate) AddAreaUpdaterIDs(ids ...int) *AdminUpdate {
+	au.mutation.AddAreaUpdaterIDs(ids...)
+	return au
+}
+
+// AddAreaUpdater adds the "area_updater" edges to the Area entity.
+func (au *AdminUpdate) AddAreaUpdater(a ...*Area) *AdminUpdate {
+	ids := make([]int, len(a))
+	for i := range a {
+		ids[i] = a[i].ID
+	}
+	return au.AddAreaUpdaterIDs(ids...)
+}
+
+// AddDeviceCreatorIDs adds the "device_creator" edge to the Device entity by IDs.
+func (au *AdminUpdate) AddDeviceCreatorIDs(ids ...int) *AdminUpdate {
+	au.mutation.AddDeviceCreatorIDs(ids...)
+	return au
+}
+
+// AddDeviceCreator adds the "device_creator" edges to the Device entity.
+func (au *AdminUpdate) AddDeviceCreator(d ...*Device) *AdminUpdate {
+	ids := make([]int, len(d))
+	for i := range d {
+		ids[i] = d[i].ID
+	}
+	return au.AddDeviceCreatorIDs(ids...)
+}
+
+// AddDeviceUpdaterIDs adds the "device_updater" edge to the Device entity by IDs.
+func (au *AdminUpdate) AddDeviceUpdaterIDs(ids ...int) *AdminUpdate {
+	au.mutation.AddDeviceUpdaterIDs(ids...)
+	return au
+}
+
+// AddDeviceUpdater adds the "device_updater" edges to the Device entity.
+func (au *AdminUpdate) AddDeviceUpdater(d ...*Device) *AdminUpdate {
+	ids := make([]int, len(d))
+	for i := range d {
+		ids[i] = d[i].ID
+	}
+	return au.AddDeviceUpdaterIDs(ids...)
+}
+
+// AddDeviceInstallationCreatorIDs adds the "device_installation_creator" edge to the DeviceInstallation entity by IDs.
+func (au *AdminUpdate) AddDeviceInstallationCreatorIDs(ids ...int) *AdminUpdate {
+	au.mutation.AddDeviceInstallationCreatorIDs(ids...)
+	return au
+}
+
+// AddDeviceInstallationCreator adds the "device_installation_creator" edges to the DeviceInstallation entity.
+func (au *AdminUpdate) AddDeviceInstallationCreator(d ...*DeviceInstallation) *AdminUpdate {
+	ids := make([]int, len(d))
+	for i := range d {
+		ids[i] = d[i].ID
+	}
+	return au.AddDeviceInstallationCreatorIDs(ids...)
+}
+
+// AddDeviceInstallationUpdaterIDs adds the "device_installation_updater" edge to the DeviceInstallation entity by IDs.
+func (au *AdminUpdate) AddDeviceInstallationUpdaterIDs(ids ...int) *AdminUpdate {
+	au.mutation.AddDeviceInstallationUpdaterIDs(ids...)
+	return au
+}
+
+// AddDeviceInstallationUpdater adds the "device_installation_updater" edges to the DeviceInstallation entity.
+func (au *AdminUpdate) AddDeviceInstallationUpdater(d ...*DeviceInstallation) *AdminUpdate {
+	ids := make([]int, len(d))
+	for i := range d {
+		ids[i] = d[i].ID
+	}
+	return au.AddDeviceInstallationUpdaterIDs(ids...)
+}
+
+// AddEventLevelCreatorIDs adds the "event_level_creator" edge to the EventLevel entity by IDs.
+func (au *AdminUpdate) AddEventLevelCreatorIDs(ids ...int) *AdminUpdate {
+	au.mutation.AddEventLevelCreatorIDs(ids...)
+	return au
+}
+
+// AddEventLevelCreator adds the "event_level_creator" edges to the EventLevel entity.
+func (au *AdminUpdate) AddEventLevelCreator(e ...*EventLevel) *AdminUpdate {
+	ids := make([]int, len(e))
+	for i := range e {
+		ids[i] = e[i].ID
+	}
+	return au.AddEventLevelCreatorIDs(ids...)
+}
+
+// AddEventLevelUpdaterIDs adds the "event_level_updater" edge to the EventLevel entity by IDs.
+func (au *AdminUpdate) AddEventLevelUpdaterIDs(ids ...int) *AdminUpdate {
+	au.mutation.AddEventLevelUpdaterIDs(ids...)
+	return au
+}
+
+// AddEventLevelUpdater adds the "event_level_updater" edges to the EventLevel entity.
+func (au *AdminUpdate) AddEventLevelUpdater(e ...*EventLevel) *AdminUpdate {
+	ids := make([]int, len(e))
+	for i := range e {
+		ids[i] = e[i].ID
+	}
+	return au.AddEventLevelUpdaterIDs(ids...)
 }
 
 // Mutation returns the AdminMutation object of the builder.
@@ -883,46 +1007,46 @@ func (au *AdminUpdate) RemoveOccupationUpdater(o ...*Occupation) *AdminUpdate {
 	return au.RemoveOccupationUpdaterIDs(ids...)
 }
 
-// ClearIpcReportEventCreator clears all "ipc_report_event_creator" edges to the IPCReportEvent entity.
-func (au *AdminUpdate) ClearIpcReportEventCreator() *AdminUpdate {
-	au.mutation.ClearIpcReportEventCreator()
+// ClearIpcEventCreator clears all "ipc_event_creator" edges to the IPCEvent entity.
+func (au *AdminUpdate) ClearIpcEventCreator() *AdminUpdate {
+	au.mutation.ClearIpcEventCreator()
 	return au
 }
 
-// RemoveIpcReportEventCreatorIDs removes the "ipc_report_event_creator" edge to IPCReportEvent entities by IDs.
-func (au *AdminUpdate) RemoveIpcReportEventCreatorIDs(ids ...int) *AdminUpdate {
-	au.mutation.RemoveIpcReportEventCreatorIDs(ids...)
+// RemoveIpcEventCreatorIDs removes the "ipc_event_creator" edge to IPCEvent entities by IDs.
+func (au *AdminUpdate) RemoveIpcEventCreatorIDs(ids ...int) *AdminUpdate {
+	au.mutation.RemoveIpcEventCreatorIDs(ids...)
 	return au
 }
 
-// RemoveIpcReportEventCreator removes "ipc_report_event_creator" edges to IPCReportEvent entities.
-func (au *AdminUpdate) RemoveIpcReportEventCreator(i ...*IPCReportEvent) *AdminUpdate {
+// RemoveIpcEventCreator removes "ipc_event_creator" edges to IPCEvent entities.
+func (au *AdminUpdate) RemoveIpcEventCreator(i ...*IPCEvent) *AdminUpdate {
 	ids := make([]int, len(i))
 	for j := range i {
 		ids[j] = i[j].ID
 	}
-	return au.RemoveIpcReportEventCreatorIDs(ids...)
+	return au.RemoveIpcEventCreatorIDs(ids...)
 }
 
-// ClearIpcReportEventUpdater clears all "ipc_report_event_updater" edges to the IPCReportEvent entity.
-func (au *AdminUpdate) ClearIpcReportEventUpdater() *AdminUpdate {
-	au.mutation.ClearIpcReportEventUpdater()
+// ClearIpcEventUpdater clears all "ipc_event_updater" edges to the IPCEvent entity.
+func (au *AdminUpdate) ClearIpcEventUpdater() *AdminUpdate {
+	au.mutation.ClearIpcEventUpdater()
 	return au
 }
 
-// RemoveIpcReportEventUpdaterIDs removes the "ipc_report_event_updater" edge to IPCReportEvent entities by IDs.
-func (au *AdminUpdate) RemoveIpcReportEventUpdaterIDs(ids ...int) *AdminUpdate {
-	au.mutation.RemoveIpcReportEventUpdaterIDs(ids...)
+// RemoveIpcEventUpdaterIDs removes the "ipc_event_updater" edge to IPCEvent entities by IDs.
+func (au *AdminUpdate) RemoveIpcEventUpdaterIDs(ids ...int) *AdminUpdate {
+	au.mutation.RemoveIpcEventUpdaterIDs(ids...)
 	return au
 }
 
-// RemoveIpcReportEventUpdater removes "ipc_report_event_updater" edges to IPCReportEvent entities.
-func (au *AdminUpdate) RemoveIpcReportEventUpdater(i ...*IPCReportEvent) *AdminUpdate {
+// RemoveIpcEventUpdater removes "ipc_event_updater" edges to IPCEvent entities.
+func (au *AdminUpdate) RemoveIpcEventUpdater(i ...*IPCEvent) *AdminUpdate {
 	ids := make([]int, len(i))
 	for j := range i {
 		ids[j] = i[j].ID
 	}
-	return au.RemoveIpcReportEventUpdaterIDs(ids...)
+	return au.RemoveIpcEventUpdaterIDs(ids...)
 }
 
 // ClearVideoCreator clears all "video_creator" edges to the Video entity.
@@ -965,6 +1089,174 @@ func (au *AdminUpdate) RemoveVideoUpdater(v ...*Video) *AdminUpdate {
 		ids[i] = v[i].ID
 	}
 	return au.RemoveVideoUpdaterIDs(ids...)
+}
+
+// ClearAreaCreator clears all "area_creator" edges to the Area entity.
+func (au *AdminUpdate) ClearAreaCreator() *AdminUpdate {
+	au.mutation.ClearAreaCreator()
+	return au
+}
+
+// RemoveAreaCreatorIDs removes the "area_creator" edge to Area entities by IDs.
+func (au *AdminUpdate) RemoveAreaCreatorIDs(ids ...int) *AdminUpdate {
+	au.mutation.RemoveAreaCreatorIDs(ids...)
+	return au
+}
+
+// RemoveAreaCreator removes "area_creator" edges to Area entities.
+func (au *AdminUpdate) RemoveAreaCreator(a ...*Area) *AdminUpdate {
+	ids := make([]int, len(a))
+	for i := range a {
+		ids[i] = a[i].ID
+	}
+	return au.RemoveAreaCreatorIDs(ids...)
+}
+
+// ClearAreaUpdater clears all "area_updater" edges to the Area entity.
+func (au *AdminUpdate) ClearAreaUpdater() *AdminUpdate {
+	au.mutation.ClearAreaUpdater()
+	return au
+}
+
+// RemoveAreaUpdaterIDs removes the "area_updater" edge to Area entities by IDs.
+func (au *AdminUpdate) RemoveAreaUpdaterIDs(ids ...int) *AdminUpdate {
+	au.mutation.RemoveAreaUpdaterIDs(ids...)
+	return au
+}
+
+// RemoveAreaUpdater removes "area_updater" edges to Area entities.
+func (au *AdminUpdate) RemoveAreaUpdater(a ...*Area) *AdminUpdate {
+	ids := make([]int, len(a))
+	for i := range a {
+		ids[i] = a[i].ID
+	}
+	return au.RemoveAreaUpdaterIDs(ids...)
+}
+
+// ClearDeviceCreator clears all "device_creator" edges to the Device entity.
+func (au *AdminUpdate) ClearDeviceCreator() *AdminUpdate {
+	au.mutation.ClearDeviceCreator()
+	return au
+}
+
+// RemoveDeviceCreatorIDs removes the "device_creator" edge to Device entities by IDs.
+func (au *AdminUpdate) RemoveDeviceCreatorIDs(ids ...int) *AdminUpdate {
+	au.mutation.RemoveDeviceCreatorIDs(ids...)
+	return au
+}
+
+// RemoveDeviceCreator removes "device_creator" edges to Device entities.
+func (au *AdminUpdate) RemoveDeviceCreator(d ...*Device) *AdminUpdate {
+	ids := make([]int, len(d))
+	for i := range d {
+		ids[i] = d[i].ID
+	}
+	return au.RemoveDeviceCreatorIDs(ids...)
+}
+
+// ClearDeviceUpdater clears all "device_updater" edges to the Device entity.
+func (au *AdminUpdate) ClearDeviceUpdater() *AdminUpdate {
+	au.mutation.ClearDeviceUpdater()
+	return au
+}
+
+// RemoveDeviceUpdaterIDs removes the "device_updater" edge to Device entities by IDs.
+func (au *AdminUpdate) RemoveDeviceUpdaterIDs(ids ...int) *AdminUpdate {
+	au.mutation.RemoveDeviceUpdaterIDs(ids...)
+	return au
+}
+
+// RemoveDeviceUpdater removes "device_updater" edges to Device entities.
+func (au *AdminUpdate) RemoveDeviceUpdater(d ...*Device) *AdminUpdate {
+	ids := make([]int, len(d))
+	for i := range d {
+		ids[i] = d[i].ID
+	}
+	return au.RemoveDeviceUpdaterIDs(ids...)
+}
+
+// ClearDeviceInstallationCreator clears all "device_installation_creator" edges to the DeviceInstallation entity.
+func (au *AdminUpdate) ClearDeviceInstallationCreator() *AdminUpdate {
+	au.mutation.ClearDeviceInstallationCreator()
+	return au
+}
+
+// RemoveDeviceInstallationCreatorIDs removes the "device_installation_creator" edge to DeviceInstallation entities by IDs.
+func (au *AdminUpdate) RemoveDeviceInstallationCreatorIDs(ids ...int) *AdminUpdate {
+	au.mutation.RemoveDeviceInstallationCreatorIDs(ids...)
+	return au
+}
+
+// RemoveDeviceInstallationCreator removes "device_installation_creator" edges to DeviceInstallation entities.
+func (au *AdminUpdate) RemoveDeviceInstallationCreator(d ...*DeviceInstallation) *AdminUpdate {
+	ids := make([]int, len(d))
+	for i := range d {
+		ids[i] = d[i].ID
+	}
+	return au.RemoveDeviceInstallationCreatorIDs(ids...)
+}
+
+// ClearDeviceInstallationUpdater clears all "device_installation_updater" edges to the DeviceInstallation entity.
+func (au *AdminUpdate) ClearDeviceInstallationUpdater() *AdminUpdate {
+	au.mutation.ClearDeviceInstallationUpdater()
+	return au
+}
+
+// RemoveDeviceInstallationUpdaterIDs removes the "device_installation_updater" edge to DeviceInstallation entities by IDs.
+func (au *AdminUpdate) RemoveDeviceInstallationUpdaterIDs(ids ...int) *AdminUpdate {
+	au.mutation.RemoveDeviceInstallationUpdaterIDs(ids...)
+	return au
+}
+
+// RemoveDeviceInstallationUpdater removes "device_installation_updater" edges to DeviceInstallation entities.
+func (au *AdminUpdate) RemoveDeviceInstallationUpdater(d ...*DeviceInstallation) *AdminUpdate {
+	ids := make([]int, len(d))
+	for i := range d {
+		ids[i] = d[i].ID
+	}
+	return au.RemoveDeviceInstallationUpdaterIDs(ids...)
+}
+
+// ClearEventLevelCreator clears all "event_level_creator" edges to the EventLevel entity.
+func (au *AdminUpdate) ClearEventLevelCreator() *AdminUpdate {
+	au.mutation.ClearEventLevelCreator()
+	return au
+}
+
+// RemoveEventLevelCreatorIDs removes the "event_level_creator" edge to EventLevel entities by IDs.
+func (au *AdminUpdate) RemoveEventLevelCreatorIDs(ids ...int) *AdminUpdate {
+	au.mutation.RemoveEventLevelCreatorIDs(ids...)
+	return au
+}
+
+// RemoveEventLevelCreator removes "event_level_creator" edges to EventLevel entities.
+func (au *AdminUpdate) RemoveEventLevelCreator(e ...*EventLevel) *AdminUpdate {
+	ids := make([]int, len(e))
+	for i := range e {
+		ids[i] = e[i].ID
+	}
+	return au.RemoveEventLevelCreatorIDs(ids...)
+}
+
+// ClearEventLevelUpdater clears all "event_level_updater" edges to the EventLevel entity.
+func (au *AdminUpdate) ClearEventLevelUpdater() *AdminUpdate {
+	au.mutation.ClearEventLevelUpdater()
+	return au
+}
+
+// RemoveEventLevelUpdaterIDs removes the "event_level_updater" edge to EventLevel entities by IDs.
+func (au *AdminUpdate) RemoveEventLevelUpdaterIDs(ids ...int) *AdminUpdate {
+	au.mutation.RemoveEventLevelUpdaterIDs(ids...)
+	return au
+}
+
+// RemoveEventLevelUpdater removes "event_level_updater" edges to EventLevel entities.
+func (au *AdminUpdate) RemoveEventLevelUpdater(e ...*EventLevel) *AdminUpdate {
+	ids := make([]int, len(e))
+	for i := range e {
+		ids[i] = e[i].ID
+	}
+	return au.RemoveEventLevelUpdaterIDs(ids...)
 }
 
 // Save executes the query and returns the number of nodes affected by the update operation.
@@ -1928,28 +2220,28 @@ func (au *AdminUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if au.mutation.IpcReportEventCreatorCleared() {
+	if au.mutation.IpcEventCreatorCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
-			Table:   admin.IpcReportEventCreatorTable,
-			Columns: []string{admin.IpcReportEventCreatorColumn},
+			Table:   admin.IpcEventCreatorTable,
+			Columns: []string{admin.IpcEventCreatorColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(ipcreportevent.FieldID, field.TypeInt),
+				IDSpec: sqlgraph.NewFieldSpec(ipcevent.FieldID, field.TypeInt),
 			},
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := au.mutation.RemovedIpcReportEventCreatorIDs(); len(nodes) > 0 && !au.mutation.IpcReportEventCreatorCleared() {
+	if nodes := au.mutation.RemovedIpcEventCreatorIDs(); len(nodes) > 0 && !au.mutation.IpcEventCreatorCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
-			Table:   admin.IpcReportEventCreatorTable,
-			Columns: []string{admin.IpcReportEventCreatorColumn},
+			Table:   admin.IpcEventCreatorTable,
+			Columns: []string{admin.IpcEventCreatorColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(ipcreportevent.FieldID, field.TypeInt),
+				IDSpec: sqlgraph.NewFieldSpec(ipcevent.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {
@@ -1957,15 +2249,15 @@ func (au *AdminUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := au.mutation.IpcReportEventCreatorIDs(); len(nodes) > 0 {
+	if nodes := au.mutation.IpcEventCreatorIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
-			Table:   admin.IpcReportEventCreatorTable,
-			Columns: []string{admin.IpcReportEventCreatorColumn},
+			Table:   admin.IpcEventCreatorTable,
+			Columns: []string{admin.IpcEventCreatorColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(ipcreportevent.FieldID, field.TypeInt),
+				IDSpec: sqlgraph.NewFieldSpec(ipcevent.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {
@@ -1973,28 +2265,28 @@ func (au *AdminUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if au.mutation.IpcReportEventUpdaterCleared() {
+	if au.mutation.IpcEventUpdaterCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
-			Table:   admin.IpcReportEventUpdaterTable,
-			Columns: []string{admin.IpcReportEventUpdaterColumn},
+			Table:   admin.IpcEventUpdaterTable,
+			Columns: []string{admin.IpcEventUpdaterColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(ipcreportevent.FieldID, field.TypeInt),
+				IDSpec: sqlgraph.NewFieldSpec(ipcevent.FieldID, field.TypeInt),
 			},
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := au.mutation.RemovedIpcReportEventUpdaterIDs(); len(nodes) > 0 && !au.mutation.IpcReportEventUpdaterCleared() {
+	if nodes := au.mutation.RemovedIpcEventUpdaterIDs(); len(nodes) > 0 && !au.mutation.IpcEventUpdaterCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
-			Table:   admin.IpcReportEventUpdaterTable,
-			Columns: []string{admin.IpcReportEventUpdaterColumn},
+			Table:   admin.IpcEventUpdaterTable,
+			Columns: []string{admin.IpcEventUpdaterColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(ipcreportevent.FieldID, field.TypeInt),
+				IDSpec: sqlgraph.NewFieldSpec(ipcevent.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {
@@ -2002,15 +2294,15 @@ func (au *AdminUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := au.mutation.IpcReportEventUpdaterIDs(); len(nodes) > 0 {
+	if nodes := au.mutation.IpcEventUpdaterIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
-			Table:   admin.IpcReportEventUpdaterTable,
-			Columns: []string{admin.IpcReportEventUpdaterColumn},
+			Table:   admin.IpcEventUpdaterTable,
+			Columns: []string{admin.IpcEventUpdaterColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(ipcreportevent.FieldID, field.TypeInt),
+				IDSpec: sqlgraph.NewFieldSpec(ipcevent.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {
@@ -2101,6 +2393,366 @@ func (au *AdminUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(video.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if au.mutation.AreaCreatorCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   admin.AreaCreatorTable,
+			Columns: []string{admin.AreaCreatorColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(area.FieldID, field.TypeInt),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := au.mutation.RemovedAreaCreatorIDs(); len(nodes) > 0 && !au.mutation.AreaCreatorCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   admin.AreaCreatorTable,
+			Columns: []string{admin.AreaCreatorColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(area.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := au.mutation.AreaCreatorIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   admin.AreaCreatorTable,
+			Columns: []string{admin.AreaCreatorColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(area.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if au.mutation.AreaUpdaterCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   admin.AreaUpdaterTable,
+			Columns: []string{admin.AreaUpdaterColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(area.FieldID, field.TypeInt),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := au.mutation.RemovedAreaUpdaterIDs(); len(nodes) > 0 && !au.mutation.AreaUpdaterCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   admin.AreaUpdaterTable,
+			Columns: []string{admin.AreaUpdaterColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(area.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := au.mutation.AreaUpdaterIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   admin.AreaUpdaterTable,
+			Columns: []string{admin.AreaUpdaterColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(area.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if au.mutation.DeviceCreatorCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   admin.DeviceCreatorTable,
+			Columns: []string{admin.DeviceCreatorColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(device.FieldID, field.TypeInt),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := au.mutation.RemovedDeviceCreatorIDs(); len(nodes) > 0 && !au.mutation.DeviceCreatorCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   admin.DeviceCreatorTable,
+			Columns: []string{admin.DeviceCreatorColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(device.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := au.mutation.DeviceCreatorIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   admin.DeviceCreatorTable,
+			Columns: []string{admin.DeviceCreatorColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(device.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if au.mutation.DeviceUpdaterCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   admin.DeviceUpdaterTable,
+			Columns: []string{admin.DeviceUpdaterColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(device.FieldID, field.TypeInt),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := au.mutation.RemovedDeviceUpdaterIDs(); len(nodes) > 0 && !au.mutation.DeviceUpdaterCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   admin.DeviceUpdaterTable,
+			Columns: []string{admin.DeviceUpdaterColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(device.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := au.mutation.DeviceUpdaterIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   admin.DeviceUpdaterTable,
+			Columns: []string{admin.DeviceUpdaterColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(device.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if au.mutation.DeviceInstallationCreatorCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   admin.DeviceInstallationCreatorTable,
+			Columns: []string{admin.DeviceInstallationCreatorColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(deviceinstallation.FieldID, field.TypeInt),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := au.mutation.RemovedDeviceInstallationCreatorIDs(); len(nodes) > 0 && !au.mutation.DeviceInstallationCreatorCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   admin.DeviceInstallationCreatorTable,
+			Columns: []string{admin.DeviceInstallationCreatorColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(deviceinstallation.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := au.mutation.DeviceInstallationCreatorIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   admin.DeviceInstallationCreatorTable,
+			Columns: []string{admin.DeviceInstallationCreatorColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(deviceinstallation.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if au.mutation.DeviceInstallationUpdaterCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   admin.DeviceInstallationUpdaterTable,
+			Columns: []string{admin.DeviceInstallationUpdaterColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(deviceinstallation.FieldID, field.TypeInt),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := au.mutation.RemovedDeviceInstallationUpdaterIDs(); len(nodes) > 0 && !au.mutation.DeviceInstallationUpdaterCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   admin.DeviceInstallationUpdaterTable,
+			Columns: []string{admin.DeviceInstallationUpdaterColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(deviceinstallation.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := au.mutation.DeviceInstallationUpdaterIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   admin.DeviceInstallationUpdaterTable,
+			Columns: []string{admin.DeviceInstallationUpdaterColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(deviceinstallation.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if au.mutation.EventLevelCreatorCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   admin.EventLevelCreatorTable,
+			Columns: []string{admin.EventLevelCreatorColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(eventlevel.FieldID, field.TypeInt),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := au.mutation.RemovedEventLevelCreatorIDs(); len(nodes) > 0 && !au.mutation.EventLevelCreatorCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   admin.EventLevelCreatorTable,
+			Columns: []string{admin.EventLevelCreatorColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(eventlevel.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := au.mutation.EventLevelCreatorIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   admin.EventLevelCreatorTable,
+			Columns: []string{admin.EventLevelCreatorColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(eventlevel.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if au.mutation.EventLevelUpdaterCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   admin.EventLevelUpdaterTable,
+			Columns: []string{admin.EventLevelUpdaterColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(eventlevel.FieldID, field.TypeInt),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := au.mutation.RemovedEventLevelUpdaterIDs(); len(nodes) > 0 && !au.mutation.EventLevelUpdaterCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   admin.EventLevelUpdaterTable,
+			Columns: []string{admin.EventLevelUpdaterColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(eventlevel.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := au.mutation.EventLevelUpdaterIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   admin.EventLevelUpdaterTable,
+			Columns: []string{admin.EventLevelUpdaterColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(eventlevel.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {
@@ -2525,34 +3177,34 @@ func (auo *AdminUpdateOne) AddOccupationUpdater(o ...*Occupation) *AdminUpdateOn
 	return auo.AddOccupationUpdaterIDs(ids...)
 }
 
-// AddIpcReportEventCreatorIDs adds the "ipc_report_event_creator" edge to the IPCReportEvent entity by IDs.
-func (auo *AdminUpdateOne) AddIpcReportEventCreatorIDs(ids ...int) *AdminUpdateOne {
-	auo.mutation.AddIpcReportEventCreatorIDs(ids...)
+// AddIpcEventCreatorIDs adds the "ipc_event_creator" edge to the IPCEvent entity by IDs.
+func (auo *AdminUpdateOne) AddIpcEventCreatorIDs(ids ...int) *AdminUpdateOne {
+	auo.mutation.AddIpcEventCreatorIDs(ids...)
 	return auo
 }
 
-// AddIpcReportEventCreator adds the "ipc_report_event_creator" edges to the IPCReportEvent entity.
-func (auo *AdminUpdateOne) AddIpcReportEventCreator(i ...*IPCReportEvent) *AdminUpdateOne {
+// AddIpcEventCreator adds the "ipc_event_creator" edges to the IPCEvent entity.
+func (auo *AdminUpdateOne) AddIpcEventCreator(i ...*IPCEvent) *AdminUpdateOne {
 	ids := make([]int, len(i))
 	for j := range i {
 		ids[j] = i[j].ID
 	}
-	return auo.AddIpcReportEventCreatorIDs(ids...)
+	return auo.AddIpcEventCreatorIDs(ids...)
 }
 
-// AddIpcReportEventUpdaterIDs adds the "ipc_report_event_updater" edge to the IPCReportEvent entity by IDs.
-func (auo *AdminUpdateOne) AddIpcReportEventUpdaterIDs(ids ...int) *AdminUpdateOne {
-	auo.mutation.AddIpcReportEventUpdaterIDs(ids...)
+// AddIpcEventUpdaterIDs adds the "ipc_event_updater" edge to the IPCEvent entity by IDs.
+func (auo *AdminUpdateOne) AddIpcEventUpdaterIDs(ids ...int) *AdminUpdateOne {
+	auo.mutation.AddIpcEventUpdaterIDs(ids...)
 	return auo
 }
 
-// AddIpcReportEventUpdater adds the "ipc_report_event_updater" edges to the IPCReportEvent entity.
-func (auo *AdminUpdateOne) AddIpcReportEventUpdater(i ...*IPCReportEvent) *AdminUpdateOne {
+// AddIpcEventUpdater adds the "ipc_event_updater" edges to the IPCEvent entity.
+func (auo *AdminUpdateOne) AddIpcEventUpdater(i ...*IPCEvent) *AdminUpdateOne {
 	ids := make([]int, len(i))
 	for j := range i {
 		ids[j] = i[j].ID
 	}
-	return auo.AddIpcReportEventUpdaterIDs(ids...)
+	return auo.AddIpcEventUpdaterIDs(ids...)
 }
 
 // AddVideoCreatorIDs adds the "video_creator" edge to the Video entity by IDs.
@@ -2583,6 +3235,126 @@ func (auo *AdminUpdateOne) AddVideoUpdater(v ...*Video) *AdminUpdateOne {
 		ids[i] = v[i].ID
 	}
 	return auo.AddVideoUpdaterIDs(ids...)
+}
+
+// AddAreaCreatorIDs adds the "area_creator" edge to the Area entity by IDs.
+func (auo *AdminUpdateOne) AddAreaCreatorIDs(ids ...int) *AdminUpdateOne {
+	auo.mutation.AddAreaCreatorIDs(ids...)
+	return auo
+}
+
+// AddAreaCreator adds the "area_creator" edges to the Area entity.
+func (auo *AdminUpdateOne) AddAreaCreator(a ...*Area) *AdminUpdateOne {
+	ids := make([]int, len(a))
+	for i := range a {
+		ids[i] = a[i].ID
+	}
+	return auo.AddAreaCreatorIDs(ids...)
+}
+
+// AddAreaUpdaterIDs adds the "area_updater" edge to the Area entity by IDs.
+func (auo *AdminUpdateOne) AddAreaUpdaterIDs(ids ...int) *AdminUpdateOne {
+	auo.mutation.AddAreaUpdaterIDs(ids...)
+	return auo
+}
+
+// AddAreaUpdater adds the "area_updater" edges to the Area entity.
+func (auo *AdminUpdateOne) AddAreaUpdater(a ...*Area) *AdminUpdateOne {
+	ids := make([]int, len(a))
+	for i := range a {
+		ids[i] = a[i].ID
+	}
+	return auo.AddAreaUpdaterIDs(ids...)
+}
+
+// AddDeviceCreatorIDs adds the "device_creator" edge to the Device entity by IDs.
+func (auo *AdminUpdateOne) AddDeviceCreatorIDs(ids ...int) *AdminUpdateOne {
+	auo.mutation.AddDeviceCreatorIDs(ids...)
+	return auo
+}
+
+// AddDeviceCreator adds the "device_creator" edges to the Device entity.
+func (auo *AdminUpdateOne) AddDeviceCreator(d ...*Device) *AdminUpdateOne {
+	ids := make([]int, len(d))
+	for i := range d {
+		ids[i] = d[i].ID
+	}
+	return auo.AddDeviceCreatorIDs(ids...)
+}
+
+// AddDeviceUpdaterIDs adds the "device_updater" edge to the Device entity by IDs.
+func (auo *AdminUpdateOne) AddDeviceUpdaterIDs(ids ...int) *AdminUpdateOne {
+	auo.mutation.AddDeviceUpdaterIDs(ids...)
+	return auo
+}
+
+// AddDeviceUpdater adds the "device_updater" edges to the Device entity.
+func (auo *AdminUpdateOne) AddDeviceUpdater(d ...*Device) *AdminUpdateOne {
+	ids := make([]int, len(d))
+	for i := range d {
+		ids[i] = d[i].ID
+	}
+	return auo.AddDeviceUpdaterIDs(ids...)
+}
+
+// AddDeviceInstallationCreatorIDs adds the "device_installation_creator" edge to the DeviceInstallation entity by IDs.
+func (auo *AdminUpdateOne) AddDeviceInstallationCreatorIDs(ids ...int) *AdminUpdateOne {
+	auo.mutation.AddDeviceInstallationCreatorIDs(ids...)
+	return auo
+}
+
+// AddDeviceInstallationCreator adds the "device_installation_creator" edges to the DeviceInstallation entity.
+func (auo *AdminUpdateOne) AddDeviceInstallationCreator(d ...*DeviceInstallation) *AdminUpdateOne {
+	ids := make([]int, len(d))
+	for i := range d {
+		ids[i] = d[i].ID
+	}
+	return auo.AddDeviceInstallationCreatorIDs(ids...)
+}
+
+// AddDeviceInstallationUpdaterIDs adds the "device_installation_updater" edge to the DeviceInstallation entity by IDs.
+func (auo *AdminUpdateOne) AddDeviceInstallationUpdaterIDs(ids ...int) *AdminUpdateOne {
+	auo.mutation.AddDeviceInstallationUpdaterIDs(ids...)
+	return auo
+}
+
+// AddDeviceInstallationUpdater adds the "device_installation_updater" edges to the DeviceInstallation entity.
+func (auo *AdminUpdateOne) AddDeviceInstallationUpdater(d ...*DeviceInstallation) *AdminUpdateOne {
+	ids := make([]int, len(d))
+	for i := range d {
+		ids[i] = d[i].ID
+	}
+	return auo.AddDeviceInstallationUpdaterIDs(ids...)
+}
+
+// AddEventLevelCreatorIDs adds the "event_level_creator" edge to the EventLevel entity by IDs.
+func (auo *AdminUpdateOne) AddEventLevelCreatorIDs(ids ...int) *AdminUpdateOne {
+	auo.mutation.AddEventLevelCreatorIDs(ids...)
+	return auo
+}
+
+// AddEventLevelCreator adds the "event_level_creator" edges to the EventLevel entity.
+func (auo *AdminUpdateOne) AddEventLevelCreator(e ...*EventLevel) *AdminUpdateOne {
+	ids := make([]int, len(e))
+	for i := range e {
+		ids[i] = e[i].ID
+	}
+	return auo.AddEventLevelCreatorIDs(ids...)
+}
+
+// AddEventLevelUpdaterIDs adds the "event_level_updater" edge to the EventLevel entity by IDs.
+func (auo *AdminUpdateOne) AddEventLevelUpdaterIDs(ids ...int) *AdminUpdateOne {
+	auo.mutation.AddEventLevelUpdaterIDs(ids...)
+	return auo
+}
+
+// AddEventLevelUpdater adds the "event_level_updater" edges to the EventLevel entity.
+func (auo *AdminUpdateOne) AddEventLevelUpdater(e ...*EventLevel) *AdminUpdateOne {
+	ids := make([]int, len(e))
+	for i := range e {
+		ids[i] = e[i].ID
+	}
+	return auo.AddEventLevelUpdaterIDs(ids...)
 }
 
 // Mutation returns the AdminMutation object of the builder.
@@ -2974,46 +3746,46 @@ func (auo *AdminUpdateOne) RemoveOccupationUpdater(o ...*Occupation) *AdminUpdat
 	return auo.RemoveOccupationUpdaterIDs(ids...)
 }
 
-// ClearIpcReportEventCreator clears all "ipc_report_event_creator" edges to the IPCReportEvent entity.
-func (auo *AdminUpdateOne) ClearIpcReportEventCreator() *AdminUpdateOne {
-	auo.mutation.ClearIpcReportEventCreator()
+// ClearIpcEventCreator clears all "ipc_event_creator" edges to the IPCEvent entity.
+func (auo *AdminUpdateOne) ClearIpcEventCreator() *AdminUpdateOne {
+	auo.mutation.ClearIpcEventCreator()
 	return auo
 }
 
-// RemoveIpcReportEventCreatorIDs removes the "ipc_report_event_creator" edge to IPCReportEvent entities by IDs.
-func (auo *AdminUpdateOne) RemoveIpcReportEventCreatorIDs(ids ...int) *AdminUpdateOne {
-	auo.mutation.RemoveIpcReportEventCreatorIDs(ids...)
+// RemoveIpcEventCreatorIDs removes the "ipc_event_creator" edge to IPCEvent entities by IDs.
+func (auo *AdminUpdateOne) RemoveIpcEventCreatorIDs(ids ...int) *AdminUpdateOne {
+	auo.mutation.RemoveIpcEventCreatorIDs(ids...)
 	return auo
 }
 
-// RemoveIpcReportEventCreator removes "ipc_report_event_creator" edges to IPCReportEvent entities.
-func (auo *AdminUpdateOne) RemoveIpcReportEventCreator(i ...*IPCReportEvent) *AdminUpdateOne {
+// RemoveIpcEventCreator removes "ipc_event_creator" edges to IPCEvent entities.
+func (auo *AdminUpdateOne) RemoveIpcEventCreator(i ...*IPCEvent) *AdminUpdateOne {
 	ids := make([]int, len(i))
 	for j := range i {
 		ids[j] = i[j].ID
 	}
-	return auo.RemoveIpcReportEventCreatorIDs(ids...)
+	return auo.RemoveIpcEventCreatorIDs(ids...)
 }
 
-// ClearIpcReportEventUpdater clears all "ipc_report_event_updater" edges to the IPCReportEvent entity.
-func (auo *AdminUpdateOne) ClearIpcReportEventUpdater() *AdminUpdateOne {
-	auo.mutation.ClearIpcReportEventUpdater()
+// ClearIpcEventUpdater clears all "ipc_event_updater" edges to the IPCEvent entity.
+func (auo *AdminUpdateOne) ClearIpcEventUpdater() *AdminUpdateOne {
+	auo.mutation.ClearIpcEventUpdater()
 	return auo
 }
 
-// RemoveIpcReportEventUpdaterIDs removes the "ipc_report_event_updater" edge to IPCReportEvent entities by IDs.
-func (auo *AdminUpdateOne) RemoveIpcReportEventUpdaterIDs(ids ...int) *AdminUpdateOne {
-	auo.mutation.RemoveIpcReportEventUpdaterIDs(ids...)
+// RemoveIpcEventUpdaterIDs removes the "ipc_event_updater" edge to IPCEvent entities by IDs.
+func (auo *AdminUpdateOne) RemoveIpcEventUpdaterIDs(ids ...int) *AdminUpdateOne {
+	auo.mutation.RemoveIpcEventUpdaterIDs(ids...)
 	return auo
 }
 
-// RemoveIpcReportEventUpdater removes "ipc_report_event_updater" edges to IPCReportEvent entities.
-func (auo *AdminUpdateOne) RemoveIpcReportEventUpdater(i ...*IPCReportEvent) *AdminUpdateOne {
+// RemoveIpcEventUpdater removes "ipc_event_updater" edges to IPCEvent entities.
+func (auo *AdminUpdateOne) RemoveIpcEventUpdater(i ...*IPCEvent) *AdminUpdateOne {
 	ids := make([]int, len(i))
 	for j := range i {
 		ids[j] = i[j].ID
 	}
-	return auo.RemoveIpcReportEventUpdaterIDs(ids...)
+	return auo.RemoveIpcEventUpdaterIDs(ids...)
 }
 
 // ClearVideoCreator clears all "video_creator" edges to the Video entity.
@@ -3056,6 +3828,174 @@ func (auo *AdminUpdateOne) RemoveVideoUpdater(v ...*Video) *AdminUpdateOne {
 		ids[i] = v[i].ID
 	}
 	return auo.RemoveVideoUpdaterIDs(ids...)
+}
+
+// ClearAreaCreator clears all "area_creator" edges to the Area entity.
+func (auo *AdminUpdateOne) ClearAreaCreator() *AdminUpdateOne {
+	auo.mutation.ClearAreaCreator()
+	return auo
+}
+
+// RemoveAreaCreatorIDs removes the "area_creator" edge to Area entities by IDs.
+func (auo *AdminUpdateOne) RemoveAreaCreatorIDs(ids ...int) *AdminUpdateOne {
+	auo.mutation.RemoveAreaCreatorIDs(ids...)
+	return auo
+}
+
+// RemoveAreaCreator removes "area_creator" edges to Area entities.
+func (auo *AdminUpdateOne) RemoveAreaCreator(a ...*Area) *AdminUpdateOne {
+	ids := make([]int, len(a))
+	for i := range a {
+		ids[i] = a[i].ID
+	}
+	return auo.RemoveAreaCreatorIDs(ids...)
+}
+
+// ClearAreaUpdater clears all "area_updater" edges to the Area entity.
+func (auo *AdminUpdateOne) ClearAreaUpdater() *AdminUpdateOne {
+	auo.mutation.ClearAreaUpdater()
+	return auo
+}
+
+// RemoveAreaUpdaterIDs removes the "area_updater" edge to Area entities by IDs.
+func (auo *AdminUpdateOne) RemoveAreaUpdaterIDs(ids ...int) *AdminUpdateOne {
+	auo.mutation.RemoveAreaUpdaterIDs(ids...)
+	return auo
+}
+
+// RemoveAreaUpdater removes "area_updater" edges to Area entities.
+func (auo *AdminUpdateOne) RemoveAreaUpdater(a ...*Area) *AdminUpdateOne {
+	ids := make([]int, len(a))
+	for i := range a {
+		ids[i] = a[i].ID
+	}
+	return auo.RemoveAreaUpdaterIDs(ids...)
+}
+
+// ClearDeviceCreator clears all "device_creator" edges to the Device entity.
+func (auo *AdminUpdateOne) ClearDeviceCreator() *AdminUpdateOne {
+	auo.mutation.ClearDeviceCreator()
+	return auo
+}
+
+// RemoveDeviceCreatorIDs removes the "device_creator" edge to Device entities by IDs.
+func (auo *AdminUpdateOne) RemoveDeviceCreatorIDs(ids ...int) *AdminUpdateOne {
+	auo.mutation.RemoveDeviceCreatorIDs(ids...)
+	return auo
+}
+
+// RemoveDeviceCreator removes "device_creator" edges to Device entities.
+func (auo *AdminUpdateOne) RemoveDeviceCreator(d ...*Device) *AdminUpdateOne {
+	ids := make([]int, len(d))
+	for i := range d {
+		ids[i] = d[i].ID
+	}
+	return auo.RemoveDeviceCreatorIDs(ids...)
+}
+
+// ClearDeviceUpdater clears all "device_updater" edges to the Device entity.
+func (auo *AdminUpdateOne) ClearDeviceUpdater() *AdminUpdateOne {
+	auo.mutation.ClearDeviceUpdater()
+	return auo
+}
+
+// RemoveDeviceUpdaterIDs removes the "device_updater" edge to Device entities by IDs.
+func (auo *AdminUpdateOne) RemoveDeviceUpdaterIDs(ids ...int) *AdminUpdateOne {
+	auo.mutation.RemoveDeviceUpdaterIDs(ids...)
+	return auo
+}
+
+// RemoveDeviceUpdater removes "device_updater" edges to Device entities.
+func (auo *AdminUpdateOne) RemoveDeviceUpdater(d ...*Device) *AdminUpdateOne {
+	ids := make([]int, len(d))
+	for i := range d {
+		ids[i] = d[i].ID
+	}
+	return auo.RemoveDeviceUpdaterIDs(ids...)
+}
+
+// ClearDeviceInstallationCreator clears all "device_installation_creator" edges to the DeviceInstallation entity.
+func (auo *AdminUpdateOne) ClearDeviceInstallationCreator() *AdminUpdateOne {
+	auo.mutation.ClearDeviceInstallationCreator()
+	return auo
+}
+
+// RemoveDeviceInstallationCreatorIDs removes the "device_installation_creator" edge to DeviceInstallation entities by IDs.
+func (auo *AdminUpdateOne) RemoveDeviceInstallationCreatorIDs(ids ...int) *AdminUpdateOne {
+	auo.mutation.RemoveDeviceInstallationCreatorIDs(ids...)
+	return auo
+}
+
+// RemoveDeviceInstallationCreator removes "device_installation_creator" edges to DeviceInstallation entities.
+func (auo *AdminUpdateOne) RemoveDeviceInstallationCreator(d ...*DeviceInstallation) *AdminUpdateOne {
+	ids := make([]int, len(d))
+	for i := range d {
+		ids[i] = d[i].ID
+	}
+	return auo.RemoveDeviceInstallationCreatorIDs(ids...)
+}
+
+// ClearDeviceInstallationUpdater clears all "device_installation_updater" edges to the DeviceInstallation entity.
+func (auo *AdminUpdateOne) ClearDeviceInstallationUpdater() *AdminUpdateOne {
+	auo.mutation.ClearDeviceInstallationUpdater()
+	return auo
+}
+
+// RemoveDeviceInstallationUpdaterIDs removes the "device_installation_updater" edge to DeviceInstallation entities by IDs.
+func (auo *AdminUpdateOne) RemoveDeviceInstallationUpdaterIDs(ids ...int) *AdminUpdateOne {
+	auo.mutation.RemoveDeviceInstallationUpdaterIDs(ids...)
+	return auo
+}
+
+// RemoveDeviceInstallationUpdater removes "device_installation_updater" edges to DeviceInstallation entities.
+func (auo *AdminUpdateOne) RemoveDeviceInstallationUpdater(d ...*DeviceInstallation) *AdminUpdateOne {
+	ids := make([]int, len(d))
+	for i := range d {
+		ids[i] = d[i].ID
+	}
+	return auo.RemoveDeviceInstallationUpdaterIDs(ids...)
+}
+
+// ClearEventLevelCreator clears all "event_level_creator" edges to the EventLevel entity.
+func (auo *AdminUpdateOne) ClearEventLevelCreator() *AdminUpdateOne {
+	auo.mutation.ClearEventLevelCreator()
+	return auo
+}
+
+// RemoveEventLevelCreatorIDs removes the "event_level_creator" edge to EventLevel entities by IDs.
+func (auo *AdminUpdateOne) RemoveEventLevelCreatorIDs(ids ...int) *AdminUpdateOne {
+	auo.mutation.RemoveEventLevelCreatorIDs(ids...)
+	return auo
+}
+
+// RemoveEventLevelCreator removes "event_level_creator" edges to EventLevel entities.
+func (auo *AdminUpdateOne) RemoveEventLevelCreator(e ...*EventLevel) *AdminUpdateOne {
+	ids := make([]int, len(e))
+	for i := range e {
+		ids[i] = e[i].ID
+	}
+	return auo.RemoveEventLevelCreatorIDs(ids...)
+}
+
+// ClearEventLevelUpdater clears all "event_level_updater" edges to the EventLevel entity.
+func (auo *AdminUpdateOne) ClearEventLevelUpdater() *AdminUpdateOne {
+	auo.mutation.ClearEventLevelUpdater()
+	return auo
+}
+
+// RemoveEventLevelUpdaterIDs removes the "event_level_updater" edge to EventLevel entities by IDs.
+func (auo *AdminUpdateOne) RemoveEventLevelUpdaterIDs(ids ...int) *AdminUpdateOne {
+	auo.mutation.RemoveEventLevelUpdaterIDs(ids...)
+	return auo
+}
+
+// RemoveEventLevelUpdater removes "event_level_updater" edges to EventLevel entities.
+func (auo *AdminUpdateOne) RemoveEventLevelUpdater(e ...*EventLevel) *AdminUpdateOne {
+	ids := make([]int, len(e))
+	for i := range e {
+		ids[i] = e[i].ID
+	}
+	return auo.RemoveEventLevelUpdaterIDs(ids...)
 }
 
 // Where appends a list predicates to the AdminUpdate builder.
@@ -4049,28 +4989,28 @@ func (auo *AdminUpdateOne) sqlSave(ctx context.Context) (_node *Admin, err error
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if auo.mutation.IpcReportEventCreatorCleared() {
+	if auo.mutation.IpcEventCreatorCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
-			Table:   admin.IpcReportEventCreatorTable,
-			Columns: []string{admin.IpcReportEventCreatorColumn},
+			Table:   admin.IpcEventCreatorTable,
+			Columns: []string{admin.IpcEventCreatorColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(ipcreportevent.FieldID, field.TypeInt),
+				IDSpec: sqlgraph.NewFieldSpec(ipcevent.FieldID, field.TypeInt),
 			},
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := auo.mutation.RemovedIpcReportEventCreatorIDs(); len(nodes) > 0 && !auo.mutation.IpcReportEventCreatorCleared() {
+	if nodes := auo.mutation.RemovedIpcEventCreatorIDs(); len(nodes) > 0 && !auo.mutation.IpcEventCreatorCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
-			Table:   admin.IpcReportEventCreatorTable,
-			Columns: []string{admin.IpcReportEventCreatorColumn},
+			Table:   admin.IpcEventCreatorTable,
+			Columns: []string{admin.IpcEventCreatorColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(ipcreportevent.FieldID, field.TypeInt),
+				IDSpec: sqlgraph.NewFieldSpec(ipcevent.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {
@@ -4078,15 +5018,15 @@ func (auo *AdminUpdateOne) sqlSave(ctx context.Context) (_node *Admin, err error
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := auo.mutation.IpcReportEventCreatorIDs(); len(nodes) > 0 {
+	if nodes := auo.mutation.IpcEventCreatorIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
-			Table:   admin.IpcReportEventCreatorTable,
-			Columns: []string{admin.IpcReportEventCreatorColumn},
+			Table:   admin.IpcEventCreatorTable,
+			Columns: []string{admin.IpcEventCreatorColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(ipcreportevent.FieldID, field.TypeInt),
+				IDSpec: sqlgraph.NewFieldSpec(ipcevent.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {
@@ -4094,28 +5034,28 @@ func (auo *AdminUpdateOne) sqlSave(ctx context.Context) (_node *Admin, err error
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if auo.mutation.IpcReportEventUpdaterCleared() {
+	if auo.mutation.IpcEventUpdaterCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
-			Table:   admin.IpcReportEventUpdaterTable,
-			Columns: []string{admin.IpcReportEventUpdaterColumn},
+			Table:   admin.IpcEventUpdaterTable,
+			Columns: []string{admin.IpcEventUpdaterColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(ipcreportevent.FieldID, field.TypeInt),
+				IDSpec: sqlgraph.NewFieldSpec(ipcevent.FieldID, field.TypeInt),
 			},
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := auo.mutation.RemovedIpcReportEventUpdaterIDs(); len(nodes) > 0 && !auo.mutation.IpcReportEventUpdaterCleared() {
+	if nodes := auo.mutation.RemovedIpcEventUpdaterIDs(); len(nodes) > 0 && !auo.mutation.IpcEventUpdaterCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
-			Table:   admin.IpcReportEventUpdaterTable,
-			Columns: []string{admin.IpcReportEventUpdaterColumn},
+			Table:   admin.IpcEventUpdaterTable,
+			Columns: []string{admin.IpcEventUpdaterColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(ipcreportevent.FieldID, field.TypeInt),
+				IDSpec: sqlgraph.NewFieldSpec(ipcevent.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {
@@ -4123,15 +5063,15 @@ func (auo *AdminUpdateOne) sqlSave(ctx context.Context) (_node *Admin, err error
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := auo.mutation.IpcReportEventUpdaterIDs(); len(nodes) > 0 {
+	if nodes := auo.mutation.IpcEventUpdaterIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
-			Table:   admin.IpcReportEventUpdaterTable,
-			Columns: []string{admin.IpcReportEventUpdaterColumn},
+			Table:   admin.IpcEventUpdaterTable,
+			Columns: []string{admin.IpcEventUpdaterColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(ipcreportevent.FieldID, field.TypeInt),
+				IDSpec: sqlgraph.NewFieldSpec(ipcevent.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {
@@ -4222,6 +5162,366 @@ func (auo *AdminUpdateOne) sqlSave(ctx context.Context) (_node *Admin, err error
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(video.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if auo.mutation.AreaCreatorCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   admin.AreaCreatorTable,
+			Columns: []string{admin.AreaCreatorColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(area.FieldID, field.TypeInt),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := auo.mutation.RemovedAreaCreatorIDs(); len(nodes) > 0 && !auo.mutation.AreaCreatorCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   admin.AreaCreatorTable,
+			Columns: []string{admin.AreaCreatorColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(area.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := auo.mutation.AreaCreatorIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   admin.AreaCreatorTable,
+			Columns: []string{admin.AreaCreatorColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(area.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if auo.mutation.AreaUpdaterCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   admin.AreaUpdaterTable,
+			Columns: []string{admin.AreaUpdaterColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(area.FieldID, field.TypeInt),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := auo.mutation.RemovedAreaUpdaterIDs(); len(nodes) > 0 && !auo.mutation.AreaUpdaterCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   admin.AreaUpdaterTable,
+			Columns: []string{admin.AreaUpdaterColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(area.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := auo.mutation.AreaUpdaterIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   admin.AreaUpdaterTable,
+			Columns: []string{admin.AreaUpdaterColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(area.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if auo.mutation.DeviceCreatorCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   admin.DeviceCreatorTable,
+			Columns: []string{admin.DeviceCreatorColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(device.FieldID, field.TypeInt),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := auo.mutation.RemovedDeviceCreatorIDs(); len(nodes) > 0 && !auo.mutation.DeviceCreatorCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   admin.DeviceCreatorTable,
+			Columns: []string{admin.DeviceCreatorColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(device.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := auo.mutation.DeviceCreatorIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   admin.DeviceCreatorTable,
+			Columns: []string{admin.DeviceCreatorColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(device.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if auo.mutation.DeviceUpdaterCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   admin.DeviceUpdaterTable,
+			Columns: []string{admin.DeviceUpdaterColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(device.FieldID, field.TypeInt),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := auo.mutation.RemovedDeviceUpdaterIDs(); len(nodes) > 0 && !auo.mutation.DeviceUpdaterCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   admin.DeviceUpdaterTable,
+			Columns: []string{admin.DeviceUpdaterColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(device.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := auo.mutation.DeviceUpdaterIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   admin.DeviceUpdaterTable,
+			Columns: []string{admin.DeviceUpdaterColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(device.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if auo.mutation.DeviceInstallationCreatorCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   admin.DeviceInstallationCreatorTable,
+			Columns: []string{admin.DeviceInstallationCreatorColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(deviceinstallation.FieldID, field.TypeInt),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := auo.mutation.RemovedDeviceInstallationCreatorIDs(); len(nodes) > 0 && !auo.mutation.DeviceInstallationCreatorCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   admin.DeviceInstallationCreatorTable,
+			Columns: []string{admin.DeviceInstallationCreatorColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(deviceinstallation.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := auo.mutation.DeviceInstallationCreatorIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   admin.DeviceInstallationCreatorTable,
+			Columns: []string{admin.DeviceInstallationCreatorColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(deviceinstallation.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if auo.mutation.DeviceInstallationUpdaterCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   admin.DeviceInstallationUpdaterTable,
+			Columns: []string{admin.DeviceInstallationUpdaterColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(deviceinstallation.FieldID, field.TypeInt),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := auo.mutation.RemovedDeviceInstallationUpdaterIDs(); len(nodes) > 0 && !auo.mutation.DeviceInstallationUpdaterCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   admin.DeviceInstallationUpdaterTable,
+			Columns: []string{admin.DeviceInstallationUpdaterColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(deviceinstallation.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := auo.mutation.DeviceInstallationUpdaterIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   admin.DeviceInstallationUpdaterTable,
+			Columns: []string{admin.DeviceInstallationUpdaterColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(deviceinstallation.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if auo.mutation.EventLevelCreatorCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   admin.EventLevelCreatorTable,
+			Columns: []string{admin.EventLevelCreatorColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(eventlevel.FieldID, field.TypeInt),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := auo.mutation.RemovedEventLevelCreatorIDs(); len(nodes) > 0 && !auo.mutation.EventLevelCreatorCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   admin.EventLevelCreatorTable,
+			Columns: []string{admin.EventLevelCreatorColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(eventlevel.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := auo.mutation.EventLevelCreatorIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   admin.EventLevelCreatorTable,
+			Columns: []string{admin.EventLevelCreatorColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(eventlevel.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if auo.mutation.EventLevelUpdaterCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   admin.EventLevelUpdaterTable,
+			Columns: []string{admin.EventLevelUpdaterColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(eventlevel.FieldID, field.TypeInt),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := auo.mutation.RemovedEventLevelUpdaterIDs(); len(nodes) > 0 && !auo.mutation.EventLevelUpdaterCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   admin.EventLevelUpdaterTable,
+			Columns: []string{admin.EventLevelUpdaterColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(eventlevel.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := auo.mutation.EventLevelUpdaterIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   admin.EventLevelUpdaterTable,
+			Columns: []string{admin.EventLevelUpdaterColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(eventlevel.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {

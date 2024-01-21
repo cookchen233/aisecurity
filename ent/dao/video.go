@@ -38,6 +38,8 @@ type Video struct {
 	Duration string `json:"duration"`
 	// 上传时间
 	UploadedAt *time.Time `json:"uploaded_at"`
+	// 上传时间
+	UploadedAt2 *time.Time `json:"uploaded_at2"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the VideoQuery when eager-loading is set.
 	Edges        VideoEdges `json:"edges"`
@@ -50,8 +52,8 @@ type VideoEdges struct {
 	Creator *Admin `json:"creator,omitempty"`
 	// Updater holds the value of the updater edge.
 	Updater *Admin `json:"updater,omitempty"`
-	// IpcReportEventVideo holds the value of the ipc_report_event_video edge.
-	IpcReportEventVideo []*IPCReportEvent `json:"ipc_report_event_video,omitempty"`
+	// IpcEventVideo holds the value of the ipc_event_video edge.
+	IpcEventVideo []*IPCEvent `json:"ipc_event_video,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
 	loadedTypes [3]bool
@@ -83,13 +85,13 @@ func (e VideoEdges) UpdaterOrErr() (*Admin, error) {
 	return nil, &NotLoadedError{edge: "updater"}
 }
 
-// IpcReportEventVideoOrErr returns the IpcReportEventVideo value or an error if the edge
+// IpcEventVideoOrErr returns the IpcEventVideo value or an error if the edge
 // was not loaded in eager-loading.
-func (e VideoEdges) IpcReportEventVideoOrErr() ([]*IPCReportEvent, error) {
+func (e VideoEdges) IpcEventVideoOrErr() ([]*IPCEvent, error) {
 	if e.loadedTypes[2] {
-		return e.IpcReportEventVideo, nil
+		return e.IpcEventVideo, nil
 	}
-	return nil, &NotLoadedError{edge: "ipc_report_event_video"}
+	return nil, &NotLoadedError{edge: "ipc_event_video"}
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
@@ -101,7 +103,7 @@ func (*Video) scanValues(columns []string) ([]any, error) {
 			values[i] = new(sql.NullInt64)
 		case video.FieldName, video.FieldURL, video.FieldDuration:
 			values[i] = new(sql.NullString)
-		case video.FieldCreatedAt, video.FieldDeletedAt, video.FieldUpdatedAt, video.FieldUploadedAt:
+		case video.FieldCreatedAt, video.FieldDeletedAt, video.FieldUpdatedAt, video.FieldUploadedAt, video.FieldUploadedAt2:
 			values[i] = new(sql.NullTime)
 		default:
 			values[i] = new(sql.UnknownType)
@@ -186,6 +188,13 @@ func (v *Video) assignValues(columns []string, values []any) error {
 				v.UploadedAt = new(time.Time)
 				*v.UploadedAt = value.Time
 			}
+		case video.FieldUploadedAt2:
+			if value, ok := values[i].(*sql.NullTime); !ok {
+				return fmt.Errorf("unexpected type %T for field uploaded_at2", values[i])
+			} else if value.Valid {
+				v.UploadedAt2 = new(time.Time)
+				*v.UploadedAt2 = value.Time
+			}
 		default:
 			v.selectValues.Set(columns[i], values[i])
 		}
@@ -209,9 +218,9 @@ func (v *Video) QueryUpdater() *AdminQuery {
 	return NewVideoClient(v.config).QueryUpdater(v)
 }
 
-// QueryIpcReportEventVideo queries the "ipc_report_event_video" edge of the Video entity.
-func (v *Video) QueryIpcReportEventVideo() *IPCReportEventQuery {
-	return NewVideoClient(v.config).QueryIpcReportEventVideo(v)
+// QueryIpcEventVideo queries the "ipc_event_video" edge of the Video entity.
+func (v *Video) QueryIpcEventVideo() *IPCEventQuery {
+	return NewVideoClient(v.config).QueryIpcEventVideo(v)
 }
 
 // Update returns a builder for updating this Video.
@@ -268,6 +277,11 @@ func (v *Video) String() string {
 	builder.WriteString(", ")
 	if v := v.UploadedAt; v != nil {
 		builder.WriteString("uploaded_at=")
+		builder.WriteString(v.Format(time.ANSIC))
+	}
+	builder.WriteString(", ")
+	if v := v.UploadedAt2; v != nil {
+		builder.WriteString("uploaded_at2=")
 		builder.WriteString(v.Format(time.ANSIC))
 	}
 	builder.WriteByte(')')

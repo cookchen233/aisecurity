@@ -35,6 +35,7 @@ func (Employee) Edges() []ent.Edge {
 		edge.From("admin", Admin.Type).Ref("employee").Field("admin_id").Immutable().Unique().Required(),
 		edge.From("department", Department.Type).Field("department_id").Ref("employees").Unique().Required(),
 		edge.From("occupations", Occupation.Type).Ref("employees"),
+		edge.From("ipc_events", IPCEvent.Type).Ref("fixers"),
 
 		edge.To("risk_reporter", Risk.Type),
 		edge.To("risk_maintainer", Risk.Type),

@@ -5,9 +5,13 @@ package dao
 import (
 	"aisecurity/ent/dao/admin"
 	"aisecurity/ent/dao/adminrole"
+	"aisecurity/ent/dao/area"
 	"aisecurity/ent/dao/department"
+	"aisecurity/ent/dao/device"
+	"aisecurity/ent/dao/deviceinstallation"
 	"aisecurity/ent/dao/employee"
-	"aisecurity/ent/dao/ipcreportevent"
+	"aisecurity/ent/dao/eventlevel"
+	"aisecurity/ent/dao/ipcevent"
 	"aisecurity/ent/dao/occupation"
 	"aisecurity/ent/dao/predicate"
 	"aisecurity/ent/dao/risk"
@@ -27,34 +31,42 @@ import (
 // AdminQuery is the builder for querying Admin entities.
 type AdminQuery struct {
 	config
-	ctx                       *QueryContext
-	order                     []admin.OrderOption
-	inters                    []Interceptor
-	predicates                []predicate.Admin
-	withCreator               *AdminQuery
-	withUpdater               *AdminQuery
-	withAdminRoles            *AdminRoleQuery
-	withAdminCreator          *AdminQuery
-	withAdminUpdater          *AdminQuery
-	withAdminRoleCreator      *AdminRoleQuery
-	withAdminRoleUpdater      *AdminRoleQuery
-	withRiskCreator           *RiskQuery
-	withRiskUpdater           *RiskQuery
-	withRiskLocationCreator   *RiskLocationQuery
-	withRiskLocationUpdater   *RiskLocationQuery
-	withRiskCategoryCreator   *RiskCategoryQuery
-	withRiskCategoryUpdater   *RiskCategoryQuery
-	withDepartmentCreator     *DepartmentQuery
-	withDepartmentUpdater     *DepartmentQuery
-	withEmployeeCreator       *EmployeeQuery
-	withEmployeeUpdater       *EmployeeQuery
-	withEmployee              *EmployeeQuery
-	withOccupationCreator     *OccupationQuery
-	withOccupationUpdater     *OccupationQuery
-	withIpcReportEventCreator *IPCReportEventQuery
-	withIpcReportEventUpdater *IPCReportEventQuery
-	withVideoCreator          *VideoQuery
-	withVideoUpdater          *VideoQuery
+	ctx                           *QueryContext
+	order                         []admin.OrderOption
+	inters                        []Interceptor
+	predicates                    []predicate.Admin
+	withCreator                   *AdminQuery
+	withUpdater                   *AdminQuery
+	withAdminRoles                *AdminRoleQuery
+	withAdminCreator              *AdminQuery
+	withAdminUpdater              *AdminQuery
+	withAdminRoleCreator          *AdminRoleQuery
+	withAdminRoleUpdater          *AdminRoleQuery
+	withRiskCreator               *RiskQuery
+	withRiskUpdater               *RiskQuery
+	withRiskLocationCreator       *RiskLocationQuery
+	withRiskLocationUpdater       *RiskLocationQuery
+	withRiskCategoryCreator       *RiskCategoryQuery
+	withRiskCategoryUpdater       *RiskCategoryQuery
+	withDepartmentCreator         *DepartmentQuery
+	withDepartmentUpdater         *DepartmentQuery
+	withEmployeeCreator           *EmployeeQuery
+	withEmployeeUpdater           *EmployeeQuery
+	withEmployee                  *EmployeeQuery
+	withOccupationCreator         *OccupationQuery
+	withOccupationUpdater         *OccupationQuery
+	withIpcEventCreator           *IPCEventQuery
+	withIpcEventUpdater           *IPCEventQuery
+	withVideoCreator              *VideoQuery
+	withVideoUpdater              *VideoQuery
+	withAreaCreator               *AreaQuery
+	withAreaUpdater               *AreaQuery
+	withDeviceCreator             *DeviceQuery
+	withDeviceUpdater             *DeviceQuery
+	withDeviceInstallationCreator *DeviceInstallationQuery
+	withDeviceInstallationUpdater *DeviceInstallationQuery
+	withEventLevelCreator         *EventLevelQuery
+	withEventLevelUpdater         *EventLevelQuery
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
 	path func(context.Context) (*sql.Selector, error)
@@ -531,9 +543,9 @@ func (aq *AdminQuery) QueryOccupationUpdater() *OccupationQuery {
 	return query
 }
 
-// QueryIpcReportEventCreator chains the current query on the "ipc_report_event_creator" edge.
-func (aq *AdminQuery) QueryIpcReportEventCreator() *IPCReportEventQuery {
-	query := (&IPCReportEventClient{config: aq.config}).Query()
+// QueryIpcEventCreator chains the current query on the "ipc_event_creator" edge.
+func (aq *AdminQuery) QueryIpcEventCreator() *IPCEventQuery {
+	query := (&IPCEventClient{config: aq.config}).Query()
 	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
 		if err := aq.prepareQuery(ctx); err != nil {
 			return nil, err
@@ -544,8 +556,8 @@ func (aq *AdminQuery) QueryIpcReportEventCreator() *IPCReportEventQuery {
 		}
 		step := sqlgraph.NewStep(
 			sqlgraph.From(admin.Table, admin.FieldID, selector),
-			sqlgraph.To(ipcreportevent.Table, ipcreportevent.FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, false, admin.IpcReportEventCreatorTable, admin.IpcReportEventCreatorColumn),
+			sqlgraph.To(ipcevent.Table, ipcevent.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, admin.IpcEventCreatorTable, admin.IpcEventCreatorColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(aq.driver.Dialect(), step)
 		return fromU, nil
@@ -553,9 +565,9 @@ func (aq *AdminQuery) QueryIpcReportEventCreator() *IPCReportEventQuery {
 	return query
 }
 
-// QueryIpcReportEventUpdater chains the current query on the "ipc_report_event_updater" edge.
-func (aq *AdminQuery) QueryIpcReportEventUpdater() *IPCReportEventQuery {
-	query := (&IPCReportEventClient{config: aq.config}).Query()
+// QueryIpcEventUpdater chains the current query on the "ipc_event_updater" edge.
+func (aq *AdminQuery) QueryIpcEventUpdater() *IPCEventQuery {
+	query := (&IPCEventClient{config: aq.config}).Query()
 	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
 		if err := aq.prepareQuery(ctx); err != nil {
 			return nil, err
@@ -566,8 +578,8 @@ func (aq *AdminQuery) QueryIpcReportEventUpdater() *IPCReportEventQuery {
 		}
 		step := sqlgraph.NewStep(
 			sqlgraph.From(admin.Table, admin.FieldID, selector),
-			sqlgraph.To(ipcreportevent.Table, ipcreportevent.FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, false, admin.IpcReportEventUpdaterTable, admin.IpcReportEventUpdaterColumn),
+			sqlgraph.To(ipcevent.Table, ipcevent.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, admin.IpcEventUpdaterTable, admin.IpcEventUpdaterColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(aq.driver.Dialect(), step)
 		return fromU, nil
@@ -612,6 +624,182 @@ func (aq *AdminQuery) QueryVideoUpdater() *VideoQuery {
 			sqlgraph.From(admin.Table, admin.FieldID, selector),
 			sqlgraph.To(video.Table, video.FieldID),
 			sqlgraph.Edge(sqlgraph.O2M, false, admin.VideoUpdaterTable, admin.VideoUpdaterColumn),
+		)
+		fromU = sqlgraph.SetNeighbors(aq.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
+}
+
+// QueryAreaCreator chains the current query on the "area_creator" edge.
+func (aq *AdminQuery) QueryAreaCreator() *AreaQuery {
+	query := (&AreaClient{config: aq.config}).Query()
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := aq.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := aq.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(admin.Table, admin.FieldID, selector),
+			sqlgraph.To(area.Table, area.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, admin.AreaCreatorTable, admin.AreaCreatorColumn),
+		)
+		fromU = sqlgraph.SetNeighbors(aq.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
+}
+
+// QueryAreaUpdater chains the current query on the "area_updater" edge.
+func (aq *AdminQuery) QueryAreaUpdater() *AreaQuery {
+	query := (&AreaClient{config: aq.config}).Query()
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := aq.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := aq.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(admin.Table, admin.FieldID, selector),
+			sqlgraph.To(area.Table, area.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, admin.AreaUpdaterTable, admin.AreaUpdaterColumn),
+		)
+		fromU = sqlgraph.SetNeighbors(aq.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
+}
+
+// QueryDeviceCreator chains the current query on the "device_creator" edge.
+func (aq *AdminQuery) QueryDeviceCreator() *DeviceQuery {
+	query := (&DeviceClient{config: aq.config}).Query()
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := aq.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := aq.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(admin.Table, admin.FieldID, selector),
+			sqlgraph.To(device.Table, device.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, admin.DeviceCreatorTable, admin.DeviceCreatorColumn),
+		)
+		fromU = sqlgraph.SetNeighbors(aq.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
+}
+
+// QueryDeviceUpdater chains the current query on the "device_updater" edge.
+func (aq *AdminQuery) QueryDeviceUpdater() *DeviceQuery {
+	query := (&DeviceClient{config: aq.config}).Query()
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := aq.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := aq.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(admin.Table, admin.FieldID, selector),
+			sqlgraph.To(device.Table, device.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, admin.DeviceUpdaterTable, admin.DeviceUpdaterColumn),
+		)
+		fromU = sqlgraph.SetNeighbors(aq.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
+}
+
+// QueryDeviceInstallationCreator chains the current query on the "device_installation_creator" edge.
+func (aq *AdminQuery) QueryDeviceInstallationCreator() *DeviceInstallationQuery {
+	query := (&DeviceInstallationClient{config: aq.config}).Query()
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := aq.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := aq.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(admin.Table, admin.FieldID, selector),
+			sqlgraph.To(deviceinstallation.Table, deviceinstallation.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, admin.DeviceInstallationCreatorTable, admin.DeviceInstallationCreatorColumn),
+		)
+		fromU = sqlgraph.SetNeighbors(aq.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
+}
+
+// QueryDeviceInstallationUpdater chains the current query on the "device_installation_updater" edge.
+func (aq *AdminQuery) QueryDeviceInstallationUpdater() *DeviceInstallationQuery {
+	query := (&DeviceInstallationClient{config: aq.config}).Query()
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := aq.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := aq.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(admin.Table, admin.FieldID, selector),
+			sqlgraph.To(deviceinstallation.Table, deviceinstallation.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, admin.DeviceInstallationUpdaterTable, admin.DeviceInstallationUpdaterColumn),
+		)
+		fromU = sqlgraph.SetNeighbors(aq.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
+}
+
+// QueryEventLevelCreator chains the current query on the "event_level_creator" edge.
+func (aq *AdminQuery) QueryEventLevelCreator() *EventLevelQuery {
+	query := (&EventLevelClient{config: aq.config}).Query()
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := aq.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := aq.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(admin.Table, admin.FieldID, selector),
+			sqlgraph.To(eventlevel.Table, eventlevel.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, admin.EventLevelCreatorTable, admin.EventLevelCreatorColumn),
+		)
+		fromU = sqlgraph.SetNeighbors(aq.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
+}
+
+// QueryEventLevelUpdater chains the current query on the "event_level_updater" edge.
+func (aq *AdminQuery) QueryEventLevelUpdater() *EventLevelQuery {
+	query := (&EventLevelClient{config: aq.config}).Query()
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := aq.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := aq.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(admin.Table, admin.FieldID, selector),
+			sqlgraph.To(eventlevel.Table, eventlevel.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, admin.EventLevelUpdaterTable, admin.EventLevelUpdaterColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(aq.driver.Dialect(), step)
 		return fromU, nil
@@ -806,35 +994,43 @@ func (aq *AdminQuery) Clone() *AdminQuery {
 		return nil
 	}
 	return &AdminQuery{
-		config:                    aq.config,
-		ctx:                       aq.ctx.Clone(),
-		order:                     append([]admin.OrderOption{}, aq.order...),
-		inters:                    append([]Interceptor{}, aq.inters...),
-		predicates:                append([]predicate.Admin{}, aq.predicates...),
-		withCreator:               aq.withCreator.Clone(),
-		withUpdater:               aq.withUpdater.Clone(),
-		withAdminRoles:            aq.withAdminRoles.Clone(),
-		withAdminCreator:          aq.withAdminCreator.Clone(),
-		withAdminUpdater:          aq.withAdminUpdater.Clone(),
-		withAdminRoleCreator:      aq.withAdminRoleCreator.Clone(),
-		withAdminRoleUpdater:      aq.withAdminRoleUpdater.Clone(),
-		withRiskCreator:           aq.withRiskCreator.Clone(),
-		withRiskUpdater:           aq.withRiskUpdater.Clone(),
-		withRiskLocationCreator:   aq.withRiskLocationCreator.Clone(),
-		withRiskLocationUpdater:   aq.withRiskLocationUpdater.Clone(),
-		withRiskCategoryCreator:   aq.withRiskCategoryCreator.Clone(),
-		withRiskCategoryUpdater:   aq.withRiskCategoryUpdater.Clone(),
-		withDepartmentCreator:     aq.withDepartmentCreator.Clone(),
-		withDepartmentUpdater:     aq.withDepartmentUpdater.Clone(),
-		withEmployeeCreator:       aq.withEmployeeCreator.Clone(),
-		withEmployeeUpdater:       aq.withEmployeeUpdater.Clone(),
-		withEmployee:              aq.withEmployee.Clone(),
-		withOccupationCreator:     aq.withOccupationCreator.Clone(),
-		withOccupationUpdater:     aq.withOccupationUpdater.Clone(),
-		withIpcReportEventCreator: aq.withIpcReportEventCreator.Clone(),
-		withIpcReportEventUpdater: aq.withIpcReportEventUpdater.Clone(),
-		withVideoCreator:          aq.withVideoCreator.Clone(),
-		withVideoUpdater:          aq.withVideoUpdater.Clone(),
+		config:                        aq.config,
+		ctx:                           aq.ctx.Clone(),
+		order:                         append([]admin.OrderOption{}, aq.order...),
+		inters:                        append([]Interceptor{}, aq.inters...),
+		predicates:                    append([]predicate.Admin{}, aq.predicates...),
+		withCreator:                   aq.withCreator.Clone(),
+		withUpdater:                   aq.withUpdater.Clone(),
+		withAdminRoles:                aq.withAdminRoles.Clone(),
+		withAdminCreator:              aq.withAdminCreator.Clone(),
+		withAdminUpdater:              aq.withAdminUpdater.Clone(),
+		withAdminRoleCreator:          aq.withAdminRoleCreator.Clone(),
+		withAdminRoleUpdater:          aq.withAdminRoleUpdater.Clone(),
+		withRiskCreator:               aq.withRiskCreator.Clone(),
+		withRiskUpdater:               aq.withRiskUpdater.Clone(),
+		withRiskLocationCreator:       aq.withRiskLocationCreator.Clone(),
+		withRiskLocationUpdater:       aq.withRiskLocationUpdater.Clone(),
+		withRiskCategoryCreator:       aq.withRiskCategoryCreator.Clone(),
+		withRiskCategoryUpdater:       aq.withRiskCategoryUpdater.Clone(),
+		withDepartmentCreator:         aq.withDepartmentCreator.Clone(),
+		withDepartmentUpdater:         aq.withDepartmentUpdater.Clone(),
+		withEmployeeCreator:           aq.withEmployeeCreator.Clone(),
+		withEmployeeUpdater:           aq.withEmployeeUpdater.Clone(),
+		withEmployee:                  aq.withEmployee.Clone(),
+		withOccupationCreator:         aq.withOccupationCreator.Clone(),
+		withOccupationUpdater:         aq.withOccupationUpdater.Clone(),
+		withIpcEventCreator:           aq.withIpcEventCreator.Clone(),
+		withIpcEventUpdater:           aq.withIpcEventUpdater.Clone(),
+		withVideoCreator:              aq.withVideoCreator.Clone(),
+		withVideoUpdater:              aq.withVideoUpdater.Clone(),
+		withAreaCreator:               aq.withAreaCreator.Clone(),
+		withAreaUpdater:               aq.withAreaUpdater.Clone(),
+		withDeviceCreator:             aq.withDeviceCreator.Clone(),
+		withDeviceUpdater:             aq.withDeviceUpdater.Clone(),
+		withDeviceInstallationCreator: aq.withDeviceInstallationCreator.Clone(),
+		withDeviceInstallationUpdater: aq.withDeviceInstallationUpdater.Clone(),
+		withEventLevelCreator:         aq.withEventLevelCreator.Clone(),
+		withEventLevelUpdater:         aq.withEventLevelUpdater.Clone(),
 		// clone intermediate query.
 		sql:  aq.sql.Clone(),
 		path: aq.path,
@@ -1061,25 +1257,25 @@ func (aq *AdminQuery) WithOccupationUpdater(opts ...func(*OccupationQuery)) *Adm
 	return aq
 }
 
-// WithIpcReportEventCreator tells the query-builder to eager-load the nodes that are connected to
-// the "ipc_report_event_creator" edge. The optional arguments are used to configure the query builder of the edge.
-func (aq *AdminQuery) WithIpcReportEventCreator(opts ...func(*IPCReportEventQuery)) *AdminQuery {
-	query := (&IPCReportEventClient{config: aq.config}).Query()
+// WithIpcEventCreator tells the query-builder to eager-load the nodes that are connected to
+// the "ipc_event_creator" edge. The optional arguments are used to configure the query builder of the edge.
+func (aq *AdminQuery) WithIpcEventCreator(opts ...func(*IPCEventQuery)) *AdminQuery {
+	query := (&IPCEventClient{config: aq.config}).Query()
 	for _, opt := range opts {
 		opt(query)
 	}
-	aq.withIpcReportEventCreator = query
+	aq.withIpcEventCreator = query
 	return aq
 }
 
-// WithIpcReportEventUpdater tells the query-builder to eager-load the nodes that are connected to
-// the "ipc_report_event_updater" edge. The optional arguments are used to configure the query builder of the edge.
-func (aq *AdminQuery) WithIpcReportEventUpdater(opts ...func(*IPCReportEventQuery)) *AdminQuery {
-	query := (&IPCReportEventClient{config: aq.config}).Query()
+// WithIpcEventUpdater tells the query-builder to eager-load the nodes that are connected to
+// the "ipc_event_updater" edge. The optional arguments are used to configure the query builder of the edge.
+func (aq *AdminQuery) WithIpcEventUpdater(opts ...func(*IPCEventQuery)) *AdminQuery {
+	query := (&IPCEventClient{config: aq.config}).Query()
 	for _, opt := range opts {
 		opt(query)
 	}
-	aq.withIpcReportEventUpdater = query
+	aq.withIpcEventUpdater = query
 	return aq
 }
 
@@ -1102,6 +1298,94 @@ func (aq *AdminQuery) WithVideoUpdater(opts ...func(*VideoQuery)) *AdminQuery {
 		opt(query)
 	}
 	aq.withVideoUpdater = query
+	return aq
+}
+
+// WithAreaCreator tells the query-builder to eager-load the nodes that are connected to
+// the "area_creator" edge. The optional arguments are used to configure the query builder of the edge.
+func (aq *AdminQuery) WithAreaCreator(opts ...func(*AreaQuery)) *AdminQuery {
+	query := (&AreaClient{config: aq.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	aq.withAreaCreator = query
+	return aq
+}
+
+// WithAreaUpdater tells the query-builder to eager-load the nodes that are connected to
+// the "area_updater" edge. The optional arguments are used to configure the query builder of the edge.
+func (aq *AdminQuery) WithAreaUpdater(opts ...func(*AreaQuery)) *AdminQuery {
+	query := (&AreaClient{config: aq.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	aq.withAreaUpdater = query
+	return aq
+}
+
+// WithDeviceCreator tells the query-builder to eager-load the nodes that are connected to
+// the "device_creator" edge. The optional arguments are used to configure the query builder of the edge.
+func (aq *AdminQuery) WithDeviceCreator(opts ...func(*DeviceQuery)) *AdminQuery {
+	query := (&DeviceClient{config: aq.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	aq.withDeviceCreator = query
+	return aq
+}
+
+// WithDeviceUpdater tells the query-builder to eager-load the nodes that are connected to
+// the "device_updater" edge. The optional arguments are used to configure the query builder of the edge.
+func (aq *AdminQuery) WithDeviceUpdater(opts ...func(*DeviceQuery)) *AdminQuery {
+	query := (&DeviceClient{config: aq.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	aq.withDeviceUpdater = query
+	return aq
+}
+
+// WithDeviceInstallationCreator tells the query-builder to eager-load the nodes that are connected to
+// the "device_installation_creator" edge. The optional arguments are used to configure the query builder of the edge.
+func (aq *AdminQuery) WithDeviceInstallationCreator(opts ...func(*DeviceInstallationQuery)) *AdminQuery {
+	query := (&DeviceInstallationClient{config: aq.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	aq.withDeviceInstallationCreator = query
+	return aq
+}
+
+// WithDeviceInstallationUpdater tells the query-builder to eager-load the nodes that are connected to
+// the "device_installation_updater" edge. The optional arguments are used to configure the query builder of the edge.
+func (aq *AdminQuery) WithDeviceInstallationUpdater(opts ...func(*DeviceInstallationQuery)) *AdminQuery {
+	query := (&DeviceInstallationClient{config: aq.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	aq.withDeviceInstallationUpdater = query
+	return aq
+}
+
+// WithEventLevelCreator tells the query-builder to eager-load the nodes that are connected to
+// the "event_level_creator" edge. The optional arguments are used to configure the query builder of the edge.
+func (aq *AdminQuery) WithEventLevelCreator(opts ...func(*EventLevelQuery)) *AdminQuery {
+	query := (&EventLevelClient{config: aq.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	aq.withEventLevelCreator = query
+	return aq
+}
+
+// WithEventLevelUpdater tells the query-builder to eager-load the nodes that are connected to
+// the "event_level_updater" edge. The optional arguments are used to configure the query builder of the edge.
+func (aq *AdminQuery) WithEventLevelUpdater(opts ...func(*EventLevelQuery)) *AdminQuery {
+	query := (&EventLevelClient{config: aq.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	aq.withEventLevelUpdater = query
 	return aq
 }
 
@@ -1183,7 +1467,7 @@ func (aq *AdminQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Admin,
 	var (
 		nodes       = []*Admin{}
 		_spec       = aq.querySpec()
-		loadedTypes = [24]bool{
+		loadedTypes = [32]bool{
 			aq.withCreator != nil,
 			aq.withUpdater != nil,
 			aq.withAdminRoles != nil,
@@ -1204,10 +1488,18 @@ func (aq *AdminQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Admin,
 			aq.withEmployee != nil,
 			aq.withOccupationCreator != nil,
 			aq.withOccupationUpdater != nil,
-			aq.withIpcReportEventCreator != nil,
-			aq.withIpcReportEventUpdater != nil,
+			aq.withIpcEventCreator != nil,
+			aq.withIpcEventUpdater != nil,
 			aq.withVideoCreator != nil,
 			aq.withVideoUpdater != nil,
+			aq.withAreaCreator != nil,
+			aq.withAreaUpdater != nil,
+			aq.withDeviceCreator != nil,
+			aq.withDeviceUpdater != nil,
+			aq.withDeviceInstallationCreator != nil,
+			aq.withDeviceInstallationUpdater != nil,
+			aq.withEventLevelCreator != nil,
+			aq.withEventLevelUpdater != nil,
 		}
 	)
 	_spec.ScanValues = func(columns []string) ([]any, error) {
@@ -1366,21 +1658,17 @@ func (aq *AdminQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Admin,
 			return nil, err
 		}
 	}
-	if query := aq.withIpcReportEventCreator; query != nil {
-		if err := aq.loadIpcReportEventCreator(ctx, query, nodes,
-			func(n *Admin) { n.Edges.IpcReportEventCreator = []*IPCReportEvent{} },
-			func(n *Admin, e *IPCReportEvent) {
-				n.Edges.IpcReportEventCreator = append(n.Edges.IpcReportEventCreator, e)
-			}); err != nil {
+	if query := aq.withIpcEventCreator; query != nil {
+		if err := aq.loadIpcEventCreator(ctx, query, nodes,
+			func(n *Admin) { n.Edges.IpcEventCreator = []*IPCEvent{} },
+			func(n *Admin, e *IPCEvent) { n.Edges.IpcEventCreator = append(n.Edges.IpcEventCreator, e) }); err != nil {
 			return nil, err
 		}
 	}
-	if query := aq.withIpcReportEventUpdater; query != nil {
-		if err := aq.loadIpcReportEventUpdater(ctx, query, nodes,
-			func(n *Admin) { n.Edges.IpcReportEventUpdater = []*IPCReportEvent{} },
-			func(n *Admin, e *IPCReportEvent) {
-				n.Edges.IpcReportEventUpdater = append(n.Edges.IpcReportEventUpdater, e)
-			}); err != nil {
+	if query := aq.withIpcEventUpdater; query != nil {
+		if err := aq.loadIpcEventUpdater(ctx, query, nodes,
+			func(n *Admin) { n.Edges.IpcEventUpdater = []*IPCEvent{} },
+			func(n *Admin, e *IPCEvent) { n.Edges.IpcEventUpdater = append(n.Edges.IpcEventUpdater, e) }); err != nil {
 			return nil, err
 		}
 	}
@@ -1395,6 +1683,66 @@ func (aq *AdminQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Admin,
 		if err := aq.loadVideoUpdater(ctx, query, nodes,
 			func(n *Admin) { n.Edges.VideoUpdater = []*Video{} },
 			func(n *Admin, e *Video) { n.Edges.VideoUpdater = append(n.Edges.VideoUpdater, e) }); err != nil {
+			return nil, err
+		}
+	}
+	if query := aq.withAreaCreator; query != nil {
+		if err := aq.loadAreaCreator(ctx, query, nodes,
+			func(n *Admin) { n.Edges.AreaCreator = []*Area{} },
+			func(n *Admin, e *Area) { n.Edges.AreaCreator = append(n.Edges.AreaCreator, e) }); err != nil {
+			return nil, err
+		}
+	}
+	if query := aq.withAreaUpdater; query != nil {
+		if err := aq.loadAreaUpdater(ctx, query, nodes,
+			func(n *Admin) { n.Edges.AreaUpdater = []*Area{} },
+			func(n *Admin, e *Area) { n.Edges.AreaUpdater = append(n.Edges.AreaUpdater, e) }); err != nil {
+			return nil, err
+		}
+	}
+	if query := aq.withDeviceCreator; query != nil {
+		if err := aq.loadDeviceCreator(ctx, query, nodes,
+			func(n *Admin) { n.Edges.DeviceCreator = []*Device{} },
+			func(n *Admin, e *Device) { n.Edges.DeviceCreator = append(n.Edges.DeviceCreator, e) }); err != nil {
+			return nil, err
+		}
+	}
+	if query := aq.withDeviceUpdater; query != nil {
+		if err := aq.loadDeviceUpdater(ctx, query, nodes,
+			func(n *Admin) { n.Edges.DeviceUpdater = []*Device{} },
+			func(n *Admin, e *Device) { n.Edges.DeviceUpdater = append(n.Edges.DeviceUpdater, e) }); err != nil {
+			return nil, err
+		}
+	}
+	if query := aq.withDeviceInstallationCreator; query != nil {
+		if err := aq.loadDeviceInstallationCreator(ctx, query, nodes,
+			func(n *Admin) { n.Edges.DeviceInstallationCreator = []*DeviceInstallation{} },
+			func(n *Admin, e *DeviceInstallation) {
+				n.Edges.DeviceInstallationCreator = append(n.Edges.DeviceInstallationCreator, e)
+			}); err != nil {
+			return nil, err
+		}
+	}
+	if query := aq.withDeviceInstallationUpdater; query != nil {
+		if err := aq.loadDeviceInstallationUpdater(ctx, query, nodes,
+			func(n *Admin) { n.Edges.DeviceInstallationUpdater = []*DeviceInstallation{} },
+			func(n *Admin, e *DeviceInstallation) {
+				n.Edges.DeviceInstallationUpdater = append(n.Edges.DeviceInstallationUpdater, e)
+			}); err != nil {
+			return nil, err
+		}
+	}
+	if query := aq.withEventLevelCreator; query != nil {
+		if err := aq.loadEventLevelCreator(ctx, query, nodes,
+			func(n *Admin) { n.Edges.EventLevelCreator = []*EventLevel{} },
+			func(n *Admin, e *EventLevel) { n.Edges.EventLevelCreator = append(n.Edges.EventLevelCreator, e) }); err != nil {
+			return nil, err
+		}
+	}
+	if query := aq.withEventLevelUpdater; query != nil {
+		if err := aq.loadEventLevelUpdater(ctx, query, nodes,
+			func(n *Admin) { n.Edges.EventLevelUpdater = []*EventLevel{} },
+			func(n *Admin, e *EventLevel) { n.Edges.EventLevelUpdater = append(n.Edges.EventLevelUpdater, e) }); err != nil {
 			return nil, err
 		}
 	}
@@ -2030,7 +2378,7 @@ func (aq *AdminQuery) loadOccupationUpdater(ctx context.Context, query *Occupati
 	}
 	return nil
 }
-func (aq *AdminQuery) loadIpcReportEventCreator(ctx context.Context, query *IPCReportEventQuery, nodes []*Admin, init func(*Admin), assign func(*Admin, *IPCReportEvent)) error {
+func (aq *AdminQuery) loadIpcEventCreator(ctx context.Context, query *IPCEventQuery, nodes []*Admin, init func(*Admin), assign func(*Admin, *IPCEvent)) error {
 	fks := make([]driver.Value, 0, len(nodes))
 	nodeids := make(map[int]*Admin)
 	for i := range nodes {
@@ -2041,10 +2389,10 @@ func (aq *AdminQuery) loadIpcReportEventCreator(ctx context.Context, query *IPCR
 		}
 	}
 	if len(query.ctx.Fields) > 0 {
-		query.ctx.AppendFieldOnce(ipcreportevent.FieldCreatedBy)
+		query.ctx.AppendFieldOnce(ipcevent.FieldCreatedBy)
 	}
-	query.Where(predicate.IPCReportEvent(func(s *sql.Selector) {
-		s.Where(sql.InValues(s.C(admin.IpcReportEventCreatorColumn), fks...))
+	query.Where(predicate.IPCEvent(func(s *sql.Selector) {
+		s.Where(sql.InValues(s.C(admin.IpcEventCreatorColumn), fks...))
 	}))
 	neighbors, err := query.All(ctx)
 	if err != nil {
@@ -2060,7 +2408,7 @@ func (aq *AdminQuery) loadIpcReportEventCreator(ctx context.Context, query *IPCR
 	}
 	return nil
 }
-func (aq *AdminQuery) loadIpcReportEventUpdater(ctx context.Context, query *IPCReportEventQuery, nodes []*Admin, init func(*Admin), assign func(*Admin, *IPCReportEvent)) error {
+func (aq *AdminQuery) loadIpcEventUpdater(ctx context.Context, query *IPCEventQuery, nodes []*Admin, init func(*Admin), assign func(*Admin, *IPCEvent)) error {
 	fks := make([]driver.Value, 0, len(nodes))
 	nodeids := make(map[int]*Admin)
 	for i := range nodes {
@@ -2071,10 +2419,10 @@ func (aq *AdminQuery) loadIpcReportEventUpdater(ctx context.Context, query *IPCR
 		}
 	}
 	if len(query.ctx.Fields) > 0 {
-		query.ctx.AppendFieldOnce(ipcreportevent.FieldUpdatedBy)
+		query.ctx.AppendFieldOnce(ipcevent.FieldUpdatedBy)
 	}
-	query.Where(predicate.IPCReportEvent(func(s *sql.Selector) {
-		s.Where(sql.InValues(s.C(admin.IpcReportEventUpdaterColumn), fks...))
+	query.Where(predicate.IPCEvent(func(s *sql.Selector) {
+		s.Where(sql.InValues(s.C(admin.IpcEventUpdaterColumn), fks...))
 	}))
 	neighbors, err := query.All(ctx)
 	if err != nil {
@@ -2135,6 +2483,246 @@ func (aq *AdminQuery) loadVideoUpdater(ctx context.Context, query *VideoQuery, n
 	}
 	query.Where(predicate.Video(func(s *sql.Selector) {
 		s.Where(sql.InValues(s.C(admin.VideoUpdaterColumn), fks...))
+	}))
+	neighbors, err := query.All(ctx)
+	if err != nil {
+		return err
+	}
+	for _, n := range neighbors {
+		fk := n.UpdatedBy
+		node, ok := nodeids[fk]
+		if !ok {
+			return fmt.Errorf(`unexpected referenced foreign-key "updated_by" returned %v for node %v`, fk, n.ID)
+		}
+		assign(node, n)
+	}
+	return nil
+}
+func (aq *AdminQuery) loadAreaCreator(ctx context.Context, query *AreaQuery, nodes []*Admin, init func(*Admin), assign func(*Admin, *Area)) error {
+	fks := make([]driver.Value, 0, len(nodes))
+	nodeids := make(map[int]*Admin)
+	for i := range nodes {
+		fks = append(fks, nodes[i].ID)
+		nodeids[nodes[i].ID] = nodes[i]
+		if init != nil {
+			init(nodes[i])
+		}
+	}
+	if len(query.ctx.Fields) > 0 {
+		query.ctx.AppendFieldOnce(area.FieldCreatedBy)
+	}
+	query.Where(predicate.Area(func(s *sql.Selector) {
+		s.Where(sql.InValues(s.C(admin.AreaCreatorColumn), fks...))
+	}))
+	neighbors, err := query.All(ctx)
+	if err != nil {
+		return err
+	}
+	for _, n := range neighbors {
+		fk := n.CreatedBy
+		node, ok := nodeids[fk]
+		if !ok {
+			return fmt.Errorf(`unexpected referenced foreign-key "created_by" returned %v for node %v`, fk, n.ID)
+		}
+		assign(node, n)
+	}
+	return nil
+}
+func (aq *AdminQuery) loadAreaUpdater(ctx context.Context, query *AreaQuery, nodes []*Admin, init func(*Admin), assign func(*Admin, *Area)) error {
+	fks := make([]driver.Value, 0, len(nodes))
+	nodeids := make(map[int]*Admin)
+	for i := range nodes {
+		fks = append(fks, nodes[i].ID)
+		nodeids[nodes[i].ID] = nodes[i]
+		if init != nil {
+			init(nodes[i])
+		}
+	}
+	if len(query.ctx.Fields) > 0 {
+		query.ctx.AppendFieldOnce(area.FieldUpdatedBy)
+	}
+	query.Where(predicate.Area(func(s *sql.Selector) {
+		s.Where(sql.InValues(s.C(admin.AreaUpdaterColumn), fks...))
+	}))
+	neighbors, err := query.All(ctx)
+	if err != nil {
+		return err
+	}
+	for _, n := range neighbors {
+		fk := n.UpdatedBy
+		node, ok := nodeids[fk]
+		if !ok {
+			return fmt.Errorf(`unexpected referenced foreign-key "updated_by" returned %v for node %v`, fk, n.ID)
+		}
+		assign(node, n)
+	}
+	return nil
+}
+func (aq *AdminQuery) loadDeviceCreator(ctx context.Context, query *DeviceQuery, nodes []*Admin, init func(*Admin), assign func(*Admin, *Device)) error {
+	fks := make([]driver.Value, 0, len(nodes))
+	nodeids := make(map[int]*Admin)
+	for i := range nodes {
+		fks = append(fks, nodes[i].ID)
+		nodeids[nodes[i].ID] = nodes[i]
+		if init != nil {
+			init(nodes[i])
+		}
+	}
+	if len(query.ctx.Fields) > 0 {
+		query.ctx.AppendFieldOnce(device.FieldCreatedBy)
+	}
+	query.Where(predicate.Device(func(s *sql.Selector) {
+		s.Where(sql.InValues(s.C(admin.DeviceCreatorColumn), fks...))
+	}))
+	neighbors, err := query.All(ctx)
+	if err != nil {
+		return err
+	}
+	for _, n := range neighbors {
+		fk := n.CreatedBy
+		node, ok := nodeids[fk]
+		if !ok {
+			return fmt.Errorf(`unexpected referenced foreign-key "created_by" returned %v for node %v`, fk, n.ID)
+		}
+		assign(node, n)
+	}
+	return nil
+}
+func (aq *AdminQuery) loadDeviceUpdater(ctx context.Context, query *DeviceQuery, nodes []*Admin, init func(*Admin), assign func(*Admin, *Device)) error {
+	fks := make([]driver.Value, 0, len(nodes))
+	nodeids := make(map[int]*Admin)
+	for i := range nodes {
+		fks = append(fks, nodes[i].ID)
+		nodeids[nodes[i].ID] = nodes[i]
+		if init != nil {
+			init(nodes[i])
+		}
+	}
+	if len(query.ctx.Fields) > 0 {
+		query.ctx.AppendFieldOnce(device.FieldUpdatedBy)
+	}
+	query.Where(predicate.Device(func(s *sql.Selector) {
+		s.Where(sql.InValues(s.C(admin.DeviceUpdaterColumn), fks...))
+	}))
+	neighbors, err := query.All(ctx)
+	if err != nil {
+		return err
+	}
+	for _, n := range neighbors {
+		fk := n.UpdatedBy
+		node, ok := nodeids[fk]
+		if !ok {
+			return fmt.Errorf(`unexpected referenced foreign-key "updated_by" returned %v for node %v`, fk, n.ID)
+		}
+		assign(node, n)
+	}
+	return nil
+}
+func (aq *AdminQuery) loadDeviceInstallationCreator(ctx context.Context, query *DeviceInstallationQuery, nodes []*Admin, init func(*Admin), assign func(*Admin, *DeviceInstallation)) error {
+	fks := make([]driver.Value, 0, len(nodes))
+	nodeids := make(map[int]*Admin)
+	for i := range nodes {
+		fks = append(fks, nodes[i].ID)
+		nodeids[nodes[i].ID] = nodes[i]
+		if init != nil {
+			init(nodes[i])
+		}
+	}
+	if len(query.ctx.Fields) > 0 {
+		query.ctx.AppendFieldOnce(deviceinstallation.FieldCreatedBy)
+	}
+	query.Where(predicate.DeviceInstallation(func(s *sql.Selector) {
+		s.Where(sql.InValues(s.C(admin.DeviceInstallationCreatorColumn), fks...))
+	}))
+	neighbors, err := query.All(ctx)
+	if err != nil {
+		return err
+	}
+	for _, n := range neighbors {
+		fk := n.CreatedBy
+		node, ok := nodeids[fk]
+		if !ok {
+			return fmt.Errorf(`unexpected referenced foreign-key "created_by" returned %v for node %v`, fk, n.ID)
+		}
+		assign(node, n)
+	}
+	return nil
+}
+func (aq *AdminQuery) loadDeviceInstallationUpdater(ctx context.Context, query *DeviceInstallationQuery, nodes []*Admin, init func(*Admin), assign func(*Admin, *DeviceInstallation)) error {
+	fks := make([]driver.Value, 0, len(nodes))
+	nodeids := make(map[int]*Admin)
+	for i := range nodes {
+		fks = append(fks, nodes[i].ID)
+		nodeids[nodes[i].ID] = nodes[i]
+		if init != nil {
+			init(nodes[i])
+		}
+	}
+	if len(query.ctx.Fields) > 0 {
+		query.ctx.AppendFieldOnce(deviceinstallation.FieldUpdatedBy)
+	}
+	query.Where(predicate.DeviceInstallation(func(s *sql.Selector) {
+		s.Where(sql.InValues(s.C(admin.DeviceInstallationUpdaterColumn), fks...))
+	}))
+	neighbors, err := query.All(ctx)
+	if err != nil {
+		return err
+	}
+	for _, n := range neighbors {
+		fk := n.UpdatedBy
+		node, ok := nodeids[fk]
+		if !ok {
+			return fmt.Errorf(`unexpected referenced foreign-key "updated_by" returned %v for node %v`, fk, n.ID)
+		}
+		assign(node, n)
+	}
+	return nil
+}
+func (aq *AdminQuery) loadEventLevelCreator(ctx context.Context, query *EventLevelQuery, nodes []*Admin, init func(*Admin), assign func(*Admin, *EventLevel)) error {
+	fks := make([]driver.Value, 0, len(nodes))
+	nodeids := make(map[int]*Admin)
+	for i := range nodes {
+		fks = append(fks, nodes[i].ID)
+		nodeids[nodes[i].ID] = nodes[i]
+		if init != nil {
+			init(nodes[i])
+		}
+	}
+	if len(query.ctx.Fields) > 0 {
+		query.ctx.AppendFieldOnce(eventlevel.FieldCreatedBy)
+	}
+	query.Where(predicate.EventLevel(func(s *sql.Selector) {
+		s.Where(sql.InValues(s.C(admin.EventLevelCreatorColumn), fks...))
+	}))
+	neighbors, err := query.All(ctx)
+	if err != nil {
+		return err
+	}
+	for _, n := range neighbors {
+		fk := n.CreatedBy
+		node, ok := nodeids[fk]
+		if !ok {
+			return fmt.Errorf(`unexpected referenced foreign-key "created_by" returned %v for node %v`, fk, n.ID)
+		}
+		assign(node, n)
+	}
+	return nil
+}
+func (aq *AdminQuery) loadEventLevelUpdater(ctx context.Context, query *EventLevelQuery, nodes []*Admin, init func(*Admin), assign func(*Admin, *EventLevel)) error {
+	fks := make([]driver.Value, 0, len(nodes))
+	nodeids := make(map[int]*Admin)
+	for i := range nodes {
+		fks = append(fks, nodes[i].ID)
+		nodeids[nodes[i].ID] = nodes[i]
+		if init != nil {
+			init(nodes[i])
+		}
+	}
+	if len(query.ctx.Fields) > 0 {
+		query.ctx.AppendFieldOnce(eventlevel.FieldUpdatedBy)
+	}
+	query.Where(predicate.EventLevel(func(s *sql.Selector) {
+		s.Where(sql.InValues(s.C(admin.EventLevelUpdaterColumn), fks...))
 	}))
 	neighbors, err := query.All(ctx)
 	if err != nil {

@@ -13,6 +13,7 @@ import (
 	"aisecurity/structs/types"
 	"aisecurity/utils"
 	"aisecurity/utils/http"
+	"encoding/json"
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"go.uber.org/zap"
@@ -23,7 +24,7 @@ import (
 
 type TwoHandler struct {
 	handlers.IPCHandler
-	Service *services.IPCReportEventService
+	Service *services.IPCEventService
 }
 
 func NewTwoHandler() *TwoHandler { return &TwoHandler{} }
@@ -37,10 +38,10 @@ func (h *TwoHandler) GetEntity(c *gin.Context) structs.IEntity {
 	return h.Entity
 }
 func (h *TwoHandler) SetRequestContext(c *gin.Context, h2 handlers.IHandler) {
-	h.Service = services.NewIPCReportEventService()
+	h.Service = services.NewIPCEventService()
 	h.Service.Ctx = c
-	h.Filter = &filters.IPCReportEvent{}
-	h.Entity = &entities.IPCReportEvent{}
+	h.Filter = &filters.IPCEvent{}
+	h.Entity = &entities.IPCEvent{}
 	h.IPCHandler.SetRequestContext(c, h)
 }
 
@@ -51,27 +52,75 @@ func (h *TwoHandler) ReportEvent(c *gin.Context) {
 	re := regexp.MustCompile(pattern)
 	bodyString = re.ReplaceAllString(bodyString, `"$1": "$3...$4"`)
 
-	var p posts.TwoIPCReportEvent
+	var p posts.TwoIPCEvent
 	if err := c.ShouldBindJSON(&p); err != nil {
 		http.Error(c, err, 900)
 		return
 	}
 
-	eventType := enums.IPCReportEventType(0).GetEventTypeByTwoType(p.Result.Type)
+	// event type
+	eventType := enums.EventType(0).GetEventTypeByTwoType(p.Result.Type)
 
+	// event time
 	timestampMicro := int64(p.TimeStamp)
 	eventTime := time.Unix(0, timestampMicro*int64(time.Microsecond))
 
+	// description
 	description := p.Result.Description
 	if description == "" {
 		description = eventType.Label()
 	}
 
-	ent := entities.IPCReportEvent{
-		IPCReportEvent: dao.IPCReportEvent{
-			DeviceBrand: enums.IREDB1,
-			DeviceModel: enums.IREDM1,
-			DeviceID:    p.BoardID,
+	// device
+	deviceService := services.NewDevice(c)
+	device, err := deviceService.GetBySn(p.BoardID)
+	if err != nil {
+		if dao.IsNotFound(err) {
+			device, err = deviceService.Create(&entities.Device{
+				Device: dao.Device{
+					Brand:      enums.DB1,
+					Model:      enums.DM1,
+					Name:       "图为T1206",
+					Sn:         p.BoardID,
+					DeviceType: enums.DT1,
+				},
+			})
+			if err != nil {
+				http.Error(c, utils.ErrorWithStack(err), 1000)
+				return
+			}
+		} else {
+			http.Error(c, utils.ErrorWithStack(err), 1000)
+			return
+		}
+	}
+	d := device.(*entities.Device)
+
+	// device installation
+	deviceInstallationService := services.NewDeviceInstallation(c)
+	_, err = deviceInstallationService.GetByDeviceID(d.ID)
+	if err != nil {
+		if dao.IsNotFound(err) {
+			area, _ := services.NewAreaService(c).GetAnyOne()
+			locationData, _ := json.Marshal(p.GPS)
+			_, _ = deviceInstallationService.Create(&entities.DeviceInstallation{
+				DeviceInstallation: dao.DeviceInstallation{
+					DeviceID:     d.ID,
+					AreaID:       area.(*entities.Area).ID,
+					AliasName:    "图为T1206默认安装",
+					Longitude:    p.GPS.Longitude,
+					Latitude:     p.GPS.Latitude,
+					LocationData: string(locationData),
+					Location:     "默认位置",
+					InstallTime:  time.Now(),
+				},
+			})
+		}
+	}
+
+	ent := entities.IPCEvent{
+		IPCEvent: dao.IPCEvent{
+			DeviceID:    d.ID,
 			EventID:     p.AlarmID,
 			EventTime:   eventTime,
 			EventType:   eventType,

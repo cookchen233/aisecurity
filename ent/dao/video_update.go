@@ -4,7 +4,7 @@ package dao
 
 import (
 	"aisecurity/ent/dao/admin"
-	"aisecurity/ent/dao/ipcreportevent"
+	"aisecurity/ent/dao/ipcevent"
 	"aisecurity/ent/dao/predicate"
 	"aisecurity/ent/dao/video"
 	"context"
@@ -171,6 +171,26 @@ func (vu *VideoUpdate) ClearUploadedAt() *VideoUpdate {
 	return vu
 }
 
+// SetUploadedAt2 sets the "uploaded_at2" field.
+func (vu *VideoUpdate) SetUploadedAt2(t time.Time) *VideoUpdate {
+	vu.mutation.SetUploadedAt2(t)
+	return vu
+}
+
+// SetNillableUploadedAt2 sets the "uploaded_at2" field if the given value is not nil.
+func (vu *VideoUpdate) SetNillableUploadedAt2(t *time.Time) *VideoUpdate {
+	if t != nil {
+		vu.SetUploadedAt2(*t)
+	}
+	return vu
+}
+
+// ClearUploadedAt2 clears the value of the "uploaded_at2" field.
+func (vu *VideoUpdate) ClearUploadedAt2() *VideoUpdate {
+	vu.mutation.ClearUploadedAt2()
+	return vu
+}
+
 // SetUpdaterID sets the "updater" edge to the Admin entity by ID.
 func (vu *VideoUpdate) SetUpdaterID(id int) *VideoUpdate {
 	vu.mutation.SetUpdaterID(id)
@@ -182,19 +202,19 @@ func (vu *VideoUpdate) SetUpdater(a *Admin) *VideoUpdate {
 	return vu.SetUpdaterID(a.ID)
 }
 
-// AddIpcReportEventVideoIDs adds the "ipc_report_event_video" edge to the IPCReportEvent entity by IDs.
-func (vu *VideoUpdate) AddIpcReportEventVideoIDs(ids ...int) *VideoUpdate {
-	vu.mutation.AddIpcReportEventVideoIDs(ids...)
+// AddIpcEventVideoIDs adds the "ipc_event_video" edge to the IPCEvent entity by IDs.
+func (vu *VideoUpdate) AddIpcEventVideoIDs(ids ...int) *VideoUpdate {
+	vu.mutation.AddIpcEventVideoIDs(ids...)
 	return vu
 }
 
-// AddIpcReportEventVideo adds the "ipc_report_event_video" edges to the IPCReportEvent entity.
-func (vu *VideoUpdate) AddIpcReportEventVideo(i ...*IPCReportEvent) *VideoUpdate {
+// AddIpcEventVideo adds the "ipc_event_video" edges to the IPCEvent entity.
+func (vu *VideoUpdate) AddIpcEventVideo(i ...*IPCEvent) *VideoUpdate {
 	ids := make([]int, len(i))
 	for j := range i {
 		ids[j] = i[j].ID
 	}
-	return vu.AddIpcReportEventVideoIDs(ids...)
+	return vu.AddIpcEventVideoIDs(ids...)
 }
 
 // Mutation returns the VideoMutation object of the builder.
@@ -208,25 +228,25 @@ func (vu *VideoUpdate) ClearUpdater() *VideoUpdate {
 	return vu
 }
 
-// ClearIpcReportEventVideo clears all "ipc_report_event_video" edges to the IPCReportEvent entity.
-func (vu *VideoUpdate) ClearIpcReportEventVideo() *VideoUpdate {
-	vu.mutation.ClearIpcReportEventVideo()
+// ClearIpcEventVideo clears all "ipc_event_video" edges to the IPCEvent entity.
+func (vu *VideoUpdate) ClearIpcEventVideo() *VideoUpdate {
+	vu.mutation.ClearIpcEventVideo()
 	return vu
 }
 
-// RemoveIpcReportEventVideoIDs removes the "ipc_report_event_video" edge to IPCReportEvent entities by IDs.
-func (vu *VideoUpdate) RemoveIpcReportEventVideoIDs(ids ...int) *VideoUpdate {
-	vu.mutation.RemoveIpcReportEventVideoIDs(ids...)
+// RemoveIpcEventVideoIDs removes the "ipc_event_video" edge to IPCEvent entities by IDs.
+func (vu *VideoUpdate) RemoveIpcEventVideoIDs(ids ...int) *VideoUpdate {
+	vu.mutation.RemoveIpcEventVideoIDs(ids...)
 	return vu
 }
 
-// RemoveIpcReportEventVideo removes "ipc_report_event_video" edges to IPCReportEvent entities.
-func (vu *VideoUpdate) RemoveIpcReportEventVideo(i ...*IPCReportEvent) *VideoUpdate {
+// RemoveIpcEventVideo removes "ipc_event_video" edges to IPCEvent entities.
+func (vu *VideoUpdate) RemoveIpcEventVideo(i ...*IPCEvent) *VideoUpdate {
 	ids := make([]int, len(i))
 	for j := range i {
 		ids[j] = i[j].ID
 	}
-	return vu.RemoveIpcReportEventVideoIDs(ids...)
+	return vu.RemoveIpcEventVideoIDs(ids...)
 }
 
 // Save executes the query and returns the number of nodes affected by the update operation.
@@ -338,6 +358,12 @@ func (vu *VideoUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	if vu.mutation.UploadedAtCleared() {
 		_spec.ClearField(video.FieldUploadedAt, field.TypeTime)
 	}
+	if value, ok := vu.mutation.UploadedAt2(); ok {
+		_spec.SetField(video.FieldUploadedAt2, field.TypeTime, value)
+	}
+	if vu.mutation.UploadedAt2Cleared() {
+		_spec.ClearField(video.FieldUploadedAt2, field.TypeTime)
+	}
 	if vu.mutation.UpdaterCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
@@ -367,28 +393,28 @@ func (vu *VideoUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if vu.mutation.IpcReportEventVideoCleared() {
+	if vu.mutation.IpcEventVideoCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
-			Table:   video.IpcReportEventVideoTable,
-			Columns: []string{video.IpcReportEventVideoColumn},
+			Table:   video.IpcEventVideoTable,
+			Columns: []string{video.IpcEventVideoColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(ipcreportevent.FieldID, field.TypeInt),
+				IDSpec: sqlgraph.NewFieldSpec(ipcevent.FieldID, field.TypeInt),
 			},
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := vu.mutation.RemovedIpcReportEventVideoIDs(); len(nodes) > 0 && !vu.mutation.IpcReportEventVideoCleared() {
+	if nodes := vu.mutation.RemovedIpcEventVideoIDs(); len(nodes) > 0 && !vu.mutation.IpcEventVideoCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
-			Table:   video.IpcReportEventVideoTable,
-			Columns: []string{video.IpcReportEventVideoColumn},
+			Table:   video.IpcEventVideoTable,
+			Columns: []string{video.IpcEventVideoColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(ipcreportevent.FieldID, field.TypeInt),
+				IDSpec: sqlgraph.NewFieldSpec(ipcevent.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {
@@ -396,15 +422,15 @@ func (vu *VideoUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := vu.mutation.IpcReportEventVideoIDs(); len(nodes) > 0 {
+	if nodes := vu.mutation.IpcEventVideoIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
-			Table:   video.IpcReportEventVideoTable,
-			Columns: []string{video.IpcReportEventVideoColumn},
+			Table:   video.IpcEventVideoTable,
+			Columns: []string{video.IpcEventVideoColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(ipcreportevent.FieldID, field.TypeInt),
+				IDSpec: sqlgraph.NewFieldSpec(ipcevent.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {
@@ -573,6 +599,26 @@ func (vuo *VideoUpdateOne) ClearUploadedAt() *VideoUpdateOne {
 	return vuo
 }
 
+// SetUploadedAt2 sets the "uploaded_at2" field.
+func (vuo *VideoUpdateOne) SetUploadedAt2(t time.Time) *VideoUpdateOne {
+	vuo.mutation.SetUploadedAt2(t)
+	return vuo
+}
+
+// SetNillableUploadedAt2 sets the "uploaded_at2" field if the given value is not nil.
+func (vuo *VideoUpdateOne) SetNillableUploadedAt2(t *time.Time) *VideoUpdateOne {
+	if t != nil {
+		vuo.SetUploadedAt2(*t)
+	}
+	return vuo
+}
+
+// ClearUploadedAt2 clears the value of the "uploaded_at2" field.
+func (vuo *VideoUpdateOne) ClearUploadedAt2() *VideoUpdateOne {
+	vuo.mutation.ClearUploadedAt2()
+	return vuo
+}
+
 // SetUpdaterID sets the "updater" edge to the Admin entity by ID.
 func (vuo *VideoUpdateOne) SetUpdaterID(id int) *VideoUpdateOne {
 	vuo.mutation.SetUpdaterID(id)
@@ -584,19 +630,19 @@ func (vuo *VideoUpdateOne) SetUpdater(a *Admin) *VideoUpdateOne {
 	return vuo.SetUpdaterID(a.ID)
 }
 
-// AddIpcReportEventVideoIDs adds the "ipc_report_event_video" edge to the IPCReportEvent entity by IDs.
-func (vuo *VideoUpdateOne) AddIpcReportEventVideoIDs(ids ...int) *VideoUpdateOne {
-	vuo.mutation.AddIpcReportEventVideoIDs(ids...)
+// AddIpcEventVideoIDs adds the "ipc_event_video" edge to the IPCEvent entity by IDs.
+func (vuo *VideoUpdateOne) AddIpcEventVideoIDs(ids ...int) *VideoUpdateOne {
+	vuo.mutation.AddIpcEventVideoIDs(ids...)
 	return vuo
 }
 
-// AddIpcReportEventVideo adds the "ipc_report_event_video" edges to the IPCReportEvent entity.
-func (vuo *VideoUpdateOne) AddIpcReportEventVideo(i ...*IPCReportEvent) *VideoUpdateOne {
+// AddIpcEventVideo adds the "ipc_event_video" edges to the IPCEvent entity.
+func (vuo *VideoUpdateOne) AddIpcEventVideo(i ...*IPCEvent) *VideoUpdateOne {
 	ids := make([]int, len(i))
 	for j := range i {
 		ids[j] = i[j].ID
 	}
-	return vuo.AddIpcReportEventVideoIDs(ids...)
+	return vuo.AddIpcEventVideoIDs(ids...)
 }
 
 // Mutation returns the VideoMutation object of the builder.
@@ -610,25 +656,25 @@ func (vuo *VideoUpdateOne) ClearUpdater() *VideoUpdateOne {
 	return vuo
 }
 
-// ClearIpcReportEventVideo clears all "ipc_report_event_video" edges to the IPCReportEvent entity.
-func (vuo *VideoUpdateOne) ClearIpcReportEventVideo() *VideoUpdateOne {
-	vuo.mutation.ClearIpcReportEventVideo()
+// ClearIpcEventVideo clears all "ipc_event_video" edges to the IPCEvent entity.
+func (vuo *VideoUpdateOne) ClearIpcEventVideo() *VideoUpdateOne {
+	vuo.mutation.ClearIpcEventVideo()
 	return vuo
 }
 
-// RemoveIpcReportEventVideoIDs removes the "ipc_report_event_video" edge to IPCReportEvent entities by IDs.
-func (vuo *VideoUpdateOne) RemoveIpcReportEventVideoIDs(ids ...int) *VideoUpdateOne {
-	vuo.mutation.RemoveIpcReportEventVideoIDs(ids...)
+// RemoveIpcEventVideoIDs removes the "ipc_event_video" edge to IPCEvent entities by IDs.
+func (vuo *VideoUpdateOne) RemoveIpcEventVideoIDs(ids ...int) *VideoUpdateOne {
+	vuo.mutation.RemoveIpcEventVideoIDs(ids...)
 	return vuo
 }
 
-// RemoveIpcReportEventVideo removes "ipc_report_event_video" edges to IPCReportEvent entities.
-func (vuo *VideoUpdateOne) RemoveIpcReportEventVideo(i ...*IPCReportEvent) *VideoUpdateOne {
+// RemoveIpcEventVideo removes "ipc_event_video" edges to IPCEvent entities.
+func (vuo *VideoUpdateOne) RemoveIpcEventVideo(i ...*IPCEvent) *VideoUpdateOne {
 	ids := make([]int, len(i))
 	for j := range i {
 		ids[j] = i[j].ID
 	}
-	return vuo.RemoveIpcReportEventVideoIDs(ids...)
+	return vuo.RemoveIpcEventVideoIDs(ids...)
 }
 
 // Where appends a list predicates to the VideoUpdate builder.
@@ -770,6 +816,12 @@ func (vuo *VideoUpdateOne) sqlSave(ctx context.Context) (_node *Video, err error
 	if vuo.mutation.UploadedAtCleared() {
 		_spec.ClearField(video.FieldUploadedAt, field.TypeTime)
 	}
+	if value, ok := vuo.mutation.UploadedAt2(); ok {
+		_spec.SetField(video.FieldUploadedAt2, field.TypeTime, value)
+	}
+	if vuo.mutation.UploadedAt2Cleared() {
+		_spec.ClearField(video.FieldUploadedAt2, field.TypeTime)
+	}
 	if vuo.mutation.UpdaterCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
@@ -799,28 +851,28 @@ func (vuo *VideoUpdateOne) sqlSave(ctx context.Context) (_node *Video, err error
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if vuo.mutation.IpcReportEventVideoCleared() {
+	if vuo.mutation.IpcEventVideoCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
-			Table:   video.IpcReportEventVideoTable,
-			Columns: []string{video.IpcReportEventVideoColumn},
+			Table:   video.IpcEventVideoTable,
+			Columns: []string{video.IpcEventVideoColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(ipcreportevent.FieldID, field.TypeInt),
+				IDSpec: sqlgraph.NewFieldSpec(ipcevent.FieldID, field.TypeInt),
 			},
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := vuo.mutation.RemovedIpcReportEventVideoIDs(); len(nodes) > 0 && !vuo.mutation.IpcReportEventVideoCleared() {
+	if nodes := vuo.mutation.RemovedIpcEventVideoIDs(); len(nodes) > 0 && !vuo.mutation.IpcEventVideoCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
-			Table:   video.IpcReportEventVideoTable,
-			Columns: []string{video.IpcReportEventVideoColumn},
+			Table:   video.IpcEventVideoTable,
+			Columns: []string{video.IpcEventVideoColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(ipcreportevent.FieldID, field.TypeInt),
+				IDSpec: sqlgraph.NewFieldSpec(ipcevent.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {
@@ -828,15 +880,15 @@ func (vuo *VideoUpdateOne) sqlSave(ctx context.Context) (_node *Video, err error
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := vuo.mutation.IpcReportEventVideoIDs(); len(nodes) > 0 {
+	if nodes := vuo.mutation.IpcEventVideoIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
-			Table:   video.IpcReportEventVideoTable,
-			Columns: []string{video.IpcReportEventVideoColumn},
+			Table:   video.IpcEventVideoTable,
+			Columns: []string{video.IpcEventVideoColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(ipcreportevent.FieldID, field.TypeInt),
+				IDSpec: sqlgraph.NewFieldSpec(ipcevent.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {

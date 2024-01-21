@@ -4,7 +4,7 @@ package dao
 
 import (
 	"aisecurity/ent/dao/admin"
-	"aisecurity/ent/dao/ipcreportevent"
+	"aisecurity/ent/dao/ipcevent"
 	"aisecurity/ent/dao/video"
 	"context"
 	"errors"
@@ -146,6 +146,20 @@ func (vc *VideoCreate) SetNillableUploadedAt(t *time.Time) *VideoCreate {
 	return vc
 }
 
+// SetUploadedAt2 sets the "uploaded_at2" field.
+func (vc *VideoCreate) SetUploadedAt2(t time.Time) *VideoCreate {
+	vc.mutation.SetUploadedAt2(t)
+	return vc
+}
+
+// SetNillableUploadedAt2 sets the "uploaded_at2" field if the given value is not nil.
+func (vc *VideoCreate) SetNillableUploadedAt2(t *time.Time) *VideoCreate {
+	if t != nil {
+		vc.SetUploadedAt2(*t)
+	}
+	return vc
+}
+
 // SetCreatorID sets the "creator" edge to the Admin entity by ID.
 func (vc *VideoCreate) SetCreatorID(id int) *VideoCreate {
 	vc.mutation.SetCreatorID(id)
@@ -168,19 +182,19 @@ func (vc *VideoCreate) SetUpdater(a *Admin) *VideoCreate {
 	return vc.SetUpdaterID(a.ID)
 }
 
-// AddIpcReportEventVideoIDs adds the "ipc_report_event_video" edge to the IPCReportEvent entity by IDs.
-func (vc *VideoCreate) AddIpcReportEventVideoIDs(ids ...int) *VideoCreate {
-	vc.mutation.AddIpcReportEventVideoIDs(ids...)
+// AddIpcEventVideoIDs adds the "ipc_event_video" edge to the IPCEvent entity by IDs.
+func (vc *VideoCreate) AddIpcEventVideoIDs(ids ...int) *VideoCreate {
+	vc.mutation.AddIpcEventVideoIDs(ids...)
 	return vc
 }
 
-// AddIpcReportEventVideo adds the "ipc_report_event_video" edges to the IPCReportEvent entity.
-func (vc *VideoCreate) AddIpcReportEventVideo(i ...*IPCReportEvent) *VideoCreate {
+// AddIpcEventVideo adds the "ipc_event_video" edges to the IPCEvent entity.
+func (vc *VideoCreate) AddIpcEventVideo(i ...*IPCEvent) *VideoCreate {
 	ids := make([]int, len(i))
 	for j := range i {
 		ids[j] = i[j].ID
 	}
-	return vc.AddIpcReportEventVideoIDs(ids...)
+	return vc.AddIpcEventVideoIDs(ids...)
 }
 
 // Mutation returns the VideoMutation object of the builder.
@@ -332,6 +346,10 @@ func (vc *VideoCreate) createSpec() (*Video, *sqlgraph.CreateSpec) {
 		_spec.SetField(video.FieldUploadedAt, field.TypeTime, value)
 		_node.UploadedAt = &value
 	}
+	if value, ok := vc.mutation.UploadedAt2(); ok {
+		_spec.SetField(video.FieldUploadedAt2, field.TypeTime, value)
+		_node.UploadedAt2 = &value
+	}
 	if nodes := vc.mutation.CreatorIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
@@ -366,15 +384,15 @@ func (vc *VideoCreate) createSpec() (*Video, *sqlgraph.CreateSpec) {
 		_node.UpdatedBy = nodes[0]
 		_spec.Edges = append(_spec.Edges, edge)
 	}
-	if nodes := vc.mutation.IpcReportEventVideoIDs(); len(nodes) > 0 {
+	if nodes := vc.mutation.IpcEventVideoIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
-			Table:   video.IpcReportEventVideoTable,
-			Columns: []string{video.IpcReportEventVideoColumn},
+			Table:   video.IpcEventVideoTable,
+			Columns: []string{video.IpcEventVideoColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(ipcreportevent.FieldID, field.TypeInt),
+				IDSpec: sqlgraph.NewFieldSpec(ipcevent.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {

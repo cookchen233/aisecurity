@@ -36,8 +36,9 @@ func init() {
 	if err != nil {
 		log.Panicf("error opening file: %v", err)
 	}
-	wr := io.MultiWriter(_f, os.Stdout)
-	_log = log.New(wr, "INFO ", log.LstdFlags|log.Lmicroseconds)
+	//wr := io.MultiWriter(_f, os.Stdout)
+	//_log = log.New(wr, "INFO ", log.LstdFlags|log.Lmicroseconds)
+	_log = log.New(_f, "INFO ", log.LstdFlags|log.Lmicroseconds)
 	_log.SetFlags(log.LstdFlags | log.Lmicroseconds)
 }
 
@@ -53,8 +54,9 @@ func JoyRequestLog() gin.HandlerFunc {
 			if err != nil {
 				log.Panicf("error opening file: %v", err)
 			}
-			wr := io.MultiWriter(newF, os.Stdout)
-			_log.SetOutput(wr)
+			//wr := io.MultiWriter(newF, os.Stdout)
+			//_log.SetOutput(wr)
+			_log.SetOutput(newF)
 		}
 
 		var bodyString string

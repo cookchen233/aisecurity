@@ -6,6 +6,7 @@ import (
 	"aisecurity/ent/dao/admin"
 	"aisecurity/ent/dao/department"
 	"aisecurity/ent/dao/employee"
+	"aisecurity/ent/dao/ipcevent"
 	"aisecurity/ent/dao/occupation"
 	"aisecurity/ent/dao/predicate"
 	"aisecurity/ent/dao/risk"
@@ -117,6 +118,21 @@ func (eu *EmployeeUpdate) AddOccupations(o ...*Occupation) *EmployeeUpdate {
 	return eu.AddOccupationIDs(ids...)
 }
 
+// AddIpcEventIDs adds the "ipc_events" edge to the IPCEvent entity by IDs.
+func (eu *EmployeeUpdate) AddIpcEventIDs(ids ...int) *EmployeeUpdate {
+	eu.mutation.AddIpcEventIDs(ids...)
+	return eu
+}
+
+// AddIpcEvents adds the "ipc_events" edges to the IPCEvent entity.
+func (eu *EmployeeUpdate) AddIpcEvents(i ...*IPCEvent) *EmployeeUpdate {
+	ids := make([]int, len(i))
+	for j := range i {
+		ids[j] = i[j].ID
+	}
+	return eu.AddIpcEventIDs(ids...)
+}
+
 // AddRiskReporterIDs adds the "risk_reporter" edge to the Risk entity by IDs.
 func (eu *EmployeeUpdate) AddRiskReporterIDs(ids ...int) *EmployeeUpdate {
 	eu.mutation.AddRiskReporterIDs(ids...)
@@ -183,6 +199,27 @@ func (eu *EmployeeUpdate) RemoveOccupations(o ...*Occupation) *EmployeeUpdate {
 		ids[i] = o[i].ID
 	}
 	return eu.RemoveOccupationIDs(ids...)
+}
+
+// ClearIpcEvents clears all "ipc_events" edges to the IPCEvent entity.
+func (eu *EmployeeUpdate) ClearIpcEvents() *EmployeeUpdate {
+	eu.mutation.ClearIpcEvents()
+	return eu
+}
+
+// RemoveIpcEventIDs removes the "ipc_events" edge to IPCEvent entities by IDs.
+func (eu *EmployeeUpdate) RemoveIpcEventIDs(ids ...int) *EmployeeUpdate {
+	eu.mutation.RemoveIpcEventIDs(ids...)
+	return eu
+}
+
+// RemoveIpcEvents removes "ipc_events" edges to IPCEvent entities.
+func (eu *EmployeeUpdate) RemoveIpcEvents(i ...*IPCEvent) *EmployeeUpdate {
+	ids := make([]int, len(i))
+	for j := range i {
+		ids[j] = i[j].ID
+	}
+	return eu.RemoveIpcEventIDs(ids...)
 }
 
 // ClearRiskReporter clears all "risk_reporter" edges to the Risk entity.
@@ -420,6 +457,51 @@ func (eu *EmployeeUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
+	if eu.mutation.IpcEventsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: true,
+			Table:   employee.IpcEventsTable,
+			Columns: employee.IpcEventsPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(ipcevent.FieldID, field.TypeInt),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := eu.mutation.RemovedIpcEventsIDs(); len(nodes) > 0 && !eu.mutation.IpcEventsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: true,
+			Table:   employee.IpcEventsTable,
+			Columns: employee.IpcEventsPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(ipcevent.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := eu.mutation.IpcEventsIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: true,
+			Table:   employee.IpcEventsTable,
+			Columns: employee.IpcEventsPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(ipcevent.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
 	if eu.mutation.RiskReporterCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
@@ -615,6 +697,21 @@ func (euo *EmployeeUpdateOne) AddOccupations(o ...*Occupation) *EmployeeUpdateOn
 	return euo.AddOccupationIDs(ids...)
 }
 
+// AddIpcEventIDs adds the "ipc_events" edge to the IPCEvent entity by IDs.
+func (euo *EmployeeUpdateOne) AddIpcEventIDs(ids ...int) *EmployeeUpdateOne {
+	euo.mutation.AddIpcEventIDs(ids...)
+	return euo
+}
+
+// AddIpcEvents adds the "ipc_events" edges to the IPCEvent entity.
+func (euo *EmployeeUpdateOne) AddIpcEvents(i ...*IPCEvent) *EmployeeUpdateOne {
+	ids := make([]int, len(i))
+	for j := range i {
+		ids[j] = i[j].ID
+	}
+	return euo.AddIpcEventIDs(ids...)
+}
+
 // AddRiskReporterIDs adds the "risk_reporter" edge to the Risk entity by IDs.
 func (euo *EmployeeUpdateOne) AddRiskReporterIDs(ids ...int) *EmployeeUpdateOne {
 	euo.mutation.AddRiskReporterIDs(ids...)
@@ -681,6 +778,27 @@ func (euo *EmployeeUpdateOne) RemoveOccupations(o ...*Occupation) *EmployeeUpdat
 		ids[i] = o[i].ID
 	}
 	return euo.RemoveOccupationIDs(ids...)
+}
+
+// ClearIpcEvents clears all "ipc_events" edges to the IPCEvent entity.
+func (euo *EmployeeUpdateOne) ClearIpcEvents() *EmployeeUpdateOne {
+	euo.mutation.ClearIpcEvents()
+	return euo
+}
+
+// RemoveIpcEventIDs removes the "ipc_events" edge to IPCEvent entities by IDs.
+func (euo *EmployeeUpdateOne) RemoveIpcEventIDs(ids ...int) *EmployeeUpdateOne {
+	euo.mutation.RemoveIpcEventIDs(ids...)
+	return euo
+}
+
+// RemoveIpcEvents removes "ipc_events" edges to IPCEvent entities.
+func (euo *EmployeeUpdateOne) RemoveIpcEvents(i ...*IPCEvent) *EmployeeUpdateOne {
+	ids := make([]int, len(i))
+	for j := range i {
+		ids[j] = i[j].ID
+	}
+	return euo.RemoveIpcEventIDs(ids...)
 }
 
 // ClearRiskReporter clears all "risk_reporter" edges to the Risk entity.
@@ -941,6 +1059,51 @@ func (euo *EmployeeUpdateOne) sqlSave(ctx context.Context) (_node *Employee, err
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(occupation.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if euo.mutation.IpcEventsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: true,
+			Table:   employee.IpcEventsTable,
+			Columns: employee.IpcEventsPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(ipcevent.FieldID, field.TypeInt),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := euo.mutation.RemovedIpcEventsIDs(); len(nodes) > 0 && !euo.mutation.IpcEventsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: true,
+			Table:   employee.IpcEventsTable,
+			Columns: employee.IpcEventsPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(ipcevent.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := euo.mutation.IpcEventsIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: true,
+			Table:   employee.IpcEventsTable,
+			Columns: employee.IpcEventsPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(ipcevent.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {

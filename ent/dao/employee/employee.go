@@ -39,6 +39,8 @@ const (
 	EdgeDepartment = "department"
 	// EdgeOccupations holds the string denoting the occupations edge name in mutations.
 	EdgeOccupations = "occupations"
+	// EdgeIpcEvents holds the string denoting the ipc_events edge name in mutations.
+	EdgeIpcEvents = "ipc_events"
 	// EdgeRiskReporter holds the string denoting the risk_reporter edge name in mutations.
 	EdgeRiskReporter = "risk_reporter"
 	// EdgeRiskMaintainer holds the string denoting the risk_maintainer edge name in mutations.
@@ -78,6 +80,11 @@ const (
 	// OccupationsInverseTable is the table name for the Occupation entity.
 	// It exists in this package in order to avoid circular dependency with the "occupation" package.
 	OccupationsInverseTable = "occupations"
+	// IpcEventsTable is the table that holds the ipc_events relation/edge. The primary key declared below.
+	IpcEventsTable = "ipc_event_fixers"
+	// IpcEventsInverseTable is the table name for the IPCEvent entity.
+	// It exists in this package in order to avoid circular dependency with the "ipcevent" package.
+	IpcEventsInverseTable = "ipc_events"
 	// RiskReporterTable is the table that holds the risk_reporter relation/edge.
 	RiskReporterTable = "risks"
 	// RiskReporterInverseTable is the table name for the Risk entity.
@@ -110,6 +117,9 @@ var (
 	// OccupationsPrimaryKey and OccupationsColumn2 are the table columns denoting the
 	// primary key for the occupations relation (M2M).
 	OccupationsPrimaryKey = []string{"occupation_id", "employee_id"}
+	// IpcEventsPrimaryKey and IpcEventsColumn2 are the table columns denoting the
+	// primary key for the ipc_events relation (M2M).
+	IpcEventsPrimaryKey = []string{"ipc_event_id", "employee_id"}
 )
 
 // ValidColumn reports if the column name is valid (part of the table columns).
@@ -230,6 +240,20 @@ func ByOccupations(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
 	}
 }
 
+// ByIpcEventsCount orders the results by ipc_events count.
+func ByIpcEventsCount(opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborsCount(s, newIpcEventsStep(), opts...)
+	}
+}
+
+// ByIpcEvents orders the results by ipc_events terms.
+func ByIpcEvents(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newIpcEventsStep(), append([]sql.OrderTerm{term}, terms...)...)
+	}
+}
+
 // ByRiskReporterCount orders the results by risk_reporter count.
 func ByRiskReporterCount(opts ...sql.OrderTermOption) OrderOption {
 	return func(s *sql.Selector) {
@@ -290,6 +314,13 @@ func newOccupationsStep() *sqlgraph.Step {
 		sqlgraph.From(Table, FieldID),
 		sqlgraph.To(OccupationsInverseTable, FieldID),
 		sqlgraph.Edge(sqlgraph.M2M, true, OccupationsTable, OccupationsPrimaryKey...),
+	)
+}
+func newIpcEventsStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(IpcEventsInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.M2M, true, IpcEventsTable, IpcEventsPrimaryKey...),
 	)
 }
 func newRiskReporterStep() *sqlgraph.Step {

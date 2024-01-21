@@ -85,17 +85,33 @@ type AdminEdges struct {
 	OccupationCreator []*Occupation `json:"occupation_creator,omitempty"`
 	// OccupationUpdater holds the value of the occupation_updater edge.
 	OccupationUpdater []*Occupation `json:"occupation_updater,omitempty"`
-	// IpcReportEventCreator holds the value of the ipc_report_event_creator edge.
-	IpcReportEventCreator []*IPCReportEvent `json:"ipc_report_event_creator,omitempty"`
-	// IpcReportEventUpdater holds the value of the ipc_report_event_updater edge.
-	IpcReportEventUpdater []*IPCReportEvent `json:"ipc_report_event_updater,omitempty"`
+	// IpcEventCreator holds the value of the ipc_event_creator edge.
+	IpcEventCreator []*IPCEvent `json:"ipc_event_creator,omitempty"`
+	// IpcEventUpdater holds the value of the ipc_event_updater edge.
+	IpcEventUpdater []*IPCEvent `json:"ipc_event_updater,omitempty"`
 	// VideoCreator holds the value of the video_creator edge.
 	VideoCreator []*Video `json:"video_creator,omitempty"`
 	// VideoUpdater holds the value of the video_updater edge.
 	VideoUpdater []*Video `json:"video_updater,omitempty"`
+	// AreaCreator holds the value of the area_creator edge.
+	AreaCreator []*Area `json:"area_creator,omitempty"`
+	// AreaUpdater holds the value of the area_updater edge.
+	AreaUpdater []*Area `json:"area_updater,omitempty"`
+	// DeviceCreator holds the value of the device_creator edge.
+	DeviceCreator []*Device `json:"device_creator,omitempty"`
+	// DeviceUpdater holds the value of the device_updater edge.
+	DeviceUpdater []*Device `json:"device_updater,omitempty"`
+	// DeviceInstallationCreator holds the value of the device_installation_creator edge.
+	DeviceInstallationCreator []*DeviceInstallation `json:"device_installation_creator,omitempty"`
+	// DeviceInstallationUpdater holds the value of the device_installation_updater edge.
+	DeviceInstallationUpdater []*DeviceInstallation `json:"device_installation_updater,omitempty"`
+	// EventLevelCreator holds the value of the event_level_creator edge.
+	EventLevelCreator []*EventLevel `json:"event_level_creator,omitempty"`
+	// EventLevelUpdater holds the value of the event_level_updater edge.
+	EventLevelUpdater []*EventLevel `json:"event_level_updater,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
-	loadedTypes [24]bool
+	loadedTypes [32]bool
 }
 
 // CreatorOrErr returns the Creator value or an error if the edge
@@ -286,22 +302,22 @@ func (e AdminEdges) OccupationUpdaterOrErr() ([]*Occupation, error) {
 	return nil, &NotLoadedError{edge: "occupation_updater"}
 }
 
-// IpcReportEventCreatorOrErr returns the IpcReportEventCreator value or an error if the edge
+// IpcEventCreatorOrErr returns the IpcEventCreator value or an error if the edge
 // was not loaded in eager-loading.
-func (e AdminEdges) IpcReportEventCreatorOrErr() ([]*IPCReportEvent, error) {
+func (e AdminEdges) IpcEventCreatorOrErr() ([]*IPCEvent, error) {
 	if e.loadedTypes[20] {
-		return e.IpcReportEventCreator, nil
+		return e.IpcEventCreator, nil
 	}
-	return nil, &NotLoadedError{edge: "ipc_report_event_creator"}
+	return nil, &NotLoadedError{edge: "ipc_event_creator"}
 }
 
-// IpcReportEventUpdaterOrErr returns the IpcReportEventUpdater value or an error if the edge
+// IpcEventUpdaterOrErr returns the IpcEventUpdater value or an error if the edge
 // was not loaded in eager-loading.
-func (e AdminEdges) IpcReportEventUpdaterOrErr() ([]*IPCReportEvent, error) {
+func (e AdminEdges) IpcEventUpdaterOrErr() ([]*IPCEvent, error) {
 	if e.loadedTypes[21] {
-		return e.IpcReportEventUpdater, nil
+		return e.IpcEventUpdater, nil
 	}
-	return nil, &NotLoadedError{edge: "ipc_report_event_updater"}
+	return nil, &NotLoadedError{edge: "ipc_event_updater"}
 }
 
 // VideoCreatorOrErr returns the VideoCreator value or an error if the edge
@@ -320,6 +336,78 @@ func (e AdminEdges) VideoUpdaterOrErr() ([]*Video, error) {
 		return e.VideoUpdater, nil
 	}
 	return nil, &NotLoadedError{edge: "video_updater"}
+}
+
+// AreaCreatorOrErr returns the AreaCreator value or an error if the edge
+// was not loaded in eager-loading.
+func (e AdminEdges) AreaCreatorOrErr() ([]*Area, error) {
+	if e.loadedTypes[24] {
+		return e.AreaCreator, nil
+	}
+	return nil, &NotLoadedError{edge: "area_creator"}
+}
+
+// AreaUpdaterOrErr returns the AreaUpdater value or an error if the edge
+// was not loaded in eager-loading.
+func (e AdminEdges) AreaUpdaterOrErr() ([]*Area, error) {
+	if e.loadedTypes[25] {
+		return e.AreaUpdater, nil
+	}
+	return nil, &NotLoadedError{edge: "area_updater"}
+}
+
+// DeviceCreatorOrErr returns the DeviceCreator value or an error if the edge
+// was not loaded in eager-loading.
+func (e AdminEdges) DeviceCreatorOrErr() ([]*Device, error) {
+	if e.loadedTypes[26] {
+		return e.DeviceCreator, nil
+	}
+	return nil, &NotLoadedError{edge: "device_creator"}
+}
+
+// DeviceUpdaterOrErr returns the DeviceUpdater value or an error if the edge
+// was not loaded in eager-loading.
+func (e AdminEdges) DeviceUpdaterOrErr() ([]*Device, error) {
+	if e.loadedTypes[27] {
+		return e.DeviceUpdater, nil
+	}
+	return nil, &NotLoadedError{edge: "device_updater"}
+}
+
+// DeviceInstallationCreatorOrErr returns the DeviceInstallationCreator value or an error if the edge
+// was not loaded in eager-loading.
+func (e AdminEdges) DeviceInstallationCreatorOrErr() ([]*DeviceInstallation, error) {
+	if e.loadedTypes[28] {
+		return e.DeviceInstallationCreator, nil
+	}
+	return nil, &NotLoadedError{edge: "device_installation_creator"}
+}
+
+// DeviceInstallationUpdaterOrErr returns the DeviceInstallationUpdater value or an error if the edge
+// was not loaded in eager-loading.
+func (e AdminEdges) DeviceInstallationUpdaterOrErr() ([]*DeviceInstallation, error) {
+	if e.loadedTypes[29] {
+		return e.DeviceInstallationUpdater, nil
+	}
+	return nil, &NotLoadedError{edge: "device_installation_updater"}
+}
+
+// EventLevelCreatorOrErr returns the EventLevelCreator value or an error if the edge
+// was not loaded in eager-loading.
+func (e AdminEdges) EventLevelCreatorOrErr() ([]*EventLevel, error) {
+	if e.loadedTypes[30] {
+		return e.EventLevelCreator, nil
+	}
+	return nil, &NotLoadedError{edge: "event_level_creator"}
+}
+
+// EventLevelUpdaterOrErr returns the EventLevelUpdater value or an error if the edge
+// was not loaded in eager-loading.
+func (e AdminEdges) EventLevelUpdaterOrErr() ([]*EventLevel, error) {
+	if e.loadedTypes[31] {
+		return e.EventLevelUpdater, nil
+	}
+	return nil, &NotLoadedError{edge: "event_level_updater"}
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
@@ -528,14 +616,14 @@ func (a *Admin) QueryOccupationUpdater() *OccupationQuery {
 	return NewAdminClient(a.config).QueryOccupationUpdater(a)
 }
 
-// QueryIpcReportEventCreator queries the "ipc_report_event_creator" edge of the Admin entity.
-func (a *Admin) QueryIpcReportEventCreator() *IPCReportEventQuery {
-	return NewAdminClient(a.config).QueryIpcReportEventCreator(a)
+// QueryIpcEventCreator queries the "ipc_event_creator" edge of the Admin entity.
+func (a *Admin) QueryIpcEventCreator() *IPCEventQuery {
+	return NewAdminClient(a.config).QueryIpcEventCreator(a)
 }
 
-// QueryIpcReportEventUpdater queries the "ipc_report_event_updater" edge of the Admin entity.
-func (a *Admin) QueryIpcReportEventUpdater() *IPCReportEventQuery {
-	return NewAdminClient(a.config).QueryIpcReportEventUpdater(a)
+// QueryIpcEventUpdater queries the "ipc_event_updater" edge of the Admin entity.
+func (a *Admin) QueryIpcEventUpdater() *IPCEventQuery {
+	return NewAdminClient(a.config).QueryIpcEventUpdater(a)
 }
 
 // QueryVideoCreator queries the "video_creator" edge of the Admin entity.
@@ -546,6 +634,46 @@ func (a *Admin) QueryVideoCreator() *VideoQuery {
 // QueryVideoUpdater queries the "video_updater" edge of the Admin entity.
 func (a *Admin) QueryVideoUpdater() *VideoQuery {
 	return NewAdminClient(a.config).QueryVideoUpdater(a)
+}
+
+// QueryAreaCreator queries the "area_creator" edge of the Admin entity.
+func (a *Admin) QueryAreaCreator() *AreaQuery {
+	return NewAdminClient(a.config).QueryAreaCreator(a)
+}
+
+// QueryAreaUpdater queries the "area_updater" edge of the Admin entity.
+func (a *Admin) QueryAreaUpdater() *AreaQuery {
+	return NewAdminClient(a.config).QueryAreaUpdater(a)
+}
+
+// QueryDeviceCreator queries the "device_creator" edge of the Admin entity.
+func (a *Admin) QueryDeviceCreator() *DeviceQuery {
+	return NewAdminClient(a.config).QueryDeviceCreator(a)
+}
+
+// QueryDeviceUpdater queries the "device_updater" edge of the Admin entity.
+func (a *Admin) QueryDeviceUpdater() *DeviceQuery {
+	return NewAdminClient(a.config).QueryDeviceUpdater(a)
+}
+
+// QueryDeviceInstallationCreator queries the "device_installation_creator" edge of the Admin entity.
+func (a *Admin) QueryDeviceInstallationCreator() *DeviceInstallationQuery {
+	return NewAdminClient(a.config).QueryDeviceInstallationCreator(a)
+}
+
+// QueryDeviceInstallationUpdater queries the "device_installation_updater" edge of the Admin entity.
+func (a *Admin) QueryDeviceInstallationUpdater() *DeviceInstallationQuery {
+	return NewAdminClient(a.config).QueryDeviceInstallationUpdater(a)
+}
+
+// QueryEventLevelCreator queries the "event_level_creator" edge of the Admin entity.
+func (a *Admin) QueryEventLevelCreator() *EventLevelQuery {
+	return NewAdminClient(a.config).QueryEventLevelCreator(a)
+}
+
+// QueryEventLevelUpdater queries the "event_level_updater" edge of the Admin entity.
+func (a *Admin) QueryEventLevelUpdater() *EventLevelQuery {
+	return NewAdminClient(a.config).QueryEventLevelUpdater(a)
 }
 
 // Update returns a builder for updating this Admin.

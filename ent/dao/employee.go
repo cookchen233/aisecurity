@@ -51,13 +51,15 @@ type EmployeeEdges struct {
 	Department *Department `json:"department,omitempty"`
 	// Occupations holds the value of the occupations edge.
 	Occupations []*Occupation `json:"occupations,omitempty"`
+	// IpcEvents holds the value of the ipc_events edge.
+	IpcEvents []*IPCEvent `json:"ipc_events,omitempty"`
 	// RiskReporter holds the value of the risk_reporter edge.
 	RiskReporter []*Risk `json:"risk_reporter,omitempty"`
 	// RiskMaintainer holds the value of the risk_maintainer edge.
 	RiskMaintainer []*Risk `json:"risk_maintainer,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
-	loadedTypes [7]bool
+	loadedTypes [8]bool
 }
 
 // CreatorOrErr returns the Creator value or an error if the edge
@@ -121,10 +123,19 @@ func (e EmployeeEdges) OccupationsOrErr() ([]*Occupation, error) {
 	return nil, &NotLoadedError{edge: "occupations"}
 }
 
+// IpcEventsOrErr returns the IpcEvents value or an error if the edge
+// was not loaded in eager-loading.
+func (e EmployeeEdges) IpcEventsOrErr() ([]*IPCEvent, error) {
+	if e.loadedTypes[5] {
+		return e.IpcEvents, nil
+	}
+	return nil, &NotLoadedError{edge: "ipc_events"}
+}
+
 // RiskReporterOrErr returns the RiskReporter value or an error if the edge
 // was not loaded in eager-loading.
 func (e EmployeeEdges) RiskReporterOrErr() ([]*Risk, error) {
-	if e.loadedTypes[5] {
+	if e.loadedTypes[6] {
 		return e.RiskReporter, nil
 	}
 	return nil, &NotLoadedError{edge: "risk_reporter"}
@@ -133,7 +144,7 @@ func (e EmployeeEdges) RiskReporterOrErr() ([]*Risk, error) {
 // RiskMaintainerOrErr returns the RiskMaintainer value or an error if the edge
 // was not loaded in eager-loading.
 func (e EmployeeEdges) RiskMaintainerOrErr() ([]*Risk, error) {
-	if e.loadedTypes[6] {
+	if e.loadedTypes[7] {
 		return e.RiskMaintainer, nil
 	}
 	return nil, &NotLoadedError{edge: "risk_maintainer"}
@@ -248,6 +259,11 @@ func (e *Employee) QueryDepartment() *DepartmentQuery {
 // QueryOccupations queries the "occupations" edge of the Employee entity.
 func (e *Employee) QueryOccupations() *OccupationQuery {
 	return NewEmployeeClient(e.config).QueryOccupations(e)
+}
+
+// QueryIpcEvents queries the "ipc_events" edge of the Employee entity.
+func (e *Employee) QueryIpcEvents() *IPCEventQuery {
+	return NewEmployeeClient(e.config).QueryIpcEvents(e)
 }
 
 // QueryRiskReporter queries the "risk_reporter" edge of the Employee entity.

@@ -56,14 +56,6 @@ func ConvertTo2[T any](from interface{}) T {
 	return toVal.Interface().(T)
 }
 
-func ConvertListTo[Tdata any, Tto any](list []Tdata) []*Tto {
-	list2 := make([]*Tto, len(list))
-	for i, v := range list {
-		list2[i] = ConvertTo[Tdata, Tto](v)
-	}
-	return list2
-}
-
 func ConvertTo[Tdata any, Tto any](data Tdata) *Tto {
 	data2 := new(Tto)
 	err := gconv.Struct(data, data2)
@@ -127,8 +119,8 @@ func (p *StandardPost) GetID() int {
 	return p.ID
 }
 
-// IResponse represents output data
-type IResponse interface {
+// IESponse represents output data
+type IESponse interface {
 	Hash() string
 }
 

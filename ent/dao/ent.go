@@ -5,9 +5,13 @@ package dao
 import (
 	"aisecurity/ent/dao/admin"
 	"aisecurity/ent/dao/adminrole"
+	"aisecurity/ent/dao/area"
 	"aisecurity/ent/dao/department"
+	"aisecurity/ent/dao/device"
+	"aisecurity/ent/dao/deviceinstallation"
 	"aisecurity/ent/dao/employee"
-	"aisecurity/ent/dao/ipcreportevent"
+	"aisecurity/ent/dao/eventlevel"
+	"aisecurity/ent/dao/ipcevent"
 	"aisecurity/ent/dao/occupation"
 	"aisecurity/ent/dao/risk"
 	"aisecurity/ent/dao/riskcategory"
@@ -82,16 +86,20 @@ var (
 func checkColumn(table, column string) error {
 	initCheck.Do(func() {
 		columnCheck = sql.NewColumnCheck(map[string]func(string) bool{
-			admin.Table:          admin.ValidColumn,
-			adminrole.Table:      adminrole.ValidColumn,
-			department.Table:     department.ValidColumn,
-			employee.Table:       employee.ValidColumn,
-			ipcreportevent.Table: ipcreportevent.ValidColumn,
-			occupation.Table:     occupation.ValidColumn,
-			risk.Table:           risk.ValidColumn,
-			riskcategory.Table:   riskcategory.ValidColumn,
-			risklocation.Table:   risklocation.ValidColumn,
-			video.Table:          video.ValidColumn,
+			admin.Table:              admin.ValidColumn,
+			adminrole.Table:          adminrole.ValidColumn,
+			area.Table:               area.ValidColumn,
+			department.Table:         department.ValidColumn,
+			device.Table:             device.ValidColumn,
+			deviceinstallation.Table: deviceinstallation.ValidColumn,
+			employee.Table:           employee.ValidColumn,
+			eventlevel.Table:         eventlevel.ValidColumn,
+			ipcevent.Table:           ipcevent.ValidColumn,
+			occupation.Table:         occupation.ValidColumn,
+			risk.Table:               risk.ValidColumn,
+			riskcategory.Table:       riskcategory.ValidColumn,
+			risklocation.Table:       risklocation.ValidColumn,
+			video.Table:              video.ValidColumn,
 		})
 	})
 	return columnCheck(table, column)

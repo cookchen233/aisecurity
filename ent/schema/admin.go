@@ -61,10 +61,22 @@ func (Admin) Edges() []ent.Edge {
 		edge.To("occupation_creator", Occupation.Type),
 		edge.To("occupation_updater", Occupation.Type),
 
-		edge.To("ipc_report_event_creator", IPCReportEvent.Type),
-		edge.To("ipc_report_event_updater", IPCReportEvent.Type),
+		edge.To("ipc_event_creator", IPCEvent.Type),
+		edge.To("ipc_event_updater", IPCEvent.Type),
 
 		edge.To("video_creator", Video.Type),
 		edge.To("video_updater", Video.Type),
+
+		edge.To("area_creator", Area.Type),
+		edge.To("area_updater", Area.Type),
+
+		edge.To("device_creator", Device.Type),
+		edge.To("device_updater", Device.Type),
+
+		edge.To("device_installation_creator", DeviceInstallation.Type),
+		edge.To("device_installation_updater", DeviceInstallation.Type),
+
+		edge.To("event_level_creator", EventLevel.Type),
+		edge.To("event_level_updater", EventLevel.Type),
 	}
 }

@@ -18,12 +18,20 @@ type Tx struct {
 	Admin *AdminClient
 	// AdminRole is the client for interacting with the AdminRole builders.
 	AdminRole *AdminRoleClient
+	// Area is the client for interacting with the Area builders.
+	Area *AreaClient
 	// Department is the client for interacting with the Department builders.
 	Department *DepartmentClient
+	// Device is the client for interacting with the Device builders.
+	Device *DeviceClient
+	// DeviceInstallation is the client for interacting with the DeviceInstallation builders.
+	DeviceInstallation *DeviceInstallationClient
 	// Employee is the client for interacting with the Employee builders.
 	Employee *EmployeeClient
-	// IPCReportEvent is the client for interacting with the IPCReportEvent builders.
-	IPCReportEvent *IPCReportEventClient
+	// EventLevel is the client for interacting with the EventLevel builders.
+	EventLevel *EventLevelClient
+	// IPCEvent is the client for interacting with the IPCEvent builders.
+	IPCEvent *IPCEventClient
 	// Occupation is the client for interacting with the Occupation builders.
 	Occupation *OccupationClient
 	// Risk is the client for interacting with the Risk builders.
@@ -167,9 +175,13 @@ func (tx *Tx) Client() *Client {
 func (tx *Tx) init() {
 	tx.Admin = NewAdminClient(tx.config)
 	tx.AdminRole = NewAdminRoleClient(tx.config)
+	tx.Area = NewAreaClient(tx.config)
 	tx.Department = NewDepartmentClient(tx.config)
+	tx.Device = NewDeviceClient(tx.config)
+	tx.DeviceInstallation = NewDeviceInstallationClient(tx.config)
 	tx.Employee = NewEmployeeClient(tx.config)
-	tx.IPCReportEvent = NewIPCReportEventClient(tx.config)
+	tx.EventLevel = NewEventLevelClient(tx.config)
+	tx.IPCEvent = NewIPCEventClient(tx.config)
 	tx.Occupation = NewOccupationClient(tx.config)
 	tx.Risk = NewRiskClient(tx.config)
 	tx.RiskCategory = NewRiskCategoryClient(tx.config)

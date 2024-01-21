@@ -35,12 +35,14 @@ const (
 	FieldDuration = "duration"
 	// FieldUploadedAt holds the string denoting the uploaded_at field in the database.
 	FieldUploadedAt = "uploaded_at"
+	// FieldUploadedAt2 holds the string denoting the uploaded_at2 field in the database.
+	FieldUploadedAt2 = "uploaded_at2"
 	// EdgeCreator holds the string denoting the creator edge name in mutations.
 	EdgeCreator = "creator"
 	// EdgeUpdater holds the string denoting the updater edge name in mutations.
 	EdgeUpdater = "updater"
-	// EdgeIpcReportEventVideo holds the string denoting the ipc_report_event_video edge name in mutations.
-	EdgeIpcReportEventVideo = "ipc_report_event_video"
+	// EdgeIpcEventVideo holds the string denoting the ipc_event_video edge name in mutations.
+	EdgeIpcEventVideo = "ipc_event_video"
 	// Table holds the table name of the video in the database.
 	Table = "videos"
 	// CreatorTable is the table that holds the creator relation/edge.
@@ -57,13 +59,13 @@ const (
 	UpdaterInverseTable = "admins"
 	// UpdaterColumn is the table column denoting the updater relation/edge.
 	UpdaterColumn = "updated_by"
-	// IpcReportEventVideoTable is the table that holds the ipc_report_event_video relation/edge.
-	IpcReportEventVideoTable = "ipc_report_events"
-	// IpcReportEventVideoInverseTable is the table name for the IPCReportEvent entity.
-	// It exists in this package in order to avoid circular dependency with the "ipcreportevent" package.
-	IpcReportEventVideoInverseTable = "ipc_report_events"
-	// IpcReportEventVideoColumn is the table column denoting the ipc_report_event_video relation/edge.
-	IpcReportEventVideoColumn = "video_id"
+	// IpcEventVideoTable is the table that holds the ipc_event_video relation/edge.
+	IpcEventVideoTable = "ipc_events"
+	// IpcEventVideoInverseTable is the table name for the IPCEvent entity.
+	// It exists in this package in order to avoid circular dependency with the "ipcevent" package.
+	IpcEventVideoInverseTable = "ipc_events"
+	// IpcEventVideoColumn is the table column denoting the ipc_event_video relation/edge.
+	IpcEventVideoColumn = "video_id"
 )
 
 // Columns holds all SQL columns for video fields.
@@ -79,6 +81,7 @@ var Columns = []string{
 	FieldSize,
 	FieldDuration,
 	FieldUploadedAt,
+	FieldUploadedAt2,
 }
 
 // ValidColumn reports if the column name is valid (part of the table columns).
@@ -170,6 +173,11 @@ func ByUploadedAt(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldUploadedAt, opts...).ToFunc()
 }
 
+// ByUploadedAt2 orders the results by the uploaded_at2 field.
+func ByUploadedAt2(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldUploadedAt2, opts...).ToFunc()
+}
+
 // ByCreatorField orders the results by creator field.
 func ByCreatorField(field string, opts ...sql.OrderTermOption) OrderOption {
 	return func(s *sql.Selector) {
@@ -184,17 +192,17 @@ func ByUpdaterField(field string, opts ...sql.OrderTermOption) OrderOption {
 	}
 }
 
-// ByIpcReportEventVideoCount orders the results by ipc_report_event_video count.
-func ByIpcReportEventVideoCount(opts ...sql.OrderTermOption) OrderOption {
+// ByIpcEventVideoCount orders the results by ipc_event_video count.
+func ByIpcEventVideoCount(opts ...sql.OrderTermOption) OrderOption {
 	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborsCount(s, newIpcReportEventVideoStep(), opts...)
+		sqlgraph.OrderByNeighborsCount(s, newIpcEventVideoStep(), opts...)
 	}
 }
 
-// ByIpcReportEventVideo orders the results by ipc_report_event_video terms.
-func ByIpcReportEventVideo(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+// ByIpcEventVideo orders the results by ipc_event_video terms.
+func ByIpcEventVideo(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
 	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborTerms(s, newIpcReportEventVideoStep(), append([]sql.OrderTerm{term}, terms...)...)
+		sqlgraph.OrderByNeighborTerms(s, newIpcEventVideoStep(), append([]sql.OrderTerm{term}, terms...)...)
 	}
 }
 func newCreatorStep() *sqlgraph.Step {
@@ -211,10 +219,10 @@ func newUpdaterStep() *sqlgraph.Step {
 		sqlgraph.Edge(sqlgraph.M2O, true, UpdaterTable, UpdaterColumn),
 	)
 }
-func newIpcReportEventVideoStep() *sqlgraph.Step {
+func newIpcEventVideoStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
-		sqlgraph.To(IpcReportEventVideoInverseTable, FieldID),
-		sqlgraph.Edge(sqlgraph.O2M, false, IpcReportEventVideoTable, IpcReportEventVideoColumn),
+		sqlgraph.To(IpcEventVideoInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.O2M, false, IpcEventVideoTable, IpcEventVideoColumn),
 	)
 }

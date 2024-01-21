@@ -72,6 +72,37 @@ var (
 			},
 		},
 	}
+	// AreasColumns holds the columns for the "areas" table.
+	AreasColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeInt, Increment: true},
+		{Name: "created_at", Type: field.TypeTime},
+		{Name: "deleted_at", Type: field.TypeTime, Nullable: true},
+		{Name: "updated_at", Type: field.TypeTime},
+		{Name: "name", Type: field.TypeString, Nullable: true, Size: 255, Default: "未命名区域"},
+		{Name: "description", Type: field.TypeString, Nullable: true},
+		{Name: "created_by", Type: field.TypeInt},
+		{Name: "updated_by", Type: field.TypeInt},
+	}
+	// AreasTable holds the schema information for the "areas" table.
+	AreasTable = &schema.Table{
+		Name:       "areas",
+		Columns:    AreasColumns,
+		PrimaryKey: []*schema.Column{AreasColumns[0]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:     "areas_admins_area_creator",
+				Columns:    []*schema.Column{AreasColumns[6]},
+				RefColumns: []*schema.Column{AdminsColumns[0]},
+				OnDelete:   schema.NoAction,
+			},
+			{
+				Symbol:     "areas_admins_area_updater",
+				Columns:    []*schema.Column{AreasColumns[7]},
+				RefColumns: []*schema.Column{AdminsColumns[0]},
+				OnDelete:   schema.NoAction,
+			},
+		},
+	}
 	// DepartmentsColumns holds the columns for the "departments" table.
 	DepartmentsColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt, Increment: true},
@@ -106,6 +137,90 @@ var (
 				Columns:    []*schema.Column{DepartmentsColumns[7]},
 				RefColumns: []*schema.Column{DepartmentsColumns[0]},
 				OnDelete:   schema.SetNull,
+			},
+		},
+	}
+	// DevicesColumns holds the columns for the "devices" table.
+	DevicesColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeInt, Increment: true},
+		{Name: "created_at", Type: field.TypeTime},
+		{Name: "deleted_at", Type: field.TypeTime, Nullable: true},
+		{Name: "updated_at", Type: field.TypeTime},
+		{Name: "brand", Type: field.TypeInt, Nullable: true, Default: 0},
+		{Name: "model", Type: field.TypeInt, Nullable: true, Default: 0},
+		{Name: "name", Type: field.TypeString, Nullable: true, Size: 255, Default: "未命名设备"},
+		{Name: "sn", Type: field.TypeString, Nullable: true, Size: 255},
+		{Name: "device_type", Type: field.TypeInt, Default: 0},
+		{Name: "created_by", Type: field.TypeInt},
+		{Name: "updated_by", Type: field.TypeInt},
+	}
+	// DevicesTable holds the schema information for the "devices" table.
+	DevicesTable = &schema.Table{
+		Name:       "devices",
+		Columns:    DevicesColumns,
+		PrimaryKey: []*schema.Column{DevicesColumns[0]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:     "devices_admins_device_creator",
+				Columns:    []*schema.Column{DevicesColumns[9]},
+				RefColumns: []*schema.Column{AdminsColumns[0]},
+				OnDelete:   schema.NoAction,
+			},
+			{
+				Symbol:     "devices_admins_device_updater",
+				Columns:    []*schema.Column{DevicesColumns[10]},
+				RefColumns: []*schema.Column{AdminsColumns[0]},
+				OnDelete:   schema.NoAction,
+			},
+		},
+	}
+	// DeviceInstallationsColumns holds the columns for the "device_installations" table.
+	DeviceInstallationsColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeInt, Increment: true},
+		{Name: "created_at", Type: field.TypeTime},
+		{Name: "deleted_at", Type: field.TypeTime, Nullable: true},
+		{Name: "updated_at", Type: field.TypeTime},
+		{Name: "alias_name", Type: field.TypeString, Nullable: true, Size: 255},
+		{Name: "longitude", Type: field.TypeFloat64},
+		{Name: "latitude", Type: field.TypeFloat64},
+		{Name: "location_data", Type: field.TypeString, Nullable: true},
+		{Name: "location", Type: field.TypeString, Nullable: true},
+		{Name: "installer", Type: field.TypeString, Nullable: true},
+		{Name: "install_time", Type: field.TypeTime, Nullable: true},
+		{Name: "created_by", Type: field.TypeInt},
+		{Name: "updated_by", Type: field.TypeInt},
+		{Name: "area_id", Type: field.TypeInt},
+		{Name: "device_id", Type: field.TypeInt},
+	}
+	// DeviceInstallationsTable holds the schema information for the "device_installations" table.
+	DeviceInstallationsTable = &schema.Table{
+		Name:       "device_installations",
+		Columns:    DeviceInstallationsColumns,
+		PrimaryKey: []*schema.Column{DeviceInstallationsColumns[0]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:     "device_installations_admins_device_installation_creator",
+				Columns:    []*schema.Column{DeviceInstallationsColumns[11]},
+				RefColumns: []*schema.Column{AdminsColumns[0]},
+				OnDelete:   schema.NoAction,
+			},
+			{
+				Symbol:     "device_installations_admins_device_installation_updater",
+				Columns:    []*schema.Column{DeviceInstallationsColumns[12]},
+				RefColumns: []*schema.Column{AdminsColumns[0]},
+				OnDelete:   schema.NoAction,
+			},
+			{
+				Symbol:     "device_installations_areas_device_installation_area",
+				Columns:    []*schema.Column{DeviceInstallationsColumns[13]},
+				RefColumns: []*schema.Column{AreasColumns[0]},
+				OnDelete:   schema.NoAction,
+			},
+			{
+				Symbol:     "device_installations_devices_device_installation_device",
+				Columns:    []*schema.Column{DeviceInstallationsColumns[14]},
+				RefColumns: []*schema.Column{DevicesColumns[0]},
+				OnDelete:   schema.NoAction,
 			},
 		},
 	}
@@ -152,48 +267,85 @@ var (
 			},
 		},
 	}
-	// IpcReportEventsColumns holds the columns for the "ipc_report_events" table.
-	IpcReportEventsColumns = []*schema.Column{
+	// EventLevelsColumns holds the columns for the "event_levels" table.
+	EventLevelsColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt, Increment: true},
 		{Name: "created_at", Type: field.TypeTime},
 		{Name: "deleted_at", Type: field.TypeTime, Nullable: true},
 		{Name: "updated_at", Type: field.TypeTime},
-		{Name: "device_brand", Type: field.TypeInt, Default: 0},
-		{Name: "device_model", Type: field.TypeInt, Default: 0},
-		{Name: "device_id", Type: field.TypeString, Size: 255},
-		{Name: "event_id", Type: field.TypeString, Size: 255},
+		{Name: "name", Type: field.TypeString, Nullable: true, Size: 255},
+		{Name: "event_types", Type: field.TypeJSON},
+		{Name: "description", Type: field.TypeString, Nullable: true},
+		{Name: "is_report", Type: field.TypeBool, Nullable: true, Default: false},
+		{Name: "created_by", Type: field.TypeInt},
+		{Name: "updated_by", Type: field.TypeInt},
+	}
+	// EventLevelsTable holds the schema information for the "event_levels" table.
+	EventLevelsTable = &schema.Table{
+		Name:       "event_levels",
+		Columns:    EventLevelsColumns,
+		PrimaryKey: []*schema.Column{EventLevelsColumns[0]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:     "event_levels_admins_event_level_creator",
+				Columns:    []*schema.Column{EventLevelsColumns[8]},
+				RefColumns: []*schema.Column{AdminsColumns[0]},
+				OnDelete:   schema.NoAction,
+			},
+			{
+				Symbol:     "event_levels_admins_event_level_updater",
+				Columns:    []*schema.Column{EventLevelsColumns[9]},
+				RefColumns: []*schema.Column{AdminsColumns[0]},
+				OnDelete:   schema.NoAction,
+			},
+		},
+	}
+	// IpcEventsColumns holds the columns for the "ipc_events" table.
+	IpcEventsColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeInt, Increment: true},
+		{Name: "created_at", Type: field.TypeTime},
+		{Name: "deleted_at", Type: field.TypeTime, Nullable: true},
+		{Name: "updated_at", Type: field.TypeTime},
 		{Name: "event_time", Type: field.TypeTime},
 		{Name: "event_type", Type: field.TypeInt, Default: 0},
 		{Name: "event_status", Type: field.TypeInt, Default: 1},
 		{Name: "images", Type: field.TypeJSON, Nullable: true},
 		{Name: "labeled_images", Type: field.TypeJSON, Nullable: true},
+		{Name: "event_id", Type: field.TypeString, Size: 255},
 		{Name: "description", Type: field.TypeString, Nullable: true},
 		{Name: "raw_data", Type: field.TypeString, Nullable: true},
 		{Name: "created_by", Type: field.TypeInt},
 		{Name: "updated_by", Type: field.TypeInt},
+		{Name: "device_id", Type: field.TypeInt},
 		{Name: "video_id", Type: field.TypeInt, Nullable: true},
 	}
-	// IpcReportEventsTable holds the schema information for the "ipc_report_events" table.
-	IpcReportEventsTable = &schema.Table{
-		Name:       "ipc_report_events",
-		Columns:    IpcReportEventsColumns,
-		PrimaryKey: []*schema.Column{IpcReportEventsColumns[0]},
+	// IpcEventsTable holds the schema information for the "ipc_events" table.
+	IpcEventsTable = &schema.Table{
+		Name:       "ipc_events",
+		Columns:    IpcEventsColumns,
+		PrimaryKey: []*schema.Column{IpcEventsColumns[0]},
 		ForeignKeys: []*schema.ForeignKey{
 			{
-				Symbol:     "ipc_report_events_admins_ipc_report_event_creator",
-				Columns:    []*schema.Column{IpcReportEventsColumns[15]},
+				Symbol:     "ipc_events_admins_ipc_event_creator",
+				Columns:    []*schema.Column{IpcEventsColumns[12]},
 				RefColumns: []*schema.Column{AdminsColumns[0]},
 				OnDelete:   schema.NoAction,
 			},
 			{
-				Symbol:     "ipc_report_events_admins_ipc_report_event_updater",
-				Columns:    []*schema.Column{IpcReportEventsColumns[16]},
+				Symbol:     "ipc_events_admins_ipc_event_updater",
+				Columns:    []*schema.Column{IpcEventsColumns[13]},
 				RefColumns: []*schema.Column{AdminsColumns[0]},
 				OnDelete:   schema.NoAction,
 			},
 			{
-				Symbol:     "ipc_report_events_videos_ipc_report_event_video",
-				Columns:    []*schema.Column{IpcReportEventsColumns[17]},
+				Symbol:     "ipc_events_devices_ipc_event_device",
+				Columns:    []*schema.Column{IpcEventsColumns[14]},
+				RefColumns: []*schema.Column{DevicesColumns[0]},
+				OnDelete:   schema.NoAction,
+			},
+			{
+				Symbol:     "ipc_events_videos_ipc_event_video",
+				Columns:    []*schema.Column{IpcEventsColumns[15]},
 				RefColumns: []*schema.Column{VideosColumns[0]},
 				OnDelete:   schema.SetNull,
 			},
@@ -364,6 +516,7 @@ var (
 		{Name: "size", Type: field.TypeInt64, Default: 0},
 		{Name: "duration", Type: field.TypeString, Nullable: true},
 		{Name: "uploaded_at", Type: field.TypeTime, Nullable: true},
+		{Name: "uploaded_at2", Type: field.TypeTime, Nullable: true},
 		{Name: "created_by", Type: field.TypeInt},
 		{Name: "updated_by", Type: field.TypeInt},
 	}
@@ -375,13 +528,13 @@ var (
 		ForeignKeys: []*schema.ForeignKey{
 			{
 				Symbol:     "videos_admins_video_creator",
-				Columns:    []*schema.Column{VideosColumns[9]},
+				Columns:    []*schema.Column{VideosColumns[10]},
 				RefColumns: []*schema.Column{AdminsColumns[0]},
 				OnDelete:   schema.NoAction,
 			},
 			{
 				Symbol:     "videos_admins_video_updater",
-				Columns:    []*schema.Column{VideosColumns[10]},
+				Columns:    []*schema.Column{VideosColumns[11]},
 				RefColumns: []*schema.Column{AdminsColumns[0]},
 				OnDelete:   schema.NoAction,
 			},
@@ -408,6 +561,31 @@ var (
 				Symbol:     "admin_role_admins_admin_id",
 				Columns:    []*schema.Column{AdminRoleAdminsColumns[1]},
 				RefColumns: []*schema.Column{AdminsColumns[0]},
+				OnDelete:   schema.Cascade,
+			},
+		},
+	}
+	// IpcEventFixersColumns holds the columns for the "ipc_event_fixers" table.
+	IpcEventFixersColumns = []*schema.Column{
+		{Name: "ipc_event_id", Type: field.TypeInt},
+		{Name: "employee_id", Type: field.TypeInt},
+	}
+	// IpcEventFixersTable holds the schema information for the "ipc_event_fixers" table.
+	IpcEventFixersTable = &schema.Table{
+		Name:       "ipc_event_fixers",
+		Columns:    IpcEventFixersColumns,
+		PrimaryKey: []*schema.Column{IpcEventFixersColumns[0], IpcEventFixersColumns[1]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:     "ipc_event_fixers_ipc_event_id",
+				Columns:    []*schema.Column{IpcEventFixersColumns[0]},
+				RefColumns: []*schema.Column{IpcEventsColumns[0]},
+				OnDelete:   schema.Cascade,
+			},
+			{
+				Symbol:     "ipc_event_fixers_employee_id",
+				Columns:    []*schema.Column{IpcEventFixersColumns[1]},
+				RefColumns: []*schema.Column{EmployeesColumns[0]},
 				OnDelete:   schema.Cascade,
 			},
 		},
@@ -441,15 +619,20 @@ var (
 	Tables = []*schema.Table{
 		AdminsTable,
 		AdminRolesTable,
+		AreasTable,
 		DepartmentsTable,
+		DevicesTable,
+		DeviceInstallationsTable,
 		EmployeesTable,
-		IpcReportEventsTable,
+		EventLevelsTable,
+		IpcEventsTable,
 		OccupationsTable,
 		RisksTable,
 		RiskCategoriesTable,
 		RiskLocationsTable,
 		VideosTable,
 		AdminRoleAdminsTable,
+		IpcEventFixersTable,
 		OccupationEmployeesTable,
 	}
 )
@@ -459,16 +642,27 @@ func init() {
 	AdminsTable.ForeignKeys[1].RefTable = AdminsTable
 	AdminRolesTable.ForeignKeys[0].RefTable = AdminsTable
 	AdminRolesTable.ForeignKeys[1].RefTable = AdminsTable
+	AreasTable.ForeignKeys[0].RefTable = AdminsTable
+	AreasTable.ForeignKeys[1].RefTable = AdminsTable
 	DepartmentsTable.ForeignKeys[0].RefTable = AdminsTable
 	DepartmentsTable.ForeignKeys[1].RefTable = AdminsTable
 	DepartmentsTable.ForeignKeys[2].RefTable = DepartmentsTable
+	DevicesTable.ForeignKeys[0].RefTable = AdminsTable
+	DevicesTable.ForeignKeys[1].RefTable = AdminsTable
+	DeviceInstallationsTable.ForeignKeys[0].RefTable = AdminsTable
+	DeviceInstallationsTable.ForeignKeys[1].RefTable = AdminsTable
+	DeviceInstallationsTable.ForeignKeys[2].RefTable = AreasTable
+	DeviceInstallationsTable.ForeignKeys[3].RefTable = DevicesTable
 	EmployeesTable.ForeignKeys[0].RefTable = AdminsTable
 	EmployeesTable.ForeignKeys[1].RefTable = AdminsTable
 	EmployeesTable.ForeignKeys[2].RefTable = AdminsTable
 	EmployeesTable.ForeignKeys[3].RefTable = DepartmentsTable
-	IpcReportEventsTable.ForeignKeys[0].RefTable = AdminsTable
-	IpcReportEventsTable.ForeignKeys[1].RefTable = AdminsTable
-	IpcReportEventsTable.ForeignKeys[2].RefTable = VideosTable
+	EventLevelsTable.ForeignKeys[0].RefTable = AdminsTable
+	EventLevelsTable.ForeignKeys[1].RefTable = AdminsTable
+	IpcEventsTable.ForeignKeys[0].RefTable = AdminsTable
+	IpcEventsTable.ForeignKeys[1].RefTable = AdminsTable
+	IpcEventsTable.ForeignKeys[2].RefTable = DevicesTable
+	IpcEventsTable.ForeignKeys[3].RefTable = VideosTable
 	OccupationsTable.ForeignKeys[0].RefTable = AdminsTable
 	OccupationsTable.ForeignKeys[1].RefTable = AdminsTable
 	RisksTable.ForeignKeys[0].RefTable = AdminsTable
@@ -485,6 +679,8 @@ func init() {
 	VideosTable.ForeignKeys[1].RefTable = AdminsTable
 	AdminRoleAdminsTable.ForeignKeys[0].RefTable = AdminRolesTable
 	AdminRoleAdminsTable.ForeignKeys[1].RefTable = AdminsTable
+	IpcEventFixersTable.ForeignKeys[0].RefTable = IpcEventsTable
+	IpcEventFixersTable.ForeignKeys[1].RefTable = EmployeesTable
 	OccupationEmployeesTable.ForeignKeys[0].RefTable = OccupationsTable
 	OccupationEmployeesTable.ForeignKeys[1].RefTable = EmployeesTable
 }

@@ -5,9 +5,13 @@ package dao
 import (
 	"aisecurity/ent/dao/admin"
 	"aisecurity/ent/dao/adminrole"
+	"aisecurity/ent/dao/area"
 	"aisecurity/ent/dao/department"
+	"aisecurity/ent/dao/device"
+	"aisecurity/ent/dao/deviceinstallation"
 	"aisecurity/ent/dao/employee"
-	"aisecurity/ent/dao/ipcreportevent"
+	"aisecurity/ent/dao/eventlevel"
+	"aisecurity/ent/dao/ipcevent"
 	"aisecurity/ent/dao/occupation"
 	"aisecurity/ent/dao/risk"
 	"aisecurity/ent/dao/riskcategory"
@@ -413,34 +417,34 @@ func (ac *AdminCreate) AddOccupationUpdater(o ...*Occupation) *AdminCreate {
 	return ac.AddOccupationUpdaterIDs(ids...)
 }
 
-// AddIpcReportEventCreatorIDs adds the "ipc_report_event_creator" edge to the IPCReportEvent entity by IDs.
-func (ac *AdminCreate) AddIpcReportEventCreatorIDs(ids ...int) *AdminCreate {
-	ac.mutation.AddIpcReportEventCreatorIDs(ids...)
+// AddIpcEventCreatorIDs adds the "ipc_event_creator" edge to the IPCEvent entity by IDs.
+func (ac *AdminCreate) AddIpcEventCreatorIDs(ids ...int) *AdminCreate {
+	ac.mutation.AddIpcEventCreatorIDs(ids...)
 	return ac
 }
 
-// AddIpcReportEventCreator adds the "ipc_report_event_creator" edges to the IPCReportEvent entity.
-func (ac *AdminCreate) AddIpcReportEventCreator(i ...*IPCReportEvent) *AdminCreate {
+// AddIpcEventCreator adds the "ipc_event_creator" edges to the IPCEvent entity.
+func (ac *AdminCreate) AddIpcEventCreator(i ...*IPCEvent) *AdminCreate {
 	ids := make([]int, len(i))
 	for j := range i {
 		ids[j] = i[j].ID
 	}
-	return ac.AddIpcReportEventCreatorIDs(ids...)
+	return ac.AddIpcEventCreatorIDs(ids...)
 }
 
-// AddIpcReportEventUpdaterIDs adds the "ipc_report_event_updater" edge to the IPCReportEvent entity by IDs.
-func (ac *AdminCreate) AddIpcReportEventUpdaterIDs(ids ...int) *AdminCreate {
-	ac.mutation.AddIpcReportEventUpdaterIDs(ids...)
+// AddIpcEventUpdaterIDs adds the "ipc_event_updater" edge to the IPCEvent entity by IDs.
+func (ac *AdminCreate) AddIpcEventUpdaterIDs(ids ...int) *AdminCreate {
+	ac.mutation.AddIpcEventUpdaterIDs(ids...)
 	return ac
 }
 
-// AddIpcReportEventUpdater adds the "ipc_report_event_updater" edges to the IPCReportEvent entity.
-func (ac *AdminCreate) AddIpcReportEventUpdater(i ...*IPCReportEvent) *AdminCreate {
+// AddIpcEventUpdater adds the "ipc_event_updater" edges to the IPCEvent entity.
+func (ac *AdminCreate) AddIpcEventUpdater(i ...*IPCEvent) *AdminCreate {
 	ids := make([]int, len(i))
 	for j := range i {
 		ids[j] = i[j].ID
 	}
-	return ac.AddIpcReportEventUpdaterIDs(ids...)
+	return ac.AddIpcEventUpdaterIDs(ids...)
 }
 
 // AddVideoCreatorIDs adds the "video_creator" edge to the Video entity by IDs.
@@ -471,6 +475,126 @@ func (ac *AdminCreate) AddVideoUpdater(v ...*Video) *AdminCreate {
 		ids[i] = v[i].ID
 	}
 	return ac.AddVideoUpdaterIDs(ids...)
+}
+
+// AddAreaCreatorIDs adds the "area_creator" edge to the Area entity by IDs.
+func (ac *AdminCreate) AddAreaCreatorIDs(ids ...int) *AdminCreate {
+	ac.mutation.AddAreaCreatorIDs(ids...)
+	return ac
+}
+
+// AddAreaCreator adds the "area_creator" edges to the Area entity.
+func (ac *AdminCreate) AddAreaCreator(a ...*Area) *AdminCreate {
+	ids := make([]int, len(a))
+	for i := range a {
+		ids[i] = a[i].ID
+	}
+	return ac.AddAreaCreatorIDs(ids...)
+}
+
+// AddAreaUpdaterIDs adds the "area_updater" edge to the Area entity by IDs.
+func (ac *AdminCreate) AddAreaUpdaterIDs(ids ...int) *AdminCreate {
+	ac.mutation.AddAreaUpdaterIDs(ids...)
+	return ac
+}
+
+// AddAreaUpdater adds the "area_updater" edges to the Area entity.
+func (ac *AdminCreate) AddAreaUpdater(a ...*Area) *AdminCreate {
+	ids := make([]int, len(a))
+	for i := range a {
+		ids[i] = a[i].ID
+	}
+	return ac.AddAreaUpdaterIDs(ids...)
+}
+
+// AddDeviceCreatorIDs adds the "device_creator" edge to the Device entity by IDs.
+func (ac *AdminCreate) AddDeviceCreatorIDs(ids ...int) *AdminCreate {
+	ac.mutation.AddDeviceCreatorIDs(ids...)
+	return ac
+}
+
+// AddDeviceCreator adds the "device_creator" edges to the Device entity.
+func (ac *AdminCreate) AddDeviceCreator(d ...*Device) *AdminCreate {
+	ids := make([]int, len(d))
+	for i := range d {
+		ids[i] = d[i].ID
+	}
+	return ac.AddDeviceCreatorIDs(ids...)
+}
+
+// AddDeviceUpdaterIDs adds the "device_updater" edge to the Device entity by IDs.
+func (ac *AdminCreate) AddDeviceUpdaterIDs(ids ...int) *AdminCreate {
+	ac.mutation.AddDeviceUpdaterIDs(ids...)
+	return ac
+}
+
+// AddDeviceUpdater adds the "device_updater" edges to the Device entity.
+func (ac *AdminCreate) AddDeviceUpdater(d ...*Device) *AdminCreate {
+	ids := make([]int, len(d))
+	for i := range d {
+		ids[i] = d[i].ID
+	}
+	return ac.AddDeviceUpdaterIDs(ids...)
+}
+
+// AddDeviceInstallationCreatorIDs adds the "device_installation_creator" edge to the DeviceInstallation entity by IDs.
+func (ac *AdminCreate) AddDeviceInstallationCreatorIDs(ids ...int) *AdminCreate {
+	ac.mutation.AddDeviceInstallationCreatorIDs(ids...)
+	return ac
+}
+
+// AddDeviceInstallationCreator adds the "device_installation_creator" edges to the DeviceInstallation entity.
+func (ac *AdminCreate) AddDeviceInstallationCreator(d ...*DeviceInstallation) *AdminCreate {
+	ids := make([]int, len(d))
+	for i := range d {
+		ids[i] = d[i].ID
+	}
+	return ac.AddDeviceInstallationCreatorIDs(ids...)
+}
+
+// AddDeviceInstallationUpdaterIDs adds the "device_installation_updater" edge to the DeviceInstallation entity by IDs.
+func (ac *AdminCreate) AddDeviceInstallationUpdaterIDs(ids ...int) *AdminCreate {
+	ac.mutation.AddDeviceInstallationUpdaterIDs(ids...)
+	return ac
+}
+
+// AddDeviceInstallationUpdater adds the "device_installation_updater" edges to the DeviceInstallation entity.
+func (ac *AdminCreate) AddDeviceInstallationUpdater(d ...*DeviceInstallation) *AdminCreate {
+	ids := make([]int, len(d))
+	for i := range d {
+		ids[i] = d[i].ID
+	}
+	return ac.AddDeviceInstallationUpdaterIDs(ids...)
+}
+
+// AddEventLevelCreatorIDs adds the "event_level_creator" edge to the EventLevel entity by IDs.
+func (ac *AdminCreate) AddEventLevelCreatorIDs(ids ...int) *AdminCreate {
+	ac.mutation.AddEventLevelCreatorIDs(ids...)
+	return ac
+}
+
+// AddEventLevelCreator adds the "event_level_creator" edges to the EventLevel entity.
+func (ac *AdminCreate) AddEventLevelCreator(e ...*EventLevel) *AdminCreate {
+	ids := make([]int, len(e))
+	for i := range e {
+		ids[i] = e[i].ID
+	}
+	return ac.AddEventLevelCreatorIDs(ids...)
+}
+
+// AddEventLevelUpdaterIDs adds the "event_level_updater" edge to the EventLevel entity by IDs.
+func (ac *AdminCreate) AddEventLevelUpdaterIDs(ids ...int) *AdminCreate {
+	ac.mutation.AddEventLevelUpdaterIDs(ids...)
+	return ac
+}
+
+// AddEventLevelUpdater adds the "event_level_updater" edges to the EventLevel entity.
+func (ac *AdminCreate) AddEventLevelUpdater(e ...*EventLevel) *AdminCreate {
+	ids := make([]int, len(e))
+	for i := range e {
+		ids[i] = e[i].ID
+	}
+	return ac.AddEventLevelUpdaterIDs(ids...)
 }
 
 // Mutation returns the AdminMutation object of the builder.
@@ -974,15 +1098,15 @@ func (ac *AdminCreate) createSpec() (*Admin, *sqlgraph.CreateSpec) {
 		}
 		_spec.Edges = append(_spec.Edges, edge)
 	}
-	if nodes := ac.mutation.IpcReportEventCreatorIDs(); len(nodes) > 0 {
+	if nodes := ac.mutation.IpcEventCreatorIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
-			Table:   admin.IpcReportEventCreatorTable,
-			Columns: []string{admin.IpcReportEventCreatorColumn},
+			Table:   admin.IpcEventCreatorTable,
+			Columns: []string{admin.IpcEventCreatorColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(ipcreportevent.FieldID, field.TypeInt),
+				IDSpec: sqlgraph.NewFieldSpec(ipcevent.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {
@@ -990,15 +1114,15 @@ func (ac *AdminCreate) createSpec() (*Admin, *sqlgraph.CreateSpec) {
 		}
 		_spec.Edges = append(_spec.Edges, edge)
 	}
-	if nodes := ac.mutation.IpcReportEventUpdaterIDs(); len(nodes) > 0 {
+	if nodes := ac.mutation.IpcEventUpdaterIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
-			Table:   admin.IpcReportEventUpdaterTable,
-			Columns: []string{admin.IpcReportEventUpdaterColumn},
+			Table:   admin.IpcEventUpdaterTable,
+			Columns: []string{admin.IpcEventUpdaterColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(ipcreportevent.FieldID, field.TypeInt),
+				IDSpec: sqlgraph.NewFieldSpec(ipcevent.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {
@@ -1031,6 +1155,134 @@ func (ac *AdminCreate) createSpec() (*Admin, *sqlgraph.CreateSpec) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(video.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := ac.mutation.AreaCreatorIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   admin.AreaCreatorTable,
+			Columns: []string{admin.AreaCreatorColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(area.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := ac.mutation.AreaUpdaterIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   admin.AreaUpdaterTable,
+			Columns: []string{admin.AreaUpdaterColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(area.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := ac.mutation.DeviceCreatorIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   admin.DeviceCreatorTable,
+			Columns: []string{admin.DeviceCreatorColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(device.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := ac.mutation.DeviceUpdaterIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   admin.DeviceUpdaterTable,
+			Columns: []string{admin.DeviceUpdaterColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(device.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := ac.mutation.DeviceInstallationCreatorIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   admin.DeviceInstallationCreatorTable,
+			Columns: []string{admin.DeviceInstallationCreatorColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(deviceinstallation.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := ac.mutation.DeviceInstallationUpdaterIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   admin.DeviceInstallationUpdaterTable,
+			Columns: []string{admin.DeviceInstallationUpdaterColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(deviceinstallation.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := ac.mutation.EventLevelCreatorIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   admin.EventLevelCreatorTable,
+			Columns: []string{admin.EventLevelCreatorColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(eventlevel.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := ac.mutation.EventLevelUpdaterIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   admin.EventLevelUpdaterTable,
+			Columns: []string{admin.EventLevelUpdaterColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(eventlevel.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {
