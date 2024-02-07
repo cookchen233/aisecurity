@@ -17,16 +17,16 @@ const (
 	Label = "risk"
 	// FieldID holds the string denoting the id field in the database.
 	FieldID = "id"
-	// FieldCreatedAt holds the string denoting the created_at field in the database.
-	FieldCreatedAt = "created_at"
-	// FieldCreatedBy holds the string denoting the created_by field in the database.
-	FieldCreatedBy = "created_by"
-	// FieldDeletedAt holds the string denoting the deleted_at field in the database.
-	FieldDeletedAt = "deleted_at"
-	// FieldUpdatedBy holds the string denoting the updated_by field in the database.
-	FieldUpdatedBy = "updated_by"
-	// FieldUpdatedAt holds the string denoting the updated_at field in the database.
-	FieldUpdatedAt = "updated_at"
+	// FieldCreateTime holds the string denoting the create_time field in the database.
+	FieldCreateTime = "create_time"
+	// FieldCreatorID holds the string denoting the creator_id field in the database.
+	FieldCreatorID = "creator_id"
+	// FieldDeleteTime holds the string denoting the delete_time field in the database.
+	FieldDeleteTime = "delete_time"
+	// FieldUpdaterID holds the string denoting the updater_id field in the database.
+	FieldUpdaterID = "updater_id"
+	// FieldUpdateTime holds the string denoting the update_time field in the database.
+	FieldUpdateTime = "update_time"
 	// FieldTitle holds the string denoting the title field in the database.
 	FieldTitle = "title"
 	// FieldContent holds the string denoting the content field in the database.
@@ -37,8 +37,6 @@ const (
 	FieldRiskCategoryID = "risk_category_id"
 	// FieldRiskLocationID holds the string denoting the risk_location_id field in the database.
 	FieldRiskLocationID = "risk_location_id"
-	// FieldReporterID holds the string denoting the reporter_id field in the database.
-	FieldReporterID = "reporter_id"
 	// FieldMaintainerID holds the string denoting the maintainer_id field in the database.
 	FieldMaintainerID = "maintainer_id"
 	// FieldMeasures holds the string denoting the measures field in the database.
@@ -55,8 +53,6 @@ const (
 	EdgeRiskCategory = "risk_category"
 	// EdgeRiskLocation holds the string denoting the risk_location edge name in mutations.
 	EdgeRiskLocation = "risk_location"
-	// EdgeReporter holds the string denoting the reporter edge name in mutations.
-	EdgeReporter = "reporter"
 	// EdgeMaintainer holds the string denoting the maintainer edge name in mutations.
 	EdgeMaintainer = "maintainer"
 	// Table holds the table name of the risk in the database.
@@ -67,14 +63,14 @@ const (
 	// It exists in this package in order to avoid circular dependency with the "admin" package.
 	CreatorInverseTable = "admins"
 	// CreatorColumn is the table column denoting the creator relation/edge.
-	CreatorColumn = "created_by"
+	CreatorColumn = "creator_id"
 	// UpdaterTable is the table that holds the updater relation/edge.
 	UpdaterTable = "risks"
 	// UpdaterInverseTable is the table name for the Admin entity.
 	// It exists in this package in order to avoid circular dependency with the "admin" package.
 	UpdaterInverseTable = "admins"
 	// UpdaterColumn is the table column denoting the updater relation/edge.
-	UpdaterColumn = "updated_by"
+	UpdaterColumn = "updater_id"
 	// RiskCategoryTable is the table that holds the risk_category relation/edge.
 	RiskCategoryTable = "risks"
 	// RiskCategoryInverseTable is the table name for the RiskCategory entity.
@@ -89,18 +85,11 @@ const (
 	RiskLocationInverseTable = "risk_locations"
 	// RiskLocationColumn is the table column denoting the risk_location relation/edge.
 	RiskLocationColumn = "risk_location_id"
-	// ReporterTable is the table that holds the reporter relation/edge.
-	ReporterTable = "risks"
-	// ReporterInverseTable is the table name for the Employee entity.
-	// It exists in this package in order to avoid circular dependency with the "employee" package.
-	ReporterInverseTable = "employees"
-	// ReporterColumn is the table column denoting the reporter relation/edge.
-	ReporterColumn = "reporter_id"
 	// MaintainerTable is the table that holds the maintainer relation/edge.
 	MaintainerTable = "risks"
-	// MaintainerInverseTable is the table name for the Employee entity.
-	// It exists in this package in order to avoid circular dependency with the "employee" package.
-	MaintainerInverseTable = "employees"
+	// MaintainerInverseTable is the table name for the Admin entity.
+	// It exists in this package in order to avoid circular dependency with the "admin" package.
+	MaintainerInverseTable = "admins"
 	// MaintainerColumn is the table column denoting the maintainer relation/edge.
 	MaintainerColumn = "maintainer_id"
 )
@@ -108,17 +97,16 @@ const (
 // Columns holds all SQL columns for risk fields.
 var Columns = []string{
 	FieldID,
-	FieldCreatedAt,
-	FieldCreatedBy,
-	FieldDeletedAt,
-	FieldUpdatedBy,
-	FieldUpdatedAt,
+	FieldCreateTime,
+	FieldCreatorID,
+	FieldDeleteTime,
+	FieldUpdaterID,
+	FieldUpdateTime,
 	FieldTitle,
 	FieldContent,
 	FieldImages,
 	FieldRiskCategoryID,
 	FieldRiskLocationID,
-	FieldReporterID,
 	FieldMaintainerID,
 	FieldMeasures,
 	FieldMaintainStatus,
@@ -142,16 +130,16 @@ func ValidColumn(column string) bool {
 //	import _ "aisecurity/ent/dao/runtime"
 var (
 	Hooks [1]ent.Hook
-	// DefaultCreatedAt holds the default value on creation for the "created_at" field.
-	DefaultCreatedAt func() time.Time
-	// CreatedByValidator is a validator for the "created_by" field. It is called by the builders before save.
-	CreatedByValidator func(int) error
-	// UpdatedByValidator is a validator for the "updated_by" field. It is called by the builders before save.
-	UpdatedByValidator func(int) error
-	// DefaultUpdatedAt holds the default value on creation for the "updated_at" field.
-	DefaultUpdatedAt func() time.Time
-	// UpdateDefaultUpdatedAt holds the default value on update for the "updated_at" field.
-	UpdateDefaultUpdatedAt func() time.Time
+	// DefaultCreateTime holds the default value on creation for the "create_time" field.
+	DefaultCreateTime func() time.Time
+	// CreatorIDValidator is a validator for the "creator_id" field. It is called by the builders before save.
+	CreatorIDValidator func(int) error
+	// UpdaterIDValidator is a validator for the "updater_id" field. It is called by the builders before save.
+	UpdaterIDValidator func(int) error
+	// DefaultUpdateTime holds the default value on creation for the "update_time" field.
+	DefaultUpdateTime func() time.Time
+	// UpdateDefaultUpdateTime holds the default value on update for the "update_time" field.
+	UpdateDefaultUpdateTime func() time.Time
 	// TitleValidator is a validator for the "title" field. It is called by the builders before save.
 	TitleValidator func(string) error
 	// DefaultImages holds the default value on creation for the "images" field.
@@ -160,8 +148,6 @@ var (
 	RiskCategoryIDValidator func(int) error
 	// RiskLocationIDValidator is a validator for the "risk_location_id" field. It is called by the builders before save.
 	RiskLocationIDValidator func(int) error
-	// ReporterIDValidator is a validator for the "reporter_id" field. It is called by the builders before save.
-	ReporterIDValidator func(int) error
 	// MaintainerIDValidator is a validator for the "maintainer_id" field. It is called by the builders before save.
 	MaintainerIDValidator func(int) error
 	// DefaultMaintainStatus holds the default value on creation for the "maintain_status" field.
@@ -178,29 +164,29 @@ func ByID(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldID, opts...).ToFunc()
 }
 
-// ByCreatedAt orders the results by the created_at field.
-func ByCreatedAt(opts ...sql.OrderTermOption) OrderOption {
-	return sql.OrderByField(FieldCreatedAt, opts...).ToFunc()
+// ByCreateTime orders the results by the create_time field.
+func ByCreateTime(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldCreateTime, opts...).ToFunc()
 }
 
-// ByCreatedBy orders the results by the created_by field.
-func ByCreatedBy(opts ...sql.OrderTermOption) OrderOption {
-	return sql.OrderByField(FieldCreatedBy, opts...).ToFunc()
+// ByCreatorID orders the results by the creator_id field.
+func ByCreatorID(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldCreatorID, opts...).ToFunc()
 }
 
-// ByDeletedAt orders the results by the deleted_at field.
-func ByDeletedAt(opts ...sql.OrderTermOption) OrderOption {
-	return sql.OrderByField(FieldDeletedAt, opts...).ToFunc()
+// ByDeleteTime orders the results by the delete_time field.
+func ByDeleteTime(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldDeleteTime, opts...).ToFunc()
 }
 
-// ByUpdatedBy orders the results by the updated_by field.
-func ByUpdatedBy(opts ...sql.OrderTermOption) OrderOption {
-	return sql.OrderByField(FieldUpdatedBy, opts...).ToFunc()
+// ByUpdaterID orders the results by the updater_id field.
+func ByUpdaterID(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldUpdaterID, opts...).ToFunc()
 }
 
-// ByUpdatedAt orders the results by the updated_at field.
-func ByUpdatedAt(opts ...sql.OrderTermOption) OrderOption {
-	return sql.OrderByField(FieldUpdatedAt, opts...).ToFunc()
+// ByUpdateTime orders the results by the update_time field.
+func ByUpdateTime(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldUpdateTime, opts...).ToFunc()
 }
 
 // ByTitle orders the results by the title field.
@@ -221,11 +207,6 @@ func ByRiskCategoryID(opts ...sql.OrderTermOption) OrderOption {
 // ByRiskLocationID orders the results by the risk_location_id field.
 func ByRiskLocationID(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldRiskLocationID, opts...).ToFunc()
-}
-
-// ByReporterID orders the results by the reporter_id field.
-func ByReporterID(opts ...sql.OrderTermOption) OrderOption {
-	return sql.OrderByField(FieldReporterID, opts...).ToFunc()
 }
 
 // ByMaintainerID orders the results by the maintainer_id field.
@@ -276,13 +257,6 @@ func ByRiskLocationField(field string, opts ...sql.OrderTermOption) OrderOption 
 	}
 }
 
-// ByReporterField orders the results by reporter field.
-func ByReporterField(field string, opts ...sql.OrderTermOption) OrderOption {
-	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborTerms(s, newReporterStep(), sql.OrderByField(field, opts...))
-	}
-}
-
 // ByMaintainerField orders the results by maintainer field.
 func ByMaintainerField(field string, opts ...sql.OrderTermOption) OrderOption {
 	return func(s *sql.Selector) {
@@ -315,13 +289,6 @@ func newRiskLocationStep() *sqlgraph.Step {
 		sqlgraph.From(Table, FieldID),
 		sqlgraph.To(RiskLocationInverseTable, FieldID),
 		sqlgraph.Edge(sqlgraph.M2O, true, RiskLocationTable, RiskLocationColumn),
-	)
-}
-func newReporterStep() *sqlgraph.Step {
-	return sqlgraph.NewStep(
-		sqlgraph.From(Table, FieldID),
-		sqlgraph.To(ReporterInverseTable, FieldID),
-		sqlgraph.Edge(sqlgraph.M2O, true, ReporterTable, ReporterColumn),
 	)
 }
 func newMaintainerStep() *sqlgraph.Step {

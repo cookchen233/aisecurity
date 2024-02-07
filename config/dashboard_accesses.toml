@@ -1,0 +1,87 @@
+# 这是一个后台权限配置表
+
+# 隐患汇报
+[[access_group]]
+id = "risk"
+title = "隐患汇报"
+enabled = true
+[[access_group.access]]
+id = "risk/list"
+title = "汇报列表"
+enabled = true
+[[access_group.access]]
+id = "risk/create"
+title = "新增汇报"
+enabled = true
+[[access_group.access]]
+id = "risk/update"
+title = "修改汇报"
+enabled = true
+[[access_group.access]]
+id = "risk/delete"
+title = "删除汇报"
+enabled = true
+
+# 智能监控告警
+[[access_group]]
+id = "event"
+title = "智能监控告警"
+enabled = true
+[[access_group.access]]
+id = "event/list"
+title = "告警列表"
+enabled = true
+
+# 部门
+[[access_group]]
+id = "department"
+title = "部门管理"
+enabled = true
+[[access_group.access]]
+id = "department/list"
+title = "部门列表"
+enabled = true
+[[access_group.access]]
+id = "department/update"
+title = "修改部门"
+enabled = true
+[[access_group.access]]
+id = "department/create"
+title = "新增部门"
+enabled = true
+
+# 成员
+[[access_group]]
+id = "admin"
+title = "成员管理"
+enabled = true
+[[access_group.access]]
+id = "admin/list"
+title = "成员列表"
+enabled = true
+[[access_group.access]]
+id = "admin/update"
+title = "修改成员"
+enabled = true
+[[access_group.access]]
+id = "admin/create"
+title = "新增成员"
+enabled = true
+
+# 权限组
+[[access_group]]
+id = "permission"
+title = "权限组管理"
+enabled = true
+[[access_group.access]]
+id = "permission/list"
+title = "权限组列表"
+enabled = true
+[[access_group.access]]
+id = "permission/update"
+title = "修改权限组"
+enabled = true
+[[access_group.access]]
+id = "permission/create"
+title = "新增权限组"
+enabled = true

@@ -19,15 +19,15 @@ type RiskLocation struct {
 	// ID of the ent.
 	ID int `json:"id,omitempty"`
 	// 创建时间
-	CreatedAt time.Time `json:"created_at"`
+	CreateTime time.Time `json:"create_time"`
 	// 创建者
-	CreatedBy int `json:"created_by"`
+	CreatorID int `json:"creator_id"`
 	// 删除时间
-	DeletedAt *time.Time `json:"deleted_at"`
+	DeleteTime *time.Time `json:"delete_time"`
 	// 最后更新者
-	UpdatedBy int `json:"updated_by"`
+	UpdaterID int `json:"updater_id"`
 	// 最后更新时间
-	UpdatedAt time.Time `json:"updated_at"`
+	UpdateTime time.Time `json:"update_time"`
 	// 名称
 	Name string `json:"name" validate:"required"`
 	// Edges holds the relations/edges for other nodes in the graph.
@@ -44,9 +44,11 @@ type RiskLocationEdges struct {
 	Updater *Admin `json:"updater,omitempty"`
 	// Risk holds the value of the risk edge.
 	Risk []*Risk `json:"risk,omitempty"`
+	// Sweep holds the value of the sweep edge.
+	Sweep []*Sweep `json:"sweep,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
-	loadedTypes [3]bool
+	loadedTypes [4]bool
 }
 
 // CreatorOrErr returns the Creator value or an error if the edge
@@ -84,16 +86,25 @@ func (e RiskLocationEdges) RiskOrErr() ([]*Risk, error) {
 	return nil, &NotLoadedError{edge: "risk"}
 }
 
+// SweepOrErr returns the Sweep value or an error if the edge
+// was not loaded in eager-loading.
+func (e RiskLocationEdges) SweepOrErr() ([]*Sweep, error) {
+	if e.loadedTypes[3] {
+		return e.Sweep, nil
+	}
+	return nil, &NotLoadedError{edge: "sweep"}
+}
+
 // scanValues returns the types for scanning values from sql.Rows.
 func (*RiskLocation) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
 	for i := range columns {
 		switch columns[i] {
-		case risklocation.FieldID, risklocation.FieldCreatedBy, risklocation.FieldUpdatedBy:
+		case risklocation.FieldID, risklocation.FieldCreatorID, risklocation.FieldUpdaterID:
 			values[i] = new(sql.NullInt64)
 		case risklocation.FieldName:
 			values[i] = new(sql.NullString)
-		case risklocation.FieldCreatedAt, risklocation.FieldDeletedAt, risklocation.FieldUpdatedAt:
+		case risklocation.FieldCreateTime, risklocation.FieldDeleteTime, risklocation.FieldUpdateTime:
 			values[i] = new(sql.NullTime)
 		default:
 			values[i] = new(sql.UnknownType)
@@ -116,36 +127,36 @@ func (rl *RiskLocation) assignValues(columns []string, values []any) error {
 				return fmt.Errorf("unexpected type %T for field id", value)
 			}
 			rl.ID = int(value.Int64)
-		case risklocation.FieldCreatedAt:
+		case risklocation.FieldCreateTime:
 			if value, ok := values[i].(*sql.NullTime); !ok {
-				return fmt.Errorf("unexpected type %T for field created_at", values[i])
+				return fmt.Errorf("unexpected type %T for field create_time", values[i])
 			} else if value.Valid {
-				rl.CreatedAt = value.Time
+				rl.CreateTime = value.Time
 			}
-		case risklocation.FieldCreatedBy:
+		case risklocation.FieldCreatorID:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
-				return fmt.Errorf("unexpected type %T for field created_by", values[i])
+				return fmt.Errorf("unexpected type %T for field creator_id", values[i])
 			} else if value.Valid {
-				rl.CreatedBy = int(value.Int64)
+				rl.CreatorID = int(value.Int64)
 			}
-		case risklocation.FieldDeletedAt:
+		case risklocation.FieldDeleteTime:
 			if value, ok := values[i].(*sql.NullTime); !ok {
-				return fmt.Errorf("unexpected type %T for field deleted_at", values[i])
+				return fmt.Errorf("unexpected type %T for field delete_time", values[i])
 			} else if value.Valid {
-				rl.DeletedAt = new(time.Time)
-				*rl.DeletedAt = value.Time
+				rl.DeleteTime = new(time.Time)
+				*rl.DeleteTime = value.Time
 			}
-		case risklocation.FieldUpdatedBy:
+		case risklocation.FieldUpdaterID:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
-				return fmt.Errorf("unexpected type %T for field updated_by", values[i])
+				return fmt.Errorf("unexpected type %T for field updater_id", values[i])
 			} else if value.Valid {
-				rl.UpdatedBy = int(value.Int64)
+				rl.UpdaterID = int(value.Int64)
 			}
-		case risklocation.FieldUpdatedAt:
+		case risklocation.FieldUpdateTime:
 			if value, ok := values[i].(*sql.NullTime); !ok {
-				return fmt.Errorf("unexpected type %T for field updated_at", values[i])
+				return fmt.Errorf("unexpected type %T for field update_time", values[i])
 			} else if value.Valid {
-				rl.UpdatedAt = value.Time
+				rl.UpdateTime = value.Time
 			}
 		case risklocation.FieldName:
 			if value, ok := values[i].(*sql.NullString); !ok {
@@ -181,6 +192,11 @@ func (rl *RiskLocation) QueryRisk() *RiskQuery {
 	return NewRiskLocationClient(rl.config).QueryRisk(rl)
 }
 
+// QuerySweep queries the "sweep" edge of the RiskLocation entity.
+func (rl *RiskLocation) QuerySweep() *SweepQuery {
+	return NewRiskLocationClient(rl.config).QuerySweep(rl)
+}
+
 // Update returns a builder for updating this RiskLocation.
 // Note that you need to call RiskLocation.Unwrap() before calling this method if this RiskLocation
 // was returned from a transaction, and the transaction was committed or rolled back.
@@ -204,22 +220,22 @@ func (rl *RiskLocation) String() string {
 	var builder strings.Builder
 	builder.WriteString("RiskLocation(")
 	builder.WriteString(fmt.Sprintf("id=%v, ", rl.ID))
-	builder.WriteString("created_at=")
-	builder.WriteString(rl.CreatedAt.Format(time.ANSIC))
+	builder.WriteString("create_time=")
+	builder.WriteString(rl.CreateTime.Format(time.ANSIC))
 	builder.WriteString(", ")
-	builder.WriteString("created_by=")
-	builder.WriteString(fmt.Sprintf("%v", rl.CreatedBy))
+	builder.WriteString("creator_id=")
+	builder.WriteString(fmt.Sprintf("%v", rl.CreatorID))
 	builder.WriteString(", ")
-	if v := rl.DeletedAt; v != nil {
-		builder.WriteString("deleted_at=")
+	if v := rl.DeleteTime; v != nil {
+		builder.WriteString("delete_time=")
 		builder.WriteString(v.Format(time.ANSIC))
 	}
 	builder.WriteString(", ")
-	builder.WriteString("updated_by=")
-	builder.WriteString(fmt.Sprintf("%v", rl.UpdatedBy))
+	builder.WriteString("updater_id=")
+	builder.WriteString(fmt.Sprintf("%v", rl.UpdaterID))
 	builder.WriteString(", ")
-	builder.WriteString("updated_at=")
-	builder.WriteString(rl.UpdatedAt.Format(time.ANSIC))
+	builder.WriteString("update_time=")
+	builder.WriteString(rl.UpdateTime.Format(time.ANSIC))
 	builder.WriteString(", ")
 	builder.WriteString("name=")
 	builder.WriteString(rl.Name)

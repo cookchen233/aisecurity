@@ -7,6 +7,7 @@ import (
 	"aisecurity/ent/dao/predicate"
 	"aisecurity/ent/dao/risk"
 	"aisecurity/ent/dao/risklocation"
+	"aisecurity/ent/dao/sweep"
 	"context"
 	"database/sql/driver"
 	"fmt"
@@ -27,6 +28,7 @@ type RiskLocationQuery struct {
 	withCreator *AdminQuery
 	withUpdater *AdminQuery
 	withRisk    *RiskQuery
+	withSweep   *SweepQuery
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
 	path func(context.Context) (*sql.Selector, error)
@@ -122,6 +124,28 @@ func (rlq *RiskLocationQuery) QueryRisk() *RiskQuery {
 			sqlgraph.From(risklocation.Table, risklocation.FieldID, selector),
 			sqlgraph.To(risk.Table, risk.FieldID),
 			sqlgraph.Edge(sqlgraph.O2M, false, risklocation.RiskTable, risklocation.RiskColumn),
+		)
+		fromU = sqlgraph.SetNeighbors(rlq.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
+}
+
+// QuerySweep chains the current query on the "sweep" edge.
+func (rlq *RiskLocationQuery) QuerySweep() *SweepQuery {
+	query := (&SweepClient{config: rlq.config}).Query()
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := rlq.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := rlq.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(risklocation.Table, risklocation.FieldID, selector),
+			sqlgraph.To(sweep.Table, sweep.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, risklocation.SweepTable, risklocation.SweepColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(rlq.driver.Dialect(), step)
 		return fromU, nil
@@ -324,6 +348,7 @@ func (rlq *RiskLocationQuery) Clone() *RiskLocationQuery {
 		withCreator: rlq.withCreator.Clone(),
 		withUpdater: rlq.withUpdater.Clone(),
 		withRisk:    rlq.withRisk.Clone(),
+		withSweep:   rlq.withSweep.Clone(),
 		// clone intermediate query.
 		sql:  rlq.sql.Clone(),
 		path: rlq.path,
@@ -363,18 +388,29 @@ func (rlq *RiskLocationQuery) WithRisk(opts ...func(*RiskQuery)) *RiskLocationQu
 	return rlq
 }
 
+// WithSweep tells the query-builder to eager-load the nodes that are connected to
+// the "sweep" edge. The optional arguments are used to configure the query builder of the edge.
+func (rlq *RiskLocationQuery) WithSweep(opts ...func(*SweepQuery)) *RiskLocationQuery {
+	query := (&SweepClient{config: rlq.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	rlq.withSweep = query
+	return rlq
+}
+
 // GroupBy is used to group vertices by one or more fields/columns.
 // It is often used with aggregate functions, like: count, max, mean, min, sum.
 //
 // Example:
 //
 //	var v []struct {
-//		CreatedAt time.Time `json:"created_at"`
+//		CreateTime time.Time `json:"create_time"`
 //		Count int `json:"count,omitempty"`
 //	}
 //
 //	client.RiskLocation.Query().
-//		GroupBy(risklocation.FieldCreatedAt).
+//		GroupBy(risklocation.FieldCreateTime).
 //		Aggregate(dao.Count()).
 //		Scan(ctx, &v)
 func (rlq *RiskLocationQuery) GroupBy(field string, fields ...string) *RiskLocationGroupBy {
@@ -392,11 +428,11 @@ func (rlq *RiskLocationQuery) GroupBy(field string, fields ...string) *RiskLocat
 // Example:
 //
 //	var v []struct {
-//		CreatedAt time.Time `json:"created_at"`
+//		CreateTime time.Time `json:"create_time"`
 //	}
 //
 //	client.RiskLocation.Query().
-//		Select(risklocation.FieldCreatedAt).
+//		Select(risklocation.FieldCreateTime).
 //		Scan(ctx, &v)
 func (rlq *RiskLocationQuery) Select(fields ...string) *RiskLocationSelect {
 	rlq.ctx.Fields = append(rlq.ctx.Fields, fields...)
@@ -441,10 +477,11 @@ func (rlq *RiskLocationQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([
 	var (
 		nodes       = []*RiskLocation{}
 		_spec       = rlq.querySpec()
-		loadedTypes = [3]bool{
+		loadedTypes = [4]bool{
 			rlq.withCreator != nil,
 			rlq.withUpdater != nil,
 			rlq.withRisk != nil,
+			rlq.withSweep != nil,
 		}
 	)
 	_spec.ScanValues = func(columns []string) ([]any, error) {
@@ -484,6 +521,13 @@ func (rlq *RiskLocationQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([
 			return nil, err
 		}
 	}
+	if query := rlq.withSweep; query != nil {
+		if err := rlq.loadSweep(ctx, query, nodes,
+			func(n *RiskLocation) { n.Edges.Sweep = []*Sweep{} },
+			func(n *RiskLocation, e *Sweep) { n.Edges.Sweep = append(n.Edges.Sweep, e) }); err != nil {
+			return nil, err
+		}
+	}
 	return nodes, nil
 }
 
@@ -491,7 +535,7 @@ func (rlq *RiskLocationQuery) loadCreator(ctx context.Context, query *AdminQuery
 	ids := make([]int, 0, len(nodes))
 	nodeids := make(map[int][]*RiskLocation)
 	for i := range nodes {
-		fk := nodes[i].CreatedBy
+		fk := nodes[i].CreatorID
 		if _, ok := nodeids[fk]; !ok {
 			ids = append(ids, fk)
 		}
@@ -508,7 +552,7 @@ func (rlq *RiskLocationQuery) loadCreator(ctx context.Context, query *AdminQuery
 	for _, n := range neighbors {
 		nodes, ok := nodeids[n.ID]
 		if !ok {
-			return fmt.Errorf(`unexpected foreign-key "created_by" returned %v`, n.ID)
+			return fmt.Errorf(`unexpected foreign-key "creator_id" returned %v`, n.ID)
 		}
 		for i := range nodes {
 			assign(nodes[i], n)
@@ -520,7 +564,7 @@ func (rlq *RiskLocationQuery) loadUpdater(ctx context.Context, query *AdminQuery
 	ids := make([]int, 0, len(nodes))
 	nodeids := make(map[int][]*RiskLocation)
 	for i := range nodes {
-		fk := nodes[i].UpdatedBy
+		fk := nodes[i].UpdaterID
 		if _, ok := nodeids[fk]; !ok {
 			ids = append(ids, fk)
 		}
@@ -537,7 +581,7 @@ func (rlq *RiskLocationQuery) loadUpdater(ctx context.Context, query *AdminQuery
 	for _, n := range neighbors {
 		nodes, ok := nodeids[n.ID]
 		if !ok {
-			return fmt.Errorf(`unexpected foreign-key "updated_by" returned %v`, n.ID)
+			return fmt.Errorf(`unexpected foreign-key "updater_id" returned %v`, n.ID)
 		}
 		for i := range nodes {
 			assign(nodes[i], n)
@@ -560,6 +604,36 @@ func (rlq *RiskLocationQuery) loadRisk(ctx context.Context, query *RiskQuery, no
 	}
 	query.Where(predicate.Risk(func(s *sql.Selector) {
 		s.Where(sql.InValues(s.C(risklocation.RiskColumn), fks...))
+	}))
+	neighbors, err := query.All(ctx)
+	if err != nil {
+		return err
+	}
+	for _, n := range neighbors {
+		fk := n.RiskLocationID
+		node, ok := nodeids[fk]
+		if !ok {
+			return fmt.Errorf(`unexpected referenced foreign-key "risk_location_id" returned %v for node %v`, fk, n.ID)
+		}
+		assign(node, n)
+	}
+	return nil
+}
+func (rlq *RiskLocationQuery) loadSweep(ctx context.Context, query *SweepQuery, nodes []*RiskLocation, init func(*RiskLocation), assign func(*RiskLocation, *Sweep)) error {
+	fks := make([]driver.Value, 0, len(nodes))
+	nodeids := make(map[int]*RiskLocation)
+	for i := range nodes {
+		fks = append(fks, nodes[i].ID)
+		nodeids[nodes[i].ID] = nodes[i]
+		if init != nil {
+			init(nodes[i])
+		}
+	}
+	if len(query.ctx.Fields) > 0 {
+		query.ctx.AppendFieldOnce(sweep.FieldRiskLocationID)
+	}
+	query.Where(predicate.Sweep(func(s *sql.Selector) {
+		s.Where(sql.InValues(s.C(risklocation.SweepColumn), fks...))
 	}))
 	neighbors, err := query.All(ctx)
 	if err != nil {
@@ -602,10 +676,10 @@ func (rlq *RiskLocationQuery) querySpec() *sqlgraph.QuerySpec {
 			}
 		}
 		if rlq.withCreator != nil {
-			_spec.Node.AddColumnOnce(risklocation.FieldCreatedBy)
+			_spec.Node.AddColumnOnce(risklocation.FieldCreatorID)
 		}
 		if rlq.withUpdater != nil {
-			_spec.Node.AddColumnOnce(risklocation.FieldUpdatedBy)
+			_spec.Node.AddColumnOnce(risklocation.FieldUpdaterID)
 		}
 	}
 	if ps := rlq.predicates; len(ps) > 0 {

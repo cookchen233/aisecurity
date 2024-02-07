@@ -55,29 +55,29 @@ func IDLTE(id int) predicate.Employee {
 	return predicate.Employee(sql.FieldLTE(FieldID, id))
 }
 
-// CreatedAt applies equality check predicate on the "created_at" field. It's identical to CreatedAtEQ.
-func CreatedAt(v time.Time) predicate.Employee {
-	return predicate.Employee(sql.FieldEQ(FieldCreatedAt, v))
+// CreateTime applies equality check predicate on the "create_time" field. It's identical to CreateTimeEQ.
+func CreateTime(v time.Time) predicate.Employee {
+	return predicate.Employee(sql.FieldEQ(FieldCreateTime, v))
 }
 
-// CreatedBy applies equality check predicate on the "created_by" field. It's identical to CreatedByEQ.
-func CreatedBy(v int) predicate.Employee {
-	return predicate.Employee(sql.FieldEQ(FieldCreatedBy, v))
+// CreatorID applies equality check predicate on the "creator_id" field. It's identical to CreatorIDEQ.
+func CreatorID(v int) predicate.Employee {
+	return predicate.Employee(sql.FieldEQ(FieldCreatorID, v))
 }
 
-// DeletedAt applies equality check predicate on the "deleted_at" field. It's identical to DeletedAtEQ.
-func DeletedAt(v time.Time) predicate.Employee {
-	return predicate.Employee(sql.FieldEQ(FieldDeletedAt, v))
+// DeleteTime applies equality check predicate on the "delete_time" field. It's identical to DeleteTimeEQ.
+func DeleteTime(v time.Time) predicate.Employee {
+	return predicate.Employee(sql.FieldEQ(FieldDeleteTime, v))
 }
 
-// UpdatedBy applies equality check predicate on the "updated_by" field. It's identical to UpdatedByEQ.
-func UpdatedBy(v int) predicate.Employee {
-	return predicate.Employee(sql.FieldEQ(FieldUpdatedBy, v))
+// UpdaterID applies equality check predicate on the "updater_id" field. It's identical to UpdaterIDEQ.
+func UpdaterID(v int) predicate.Employee {
+	return predicate.Employee(sql.FieldEQ(FieldUpdaterID, v))
 }
 
-// UpdatedAt applies equality check predicate on the "updated_at" field. It's identical to UpdatedAtEQ.
-func UpdatedAt(v time.Time) predicate.Employee {
-	return predicate.Employee(sql.FieldEQ(FieldUpdatedAt, v))
+// UpdateTime applies equality check predicate on the "update_time" field. It's identical to UpdateTimeEQ.
+func UpdateTime(v time.Time) predicate.Employee {
+	return predicate.Employee(sql.FieldEQ(FieldUpdateTime, v))
 }
 
 // AdminID applies equality check predicate on the "admin_id" field. It's identical to AdminIDEQ.
@@ -90,174 +90,179 @@ func DepartmentID(v int) predicate.Employee {
 	return predicate.Employee(sql.FieldEQ(FieldDepartmentID, v))
 }
 
-// CreatedAtEQ applies the EQ predicate on the "created_at" field.
-func CreatedAtEQ(v time.Time) predicate.Employee {
-	return predicate.Employee(sql.FieldEQ(FieldCreatedAt, v))
+// OccupationID applies equality check predicate on the "occupation_id" field. It's identical to OccupationIDEQ.
+func OccupationID(v int) predicate.Employee {
+	return predicate.Employee(sql.FieldEQ(FieldOccupationID, v))
 }
 
-// CreatedAtNEQ applies the NEQ predicate on the "created_at" field.
-func CreatedAtNEQ(v time.Time) predicate.Employee {
-	return predicate.Employee(sql.FieldNEQ(FieldCreatedAt, v))
+// CreateTimeEQ applies the EQ predicate on the "create_time" field.
+func CreateTimeEQ(v time.Time) predicate.Employee {
+	return predicate.Employee(sql.FieldEQ(FieldCreateTime, v))
 }
 
-// CreatedAtIn applies the In predicate on the "created_at" field.
-func CreatedAtIn(vs ...time.Time) predicate.Employee {
-	return predicate.Employee(sql.FieldIn(FieldCreatedAt, vs...))
+// CreateTimeNEQ applies the NEQ predicate on the "create_time" field.
+func CreateTimeNEQ(v time.Time) predicate.Employee {
+	return predicate.Employee(sql.FieldNEQ(FieldCreateTime, v))
 }
 
-// CreatedAtNotIn applies the NotIn predicate on the "created_at" field.
-func CreatedAtNotIn(vs ...time.Time) predicate.Employee {
-	return predicate.Employee(sql.FieldNotIn(FieldCreatedAt, vs...))
+// CreateTimeIn applies the In predicate on the "create_time" field.
+func CreateTimeIn(vs ...time.Time) predicate.Employee {
+	return predicate.Employee(sql.FieldIn(FieldCreateTime, vs...))
 }
 
-// CreatedAtGT applies the GT predicate on the "created_at" field.
-func CreatedAtGT(v time.Time) predicate.Employee {
-	return predicate.Employee(sql.FieldGT(FieldCreatedAt, v))
+// CreateTimeNotIn applies the NotIn predicate on the "create_time" field.
+func CreateTimeNotIn(vs ...time.Time) predicate.Employee {
+	return predicate.Employee(sql.FieldNotIn(FieldCreateTime, vs...))
 }
 
-// CreatedAtGTE applies the GTE predicate on the "created_at" field.
-func CreatedAtGTE(v time.Time) predicate.Employee {
-	return predicate.Employee(sql.FieldGTE(FieldCreatedAt, v))
+// CreateTimeGT applies the GT predicate on the "create_time" field.
+func CreateTimeGT(v time.Time) predicate.Employee {
+	return predicate.Employee(sql.FieldGT(FieldCreateTime, v))
 }
 
-// CreatedAtLT applies the LT predicate on the "created_at" field.
-func CreatedAtLT(v time.Time) predicate.Employee {
-	return predicate.Employee(sql.FieldLT(FieldCreatedAt, v))
+// CreateTimeGTE applies the GTE predicate on the "create_time" field.
+func CreateTimeGTE(v time.Time) predicate.Employee {
+	return predicate.Employee(sql.FieldGTE(FieldCreateTime, v))
 }
 
-// CreatedAtLTE applies the LTE predicate on the "created_at" field.
-func CreatedAtLTE(v time.Time) predicate.Employee {
-	return predicate.Employee(sql.FieldLTE(FieldCreatedAt, v))
+// CreateTimeLT applies the LT predicate on the "create_time" field.
+func CreateTimeLT(v time.Time) predicate.Employee {
+	return predicate.Employee(sql.FieldLT(FieldCreateTime, v))
 }
 
-// CreatedByEQ applies the EQ predicate on the "created_by" field.
-func CreatedByEQ(v int) predicate.Employee {
-	return predicate.Employee(sql.FieldEQ(FieldCreatedBy, v))
+// CreateTimeLTE applies the LTE predicate on the "create_time" field.
+func CreateTimeLTE(v time.Time) predicate.Employee {
+	return predicate.Employee(sql.FieldLTE(FieldCreateTime, v))
 }
 
-// CreatedByNEQ applies the NEQ predicate on the "created_by" field.
-func CreatedByNEQ(v int) predicate.Employee {
-	return predicate.Employee(sql.FieldNEQ(FieldCreatedBy, v))
+// CreatorIDEQ applies the EQ predicate on the "creator_id" field.
+func CreatorIDEQ(v int) predicate.Employee {
+	return predicate.Employee(sql.FieldEQ(FieldCreatorID, v))
 }
 
-// CreatedByIn applies the In predicate on the "created_by" field.
-func CreatedByIn(vs ...int) predicate.Employee {
-	return predicate.Employee(sql.FieldIn(FieldCreatedBy, vs...))
+// CreatorIDNEQ applies the NEQ predicate on the "creator_id" field.
+func CreatorIDNEQ(v int) predicate.Employee {
+	return predicate.Employee(sql.FieldNEQ(FieldCreatorID, v))
 }
 
-// CreatedByNotIn applies the NotIn predicate on the "created_by" field.
-func CreatedByNotIn(vs ...int) predicate.Employee {
-	return predicate.Employee(sql.FieldNotIn(FieldCreatedBy, vs...))
+// CreatorIDIn applies the In predicate on the "creator_id" field.
+func CreatorIDIn(vs ...int) predicate.Employee {
+	return predicate.Employee(sql.FieldIn(FieldCreatorID, vs...))
 }
 
-// DeletedAtEQ applies the EQ predicate on the "deleted_at" field.
-func DeletedAtEQ(v time.Time) predicate.Employee {
-	return predicate.Employee(sql.FieldEQ(FieldDeletedAt, v))
+// CreatorIDNotIn applies the NotIn predicate on the "creator_id" field.
+func CreatorIDNotIn(vs ...int) predicate.Employee {
+	return predicate.Employee(sql.FieldNotIn(FieldCreatorID, vs...))
 }
 
-// DeletedAtNEQ applies the NEQ predicate on the "deleted_at" field.
-func DeletedAtNEQ(v time.Time) predicate.Employee {
-	return predicate.Employee(sql.FieldNEQ(FieldDeletedAt, v))
+// DeleteTimeEQ applies the EQ predicate on the "delete_time" field.
+func DeleteTimeEQ(v time.Time) predicate.Employee {
+	return predicate.Employee(sql.FieldEQ(FieldDeleteTime, v))
 }
 
-// DeletedAtIn applies the In predicate on the "deleted_at" field.
-func DeletedAtIn(vs ...time.Time) predicate.Employee {
-	return predicate.Employee(sql.FieldIn(FieldDeletedAt, vs...))
+// DeleteTimeNEQ applies the NEQ predicate on the "delete_time" field.
+func DeleteTimeNEQ(v time.Time) predicate.Employee {
+	return predicate.Employee(sql.FieldNEQ(FieldDeleteTime, v))
 }
 
-// DeletedAtNotIn applies the NotIn predicate on the "deleted_at" field.
-func DeletedAtNotIn(vs ...time.Time) predicate.Employee {
-	return predicate.Employee(sql.FieldNotIn(FieldDeletedAt, vs...))
+// DeleteTimeIn applies the In predicate on the "delete_time" field.
+func DeleteTimeIn(vs ...time.Time) predicate.Employee {
+	return predicate.Employee(sql.FieldIn(FieldDeleteTime, vs...))
 }
 
-// DeletedAtGT applies the GT predicate on the "deleted_at" field.
-func DeletedAtGT(v time.Time) predicate.Employee {
-	return predicate.Employee(sql.FieldGT(FieldDeletedAt, v))
+// DeleteTimeNotIn applies the NotIn predicate on the "delete_time" field.
+func DeleteTimeNotIn(vs ...time.Time) predicate.Employee {
+	return predicate.Employee(sql.FieldNotIn(FieldDeleteTime, vs...))
 }
 
-// DeletedAtGTE applies the GTE predicate on the "deleted_at" field.
-func DeletedAtGTE(v time.Time) predicate.Employee {
-	return predicate.Employee(sql.FieldGTE(FieldDeletedAt, v))
+// DeleteTimeGT applies the GT predicate on the "delete_time" field.
+func DeleteTimeGT(v time.Time) predicate.Employee {
+	return predicate.Employee(sql.FieldGT(FieldDeleteTime, v))
 }
 
-// DeletedAtLT applies the LT predicate on the "deleted_at" field.
-func DeletedAtLT(v time.Time) predicate.Employee {
-	return predicate.Employee(sql.FieldLT(FieldDeletedAt, v))
+// DeleteTimeGTE applies the GTE predicate on the "delete_time" field.
+func DeleteTimeGTE(v time.Time) predicate.Employee {
+	return predicate.Employee(sql.FieldGTE(FieldDeleteTime, v))
 }
 
-// DeletedAtLTE applies the LTE predicate on the "deleted_at" field.
-func DeletedAtLTE(v time.Time) predicate.Employee {
-	return predicate.Employee(sql.FieldLTE(FieldDeletedAt, v))
+// DeleteTimeLT applies the LT predicate on the "delete_time" field.
+func DeleteTimeLT(v time.Time) predicate.Employee {
+	return predicate.Employee(sql.FieldLT(FieldDeleteTime, v))
 }
 
-// DeletedAtIsNil applies the IsNil predicate on the "deleted_at" field.
-func DeletedAtIsNil() predicate.Employee {
-	return predicate.Employee(sql.FieldIsNull(FieldDeletedAt))
+// DeleteTimeLTE applies the LTE predicate on the "delete_time" field.
+func DeleteTimeLTE(v time.Time) predicate.Employee {
+	return predicate.Employee(sql.FieldLTE(FieldDeleteTime, v))
 }
 
-// DeletedAtNotNil applies the NotNil predicate on the "deleted_at" field.
-func DeletedAtNotNil() predicate.Employee {
-	return predicate.Employee(sql.FieldNotNull(FieldDeletedAt))
+// DeleteTimeIsNil applies the IsNil predicate on the "delete_time" field.
+func DeleteTimeIsNil() predicate.Employee {
+	return predicate.Employee(sql.FieldIsNull(FieldDeleteTime))
 }
 
-// UpdatedByEQ applies the EQ predicate on the "updated_by" field.
-func UpdatedByEQ(v int) predicate.Employee {
-	return predicate.Employee(sql.FieldEQ(FieldUpdatedBy, v))
+// DeleteTimeNotNil applies the NotNil predicate on the "delete_time" field.
+func DeleteTimeNotNil() predicate.Employee {
+	return predicate.Employee(sql.FieldNotNull(FieldDeleteTime))
 }
 
-// UpdatedByNEQ applies the NEQ predicate on the "updated_by" field.
-func UpdatedByNEQ(v int) predicate.Employee {
-	return predicate.Employee(sql.FieldNEQ(FieldUpdatedBy, v))
+// UpdaterIDEQ applies the EQ predicate on the "updater_id" field.
+func UpdaterIDEQ(v int) predicate.Employee {
+	return predicate.Employee(sql.FieldEQ(FieldUpdaterID, v))
 }
 
-// UpdatedByIn applies the In predicate on the "updated_by" field.
-func UpdatedByIn(vs ...int) predicate.Employee {
-	return predicate.Employee(sql.FieldIn(FieldUpdatedBy, vs...))
+// UpdaterIDNEQ applies the NEQ predicate on the "updater_id" field.
+func UpdaterIDNEQ(v int) predicate.Employee {
+	return predicate.Employee(sql.FieldNEQ(FieldUpdaterID, v))
 }
 
-// UpdatedByNotIn applies the NotIn predicate on the "updated_by" field.
-func UpdatedByNotIn(vs ...int) predicate.Employee {
-	return predicate.Employee(sql.FieldNotIn(FieldUpdatedBy, vs...))
+// UpdaterIDIn applies the In predicate on the "updater_id" field.
+func UpdaterIDIn(vs ...int) predicate.Employee {
+	return predicate.Employee(sql.FieldIn(FieldUpdaterID, vs...))
 }
 
-// UpdatedAtEQ applies the EQ predicate on the "updated_at" field.
-func UpdatedAtEQ(v time.Time) predicate.Employee {
-	return predicate.Employee(sql.FieldEQ(FieldUpdatedAt, v))
+// UpdaterIDNotIn applies the NotIn predicate on the "updater_id" field.
+func UpdaterIDNotIn(vs ...int) predicate.Employee {
+	return predicate.Employee(sql.FieldNotIn(FieldUpdaterID, vs...))
 }
 
-// UpdatedAtNEQ applies the NEQ predicate on the "updated_at" field.
-func UpdatedAtNEQ(v time.Time) predicate.Employee {
-	return predicate.Employee(sql.FieldNEQ(FieldUpdatedAt, v))
+// UpdateTimeEQ applies the EQ predicate on the "update_time" field.
+func UpdateTimeEQ(v time.Time) predicate.Employee {
+	return predicate.Employee(sql.FieldEQ(FieldUpdateTime, v))
 }
 
-// UpdatedAtIn applies the In predicate on the "updated_at" field.
-func UpdatedAtIn(vs ...time.Time) predicate.Employee {
-	return predicate.Employee(sql.FieldIn(FieldUpdatedAt, vs...))
+// UpdateTimeNEQ applies the NEQ predicate on the "update_time" field.
+func UpdateTimeNEQ(v time.Time) predicate.Employee {
+	return predicate.Employee(sql.FieldNEQ(FieldUpdateTime, v))
 }
 
-// UpdatedAtNotIn applies the NotIn predicate on the "updated_at" field.
-func UpdatedAtNotIn(vs ...time.Time) predicate.Employee {
-	return predicate.Employee(sql.FieldNotIn(FieldUpdatedAt, vs...))
+// UpdateTimeIn applies the In predicate on the "update_time" field.
+func UpdateTimeIn(vs ...time.Time) predicate.Employee {
+	return predicate.Employee(sql.FieldIn(FieldUpdateTime, vs...))
 }
 
-// UpdatedAtGT applies the GT predicate on the "updated_at" field.
-func UpdatedAtGT(v time.Time) predicate.Employee {
-	return predicate.Employee(sql.FieldGT(FieldUpdatedAt, v))
+// UpdateTimeNotIn applies the NotIn predicate on the "update_time" field.
+func UpdateTimeNotIn(vs ...time.Time) predicate.Employee {
+	return predicate.Employee(sql.FieldNotIn(FieldUpdateTime, vs...))
 }
 
-// UpdatedAtGTE applies the GTE predicate on the "updated_at" field.
-func UpdatedAtGTE(v time.Time) predicate.Employee {
-	return predicate.Employee(sql.FieldGTE(FieldUpdatedAt, v))
+// UpdateTimeGT applies the GT predicate on the "update_time" field.
+func UpdateTimeGT(v time.Time) predicate.Employee {
+	return predicate.Employee(sql.FieldGT(FieldUpdateTime, v))
 }
 
-// UpdatedAtLT applies the LT predicate on the "updated_at" field.
-func UpdatedAtLT(v time.Time) predicate.Employee {
-	return predicate.Employee(sql.FieldLT(FieldUpdatedAt, v))
+// UpdateTimeGTE applies the GTE predicate on the "update_time" field.
+func UpdateTimeGTE(v time.Time) predicate.Employee {
+	return predicate.Employee(sql.FieldGTE(FieldUpdateTime, v))
 }
 
-// UpdatedAtLTE applies the LTE predicate on the "updated_at" field.
-func UpdatedAtLTE(v time.Time) predicate.Employee {
-	return predicate.Employee(sql.FieldLTE(FieldUpdatedAt, v))
+// UpdateTimeLT applies the LT predicate on the "update_time" field.
+func UpdateTimeLT(v time.Time) predicate.Employee {
+	return predicate.Employee(sql.FieldLT(FieldUpdateTime, v))
+}
+
+// UpdateTimeLTE applies the LTE predicate on the "update_time" field.
+func UpdateTimeLTE(v time.Time) predicate.Employee {
+	return predicate.Employee(sql.FieldLTE(FieldUpdateTime, v))
 }
 
 // AdminIDEQ applies the EQ predicate on the "admin_id" field.
@@ -298,6 +303,46 @@ func DepartmentIDIn(vs ...int) predicate.Employee {
 // DepartmentIDNotIn applies the NotIn predicate on the "department_id" field.
 func DepartmentIDNotIn(vs ...int) predicate.Employee {
 	return predicate.Employee(sql.FieldNotIn(FieldDepartmentID, vs...))
+}
+
+// DepartmentIDIsNil applies the IsNil predicate on the "department_id" field.
+func DepartmentIDIsNil() predicate.Employee {
+	return predicate.Employee(sql.FieldIsNull(FieldDepartmentID))
+}
+
+// DepartmentIDNotNil applies the NotNil predicate on the "department_id" field.
+func DepartmentIDNotNil() predicate.Employee {
+	return predicate.Employee(sql.FieldNotNull(FieldDepartmentID))
+}
+
+// OccupationIDEQ applies the EQ predicate on the "occupation_id" field.
+func OccupationIDEQ(v int) predicate.Employee {
+	return predicate.Employee(sql.FieldEQ(FieldOccupationID, v))
+}
+
+// OccupationIDNEQ applies the NEQ predicate on the "occupation_id" field.
+func OccupationIDNEQ(v int) predicate.Employee {
+	return predicate.Employee(sql.FieldNEQ(FieldOccupationID, v))
+}
+
+// OccupationIDIn applies the In predicate on the "occupation_id" field.
+func OccupationIDIn(vs ...int) predicate.Employee {
+	return predicate.Employee(sql.FieldIn(FieldOccupationID, vs...))
+}
+
+// OccupationIDNotIn applies the NotIn predicate on the "occupation_id" field.
+func OccupationIDNotIn(vs ...int) predicate.Employee {
+	return predicate.Employee(sql.FieldNotIn(FieldOccupationID, vs...))
+}
+
+// OccupationIDIsNil applies the IsNil predicate on the "occupation_id" field.
+func OccupationIDIsNil() predicate.Employee {
+	return predicate.Employee(sql.FieldIsNull(FieldOccupationID))
+}
+
+// OccupationIDNotNil applies the NotNil predicate on the "occupation_id" field.
+func OccupationIDNotNil() predicate.Employee {
+	return predicate.Employee(sql.FieldNotNull(FieldOccupationID))
 }
 
 // HasCreator applies the HasEdge predicate on the "creator" edge.
@@ -351,7 +396,7 @@ func HasAdmin() predicate.Employee {
 	return predicate.Employee(func(s *sql.Selector) {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(Table, FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, true, AdminTable, AdminColumn),
+			sqlgraph.Edge(sqlgraph.O2O, true, AdminTable, AdminColumn),
 		)
 		sqlgraph.HasNeighbors(s, step)
 	})
@@ -361,6 +406,29 @@ func HasAdmin() predicate.Employee {
 func HasAdminWith(preds ...predicate.Admin) predicate.Employee {
 	return predicate.Employee(func(s *sql.Selector) {
 		step := newAdminStep()
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
+}
+
+// HasOccupation applies the HasEdge predicate on the "occupation" edge.
+func HasOccupation() predicate.Employee {
+	return predicate.Employee(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, OccupationTable, OccupationColumn),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasOccupationWith applies the HasEdge predicate on the "occupation" edge with a given conditions (other predicates).
+func HasOccupationWith(preds ...predicate.Occupation) predicate.Employee {
+	return predicate.Employee(func(s *sql.Selector) {
+		step := newOccupationStep()
 		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
 			for _, p := range preds {
 				p(s)
@@ -384,98 +452,6 @@ func HasDepartment() predicate.Employee {
 func HasDepartmentWith(preds ...predicate.Department) predicate.Employee {
 	return predicate.Employee(func(s *sql.Selector) {
 		step := newDepartmentStep()
-		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
-			for _, p := range preds {
-				p(s)
-			}
-		})
-	})
-}
-
-// HasOccupations applies the HasEdge predicate on the "occupations" edge.
-func HasOccupations() predicate.Employee {
-	return predicate.Employee(func(s *sql.Selector) {
-		step := sqlgraph.NewStep(
-			sqlgraph.From(Table, FieldID),
-			sqlgraph.Edge(sqlgraph.M2M, true, OccupationsTable, OccupationsPrimaryKey...),
-		)
-		sqlgraph.HasNeighbors(s, step)
-	})
-}
-
-// HasOccupationsWith applies the HasEdge predicate on the "occupations" edge with a given conditions (other predicates).
-func HasOccupationsWith(preds ...predicate.Occupation) predicate.Employee {
-	return predicate.Employee(func(s *sql.Selector) {
-		step := newOccupationsStep()
-		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
-			for _, p := range preds {
-				p(s)
-			}
-		})
-	})
-}
-
-// HasIpcEvents applies the HasEdge predicate on the "ipc_events" edge.
-func HasIpcEvents() predicate.Employee {
-	return predicate.Employee(func(s *sql.Selector) {
-		step := sqlgraph.NewStep(
-			sqlgraph.From(Table, FieldID),
-			sqlgraph.Edge(sqlgraph.M2M, true, IpcEventsTable, IpcEventsPrimaryKey...),
-		)
-		sqlgraph.HasNeighbors(s, step)
-	})
-}
-
-// HasIpcEventsWith applies the HasEdge predicate on the "ipc_events" edge with a given conditions (other predicates).
-func HasIpcEventsWith(preds ...predicate.IPCEvent) predicate.Employee {
-	return predicate.Employee(func(s *sql.Selector) {
-		step := newIpcEventsStep()
-		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
-			for _, p := range preds {
-				p(s)
-			}
-		})
-	})
-}
-
-// HasRiskReporter applies the HasEdge predicate on the "risk_reporter" edge.
-func HasRiskReporter() predicate.Employee {
-	return predicate.Employee(func(s *sql.Selector) {
-		step := sqlgraph.NewStep(
-			sqlgraph.From(Table, FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, false, RiskReporterTable, RiskReporterColumn),
-		)
-		sqlgraph.HasNeighbors(s, step)
-	})
-}
-
-// HasRiskReporterWith applies the HasEdge predicate on the "risk_reporter" edge with a given conditions (other predicates).
-func HasRiskReporterWith(preds ...predicate.Risk) predicate.Employee {
-	return predicate.Employee(func(s *sql.Selector) {
-		step := newRiskReporterStep()
-		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
-			for _, p := range preds {
-				p(s)
-			}
-		})
-	})
-}
-
-// HasRiskMaintainer applies the HasEdge predicate on the "risk_maintainer" edge.
-func HasRiskMaintainer() predicate.Employee {
-	return predicate.Employee(func(s *sql.Selector) {
-		step := sqlgraph.NewStep(
-			sqlgraph.From(Table, FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, false, RiskMaintainerTable, RiskMaintainerColumn),
-		)
-		sqlgraph.HasNeighbors(s, step)
-	})
-}
-
-// HasRiskMaintainerWith applies the HasEdge predicate on the "risk_maintainer" edge with a given conditions (other predicates).
-func HasRiskMaintainerWith(preds ...predicate.Risk) predicate.Employee {
-	return predicate.Employee(func(s *sql.Selector) {
-		step := newRiskMaintainerStep()
 		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
 			for _, p := range preds {
 				p(s)

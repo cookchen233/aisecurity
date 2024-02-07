@@ -26,16 +26,15 @@ func (Video) Fields() []ent.Field {
 		field.Int64("size").Comment("文件大小").Default(0),
 		field.String("duration").Comment("视频时长").Optional(),
 		field.Time("uploaded_at").Comment("上传时间").Optional().Nillable(),
-		field.Time("uploaded_at2").Comment("上传时间").Optional().Nillable(),
 	}
 }
 
 // Edges of the Video.
 func (Video) Edges() []ent.Edge {
 	return []ent.Edge{
-		edge.From("creator", Admin.Type).Ref("video_creator").Field("created_by").Immutable().Unique().Required(),
-		edge.From("updater", Admin.Type).Ref("video_updater").Field("updated_by").Required().Unique(),
+		edge.From("creator", Admin.Type).Ref("video_creator").Field("creator_id").Immutable().Unique().Required(),
+		edge.From("updater", Admin.Type).Ref("video_updater").Field("updater_id").Required().Unique(),
 
-		edge.To("ipc_event_video", IPCEvent.Type),
+		edge.To("event", Event.Type),
 	}
 }

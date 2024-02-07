@@ -332,12 +332,12 @@ func (elq *EventLevelQuery) WithUpdater(opts ...func(*AdminQuery)) *EventLevelQu
 // Example:
 //
 //	var v []struct {
-//		CreatedAt time.Time `json:"created_at"`
+//		CreateTime time.Time `json:"create_time"`
 //		Count int `json:"count,omitempty"`
 //	}
 //
 //	client.EventLevel.Query().
-//		GroupBy(eventlevel.FieldCreatedAt).
+//		GroupBy(eventlevel.FieldCreateTime).
 //		Aggregate(dao.Count()).
 //		Scan(ctx, &v)
 func (elq *EventLevelQuery) GroupBy(field string, fields ...string) *EventLevelGroupBy {
@@ -355,11 +355,11 @@ func (elq *EventLevelQuery) GroupBy(field string, fields ...string) *EventLevelG
 // Example:
 //
 //	var v []struct {
-//		CreatedAt time.Time `json:"created_at"`
+//		CreateTime time.Time `json:"create_time"`
 //	}
 //
 //	client.EventLevel.Query().
-//		Select(eventlevel.FieldCreatedAt).
+//		Select(eventlevel.FieldCreateTime).
 //		Scan(ctx, &v)
 func (elq *EventLevelQuery) Select(fields ...string) *EventLevelSelect {
 	elq.ctx.Fields = append(elq.ctx.Fields, fields...)
@@ -446,7 +446,7 @@ func (elq *EventLevelQuery) loadCreator(ctx context.Context, query *AdminQuery, 
 	ids := make([]int, 0, len(nodes))
 	nodeids := make(map[int][]*EventLevel)
 	for i := range nodes {
-		fk := nodes[i].CreatedBy
+		fk := nodes[i].CreatorID
 		if _, ok := nodeids[fk]; !ok {
 			ids = append(ids, fk)
 		}
@@ -463,7 +463,7 @@ func (elq *EventLevelQuery) loadCreator(ctx context.Context, query *AdminQuery, 
 	for _, n := range neighbors {
 		nodes, ok := nodeids[n.ID]
 		if !ok {
-			return fmt.Errorf(`unexpected foreign-key "created_by" returned %v`, n.ID)
+			return fmt.Errorf(`unexpected foreign-key "creator_id" returned %v`, n.ID)
 		}
 		for i := range nodes {
 			assign(nodes[i], n)
@@ -475,7 +475,7 @@ func (elq *EventLevelQuery) loadUpdater(ctx context.Context, query *AdminQuery, 
 	ids := make([]int, 0, len(nodes))
 	nodeids := make(map[int][]*EventLevel)
 	for i := range nodes {
-		fk := nodes[i].UpdatedBy
+		fk := nodes[i].UpdaterID
 		if _, ok := nodeids[fk]; !ok {
 			ids = append(ids, fk)
 		}
@@ -492,7 +492,7 @@ func (elq *EventLevelQuery) loadUpdater(ctx context.Context, query *AdminQuery, 
 	for _, n := range neighbors {
 		nodes, ok := nodeids[n.ID]
 		if !ok {
-			return fmt.Errorf(`unexpected foreign-key "updated_by" returned %v`, n.ID)
+			return fmt.Errorf(`unexpected foreign-key "updater_id" returned %v`, n.ID)
 		}
 		for i := range nodes {
 			assign(nodes[i], n)
@@ -527,10 +527,10 @@ func (elq *EventLevelQuery) querySpec() *sqlgraph.QuerySpec {
 			}
 		}
 		if elq.withCreator != nil {
-			_spec.Node.AddColumnOnce(eventlevel.FieldCreatedBy)
+			_spec.Node.AddColumnOnce(eventlevel.FieldCreatorID)
 		}
 		if elq.withUpdater != nil {
-			_spec.Node.AddColumnOnce(eventlevel.FieldUpdatedBy)
+			_spec.Node.AddColumnOnce(eventlevel.FieldUpdaterID)
 		}
 	}
 	if ps := elq.predicates; len(ps) > 0 {

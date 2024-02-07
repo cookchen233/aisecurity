@@ -28,9 +28,10 @@ func (RiskCategory) Fields() []ent.Field {
 // Edges of the RiskCategory.
 func (RiskCategory) Edges() []ent.Edge {
 	return []ent.Edge{
-		edge.From("creator", Admin.Type).Ref("risk_category_creator").Field("created_by").Immutable().Unique().Required(),
-		edge.From("updater", Admin.Type).Ref("risk_category_updater").Field("updated_by").Required().Unique(),
+		edge.From("creator", Admin.Type).Ref("risk_category_creator").Field("creator_id").Immutable().Unique().Required(),
+		edge.From("updater", Admin.Type).Ref("risk_category_updater").Field("updater_id").Required().Unique(),
 
 		edge.To("risk", Risk.Type),
+		edge.To("sweep", Sweep.Type),
 	}
 }

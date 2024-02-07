@@ -3,6 +3,7 @@
 package admin
 
 import (
+	"aisecurity/enums"
 	"time"
 
 	"entgo.io/ent"
@@ -15,16 +16,16 @@ const (
 	Label = "admin"
 	// FieldID holds the string denoting the id field in the database.
 	FieldID = "id"
-	// FieldCreatedAt holds the string denoting the created_at field in the database.
-	FieldCreatedAt = "created_at"
-	// FieldCreatedBy holds the string denoting the created_by field in the database.
-	FieldCreatedBy = "created_by"
-	// FieldDeletedAt holds the string denoting the deleted_at field in the database.
-	FieldDeletedAt = "deleted_at"
-	// FieldUpdatedBy holds the string denoting the updated_by field in the database.
-	FieldUpdatedBy = "updated_by"
-	// FieldUpdatedAt holds the string denoting the updated_at field in the database.
-	FieldUpdatedAt = "updated_at"
+	// FieldCreateTime holds the string denoting the create_time field in the database.
+	FieldCreateTime = "create_time"
+	// FieldCreatorID holds the string denoting the creator_id field in the database.
+	FieldCreatorID = "creator_id"
+	// FieldDeleteTime holds the string denoting the delete_time field in the database.
+	FieldDeleteTime = "delete_time"
+	// FieldUpdaterID holds the string denoting the updater_id field in the database.
+	FieldUpdaterID = "updater_id"
+	// FieldUpdateTime holds the string denoting the update_time field in the database.
+	FieldUpdateTime = "update_time"
 	// FieldUsername holds the string denoting the username field in the database.
 	FieldUsername = "username"
 	// FieldPassword holds the string denoting the password field in the database.
@@ -33,26 +34,32 @@ const (
 	FieldNickname = "nickname"
 	// FieldRealName holds the string denoting the real_name field in the database.
 	FieldRealName = "real_name"
+	// FieldMobile holds the string denoting the mobile field in the database.
+	FieldMobile = "mobile"
 	// FieldAvatar holds the string denoting the avatar field in the database.
 	FieldAvatar = "avatar"
+	// FieldAdminStatus holds the string denoting the admin_status field in the database.
+	FieldAdminStatus = "admin_status"
 	// EdgeCreator holds the string denoting the creator edge name in mutations.
 	EdgeCreator = "creator"
 	// EdgeUpdater holds the string denoting the updater edge name in mutations.
 	EdgeUpdater = "updater"
-	// EdgeAdminRoles holds the string denoting the admin_roles edge name in mutations.
-	EdgeAdminRoles = "admin_roles"
+	// EdgePermissions holds the string denoting the permissions edge name in mutations.
+	EdgePermissions = "permissions"
 	// EdgeAdminCreator holds the string denoting the admin_creator edge name in mutations.
 	EdgeAdminCreator = "admin_creator"
 	// EdgeAdminUpdater holds the string denoting the admin_updater edge name in mutations.
 	EdgeAdminUpdater = "admin_updater"
-	// EdgeAdminRoleCreator holds the string denoting the admin_role_creator edge name in mutations.
-	EdgeAdminRoleCreator = "admin_role_creator"
-	// EdgeAdminRoleUpdater holds the string denoting the admin_role_updater edge name in mutations.
-	EdgeAdminRoleUpdater = "admin_role_updater"
+	// EdgePermissionCreator holds the string denoting the permission_creator edge name in mutations.
+	EdgePermissionCreator = "permission_creator"
+	// EdgePermissionUpdater holds the string denoting the permission_updater edge name in mutations.
+	EdgePermissionUpdater = "permission_updater"
 	// EdgeRiskCreator holds the string denoting the risk_creator edge name in mutations.
 	EdgeRiskCreator = "risk_creator"
 	// EdgeRiskUpdater holds the string denoting the risk_updater edge name in mutations.
 	EdgeRiskUpdater = "risk_updater"
+	// EdgeRiskMaintainer holds the string denoting the risk_maintainer edge name in mutations.
+	EdgeRiskMaintainer = "risk_maintainer"
 	// EdgeRiskLocationCreator holds the string denoting the risk_location_creator edge name in mutations.
 	EdgeRiskLocationCreator = "risk_location_creator"
 	// EdgeRiskLocationUpdater holds the string denoting the risk_location_updater edge name in mutations.
@@ -75,10 +82,10 @@ const (
 	EdgeOccupationCreator = "occupation_creator"
 	// EdgeOccupationUpdater holds the string denoting the occupation_updater edge name in mutations.
 	EdgeOccupationUpdater = "occupation_updater"
-	// EdgeIpcEventCreator holds the string denoting the ipc_event_creator edge name in mutations.
-	EdgeIpcEventCreator = "ipc_event_creator"
-	// EdgeIpcEventUpdater holds the string denoting the ipc_event_updater edge name in mutations.
-	EdgeIpcEventUpdater = "ipc_event_updater"
+	// EdgeEventCreator holds the string denoting the event_creator edge name in mutations.
+	EdgeEventCreator = "event_creator"
+	// EdgeEventUpdater holds the string denoting the event_updater edge name in mutations.
+	EdgeEventUpdater = "event_updater"
 	// EdgeVideoCreator holds the string denoting the video_creator edge name in mutations.
 	EdgeVideoCreator = "video_creator"
 	// EdgeVideoUpdater holds the string denoting the video_updater edge name in mutations.
@@ -99,113 +106,152 @@ const (
 	EdgeEventLevelCreator = "event_level_creator"
 	// EdgeEventLevelUpdater holds the string denoting the event_level_updater edge name in mutations.
 	EdgeEventLevelUpdater = "event_level_updater"
+	// EdgeFixingCreator holds the string denoting the fixing_creator edge name in mutations.
+	EdgeFixingCreator = "fixing_creator"
+	// EdgeFixingUpdater holds the string denoting the fixing_updater edge name in mutations.
+	EdgeFixingUpdater = "fixing_updater"
+	// EdgeFixer holds the string denoting the fixer edge name in mutations.
+	EdgeFixer = "fixer"
+	// EdgeEventLogCreator holds the string denoting the event_log_creator edge name in mutations.
+	EdgeEventLogCreator = "event_log_creator"
+	// EdgeEventLogUpdater holds the string denoting the event_log_updater edge name in mutations.
+	EdgeEventLogUpdater = "event_log_updater"
+	// EdgeEventLogActor holds the string denoting the event_log_actor edge name in mutations.
+	EdgeEventLogActor = "event_log_actor"
+	// EdgeEventLogActor2 holds the string denoting the event_log_actor2 edge name in mutations.
+	EdgeEventLogActor2 = "event_log_actor2"
+	// EdgeSweepCreator holds the string denoting the sweep_creator edge name in mutations.
+	EdgeSweepCreator = "sweep_creator"
+	// EdgeSweepUpdater holds the string denoting the sweep_updater edge name in mutations.
+	EdgeSweepUpdater = "sweep_updater"
+	// EdgeSweepScheduleCreator holds the string denoting the sweep_schedule_creator edge name in mutations.
+	EdgeSweepScheduleCreator = "sweep_schedule_creator"
+	// EdgeSweepScheduleUpdater holds the string denoting the sweep_schedule_updater edge name in mutations.
+	EdgeSweepScheduleUpdater = "sweep_schedule_updater"
+	// EdgeSweepSchedule holds the string denoting the sweep_schedule edge name in mutations.
+	EdgeSweepSchedule = "sweep_schedule"
+	// EdgeSweepResultCreator holds the string denoting the sweep_result_creator edge name in mutations.
+	EdgeSweepResultCreator = "sweep_result_creator"
+	// EdgeSweepResultUpdater holds the string denoting the sweep_result_updater edge name in mutations.
+	EdgeSweepResultUpdater = "sweep_result_updater"
+	// EdgeSweepResultDetailsCreator holds the string denoting the sweep_result_details_creator edge name in mutations.
+	EdgeSweepResultDetailsCreator = "sweep_result_details_creator"
+	// EdgeSweepResultDetailsUpdater holds the string denoting the sweep_result_details_updater edge name in mutations.
+	EdgeSweepResultDetailsUpdater = "sweep_result_details_updater"
 	// Table holds the table name of the admin in the database.
 	Table = "admins"
 	// CreatorTable is the table that holds the creator relation/edge.
 	CreatorTable = "admins"
 	// CreatorColumn is the table column denoting the creator relation/edge.
-	CreatorColumn = "created_by"
+	CreatorColumn = "creator_id"
 	// UpdaterTable is the table that holds the updater relation/edge.
 	UpdaterTable = "admins"
 	// UpdaterColumn is the table column denoting the updater relation/edge.
-	UpdaterColumn = "updated_by"
-	// AdminRolesTable is the table that holds the admin_roles relation/edge. The primary key declared below.
-	AdminRolesTable = "admin_role_admins"
-	// AdminRolesInverseTable is the table name for the AdminRole entity.
-	// It exists in this package in order to avoid circular dependency with the "adminrole" package.
-	AdminRolesInverseTable = "admin_roles"
+	UpdaterColumn = "updater_id"
+	// PermissionsTable is the table that holds the permissions relation/edge. The primary key declared below.
+	PermissionsTable = "permission_admin"
+	// PermissionsInverseTable is the table name for the Permission entity.
+	// It exists in this package in order to avoid circular dependency with the "permission" package.
+	PermissionsInverseTable = "permissions"
 	// AdminCreatorTable is the table that holds the admin_creator relation/edge.
 	AdminCreatorTable = "admins"
 	// AdminCreatorColumn is the table column denoting the admin_creator relation/edge.
-	AdminCreatorColumn = "created_by"
+	AdminCreatorColumn = "creator_id"
 	// AdminUpdaterTable is the table that holds the admin_updater relation/edge.
 	AdminUpdaterTable = "admins"
 	// AdminUpdaterColumn is the table column denoting the admin_updater relation/edge.
-	AdminUpdaterColumn = "updated_by"
-	// AdminRoleCreatorTable is the table that holds the admin_role_creator relation/edge.
-	AdminRoleCreatorTable = "admin_roles"
-	// AdminRoleCreatorInverseTable is the table name for the AdminRole entity.
-	// It exists in this package in order to avoid circular dependency with the "adminrole" package.
-	AdminRoleCreatorInverseTable = "admin_roles"
-	// AdminRoleCreatorColumn is the table column denoting the admin_role_creator relation/edge.
-	AdminRoleCreatorColumn = "created_by"
-	// AdminRoleUpdaterTable is the table that holds the admin_role_updater relation/edge.
-	AdminRoleUpdaterTable = "admin_roles"
-	// AdminRoleUpdaterInverseTable is the table name for the AdminRole entity.
-	// It exists in this package in order to avoid circular dependency with the "adminrole" package.
-	AdminRoleUpdaterInverseTable = "admin_roles"
-	// AdminRoleUpdaterColumn is the table column denoting the admin_role_updater relation/edge.
-	AdminRoleUpdaterColumn = "updated_by"
+	AdminUpdaterColumn = "updater_id"
+	// PermissionCreatorTable is the table that holds the permission_creator relation/edge.
+	PermissionCreatorTable = "permissions"
+	// PermissionCreatorInverseTable is the table name for the Permission entity.
+	// It exists in this package in order to avoid circular dependency with the "permission" package.
+	PermissionCreatorInverseTable = "permissions"
+	// PermissionCreatorColumn is the table column denoting the permission_creator relation/edge.
+	PermissionCreatorColumn = "creator_id"
+	// PermissionUpdaterTable is the table that holds the permission_updater relation/edge.
+	PermissionUpdaterTable = "permissions"
+	// PermissionUpdaterInverseTable is the table name for the Permission entity.
+	// It exists in this package in order to avoid circular dependency with the "permission" package.
+	PermissionUpdaterInverseTable = "permissions"
+	// PermissionUpdaterColumn is the table column denoting the permission_updater relation/edge.
+	PermissionUpdaterColumn = "updater_id"
 	// RiskCreatorTable is the table that holds the risk_creator relation/edge.
 	RiskCreatorTable = "risks"
 	// RiskCreatorInverseTable is the table name for the Risk entity.
 	// It exists in this package in order to avoid circular dependency with the "risk" package.
 	RiskCreatorInverseTable = "risks"
 	// RiskCreatorColumn is the table column denoting the risk_creator relation/edge.
-	RiskCreatorColumn = "created_by"
+	RiskCreatorColumn = "creator_id"
 	// RiskUpdaterTable is the table that holds the risk_updater relation/edge.
 	RiskUpdaterTable = "risks"
 	// RiskUpdaterInverseTable is the table name for the Risk entity.
 	// It exists in this package in order to avoid circular dependency with the "risk" package.
 	RiskUpdaterInverseTable = "risks"
 	// RiskUpdaterColumn is the table column denoting the risk_updater relation/edge.
-	RiskUpdaterColumn = "updated_by"
+	RiskUpdaterColumn = "updater_id"
+	// RiskMaintainerTable is the table that holds the risk_maintainer relation/edge.
+	RiskMaintainerTable = "risks"
+	// RiskMaintainerInverseTable is the table name for the Risk entity.
+	// It exists in this package in order to avoid circular dependency with the "risk" package.
+	RiskMaintainerInverseTable = "risks"
+	// RiskMaintainerColumn is the table column denoting the risk_maintainer relation/edge.
+	RiskMaintainerColumn = "maintainer_id"
 	// RiskLocationCreatorTable is the table that holds the risk_location_creator relation/edge.
 	RiskLocationCreatorTable = "risk_locations"
 	// RiskLocationCreatorInverseTable is the table name for the RiskLocation entity.
 	// It exists in this package in order to avoid circular dependency with the "risklocation" package.
 	RiskLocationCreatorInverseTable = "risk_locations"
 	// RiskLocationCreatorColumn is the table column denoting the risk_location_creator relation/edge.
-	RiskLocationCreatorColumn = "created_by"
+	RiskLocationCreatorColumn = "creator_id"
 	// RiskLocationUpdaterTable is the table that holds the risk_location_updater relation/edge.
 	RiskLocationUpdaterTable = "risk_locations"
 	// RiskLocationUpdaterInverseTable is the table name for the RiskLocation entity.
 	// It exists in this package in order to avoid circular dependency with the "risklocation" package.
 	RiskLocationUpdaterInverseTable = "risk_locations"
 	// RiskLocationUpdaterColumn is the table column denoting the risk_location_updater relation/edge.
-	RiskLocationUpdaterColumn = "updated_by"
+	RiskLocationUpdaterColumn = "updater_id"
 	// RiskCategoryCreatorTable is the table that holds the risk_category_creator relation/edge.
 	RiskCategoryCreatorTable = "risk_categories"
 	// RiskCategoryCreatorInverseTable is the table name for the RiskCategory entity.
 	// It exists in this package in order to avoid circular dependency with the "riskcategory" package.
 	RiskCategoryCreatorInverseTable = "risk_categories"
 	// RiskCategoryCreatorColumn is the table column denoting the risk_category_creator relation/edge.
-	RiskCategoryCreatorColumn = "created_by"
+	RiskCategoryCreatorColumn = "creator_id"
 	// RiskCategoryUpdaterTable is the table that holds the risk_category_updater relation/edge.
 	RiskCategoryUpdaterTable = "risk_categories"
 	// RiskCategoryUpdaterInverseTable is the table name for the RiskCategory entity.
 	// It exists in this package in order to avoid circular dependency with the "riskcategory" package.
 	RiskCategoryUpdaterInverseTable = "risk_categories"
 	// RiskCategoryUpdaterColumn is the table column denoting the risk_category_updater relation/edge.
-	RiskCategoryUpdaterColumn = "updated_by"
+	RiskCategoryUpdaterColumn = "updater_id"
 	// DepartmentCreatorTable is the table that holds the department_creator relation/edge.
 	DepartmentCreatorTable = "departments"
 	// DepartmentCreatorInverseTable is the table name for the Department entity.
 	// It exists in this package in order to avoid circular dependency with the "department" package.
 	DepartmentCreatorInverseTable = "departments"
 	// DepartmentCreatorColumn is the table column denoting the department_creator relation/edge.
-	DepartmentCreatorColumn = "created_by"
+	DepartmentCreatorColumn = "creator_id"
 	// DepartmentUpdaterTable is the table that holds the department_updater relation/edge.
 	DepartmentUpdaterTable = "departments"
 	// DepartmentUpdaterInverseTable is the table name for the Department entity.
 	// It exists in this package in order to avoid circular dependency with the "department" package.
 	DepartmentUpdaterInverseTable = "departments"
 	// DepartmentUpdaterColumn is the table column denoting the department_updater relation/edge.
-	DepartmentUpdaterColumn = "updated_by"
+	DepartmentUpdaterColumn = "updater_id"
 	// EmployeeCreatorTable is the table that holds the employee_creator relation/edge.
 	EmployeeCreatorTable = "employees"
 	// EmployeeCreatorInverseTable is the table name for the Employee entity.
 	// It exists in this package in order to avoid circular dependency with the "employee" package.
 	EmployeeCreatorInverseTable = "employees"
 	// EmployeeCreatorColumn is the table column denoting the employee_creator relation/edge.
-	EmployeeCreatorColumn = "created_by"
+	EmployeeCreatorColumn = "creator_id"
 	// EmployeeUpdaterTable is the table that holds the employee_updater relation/edge.
 	EmployeeUpdaterTable = "employees"
 	// EmployeeUpdaterInverseTable is the table name for the Employee entity.
 	// It exists in this package in order to avoid circular dependency with the "employee" package.
 	EmployeeUpdaterInverseTable = "employees"
 	// EmployeeUpdaterColumn is the table column denoting the employee_updater relation/edge.
-	EmployeeUpdaterColumn = "updated_by"
+	EmployeeUpdaterColumn = "updater_id"
 	// EmployeeTable is the table that holds the employee relation/edge.
 	EmployeeTable = "employees"
 	// EmployeeInverseTable is the table name for the Employee entity.
@@ -219,119 +265,234 @@ const (
 	// It exists in this package in order to avoid circular dependency with the "occupation" package.
 	OccupationCreatorInverseTable = "occupations"
 	// OccupationCreatorColumn is the table column denoting the occupation_creator relation/edge.
-	OccupationCreatorColumn = "created_by"
+	OccupationCreatorColumn = "creator_id"
 	// OccupationUpdaterTable is the table that holds the occupation_updater relation/edge.
 	OccupationUpdaterTable = "occupations"
 	// OccupationUpdaterInverseTable is the table name for the Occupation entity.
 	// It exists in this package in order to avoid circular dependency with the "occupation" package.
 	OccupationUpdaterInverseTable = "occupations"
 	// OccupationUpdaterColumn is the table column denoting the occupation_updater relation/edge.
-	OccupationUpdaterColumn = "updated_by"
-	// IpcEventCreatorTable is the table that holds the ipc_event_creator relation/edge.
-	IpcEventCreatorTable = "ipc_events"
-	// IpcEventCreatorInverseTable is the table name for the IPCEvent entity.
-	// It exists in this package in order to avoid circular dependency with the "ipcevent" package.
-	IpcEventCreatorInverseTable = "ipc_events"
-	// IpcEventCreatorColumn is the table column denoting the ipc_event_creator relation/edge.
-	IpcEventCreatorColumn = "created_by"
-	// IpcEventUpdaterTable is the table that holds the ipc_event_updater relation/edge.
-	IpcEventUpdaterTable = "ipc_events"
-	// IpcEventUpdaterInverseTable is the table name for the IPCEvent entity.
-	// It exists in this package in order to avoid circular dependency with the "ipcevent" package.
-	IpcEventUpdaterInverseTable = "ipc_events"
-	// IpcEventUpdaterColumn is the table column denoting the ipc_event_updater relation/edge.
-	IpcEventUpdaterColumn = "updated_by"
+	OccupationUpdaterColumn = "updater_id"
+	// EventCreatorTable is the table that holds the event_creator relation/edge.
+	EventCreatorTable = "events"
+	// EventCreatorInverseTable is the table name for the Event entity.
+	// It exists in this package in order to avoid circular dependency with the "event" package.
+	EventCreatorInverseTable = "events"
+	// EventCreatorColumn is the table column denoting the event_creator relation/edge.
+	EventCreatorColumn = "creator_id"
+	// EventUpdaterTable is the table that holds the event_updater relation/edge.
+	EventUpdaterTable = "events"
+	// EventUpdaterInverseTable is the table name for the Event entity.
+	// It exists in this package in order to avoid circular dependency with the "event" package.
+	EventUpdaterInverseTable = "events"
+	// EventUpdaterColumn is the table column denoting the event_updater relation/edge.
+	EventUpdaterColumn = "updater_id"
 	// VideoCreatorTable is the table that holds the video_creator relation/edge.
 	VideoCreatorTable = "videos"
 	// VideoCreatorInverseTable is the table name for the Video entity.
 	// It exists in this package in order to avoid circular dependency with the "video" package.
 	VideoCreatorInverseTable = "videos"
 	// VideoCreatorColumn is the table column denoting the video_creator relation/edge.
-	VideoCreatorColumn = "created_by"
+	VideoCreatorColumn = "creator_id"
 	// VideoUpdaterTable is the table that holds the video_updater relation/edge.
 	VideoUpdaterTable = "videos"
 	// VideoUpdaterInverseTable is the table name for the Video entity.
 	// It exists in this package in order to avoid circular dependency with the "video" package.
 	VideoUpdaterInverseTable = "videos"
 	// VideoUpdaterColumn is the table column denoting the video_updater relation/edge.
-	VideoUpdaterColumn = "updated_by"
+	VideoUpdaterColumn = "updater_id"
 	// AreaCreatorTable is the table that holds the area_creator relation/edge.
 	AreaCreatorTable = "areas"
 	// AreaCreatorInverseTable is the table name for the Area entity.
 	// It exists in this package in order to avoid circular dependency with the "area" package.
 	AreaCreatorInverseTable = "areas"
 	// AreaCreatorColumn is the table column denoting the area_creator relation/edge.
-	AreaCreatorColumn = "created_by"
+	AreaCreatorColumn = "creator_id"
 	// AreaUpdaterTable is the table that holds the area_updater relation/edge.
 	AreaUpdaterTable = "areas"
 	// AreaUpdaterInverseTable is the table name for the Area entity.
 	// It exists in this package in order to avoid circular dependency with the "area" package.
 	AreaUpdaterInverseTable = "areas"
 	// AreaUpdaterColumn is the table column denoting the area_updater relation/edge.
-	AreaUpdaterColumn = "updated_by"
+	AreaUpdaterColumn = "updater_id"
 	// DeviceCreatorTable is the table that holds the device_creator relation/edge.
 	DeviceCreatorTable = "devices"
 	// DeviceCreatorInverseTable is the table name for the Device entity.
 	// It exists in this package in order to avoid circular dependency with the "device" package.
 	DeviceCreatorInverseTable = "devices"
 	// DeviceCreatorColumn is the table column denoting the device_creator relation/edge.
-	DeviceCreatorColumn = "created_by"
+	DeviceCreatorColumn = "creator_id"
 	// DeviceUpdaterTable is the table that holds the device_updater relation/edge.
 	DeviceUpdaterTable = "devices"
 	// DeviceUpdaterInverseTable is the table name for the Device entity.
 	// It exists in this package in order to avoid circular dependency with the "device" package.
 	DeviceUpdaterInverseTable = "devices"
 	// DeviceUpdaterColumn is the table column denoting the device_updater relation/edge.
-	DeviceUpdaterColumn = "updated_by"
+	DeviceUpdaterColumn = "updater_id"
 	// DeviceInstallationCreatorTable is the table that holds the device_installation_creator relation/edge.
 	DeviceInstallationCreatorTable = "device_installations"
 	// DeviceInstallationCreatorInverseTable is the table name for the DeviceInstallation entity.
 	// It exists in this package in order to avoid circular dependency with the "deviceinstallation" package.
 	DeviceInstallationCreatorInverseTable = "device_installations"
 	// DeviceInstallationCreatorColumn is the table column denoting the device_installation_creator relation/edge.
-	DeviceInstallationCreatorColumn = "created_by"
+	DeviceInstallationCreatorColumn = "creator_id"
 	// DeviceInstallationUpdaterTable is the table that holds the device_installation_updater relation/edge.
 	DeviceInstallationUpdaterTable = "device_installations"
 	// DeviceInstallationUpdaterInverseTable is the table name for the DeviceInstallation entity.
 	// It exists in this package in order to avoid circular dependency with the "deviceinstallation" package.
 	DeviceInstallationUpdaterInverseTable = "device_installations"
 	// DeviceInstallationUpdaterColumn is the table column denoting the device_installation_updater relation/edge.
-	DeviceInstallationUpdaterColumn = "updated_by"
+	DeviceInstallationUpdaterColumn = "updater_id"
 	// EventLevelCreatorTable is the table that holds the event_level_creator relation/edge.
 	EventLevelCreatorTable = "event_levels"
 	// EventLevelCreatorInverseTable is the table name for the EventLevel entity.
 	// It exists in this package in order to avoid circular dependency with the "eventlevel" package.
 	EventLevelCreatorInverseTable = "event_levels"
 	// EventLevelCreatorColumn is the table column denoting the event_level_creator relation/edge.
-	EventLevelCreatorColumn = "created_by"
+	EventLevelCreatorColumn = "creator_id"
 	// EventLevelUpdaterTable is the table that holds the event_level_updater relation/edge.
 	EventLevelUpdaterTable = "event_levels"
 	// EventLevelUpdaterInverseTable is the table name for the EventLevel entity.
 	// It exists in this package in order to avoid circular dependency with the "eventlevel" package.
 	EventLevelUpdaterInverseTable = "event_levels"
 	// EventLevelUpdaterColumn is the table column denoting the event_level_updater relation/edge.
-	EventLevelUpdaterColumn = "updated_by"
+	EventLevelUpdaterColumn = "updater_id"
+	// FixingCreatorTable is the table that holds the fixing_creator relation/edge.
+	FixingCreatorTable = "fixings"
+	// FixingCreatorInverseTable is the table name for the Fixing entity.
+	// It exists in this package in order to avoid circular dependency with the "fixing" package.
+	FixingCreatorInverseTable = "fixings"
+	// FixingCreatorColumn is the table column denoting the fixing_creator relation/edge.
+	FixingCreatorColumn = "creator_id"
+	// FixingUpdaterTable is the table that holds the fixing_updater relation/edge.
+	FixingUpdaterTable = "fixings"
+	// FixingUpdaterInverseTable is the table name for the Fixing entity.
+	// It exists in this package in order to avoid circular dependency with the "fixing" package.
+	FixingUpdaterInverseTable = "fixings"
+	// FixingUpdaterColumn is the table column denoting the fixing_updater relation/edge.
+	FixingUpdaterColumn = "updater_id"
+	// FixerTable is the table that holds the fixer relation/edge.
+	FixerTable = "fixings"
+	// FixerInverseTable is the table name for the Fixing entity.
+	// It exists in this package in order to avoid circular dependency with the "fixing" package.
+	FixerInverseTable = "fixings"
+	// FixerColumn is the table column denoting the fixer relation/edge.
+	FixerColumn = "fixer_id"
+	// EventLogCreatorTable is the table that holds the event_log_creator relation/edge.
+	EventLogCreatorTable = "event_logs"
+	// EventLogCreatorInverseTable is the table name for the EventLog entity.
+	// It exists in this package in order to avoid circular dependency with the "eventlog" package.
+	EventLogCreatorInverseTable = "event_logs"
+	// EventLogCreatorColumn is the table column denoting the event_log_creator relation/edge.
+	EventLogCreatorColumn = "creator_id"
+	// EventLogUpdaterTable is the table that holds the event_log_updater relation/edge.
+	EventLogUpdaterTable = "event_logs"
+	// EventLogUpdaterInverseTable is the table name for the EventLog entity.
+	// It exists in this package in order to avoid circular dependency with the "eventlog" package.
+	EventLogUpdaterInverseTable = "event_logs"
+	// EventLogUpdaterColumn is the table column denoting the event_log_updater relation/edge.
+	EventLogUpdaterColumn = "updater_id"
+	// EventLogActorTable is the table that holds the event_log_actor relation/edge.
+	EventLogActorTable = "event_logs"
+	// EventLogActorInverseTable is the table name for the EventLog entity.
+	// It exists in this package in order to avoid circular dependency with the "eventlog" package.
+	EventLogActorInverseTable = "event_logs"
+	// EventLogActorColumn is the table column denoting the event_log_actor relation/edge.
+	EventLogActorColumn = "actor_id"
+	// EventLogActor2Table is the table that holds the event_log_actor2 relation/edge.
+	EventLogActor2Table = "event_logs"
+	// EventLogActor2InverseTable is the table name for the EventLog entity.
+	// It exists in this package in order to avoid circular dependency with the "eventlog" package.
+	EventLogActor2InverseTable = "event_logs"
+	// EventLogActor2Column is the table column denoting the event_log_actor2 relation/edge.
+	EventLogActor2Column = "actor2_id"
+	// SweepCreatorTable is the table that holds the sweep_creator relation/edge.
+	SweepCreatorTable = "sweeps"
+	// SweepCreatorInverseTable is the table name for the Sweep entity.
+	// It exists in this package in order to avoid circular dependency with the "sweep" package.
+	SweepCreatorInverseTable = "sweeps"
+	// SweepCreatorColumn is the table column denoting the sweep_creator relation/edge.
+	SweepCreatorColumn = "creator_id"
+	// SweepUpdaterTable is the table that holds the sweep_updater relation/edge.
+	SweepUpdaterTable = "sweeps"
+	// SweepUpdaterInverseTable is the table name for the Sweep entity.
+	// It exists in this package in order to avoid circular dependency with the "sweep" package.
+	SweepUpdaterInverseTable = "sweeps"
+	// SweepUpdaterColumn is the table column denoting the sweep_updater relation/edge.
+	SweepUpdaterColumn = "updater_id"
+	// SweepScheduleCreatorTable is the table that holds the sweep_schedule_creator relation/edge.
+	SweepScheduleCreatorTable = "sweep_schedules"
+	// SweepScheduleCreatorInverseTable is the table name for the SweepSchedule entity.
+	// It exists in this package in order to avoid circular dependency with the "sweepschedule" package.
+	SweepScheduleCreatorInverseTable = "sweep_schedules"
+	// SweepScheduleCreatorColumn is the table column denoting the sweep_schedule_creator relation/edge.
+	SweepScheduleCreatorColumn = "creator_id"
+	// SweepScheduleUpdaterTable is the table that holds the sweep_schedule_updater relation/edge.
+	SweepScheduleUpdaterTable = "sweep_schedules"
+	// SweepScheduleUpdaterInverseTable is the table name for the SweepSchedule entity.
+	// It exists in this package in order to avoid circular dependency with the "sweepschedule" package.
+	SweepScheduleUpdaterInverseTable = "sweep_schedules"
+	// SweepScheduleUpdaterColumn is the table column denoting the sweep_schedule_updater relation/edge.
+	SweepScheduleUpdaterColumn = "updater_id"
+	// SweepScheduleTable is the table that holds the sweep_schedule relation/edge. The primary key declared below.
+	SweepScheduleTable = "admin_sweep_schedule"
+	// SweepScheduleInverseTable is the table name for the SweepSchedule entity.
+	// It exists in this package in order to avoid circular dependency with the "sweepschedule" package.
+	SweepScheduleInverseTable = "sweep_schedules"
+	// SweepResultCreatorTable is the table that holds the sweep_result_creator relation/edge.
+	SweepResultCreatorTable = "sweep_results"
+	// SweepResultCreatorInverseTable is the table name for the SweepResult entity.
+	// It exists in this package in order to avoid circular dependency with the "sweepresult" package.
+	SweepResultCreatorInverseTable = "sweep_results"
+	// SweepResultCreatorColumn is the table column denoting the sweep_result_creator relation/edge.
+	SweepResultCreatorColumn = "creator_id"
+	// SweepResultUpdaterTable is the table that holds the sweep_result_updater relation/edge.
+	SweepResultUpdaterTable = "sweep_results"
+	// SweepResultUpdaterInverseTable is the table name for the SweepResult entity.
+	// It exists in this package in order to avoid circular dependency with the "sweepresult" package.
+	SweepResultUpdaterInverseTable = "sweep_results"
+	// SweepResultUpdaterColumn is the table column denoting the sweep_result_updater relation/edge.
+	SweepResultUpdaterColumn = "updater_id"
+	// SweepResultDetailsCreatorTable is the table that holds the sweep_result_details_creator relation/edge.
+	SweepResultDetailsCreatorTable = "sweep_result_details"
+	// SweepResultDetailsCreatorInverseTable is the table name for the SweepResultDetails entity.
+	// It exists in this package in order to avoid circular dependency with the "sweepresultdetails" package.
+	SweepResultDetailsCreatorInverseTable = "sweep_result_details"
+	// SweepResultDetailsCreatorColumn is the table column denoting the sweep_result_details_creator relation/edge.
+	SweepResultDetailsCreatorColumn = "creator_id"
+	// SweepResultDetailsUpdaterTable is the table that holds the sweep_result_details_updater relation/edge.
+	SweepResultDetailsUpdaterTable = "sweep_result_details"
+	// SweepResultDetailsUpdaterInverseTable is the table name for the SweepResultDetails entity.
+	// It exists in this package in order to avoid circular dependency with the "sweepresultdetails" package.
+	SweepResultDetailsUpdaterInverseTable = "sweep_result_details"
+	// SweepResultDetailsUpdaterColumn is the table column denoting the sweep_result_details_updater relation/edge.
+	SweepResultDetailsUpdaterColumn = "updater_id"
 )
 
 // Columns holds all SQL columns for admin fields.
 var Columns = []string{
 	FieldID,
-	FieldCreatedAt,
-	FieldCreatedBy,
-	FieldDeletedAt,
-	FieldUpdatedBy,
-	FieldUpdatedAt,
+	FieldCreateTime,
+	FieldCreatorID,
+	FieldDeleteTime,
+	FieldUpdaterID,
+	FieldUpdateTime,
 	FieldUsername,
 	FieldPassword,
 	FieldNickname,
 	FieldRealName,
+	FieldMobile,
 	FieldAvatar,
+	FieldAdminStatus,
 }
 
 var (
-	// AdminRolesPrimaryKey and AdminRolesColumn2 are the table columns denoting the
-	// primary key for the admin_roles relation (M2M).
-	AdminRolesPrimaryKey = []string{"admin_role_id", "admin_id"}
+	// PermissionsPrimaryKey and PermissionsColumn2 are the table columns denoting the
+	// primary key for the permissions relation (M2M).
+	PermissionsPrimaryKey = []string{"permission_id", "admin_id"}
+	// SweepSchedulePrimaryKey and SweepScheduleColumn2 are the table columns denoting the
+	// primary key for the sweep_schedule relation (M2M).
+	SweepSchedulePrimaryKey = []string{"admin_id", "sweep_schedule_id"}
 )
 
 // ValidColumn reports if the column name is valid (part of the table columns).
@@ -351,16 +512,16 @@ func ValidColumn(column string) bool {
 //	import _ "aisecurity/ent/dao/runtime"
 var (
 	Hooks [1]ent.Hook
-	// DefaultCreatedAt holds the default value on creation for the "created_at" field.
-	DefaultCreatedAt func() time.Time
-	// CreatedByValidator is a validator for the "created_by" field. It is called by the builders before save.
-	CreatedByValidator func(int) error
-	// UpdatedByValidator is a validator for the "updated_by" field. It is called by the builders before save.
-	UpdatedByValidator func(int) error
-	// DefaultUpdatedAt holds the default value on creation for the "updated_at" field.
-	DefaultUpdatedAt func() time.Time
-	// UpdateDefaultUpdatedAt holds the default value on update for the "updated_at" field.
-	UpdateDefaultUpdatedAt func() time.Time
+	// DefaultCreateTime holds the default value on creation for the "create_time" field.
+	DefaultCreateTime func() time.Time
+	// CreatorIDValidator is a validator for the "creator_id" field. It is called by the builders before save.
+	CreatorIDValidator func(int) error
+	// UpdaterIDValidator is a validator for the "updater_id" field. It is called by the builders before save.
+	UpdaterIDValidator func(int) error
+	// DefaultUpdateTime holds the default value on creation for the "update_time" field.
+	DefaultUpdateTime func() time.Time
+	// UpdateDefaultUpdateTime holds the default value on update for the "update_time" field.
+	UpdateDefaultUpdateTime func() time.Time
 	// UsernameValidator is a validator for the "username" field. It is called by the builders before save.
 	UsernameValidator func(string) error
 	// PasswordValidator is a validator for the "password" field. It is called by the builders before save.
@@ -369,8 +530,12 @@ var (
 	NicknameValidator func(string) error
 	// RealNameValidator is a validator for the "real_name" field. It is called by the builders before save.
 	RealNameValidator func(string) error
-	// AvatarValidator is a validator for the "avatar" field. It is called by the builders before save.
-	AvatarValidator func(string) error
+	// MobileValidator is a validator for the "mobile" field. It is called by the builders before save.
+	MobileValidator func(string) error
+	// DefaultAdminStatus holds the default value on creation for the "admin_status" field.
+	DefaultAdminStatus enums.AdminStatus
+	// AdminStatusValidator is a validator for the "admin_status" field. It is called by the builders before save.
+	AdminStatusValidator func(int) error
 )
 
 // OrderOption defines the ordering options for the Admin queries.
@@ -381,29 +546,29 @@ func ByID(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldID, opts...).ToFunc()
 }
 
-// ByCreatedAt orders the results by the created_at field.
-func ByCreatedAt(opts ...sql.OrderTermOption) OrderOption {
-	return sql.OrderByField(FieldCreatedAt, opts...).ToFunc()
+// ByCreateTime orders the results by the create_time field.
+func ByCreateTime(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldCreateTime, opts...).ToFunc()
 }
 
-// ByCreatedBy orders the results by the created_by field.
-func ByCreatedBy(opts ...sql.OrderTermOption) OrderOption {
-	return sql.OrderByField(FieldCreatedBy, opts...).ToFunc()
+// ByCreatorID orders the results by the creator_id field.
+func ByCreatorID(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldCreatorID, opts...).ToFunc()
 }
 
-// ByDeletedAt orders the results by the deleted_at field.
-func ByDeletedAt(opts ...sql.OrderTermOption) OrderOption {
-	return sql.OrderByField(FieldDeletedAt, opts...).ToFunc()
+// ByDeleteTime orders the results by the delete_time field.
+func ByDeleteTime(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldDeleteTime, opts...).ToFunc()
 }
 
-// ByUpdatedBy orders the results by the updated_by field.
-func ByUpdatedBy(opts ...sql.OrderTermOption) OrderOption {
-	return sql.OrderByField(FieldUpdatedBy, opts...).ToFunc()
+// ByUpdaterID orders the results by the updater_id field.
+func ByUpdaterID(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldUpdaterID, opts...).ToFunc()
 }
 
-// ByUpdatedAt orders the results by the updated_at field.
-func ByUpdatedAt(opts ...sql.OrderTermOption) OrderOption {
-	return sql.OrderByField(FieldUpdatedAt, opts...).ToFunc()
+// ByUpdateTime orders the results by the update_time field.
+func ByUpdateTime(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldUpdateTime, opts...).ToFunc()
 }
 
 // ByUsername orders the results by the username field.
@@ -426,9 +591,14 @@ func ByRealName(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldRealName, opts...).ToFunc()
 }
 
-// ByAvatar orders the results by the avatar field.
-func ByAvatar(opts ...sql.OrderTermOption) OrderOption {
-	return sql.OrderByField(FieldAvatar, opts...).ToFunc()
+// ByMobile orders the results by the mobile field.
+func ByMobile(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldMobile, opts...).ToFunc()
+}
+
+// ByAdminStatus orders the results by the admin_status field.
+func ByAdminStatus(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldAdminStatus, opts...).ToFunc()
 }
 
 // ByCreatorField orders the results by creator field.
@@ -445,17 +615,17 @@ func ByUpdaterField(field string, opts ...sql.OrderTermOption) OrderOption {
 	}
 }
 
-// ByAdminRolesCount orders the results by admin_roles count.
-func ByAdminRolesCount(opts ...sql.OrderTermOption) OrderOption {
+// ByPermissionsCount orders the results by permissions count.
+func ByPermissionsCount(opts ...sql.OrderTermOption) OrderOption {
 	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborsCount(s, newAdminRolesStep(), opts...)
+		sqlgraph.OrderByNeighborsCount(s, newPermissionsStep(), opts...)
 	}
 }
 
-// ByAdminRoles orders the results by admin_roles terms.
-func ByAdminRoles(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+// ByPermissions orders the results by permissions terms.
+func ByPermissions(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
 	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborTerms(s, newAdminRolesStep(), append([]sql.OrderTerm{term}, terms...)...)
+		sqlgraph.OrderByNeighborTerms(s, newPermissionsStep(), append([]sql.OrderTerm{term}, terms...)...)
 	}
 }
 
@@ -487,31 +657,31 @@ func ByAdminUpdater(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
 	}
 }
 
-// ByAdminRoleCreatorCount orders the results by admin_role_creator count.
-func ByAdminRoleCreatorCount(opts ...sql.OrderTermOption) OrderOption {
+// ByPermissionCreatorCount orders the results by permission_creator count.
+func ByPermissionCreatorCount(opts ...sql.OrderTermOption) OrderOption {
 	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborsCount(s, newAdminRoleCreatorStep(), opts...)
+		sqlgraph.OrderByNeighborsCount(s, newPermissionCreatorStep(), opts...)
 	}
 }
 
-// ByAdminRoleCreator orders the results by admin_role_creator terms.
-func ByAdminRoleCreator(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+// ByPermissionCreator orders the results by permission_creator terms.
+func ByPermissionCreator(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
 	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborTerms(s, newAdminRoleCreatorStep(), append([]sql.OrderTerm{term}, terms...)...)
+		sqlgraph.OrderByNeighborTerms(s, newPermissionCreatorStep(), append([]sql.OrderTerm{term}, terms...)...)
 	}
 }
 
-// ByAdminRoleUpdaterCount orders the results by admin_role_updater count.
-func ByAdminRoleUpdaterCount(opts ...sql.OrderTermOption) OrderOption {
+// ByPermissionUpdaterCount orders the results by permission_updater count.
+func ByPermissionUpdaterCount(opts ...sql.OrderTermOption) OrderOption {
 	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborsCount(s, newAdminRoleUpdaterStep(), opts...)
+		sqlgraph.OrderByNeighborsCount(s, newPermissionUpdaterStep(), opts...)
 	}
 }
 
-// ByAdminRoleUpdater orders the results by admin_role_updater terms.
-func ByAdminRoleUpdater(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+// ByPermissionUpdater orders the results by permission_updater terms.
+func ByPermissionUpdater(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
 	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborTerms(s, newAdminRoleUpdaterStep(), append([]sql.OrderTerm{term}, terms...)...)
+		sqlgraph.OrderByNeighborTerms(s, newPermissionUpdaterStep(), append([]sql.OrderTerm{term}, terms...)...)
 	}
 }
 
@@ -540,6 +710,20 @@ func ByRiskUpdaterCount(opts ...sql.OrderTermOption) OrderOption {
 func ByRiskUpdater(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
 	return func(s *sql.Selector) {
 		sqlgraph.OrderByNeighborTerms(s, newRiskUpdaterStep(), append([]sql.OrderTerm{term}, terms...)...)
+	}
+}
+
+// ByRiskMaintainerCount orders the results by risk_maintainer count.
+func ByRiskMaintainerCount(opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborsCount(s, newRiskMaintainerStep(), opts...)
+	}
+}
+
+// ByRiskMaintainer orders the results by risk_maintainer terms.
+func ByRiskMaintainer(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newRiskMaintainerStep(), append([]sql.OrderTerm{term}, terms...)...)
 	}
 }
 
@@ -655,17 +839,10 @@ func ByEmployeeUpdater(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
 	}
 }
 
-// ByEmployeeCount orders the results by employee count.
-func ByEmployeeCount(opts ...sql.OrderTermOption) OrderOption {
+// ByEmployeeField orders the results by employee field.
+func ByEmployeeField(field string, opts ...sql.OrderTermOption) OrderOption {
 	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborsCount(s, newEmployeeStep(), opts...)
-	}
-}
-
-// ByEmployee orders the results by employee terms.
-func ByEmployee(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
-	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborTerms(s, newEmployeeStep(), append([]sql.OrderTerm{term}, terms...)...)
+		sqlgraph.OrderByNeighborTerms(s, newEmployeeStep(), sql.OrderByField(field, opts...))
 	}
 }
 
@@ -697,31 +874,31 @@ func ByOccupationUpdater(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption
 	}
 }
 
-// ByIpcEventCreatorCount orders the results by ipc_event_creator count.
-func ByIpcEventCreatorCount(opts ...sql.OrderTermOption) OrderOption {
+// ByEventCreatorCount orders the results by event_creator count.
+func ByEventCreatorCount(opts ...sql.OrderTermOption) OrderOption {
 	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborsCount(s, newIpcEventCreatorStep(), opts...)
+		sqlgraph.OrderByNeighborsCount(s, newEventCreatorStep(), opts...)
 	}
 }
 
-// ByIpcEventCreator orders the results by ipc_event_creator terms.
-func ByIpcEventCreator(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+// ByEventCreator orders the results by event_creator terms.
+func ByEventCreator(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
 	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborTerms(s, newIpcEventCreatorStep(), append([]sql.OrderTerm{term}, terms...)...)
+		sqlgraph.OrderByNeighborTerms(s, newEventCreatorStep(), append([]sql.OrderTerm{term}, terms...)...)
 	}
 }
 
-// ByIpcEventUpdaterCount orders the results by ipc_event_updater count.
-func ByIpcEventUpdaterCount(opts ...sql.OrderTermOption) OrderOption {
+// ByEventUpdaterCount orders the results by event_updater count.
+func ByEventUpdaterCount(opts ...sql.OrderTermOption) OrderOption {
 	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborsCount(s, newIpcEventUpdaterStep(), opts...)
+		sqlgraph.OrderByNeighborsCount(s, newEventUpdaterStep(), opts...)
 	}
 }
 
-// ByIpcEventUpdater orders the results by ipc_event_updater terms.
-func ByIpcEventUpdater(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+// ByEventUpdater orders the results by event_updater terms.
+func ByEventUpdater(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
 	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborTerms(s, newIpcEventUpdaterStep(), append([]sql.OrderTerm{term}, terms...)...)
+		sqlgraph.OrderByNeighborTerms(s, newEventUpdaterStep(), append([]sql.OrderTerm{term}, terms...)...)
 	}
 }
 
@@ -864,6 +1041,230 @@ func ByEventLevelUpdater(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption
 		sqlgraph.OrderByNeighborTerms(s, newEventLevelUpdaterStep(), append([]sql.OrderTerm{term}, terms...)...)
 	}
 }
+
+// ByFixingCreatorCount orders the results by fixing_creator count.
+func ByFixingCreatorCount(opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborsCount(s, newFixingCreatorStep(), opts...)
+	}
+}
+
+// ByFixingCreator orders the results by fixing_creator terms.
+func ByFixingCreator(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newFixingCreatorStep(), append([]sql.OrderTerm{term}, terms...)...)
+	}
+}
+
+// ByFixingUpdaterCount orders the results by fixing_updater count.
+func ByFixingUpdaterCount(opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborsCount(s, newFixingUpdaterStep(), opts...)
+	}
+}
+
+// ByFixingUpdater orders the results by fixing_updater terms.
+func ByFixingUpdater(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newFixingUpdaterStep(), append([]sql.OrderTerm{term}, terms...)...)
+	}
+}
+
+// ByFixerCount orders the results by fixer count.
+func ByFixerCount(opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborsCount(s, newFixerStep(), opts...)
+	}
+}
+
+// ByFixer orders the results by fixer terms.
+func ByFixer(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newFixerStep(), append([]sql.OrderTerm{term}, terms...)...)
+	}
+}
+
+// ByEventLogCreatorCount orders the results by event_log_creator count.
+func ByEventLogCreatorCount(opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborsCount(s, newEventLogCreatorStep(), opts...)
+	}
+}
+
+// ByEventLogCreator orders the results by event_log_creator terms.
+func ByEventLogCreator(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newEventLogCreatorStep(), append([]sql.OrderTerm{term}, terms...)...)
+	}
+}
+
+// ByEventLogUpdaterCount orders the results by event_log_updater count.
+func ByEventLogUpdaterCount(opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborsCount(s, newEventLogUpdaterStep(), opts...)
+	}
+}
+
+// ByEventLogUpdater orders the results by event_log_updater terms.
+func ByEventLogUpdater(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newEventLogUpdaterStep(), append([]sql.OrderTerm{term}, terms...)...)
+	}
+}
+
+// ByEventLogActorCount orders the results by event_log_actor count.
+func ByEventLogActorCount(opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborsCount(s, newEventLogActorStep(), opts...)
+	}
+}
+
+// ByEventLogActor orders the results by event_log_actor terms.
+func ByEventLogActor(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newEventLogActorStep(), append([]sql.OrderTerm{term}, terms...)...)
+	}
+}
+
+// ByEventLogActor2Count orders the results by event_log_actor2 count.
+func ByEventLogActor2Count(opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborsCount(s, newEventLogActor2Step(), opts...)
+	}
+}
+
+// ByEventLogActor2 orders the results by event_log_actor2 terms.
+func ByEventLogActor2(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newEventLogActor2Step(), append([]sql.OrderTerm{term}, terms...)...)
+	}
+}
+
+// BySweepCreatorCount orders the results by sweep_creator count.
+func BySweepCreatorCount(opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborsCount(s, newSweepCreatorStep(), opts...)
+	}
+}
+
+// BySweepCreator orders the results by sweep_creator terms.
+func BySweepCreator(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newSweepCreatorStep(), append([]sql.OrderTerm{term}, terms...)...)
+	}
+}
+
+// BySweepUpdaterCount orders the results by sweep_updater count.
+func BySweepUpdaterCount(opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborsCount(s, newSweepUpdaterStep(), opts...)
+	}
+}
+
+// BySweepUpdater orders the results by sweep_updater terms.
+func BySweepUpdater(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newSweepUpdaterStep(), append([]sql.OrderTerm{term}, terms...)...)
+	}
+}
+
+// BySweepScheduleCreatorCount orders the results by sweep_schedule_creator count.
+func BySweepScheduleCreatorCount(opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborsCount(s, newSweepScheduleCreatorStep(), opts...)
+	}
+}
+
+// BySweepScheduleCreator orders the results by sweep_schedule_creator terms.
+func BySweepScheduleCreator(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newSweepScheduleCreatorStep(), append([]sql.OrderTerm{term}, terms...)...)
+	}
+}
+
+// BySweepScheduleUpdaterCount orders the results by sweep_schedule_updater count.
+func BySweepScheduleUpdaterCount(opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborsCount(s, newSweepScheduleUpdaterStep(), opts...)
+	}
+}
+
+// BySweepScheduleUpdater orders the results by sweep_schedule_updater terms.
+func BySweepScheduleUpdater(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newSweepScheduleUpdaterStep(), append([]sql.OrderTerm{term}, terms...)...)
+	}
+}
+
+// BySweepScheduleCount orders the results by sweep_schedule count.
+func BySweepScheduleCount(opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborsCount(s, newSweepScheduleStep(), opts...)
+	}
+}
+
+// BySweepSchedule orders the results by sweep_schedule terms.
+func BySweepSchedule(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newSweepScheduleStep(), append([]sql.OrderTerm{term}, terms...)...)
+	}
+}
+
+// BySweepResultCreatorCount orders the results by sweep_result_creator count.
+func BySweepResultCreatorCount(opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborsCount(s, newSweepResultCreatorStep(), opts...)
+	}
+}
+
+// BySweepResultCreator orders the results by sweep_result_creator terms.
+func BySweepResultCreator(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newSweepResultCreatorStep(), append([]sql.OrderTerm{term}, terms...)...)
+	}
+}
+
+// BySweepResultUpdaterCount orders the results by sweep_result_updater count.
+func BySweepResultUpdaterCount(opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborsCount(s, newSweepResultUpdaterStep(), opts...)
+	}
+}
+
+// BySweepResultUpdater orders the results by sweep_result_updater terms.
+func BySweepResultUpdater(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newSweepResultUpdaterStep(), append([]sql.OrderTerm{term}, terms...)...)
+	}
+}
+
+// BySweepResultDetailsCreatorCount orders the results by sweep_result_details_creator count.
+func BySweepResultDetailsCreatorCount(opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborsCount(s, newSweepResultDetailsCreatorStep(), opts...)
+	}
+}
+
+// BySweepResultDetailsCreator orders the results by sweep_result_details_creator terms.
+func BySweepResultDetailsCreator(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newSweepResultDetailsCreatorStep(), append([]sql.OrderTerm{term}, terms...)...)
+	}
+}
+
+// BySweepResultDetailsUpdaterCount orders the results by sweep_result_details_updater count.
+func BySweepResultDetailsUpdaterCount(opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborsCount(s, newSweepResultDetailsUpdaterStep(), opts...)
+	}
+}
+
+// BySweepResultDetailsUpdater orders the results by sweep_result_details_updater terms.
+func BySweepResultDetailsUpdater(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newSweepResultDetailsUpdaterStep(), append([]sql.OrderTerm{term}, terms...)...)
+	}
+}
 func newCreatorStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
@@ -878,11 +1279,11 @@ func newUpdaterStep() *sqlgraph.Step {
 		sqlgraph.Edge(sqlgraph.M2O, true, UpdaterTable, UpdaterColumn),
 	)
 }
-func newAdminRolesStep() *sqlgraph.Step {
+func newPermissionsStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
-		sqlgraph.To(AdminRolesInverseTable, FieldID),
-		sqlgraph.Edge(sqlgraph.M2M, true, AdminRolesTable, AdminRolesPrimaryKey...),
+		sqlgraph.To(PermissionsInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.M2M, true, PermissionsTable, PermissionsPrimaryKey...),
 	)
 }
 func newAdminCreatorStep() *sqlgraph.Step {
@@ -899,18 +1300,18 @@ func newAdminUpdaterStep() *sqlgraph.Step {
 		sqlgraph.Edge(sqlgraph.O2M, false, AdminUpdaterTable, AdminUpdaterColumn),
 	)
 }
-func newAdminRoleCreatorStep() *sqlgraph.Step {
+func newPermissionCreatorStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
-		sqlgraph.To(AdminRoleCreatorInverseTable, FieldID),
-		sqlgraph.Edge(sqlgraph.O2M, false, AdminRoleCreatorTable, AdminRoleCreatorColumn),
+		sqlgraph.To(PermissionCreatorInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.O2M, false, PermissionCreatorTable, PermissionCreatorColumn),
 	)
 }
-func newAdminRoleUpdaterStep() *sqlgraph.Step {
+func newPermissionUpdaterStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
-		sqlgraph.To(AdminRoleUpdaterInverseTable, FieldID),
-		sqlgraph.Edge(sqlgraph.O2M, false, AdminRoleUpdaterTable, AdminRoleUpdaterColumn),
+		sqlgraph.To(PermissionUpdaterInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.O2M, false, PermissionUpdaterTable, PermissionUpdaterColumn),
 	)
 }
 func newRiskCreatorStep() *sqlgraph.Step {
@@ -925,6 +1326,13 @@ func newRiskUpdaterStep() *sqlgraph.Step {
 		sqlgraph.From(Table, FieldID),
 		sqlgraph.To(RiskUpdaterInverseTable, FieldID),
 		sqlgraph.Edge(sqlgraph.O2M, false, RiskUpdaterTable, RiskUpdaterColumn),
+	)
+}
+func newRiskMaintainerStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(RiskMaintainerInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.O2M, false, RiskMaintainerTable, RiskMaintainerColumn),
 	)
 }
 func newRiskLocationCreatorStep() *sqlgraph.Step {
@@ -987,7 +1395,7 @@ func newEmployeeStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
 		sqlgraph.To(EmployeeInverseTable, FieldID),
-		sqlgraph.Edge(sqlgraph.O2M, false, EmployeeTable, EmployeeColumn),
+		sqlgraph.Edge(sqlgraph.O2O, false, EmployeeTable, EmployeeColumn),
 	)
 }
 func newOccupationCreatorStep() *sqlgraph.Step {
@@ -1004,18 +1412,18 @@ func newOccupationUpdaterStep() *sqlgraph.Step {
 		sqlgraph.Edge(sqlgraph.O2M, false, OccupationUpdaterTable, OccupationUpdaterColumn),
 	)
 }
-func newIpcEventCreatorStep() *sqlgraph.Step {
+func newEventCreatorStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
-		sqlgraph.To(IpcEventCreatorInverseTable, FieldID),
-		sqlgraph.Edge(sqlgraph.O2M, false, IpcEventCreatorTable, IpcEventCreatorColumn),
+		sqlgraph.To(EventCreatorInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.O2M, false, EventCreatorTable, EventCreatorColumn),
 	)
 }
-func newIpcEventUpdaterStep() *sqlgraph.Step {
+func newEventUpdaterStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
-		sqlgraph.To(IpcEventUpdaterInverseTable, FieldID),
-		sqlgraph.Edge(sqlgraph.O2M, false, IpcEventUpdaterTable, IpcEventUpdaterColumn),
+		sqlgraph.To(EventUpdaterInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.O2M, false, EventUpdaterTable, EventUpdaterColumn),
 	)
 }
 func newVideoCreatorStep() *sqlgraph.Step {
@@ -1086,5 +1494,117 @@ func newEventLevelUpdaterStep() *sqlgraph.Step {
 		sqlgraph.From(Table, FieldID),
 		sqlgraph.To(EventLevelUpdaterInverseTable, FieldID),
 		sqlgraph.Edge(sqlgraph.O2M, false, EventLevelUpdaterTable, EventLevelUpdaterColumn),
+	)
+}
+func newFixingCreatorStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(FixingCreatorInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.O2M, false, FixingCreatorTable, FixingCreatorColumn),
+	)
+}
+func newFixingUpdaterStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(FixingUpdaterInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.O2M, false, FixingUpdaterTable, FixingUpdaterColumn),
+	)
+}
+func newFixerStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(FixerInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.O2M, false, FixerTable, FixerColumn),
+	)
+}
+func newEventLogCreatorStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(EventLogCreatorInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.O2M, false, EventLogCreatorTable, EventLogCreatorColumn),
+	)
+}
+func newEventLogUpdaterStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(EventLogUpdaterInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.O2M, false, EventLogUpdaterTable, EventLogUpdaterColumn),
+	)
+}
+func newEventLogActorStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(EventLogActorInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.O2M, false, EventLogActorTable, EventLogActorColumn),
+	)
+}
+func newEventLogActor2Step() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(EventLogActor2InverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.O2M, false, EventLogActor2Table, EventLogActor2Column),
+	)
+}
+func newSweepCreatorStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(SweepCreatorInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.O2M, false, SweepCreatorTable, SweepCreatorColumn),
+	)
+}
+func newSweepUpdaterStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(SweepUpdaterInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.O2M, false, SweepUpdaterTable, SweepUpdaterColumn),
+	)
+}
+func newSweepScheduleCreatorStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(SweepScheduleCreatorInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.O2M, false, SweepScheduleCreatorTable, SweepScheduleCreatorColumn),
+	)
+}
+func newSweepScheduleUpdaterStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(SweepScheduleUpdaterInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.O2M, false, SweepScheduleUpdaterTable, SweepScheduleUpdaterColumn),
+	)
+}
+func newSweepScheduleStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(SweepScheduleInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.M2M, false, SweepScheduleTable, SweepSchedulePrimaryKey...),
+	)
+}
+func newSweepResultCreatorStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(SweepResultCreatorInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.O2M, false, SweepResultCreatorTable, SweepResultCreatorColumn),
+	)
+}
+func newSweepResultUpdaterStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(SweepResultUpdaterInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.O2M, false, SweepResultUpdaterTable, SweepResultUpdaterColumn),
+	)
+}
+func newSweepResultDetailsCreatorStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(SweepResultDetailsCreatorInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.O2M, false, SweepResultDetailsCreatorTable, SweepResultDetailsCreatorColumn),
+	)
+}
+func newSweepResultDetailsUpdaterStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(SweepResultDetailsUpdaterInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.O2M, false, SweepResultDetailsUpdaterTable, SweepResultDetailsUpdaterColumn),
 	)
 }

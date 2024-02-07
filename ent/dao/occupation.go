@@ -19,15 +19,15 @@ type Occupation struct {
 	// ID of the ent.
 	ID int `json:"id,omitempty"`
 	// 创建时间
-	CreatedAt time.Time `json:"created_at"`
+	CreateTime time.Time `json:"create_time"`
 	// 创建者
-	CreatedBy int `json:"created_by"`
+	CreatorID int `json:"creator_id"`
 	// 删除时间
-	DeletedAt *time.Time `json:"deleted_at"`
+	DeleteTime *time.Time `json:"delete_time"`
 	// 最后更新者
-	UpdatedBy int `json:"updated_by"`
+	UpdaterID int `json:"updater_id"`
 	// 最后更新时间
-	UpdatedAt time.Time `json:"updated_at"`
+	UpdateTime time.Time `json:"update_time"`
 	// 名称
 	Name string `json:"name" validate:"required"`
 	// 描述
@@ -44,8 +44,8 @@ type OccupationEdges struct {
 	Creator *Admin `json:"creator,omitempty"`
 	// Updater holds the value of the updater edge.
 	Updater *Admin `json:"updater,omitempty"`
-	// Employees holds the value of the employees edge.
-	Employees []*Employee `json:"employees,omitempty"`
+	// Employee holds the value of the employee edge.
+	Employee []*Employee `json:"employee,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
 	loadedTypes [3]bool
@@ -77,13 +77,13 @@ func (e OccupationEdges) UpdaterOrErr() (*Admin, error) {
 	return nil, &NotLoadedError{edge: "updater"}
 }
 
-// EmployeesOrErr returns the Employees value or an error if the edge
+// EmployeeOrErr returns the Employee value or an error if the edge
 // was not loaded in eager-loading.
-func (e OccupationEdges) EmployeesOrErr() ([]*Employee, error) {
+func (e OccupationEdges) EmployeeOrErr() ([]*Employee, error) {
 	if e.loadedTypes[2] {
-		return e.Employees, nil
+		return e.Employee, nil
 	}
-	return nil, &NotLoadedError{edge: "employees"}
+	return nil, &NotLoadedError{edge: "employee"}
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
@@ -91,11 +91,11 @@ func (*Occupation) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
 	for i := range columns {
 		switch columns[i] {
-		case occupation.FieldID, occupation.FieldCreatedBy, occupation.FieldUpdatedBy:
+		case occupation.FieldID, occupation.FieldCreatorID, occupation.FieldUpdaterID:
 			values[i] = new(sql.NullInt64)
 		case occupation.FieldName, occupation.FieldDescription:
 			values[i] = new(sql.NullString)
-		case occupation.FieldCreatedAt, occupation.FieldDeletedAt, occupation.FieldUpdatedAt:
+		case occupation.FieldCreateTime, occupation.FieldDeleteTime, occupation.FieldUpdateTime:
 			values[i] = new(sql.NullTime)
 		default:
 			values[i] = new(sql.UnknownType)
@@ -118,36 +118,36 @@ func (o *Occupation) assignValues(columns []string, values []any) error {
 				return fmt.Errorf("unexpected type %T for field id", value)
 			}
 			o.ID = int(value.Int64)
-		case occupation.FieldCreatedAt:
+		case occupation.FieldCreateTime:
 			if value, ok := values[i].(*sql.NullTime); !ok {
-				return fmt.Errorf("unexpected type %T for field created_at", values[i])
+				return fmt.Errorf("unexpected type %T for field create_time", values[i])
 			} else if value.Valid {
-				o.CreatedAt = value.Time
+				o.CreateTime = value.Time
 			}
-		case occupation.FieldCreatedBy:
+		case occupation.FieldCreatorID:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
-				return fmt.Errorf("unexpected type %T for field created_by", values[i])
+				return fmt.Errorf("unexpected type %T for field creator_id", values[i])
 			} else if value.Valid {
-				o.CreatedBy = int(value.Int64)
+				o.CreatorID = int(value.Int64)
 			}
-		case occupation.FieldDeletedAt:
+		case occupation.FieldDeleteTime:
 			if value, ok := values[i].(*sql.NullTime); !ok {
-				return fmt.Errorf("unexpected type %T for field deleted_at", values[i])
+				return fmt.Errorf("unexpected type %T for field delete_time", values[i])
 			} else if value.Valid {
-				o.DeletedAt = new(time.Time)
-				*o.DeletedAt = value.Time
+				o.DeleteTime = new(time.Time)
+				*o.DeleteTime = value.Time
 			}
-		case occupation.FieldUpdatedBy:
+		case occupation.FieldUpdaterID:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
-				return fmt.Errorf("unexpected type %T for field updated_by", values[i])
+				return fmt.Errorf("unexpected type %T for field updater_id", values[i])
 			} else if value.Valid {
-				o.UpdatedBy = int(value.Int64)
+				o.UpdaterID = int(value.Int64)
 			}
-		case occupation.FieldUpdatedAt:
+		case occupation.FieldUpdateTime:
 			if value, ok := values[i].(*sql.NullTime); !ok {
-				return fmt.Errorf("unexpected type %T for field updated_at", values[i])
+				return fmt.Errorf("unexpected type %T for field update_time", values[i])
 			} else if value.Valid {
-				o.UpdatedAt = value.Time
+				o.UpdateTime = value.Time
 			}
 		case occupation.FieldName:
 			if value, ok := values[i].(*sql.NullString); !ok {
@@ -184,9 +184,9 @@ func (o *Occupation) QueryUpdater() *AdminQuery {
 	return NewOccupationClient(o.config).QueryUpdater(o)
 }
 
-// QueryEmployees queries the "employees" edge of the Occupation entity.
-func (o *Occupation) QueryEmployees() *EmployeeQuery {
-	return NewOccupationClient(o.config).QueryEmployees(o)
+// QueryEmployee queries the "employee" edge of the Occupation entity.
+func (o *Occupation) QueryEmployee() *EmployeeQuery {
+	return NewOccupationClient(o.config).QueryEmployee(o)
 }
 
 // Update returns a builder for updating this Occupation.
@@ -212,22 +212,22 @@ func (o *Occupation) String() string {
 	var builder strings.Builder
 	builder.WriteString("Occupation(")
 	builder.WriteString(fmt.Sprintf("id=%v, ", o.ID))
-	builder.WriteString("created_at=")
-	builder.WriteString(o.CreatedAt.Format(time.ANSIC))
+	builder.WriteString("create_time=")
+	builder.WriteString(o.CreateTime.Format(time.ANSIC))
 	builder.WriteString(", ")
-	builder.WriteString("created_by=")
-	builder.WriteString(fmt.Sprintf("%v", o.CreatedBy))
+	builder.WriteString("creator_id=")
+	builder.WriteString(fmt.Sprintf("%v", o.CreatorID))
 	builder.WriteString(", ")
-	if v := o.DeletedAt; v != nil {
-		builder.WriteString("deleted_at=")
+	if v := o.DeleteTime; v != nil {
+		builder.WriteString("delete_time=")
 		builder.WriteString(v.Format(time.ANSIC))
 	}
 	builder.WriteString(", ")
-	builder.WriteString("updated_by=")
-	builder.WriteString(fmt.Sprintf("%v", o.UpdatedBy))
+	builder.WriteString("updater_id=")
+	builder.WriteString(fmt.Sprintf("%v", o.UpdaterID))
 	builder.WriteString(", ")
-	builder.WriteString("updated_at=")
-	builder.WriteString(o.UpdatedAt.Format(time.ANSIC))
+	builder.WriteString("update_time=")
+	builder.WriteString(o.UpdateTime.Format(time.ANSIC))
 	builder.WriteString(", ")
 	builder.WriteString("name=")
 	builder.WriteString(o.Name)

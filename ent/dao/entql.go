@@ -4,19 +4,25 @@ package dao
 
 import (
 	"aisecurity/ent/dao/admin"
-	"aisecurity/ent/dao/adminrole"
 	"aisecurity/ent/dao/area"
 	"aisecurity/ent/dao/department"
 	"aisecurity/ent/dao/device"
 	"aisecurity/ent/dao/deviceinstallation"
 	"aisecurity/ent/dao/employee"
+	"aisecurity/ent/dao/event"
 	"aisecurity/ent/dao/eventlevel"
-	"aisecurity/ent/dao/ipcevent"
+	"aisecurity/ent/dao/eventlog"
+	"aisecurity/ent/dao/fixing"
 	"aisecurity/ent/dao/occupation"
+	"aisecurity/ent/dao/permission"
 	"aisecurity/ent/dao/predicate"
 	"aisecurity/ent/dao/risk"
 	"aisecurity/ent/dao/riskcategory"
 	"aisecurity/ent/dao/risklocation"
+	"aisecurity/ent/dao/sweep"
+	"aisecurity/ent/dao/sweepresult"
+	"aisecurity/ent/dao/sweepresultdetails"
+	"aisecurity/ent/dao/sweepschedule"
 	"aisecurity/ent/dao/video"
 
 	"entgo.io/ent/dialect/sql"
@@ -27,7 +33,7 @@ import (
 
 // schemaGraph holds a representation of ent/schema at runtime.
 var schemaGraph = func() *sqlgraph.Schema {
-	graph := &sqlgraph.Schema{Nodes: make([]*sqlgraph.Node, 14)}
+	graph := &sqlgraph.Schema{Nodes: make([]*sqlgraph.Node, 20)}
 	graph.Nodes[0] = &sqlgraph.Node{
 		NodeSpec: sqlgraph.NodeSpec{
 			Table:   admin.Table,
@@ -39,38 +45,21 @@ var schemaGraph = func() *sqlgraph.Schema {
 		},
 		Type: "Admin",
 		Fields: map[string]*sqlgraph.FieldSpec{
-			admin.FieldCreatedAt: {Type: field.TypeTime, Column: admin.FieldCreatedAt},
-			admin.FieldCreatedBy: {Type: field.TypeInt, Column: admin.FieldCreatedBy},
-			admin.FieldDeletedAt: {Type: field.TypeTime, Column: admin.FieldDeletedAt},
-			admin.FieldUpdatedBy: {Type: field.TypeInt, Column: admin.FieldUpdatedBy},
-			admin.FieldUpdatedAt: {Type: field.TypeTime, Column: admin.FieldUpdatedAt},
-			admin.FieldUsername:  {Type: field.TypeString, Column: admin.FieldUsername},
-			admin.FieldPassword:  {Type: field.TypeString, Column: admin.FieldPassword},
-			admin.FieldNickname:  {Type: field.TypeString, Column: admin.FieldNickname},
-			admin.FieldRealName:  {Type: field.TypeString, Column: admin.FieldRealName},
-			admin.FieldAvatar:    {Type: field.TypeString, Column: admin.FieldAvatar},
+			admin.FieldCreateTime:  {Type: field.TypeTime, Column: admin.FieldCreateTime},
+			admin.FieldCreatorID:   {Type: field.TypeInt, Column: admin.FieldCreatorID},
+			admin.FieldDeleteTime:  {Type: field.TypeTime, Column: admin.FieldDeleteTime},
+			admin.FieldUpdaterID:   {Type: field.TypeInt, Column: admin.FieldUpdaterID},
+			admin.FieldUpdateTime:  {Type: field.TypeTime, Column: admin.FieldUpdateTime},
+			admin.FieldUsername:    {Type: field.TypeString, Column: admin.FieldUsername},
+			admin.FieldPassword:    {Type: field.TypeString, Column: admin.FieldPassword},
+			admin.FieldNickname:    {Type: field.TypeString, Column: admin.FieldNickname},
+			admin.FieldRealName:    {Type: field.TypeString, Column: admin.FieldRealName},
+			admin.FieldMobile:      {Type: field.TypeString, Column: admin.FieldMobile},
+			admin.FieldAvatar:      {Type: field.TypeJSON, Column: admin.FieldAvatar},
+			admin.FieldAdminStatus: {Type: field.TypeInt, Column: admin.FieldAdminStatus},
 		},
 	}
 	graph.Nodes[1] = &sqlgraph.Node{
-		NodeSpec: sqlgraph.NodeSpec{
-			Table:   adminrole.Table,
-			Columns: adminrole.Columns,
-			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeInt,
-				Column: adminrole.FieldID,
-			},
-		},
-		Type: "AdminRole",
-		Fields: map[string]*sqlgraph.FieldSpec{
-			adminrole.FieldCreatedAt: {Type: field.TypeTime, Column: adminrole.FieldCreatedAt},
-			adminrole.FieldCreatedBy: {Type: field.TypeInt, Column: adminrole.FieldCreatedBy},
-			adminrole.FieldName:      {Type: field.TypeString, Column: adminrole.FieldName},
-			adminrole.FieldDeletedAt: {Type: field.TypeTime, Column: adminrole.FieldDeletedAt},
-			adminrole.FieldUpdatedBy: {Type: field.TypeInt, Column: adminrole.FieldUpdatedBy},
-			adminrole.FieldUpdatedAt: {Type: field.TypeTime, Column: adminrole.FieldUpdatedAt},
-		},
-	}
-	graph.Nodes[2] = &sqlgraph.Node{
 		NodeSpec: sqlgraph.NodeSpec{
 			Table:   area.Table,
 			Columns: area.Columns,
@@ -81,16 +70,16 @@ var schemaGraph = func() *sqlgraph.Schema {
 		},
 		Type: "Area",
 		Fields: map[string]*sqlgraph.FieldSpec{
-			area.FieldCreatedAt:   {Type: field.TypeTime, Column: area.FieldCreatedAt},
-			area.FieldCreatedBy:   {Type: field.TypeInt, Column: area.FieldCreatedBy},
-			area.FieldDeletedAt:   {Type: field.TypeTime, Column: area.FieldDeletedAt},
-			area.FieldUpdatedBy:   {Type: field.TypeInt, Column: area.FieldUpdatedBy},
-			area.FieldUpdatedAt:   {Type: field.TypeTime, Column: area.FieldUpdatedAt},
+			area.FieldCreateTime:  {Type: field.TypeTime, Column: area.FieldCreateTime},
+			area.FieldCreatorID:   {Type: field.TypeInt, Column: area.FieldCreatorID},
+			area.FieldDeleteTime:  {Type: field.TypeTime, Column: area.FieldDeleteTime},
+			area.FieldUpdaterID:   {Type: field.TypeInt, Column: area.FieldUpdaterID},
+			area.FieldUpdateTime:  {Type: field.TypeTime, Column: area.FieldUpdateTime},
 			area.FieldName:        {Type: field.TypeString, Column: area.FieldName},
 			area.FieldDescription: {Type: field.TypeString, Column: area.FieldDescription},
 		},
 	}
-	graph.Nodes[3] = &sqlgraph.Node{
+	graph.Nodes[2] = &sqlgraph.Node{
 		NodeSpec: sqlgraph.NodeSpec{
 			Table:   department.Table,
 			Columns: department.Columns,
@@ -101,16 +90,17 @@ var schemaGraph = func() *sqlgraph.Schema {
 		},
 		Type: "Department",
 		Fields: map[string]*sqlgraph.FieldSpec{
-			department.FieldCreatedAt: {Type: field.TypeTime, Column: department.FieldCreatedAt},
-			department.FieldCreatedBy: {Type: field.TypeInt, Column: department.FieldCreatedBy},
-			department.FieldDeletedAt: {Type: field.TypeTime, Column: department.FieldDeletedAt},
-			department.FieldUpdatedBy: {Type: field.TypeInt, Column: department.FieldUpdatedBy},
-			department.FieldUpdatedAt: {Type: field.TypeTime, Column: department.FieldUpdatedAt},
-			department.FieldName:      {Type: field.TypeString, Column: department.FieldName},
-			department.FieldParentID:  {Type: field.TypeInt, Column: department.FieldParentID},
+			department.FieldCreateTime: {Type: field.TypeTime, Column: department.FieldCreateTime},
+			department.FieldCreatorID:  {Type: field.TypeInt, Column: department.FieldCreatorID},
+			department.FieldDeleteTime: {Type: field.TypeTime, Column: department.FieldDeleteTime},
+			department.FieldUpdaterID:  {Type: field.TypeInt, Column: department.FieldUpdaterID},
+			department.FieldUpdateTime: {Type: field.TypeTime, Column: department.FieldUpdateTime},
+			department.FieldName:       {Type: field.TypeString, Column: department.FieldName},
+			department.FieldParentID:   {Type: field.TypeInt, Column: department.FieldParentID},
+			department.FieldNotes:      {Type: field.TypeString, Column: department.FieldNotes},
 		},
 	}
-	graph.Nodes[4] = &sqlgraph.Node{
+	graph.Nodes[3] = &sqlgraph.Node{
 		NodeSpec: sqlgraph.NodeSpec{
 			Table:   device.Table,
 			Columns: device.Columns,
@@ -121,11 +111,11 @@ var schemaGraph = func() *sqlgraph.Schema {
 		},
 		Type: "Device",
 		Fields: map[string]*sqlgraph.FieldSpec{
-			device.FieldCreatedAt:  {Type: field.TypeTime, Column: device.FieldCreatedAt},
-			device.FieldCreatedBy:  {Type: field.TypeInt, Column: device.FieldCreatedBy},
-			device.FieldDeletedAt:  {Type: field.TypeTime, Column: device.FieldDeletedAt},
-			device.FieldUpdatedBy:  {Type: field.TypeInt, Column: device.FieldUpdatedBy},
-			device.FieldUpdatedAt:  {Type: field.TypeTime, Column: device.FieldUpdatedAt},
+			device.FieldCreateTime: {Type: field.TypeTime, Column: device.FieldCreateTime},
+			device.FieldCreatorID:  {Type: field.TypeInt, Column: device.FieldCreatorID},
+			device.FieldDeleteTime: {Type: field.TypeTime, Column: device.FieldDeleteTime},
+			device.FieldUpdaterID:  {Type: field.TypeInt, Column: device.FieldUpdaterID},
+			device.FieldUpdateTime: {Type: field.TypeTime, Column: device.FieldUpdateTime},
 			device.FieldBrand:      {Type: field.TypeInt, Column: device.FieldBrand},
 			device.FieldModel:      {Type: field.TypeInt, Column: device.FieldModel},
 			device.FieldName:       {Type: field.TypeString, Column: device.FieldName},
@@ -133,7 +123,7 @@ var schemaGraph = func() *sqlgraph.Schema {
 			device.FieldDeviceType: {Type: field.TypeInt, Column: device.FieldDeviceType},
 		},
 	}
-	graph.Nodes[5] = &sqlgraph.Node{
+	graph.Nodes[4] = &sqlgraph.Node{
 		NodeSpec: sqlgraph.NodeSpec{
 			Table:   deviceinstallation.Table,
 			Columns: deviceinstallation.Columns,
@@ -144,11 +134,11 @@ var schemaGraph = func() *sqlgraph.Schema {
 		},
 		Type: "DeviceInstallation",
 		Fields: map[string]*sqlgraph.FieldSpec{
-			deviceinstallation.FieldCreatedAt:    {Type: field.TypeTime, Column: deviceinstallation.FieldCreatedAt},
-			deviceinstallation.FieldCreatedBy:    {Type: field.TypeInt, Column: deviceinstallation.FieldCreatedBy},
-			deviceinstallation.FieldDeletedAt:    {Type: field.TypeTime, Column: deviceinstallation.FieldDeletedAt},
-			deviceinstallation.FieldUpdatedBy:    {Type: field.TypeInt, Column: deviceinstallation.FieldUpdatedBy},
-			deviceinstallation.FieldUpdatedAt:    {Type: field.TypeTime, Column: deviceinstallation.FieldUpdatedAt},
+			deviceinstallation.FieldCreateTime:   {Type: field.TypeTime, Column: deviceinstallation.FieldCreateTime},
+			deviceinstallation.FieldCreatorID:    {Type: field.TypeInt, Column: deviceinstallation.FieldCreatorID},
+			deviceinstallation.FieldDeleteTime:   {Type: field.TypeTime, Column: deviceinstallation.FieldDeleteTime},
+			deviceinstallation.FieldUpdaterID:    {Type: field.TypeInt, Column: deviceinstallation.FieldUpdaterID},
+			deviceinstallation.FieldUpdateTime:   {Type: field.TypeTime, Column: deviceinstallation.FieldUpdateTime},
 			deviceinstallation.FieldDeviceID:     {Type: field.TypeInt, Column: deviceinstallation.FieldDeviceID},
 			deviceinstallation.FieldAreaID:       {Type: field.TypeInt, Column: deviceinstallation.FieldAreaID},
 			deviceinstallation.FieldAliasName:    {Type: field.TypeString, Column: deviceinstallation.FieldAliasName},
@@ -160,7 +150,7 @@ var schemaGraph = func() *sqlgraph.Schema {
 			deviceinstallation.FieldInstallTime:  {Type: field.TypeTime, Column: deviceinstallation.FieldInstallTime},
 		},
 	}
-	graph.Nodes[6] = &sqlgraph.Node{
+	graph.Nodes[5] = &sqlgraph.Node{
 		NodeSpec: sqlgraph.NodeSpec{
 			Table:   employee.Table,
 			Columns: employee.Columns,
@@ -171,13 +161,42 @@ var schemaGraph = func() *sqlgraph.Schema {
 		},
 		Type: "Employee",
 		Fields: map[string]*sqlgraph.FieldSpec{
-			employee.FieldCreatedAt:    {Type: field.TypeTime, Column: employee.FieldCreatedAt},
-			employee.FieldCreatedBy:    {Type: field.TypeInt, Column: employee.FieldCreatedBy},
-			employee.FieldDeletedAt:    {Type: field.TypeTime, Column: employee.FieldDeletedAt},
-			employee.FieldUpdatedBy:    {Type: field.TypeInt, Column: employee.FieldUpdatedBy},
-			employee.FieldUpdatedAt:    {Type: field.TypeTime, Column: employee.FieldUpdatedAt},
+			employee.FieldCreateTime:   {Type: field.TypeTime, Column: employee.FieldCreateTime},
+			employee.FieldCreatorID:    {Type: field.TypeInt, Column: employee.FieldCreatorID},
+			employee.FieldDeleteTime:   {Type: field.TypeTime, Column: employee.FieldDeleteTime},
+			employee.FieldUpdaterID:    {Type: field.TypeInt, Column: employee.FieldUpdaterID},
+			employee.FieldUpdateTime:   {Type: field.TypeTime, Column: employee.FieldUpdateTime},
 			employee.FieldAdminID:      {Type: field.TypeInt, Column: employee.FieldAdminID},
 			employee.FieldDepartmentID: {Type: field.TypeInt, Column: employee.FieldDepartmentID},
+			employee.FieldOccupationID: {Type: field.TypeInt, Column: employee.FieldOccupationID},
+		},
+	}
+	graph.Nodes[6] = &sqlgraph.Node{
+		NodeSpec: sqlgraph.NodeSpec{
+			Table:   event.Table,
+			Columns: event.Columns,
+			ID: &sqlgraph.FieldSpec{
+				Type:   field.TypeInt,
+				Column: event.FieldID,
+			},
+		},
+		Type: "Event",
+		Fields: map[string]*sqlgraph.FieldSpec{
+			event.FieldCreateTime:    {Type: field.TypeTime, Column: event.FieldCreateTime},
+			event.FieldCreatorID:     {Type: field.TypeInt, Column: event.FieldCreatorID},
+			event.FieldDeleteTime:    {Type: field.TypeTime, Column: event.FieldDeleteTime},
+			event.FieldUpdaterID:     {Type: field.TypeInt, Column: event.FieldUpdaterID},
+			event.FieldUpdateTime:    {Type: field.TypeTime, Column: event.FieldUpdateTime},
+			event.FieldDeviceID:      {Type: field.TypeInt, Column: event.FieldDeviceID},
+			event.FieldVideoID:       {Type: field.TypeInt, Column: event.FieldVideoID},
+			event.FieldEventTime:     {Type: field.TypeTime, Column: event.FieldEventTime},
+			event.FieldEventType:     {Type: field.TypeInt, Column: event.FieldEventType},
+			event.FieldEventStatus:   {Type: field.TypeInt, Column: event.FieldEventStatus},
+			event.FieldImages:        {Type: field.TypeJSON, Column: event.FieldImages},
+			event.FieldLabeledImages: {Type: field.TypeJSON, Column: event.FieldLabeledImages},
+			event.FieldDataID:        {Type: field.TypeString, Column: event.FieldDataID},
+			event.FieldDescription:   {Type: field.TypeString, Column: event.FieldDescription},
+			event.FieldRawData:       {Type: field.TypeString, Column: event.FieldRawData},
 		},
 	}
 	graph.Nodes[7] = &sqlgraph.Node{
@@ -191,46 +210,68 @@ var schemaGraph = func() *sqlgraph.Schema {
 		},
 		Type: "EventLevel",
 		Fields: map[string]*sqlgraph.FieldSpec{
-			eventlevel.FieldCreatedAt:   {Type: field.TypeTime, Column: eventlevel.FieldCreatedAt},
-			eventlevel.FieldCreatedBy:   {Type: field.TypeInt, Column: eventlevel.FieldCreatedBy},
-			eventlevel.FieldDeletedAt:   {Type: field.TypeTime, Column: eventlevel.FieldDeletedAt},
-			eventlevel.FieldUpdatedBy:   {Type: field.TypeInt, Column: eventlevel.FieldUpdatedBy},
-			eventlevel.FieldUpdatedAt:   {Type: field.TypeTime, Column: eventlevel.FieldUpdatedAt},
+			eventlevel.FieldCreateTime:  {Type: field.TypeTime, Column: eventlevel.FieldCreateTime},
+			eventlevel.FieldCreatorID:   {Type: field.TypeInt, Column: eventlevel.FieldCreatorID},
+			eventlevel.FieldDeleteTime:  {Type: field.TypeTime, Column: eventlevel.FieldDeleteTime},
+			eventlevel.FieldUpdaterID:   {Type: field.TypeInt, Column: eventlevel.FieldUpdaterID},
+			eventlevel.FieldUpdateTime:  {Type: field.TypeTime, Column: eventlevel.FieldUpdateTime},
 			eventlevel.FieldName:        {Type: field.TypeString, Column: eventlevel.FieldName},
 			eventlevel.FieldEventTypes:  {Type: field.TypeJSON, Column: eventlevel.FieldEventTypes},
 			eventlevel.FieldDescription: {Type: field.TypeString, Column: eventlevel.FieldDescription},
-			eventlevel.FieldIsReport:    {Type: field.TypeBool, Column: eventlevel.FieldIsReport},
+			eventlevel.FieldIcon:        {Type: field.TypeString, Column: eventlevel.FieldIcon},
+			eventlevel.FieldNotifyTypes: {Type: field.TypeJSON, Column: eventlevel.FieldNotifyTypes},
 		},
 	}
 	graph.Nodes[8] = &sqlgraph.Node{
 		NodeSpec: sqlgraph.NodeSpec{
-			Table:   ipcevent.Table,
-			Columns: ipcevent.Columns,
+			Table:   eventlog.Table,
+			Columns: eventlog.Columns,
 			ID: &sqlgraph.FieldSpec{
 				Type:   field.TypeInt,
-				Column: ipcevent.FieldID,
+				Column: eventlog.FieldID,
 			},
 		},
-		Type: "IPCEvent",
+		Type: "EventLog",
 		Fields: map[string]*sqlgraph.FieldSpec{
-			ipcevent.FieldCreatedAt:     {Type: field.TypeTime, Column: ipcevent.FieldCreatedAt},
-			ipcevent.FieldCreatedBy:     {Type: field.TypeInt, Column: ipcevent.FieldCreatedBy},
-			ipcevent.FieldDeletedAt:     {Type: field.TypeTime, Column: ipcevent.FieldDeletedAt},
-			ipcevent.FieldUpdatedBy:     {Type: field.TypeInt, Column: ipcevent.FieldUpdatedBy},
-			ipcevent.FieldUpdatedAt:     {Type: field.TypeTime, Column: ipcevent.FieldUpdatedAt},
-			ipcevent.FieldDeviceID:      {Type: field.TypeInt, Column: ipcevent.FieldDeviceID},
-			ipcevent.FieldVideoID:       {Type: field.TypeInt, Column: ipcevent.FieldVideoID},
-			ipcevent.FieldEventTime:     {Type: field.TypeTime, Column: ipcevent.FieldEventTime},
-			ipcevent.FieldEventType:     {Type: field.TypeInt, Column: ipcevent.FieldEventType},
-			ipcevent.FieldEventStatus:   {Type: field.TypeInt, Column: ipcevent.FieldEventStatus},
-			ipcevent.FieldImages:        {Type: field.TypeJSON, Column: ipcevent.FieldImages},
-			ipcevent.FieldLabeledImages: {Type: field.TypeJSON, Column: ipcevent.FieldLabeledImages},
-			ipcevent.FieldEventID:       {Type: field.TypeString, Column: ipcevent.FieldEventID},
-			ipcevent.FieldDescription:   {Type: field.TypeString, Column: ipcevent.FieldDescription},
-			ipcevent.FieldRawData:       {Type: field.TypeString, Column: ipcevent.FieldRawData},
+			eventlog.FieldCreateTime: {Type: field.TypeTime, Column: eventlog.FieldCreateTime},
+			eventlog.FieldCreatorID:  {Type: field.TypeInt, Column: eventlog.FieldCreatorID},
+			eventlog.FieldDeleteTime: {Type: field.TypeTime, Column: eventlog.FieldDeleteTime},
+			eventlog.FieldUpdaterID:  {Type: field.TypeInt, Column: eventlog.FieldUpdaterID},
+			eventlog.FieldUpdateTime: {Type: field.TypeTime, Column: eventlog.FieldUpdateTime},
+			eventlog.FieldDeviceID:   {Type: field.TypeInt, Column: eventlog.FieldDeviceID},
+			eventlog.FieldEventID:    {Type: field.TypeInt, Column: eventlog.FieldEventID},
+			eventlog.FieldActorID:    {Type: field.TypeInt, Column: eventlog.FieldActorID},
+			eventlog.FieldActor2ID:   {Type: field.TypeInt, Column: eventlog.FieldActor2ID},
+			eventlog.FieldLogType:    {Type: field.TypeInt, Column: eventlog.FieldLogType},
+			eventlog.FieldNotes:      {Type: field.TypeString, Column: eventlog.FieldNotes},
 		},
 	}
 	graph.Nodes[9] = &sqlgraph.Node{
+		NodeSpec: sqlgraph.NodeSpec{
+			Table:   fixing.Table,
+			Columns: fixing.Columns,
+			ID: &sqlgraph.FieldSpec{
+				Type:   field.TypeInt,
+				Column: fixing.FieldID,
+			},
+		},
+		Type: "Fixing",
+		Fields: map[string]*sqlgraph.FieldSpec{
+			fixing.FieldCreateTime:    {Type: field.TypeTime, Column: fixing.FieldCreateTime},
+			fixing.FieldCreatorID:     {Type: field.TypeInt, Column: fixing.FieldCreatorID},
+			fixing.FieldDeleteTime:    {Type: field.TypeTime, Column: fixing.FieldDeleteTime},
+			fixing.FieldUpdaterID:     {Type: field.TypeInt, Column: fixing.FieldUpdaterID},
+			fixing.FieldUpdateTime:    {Type: field.TypeTime, Column: fixing.FieldUpdateTime},
+			fixing.FieldFixerID:       {Type: field.TypeInt, Column: fixing.FieldFixerID},
+			fixing.FieldEventID:       {Type: field.TypeInt, Column: fixing.FieldEventID},
+			fixing.FieldDeviceID:      {Type: field.TypeInt, Column: fixing.FieldDeviceID},
+			fixing.FieldAssignNotes:   {Type: field.TypeString, Column: fixing.FieldAssignNotes},
+			fixing.FieldFixTime:       {Type: field.TypeTime, Column: fixing.FieldFixTime},
+			fixing.FieldCompleteTime:  {Type: field.TypeTime, Column: fixing.FieldCompleteTime},
+			fixing.FieldCompleteNotes: {Type: field.TypeString, Column: fixing.FieldCompleteNotes},
+		},
+	}
+	graph.Nodes[10] = &sqlgraph.Node{
 		NodeSpec: sqlgraph.NodeSpec{
 			Table:   occupation.Table,
 			Columns: occupation.Columns,
@@ -241,16 +282,36 @@ var schemaGraph = func() *sqlgraph.Schema {
 		},
 		Type: "Occupation",
 		Fields: map[string]*sqlgraph.FieldSpec{
-			occupation.FieldCreatedAt:   {Type: field.TypeTime, Column: occupation.FieldCreatedAt},
-			occupation.FieldCreatedBy:   {Type: field.TypeInt, Column: occupation.FieldCreatedBy},
-			occupation.FieldDeletedAt:   {Type: field.TypeTime, Column: occupation.FieldDeletedAt},
-			occupation.FieldUpdatedBy:   {Type: field.TypeInt, Column: occupation.FieldUpdatedBy},
-			occupation.FieldUpdatedAt:   {Type: field.TypeTime, Column: occupation.FieldUpdatedAt},
+			occupation.FieldCreateTime:  {Type: field.TypeTime, Column: occupation.FieldCreateTime},
+			occupation.FieldCreatorID:   {Type: field.TypeInt, Column: occupation.FieldCreatorID},
+			occupation.FieldDeleteTime:  {Type: field.TypeTime, Column: occupation.FieldDeleteTime},
+			occupation.FieldUpdaterID:   {Type: field.TypeInt, Column: occupation.FieldUpdaterID},
+			occupation.FieldUpdateTime:  {Type: field.TypeTime, Column: occupation.FieldUpdateTime},
 			occupation.FieldName:        {Type: field.TypeString, Column: occupation.FieldName},
 			occupation.FieldDescription: {Type: field.TypeString, Column: occupation.FieldDescription},
 		},
 	}
-	graph.Nodes[10] = &sqlgraph.Node{
+	graph.Nodes[11] = &sqlgraph.Node{
+		NodeSpec: sqlgraph.NodeSpec{
+			Table:   permission.Table,
+			Columns: permission.Columns,
+			ID: &sqlgraph.FieldSpec{
+				Type:   field.TypeInt,
+				Column: permission.FieldID,
+			},
+		},
+		Type: "Permission",
+		Fields: map[string]*sqlgraph.FieldSpec{
+			permission.FieldCreateTime: {Type: field.TypeTime, Column: permission.FieldCreateTime},
+			permission.FieldCreatorID:  {Type: field.TypeInt, Column: permission.FieldCreatorID},
+			permission.FieldDeleteTime: {Type: field.TypeTime, Column: permission.FieldDeleteTime},
+			permission.FieldUpdaterID:  {Type: field.TypeInt, Column: permission.FieldUpdaterID},
+			permission.FieldUpdateTime: {Type: field.TypeTime, Column: permission.FieldUpdateTime},
+			permission.FieldName:       {Type: field.TypeString, Column: permission.FieldName},
+			permission.FieldAccessIds:  {Type: field.TypeJSON, Column: permission.FieldAccessIds},
+		},
+	}
+	graph.Nodes[12] = &sqlgraph.Node{
 		NodeSpec: sqlgraph.NodeSpec{
 			Table:   risk.Table,
 			Columns: risk.Columns,
@@ -261,24 +322,23 @@ var schemaGraph = func() *sqlgraph.Schema {
 		},
 		Type: "Risk",
 		Fields: map[string]*sqlgraph.FieldSpec{
-			risk.FieldCreatedAt:      {Type: field.TypeTime, Column: risk.FieldCreatedAt},
-			risk.FieldCreatedBy:      {Type: field.TypeInt, Column: risk.FieldCreatedBy},
-			risk.FieldDeletedAt:      {Type: field.TypeTime, Column: risk.FieldDeletedAt},
-			risk.FieldUpdatedBy:      {Type: field.TypeInt, Column: risk.FieldUpdatedBy},
-			risk.FieldUpdatedAt:      {Type: field.TypeTime, Column: risk.FieldUpdatedAt},
+			risk.FieldCreateTime:     {Type: field.TypeTime, Column: risk.FieldCreateTime},
+			risk.FieldCreatorID:      {Type: field.TypeInt, Column: risk.FieldCreatorID},
+			risk.FieldDeleteTime:     {Type: field.TypeTime, Column: risk.FieldDeleteTime},
+			risk.FieldUpdaterID:      {Type: field.TypeInt, Column: risk.FieldUpdaterID},
+			risk.FieldUpdateTime:     {Type: field.TypeTime, Column: risk.FieldUpdateTime},
 			risk.FieldTitle:          {Type: field.TypeString, Column: risk.FieldTitle},
 			risk.FieldContent:        {Type: field.TypeString, Column: risk.FieldContent},
 			risk.FieldImages:         {Type: field.TypeJSON, Column: risk.FieldImages},
 			risk.FieldRiskCategoryID: {Type: field.TypeInt, Column: risk.FieldRiskCategoryID},
 			risk.FieldRiskLocationID: {Type: field.TypeInt, Column: risk.FieldRiskLocationID},
-			risk.FieldReporterID:     {Type: field.TypeInt, Column: risk.FieldReporterID},
 			risk.FieldMaintainerID:   {Type: field.TypeInt, Column: risk.FieldMaintainerID},
 			risk.FieldMeasures:       {Type: field.TypeString, Column: risk.FieldMeasures},
 			risk.FieldMaintainStatus: {Type: field.TypeInt, Column: risk.FieldMaintainStatus},
 			risk.FieldDueTime:        {Type: field.TypeTime, Column: risk.FieldDueTime},
 		},
 	}
-	graph.Nodes[11] = &sqlgraph.Node{
+	graph.Nodes[13] = &sqlgraph.Node{
 		NodeSpec: sqlgraph.NodeSpec{
 			Table:   riskcategory.Table,
 			Columns: riskcategory.Columns,
@@ -289,15 +349,15 @@ var schemaGraph = func() *sqlgraph.Schema {
 		},
 		Type: "RiskCategory",
 		Fields: map[string]*sqlgraph.FieldSpec{
-			riskcategory.FieldCreatedAt: {Type: field.TypeTime, Column: riskcategory.FieldCreatedAt},
-			riskcategory.FieldCreatedBy: {Type: field.TypeInt, Column: riskcategory.FieldCreatedBy},
-			riskcategory.FieldDeletedAt: {Type: field.TypeTime, Column: riskcategory.FieldDeletedAt},
-			riskcategory.FieldUpdatedBy: {Type: field.TypeInt, Column: riskcategory.FieldUpdatedBy},
-			riskcategory.FieldUpdatedAt: {Type: field.TypeTime, Column: riskcategory.FieldUpdatedAt},
-			riskcategory.FieldName:      {Type: field.TypeString, Column: riskcategory.FieldName},
+			riskcategory.FieldCreateTime: {Type: field.TypeTime, Column: riskcategory.FieldCreateTime},
+			riskcategory.FieldCreatorID:  {Type: field.TypeInt, Column: riskcategory.FieldCreatorID},
+			riskcategory.FieldDeleteTime: {Type: field.TypeTime, Column: riskcategory.FieldDeleteTime},
+			riskcategory.FieldUpdaterID:  {Type: field.TypeInt, Column: riskcategory.FieldUpdaterID},
+			riskcategory.FieldUpdateTime: {Type: field.TypeTime, Column: riskcategory.FieldUpdateTime},
+			riskcategory.FieldName:       {Type: field.TypeString, Column: riskcategory.FieldName},
 		},
 	}
-	graph.Nodes[12] = &sqlgraph.Node{
+	graph.Nodes[14] = &sqlgraph.Node{
 		NodeSpec: sqlgraph.NodeSpec{
 			Table:   risklocation.Table,
 			Columns: risklocation.Columns,
@@ -308,15 +368,107 @@ var schemaGraph = func() *sqlgraph.Schema {
 		},
 		Type: "RiskLocation",
 		Fields: map[string]*sqlgraph.FieldSpec{
-			risklocation.FieldCreatedAt: {Type: field.TypeTime, Column: risklocation.FieldCreatedAt},
-			risklocation.FieldCreatedBy: {Type: field.TypeInt, Column: risklocation.FieldCreatedBy},
-			risklocation.FieldDeletedAt: {Type: field.TypeTime, Column: risklocation.FieldDeletedAt},
-			risklocation.FieldUpdatedBy: {Type: field.TypeInt, Column: risklocation.FieldUpdatedBy},
-			risklocation.FieldUpdatedAt: {Type: field.TypeTime, Column: risklocation.FieldUpdatedAt},
-			risklocation.FieldName:      {Type: field.TypeString, Column: risklocation.FieldName},
+			risklocation.FieldCreateTime: {Type: field.TypeTime, Column: risklocation.FieldCreateTime},
+			risklocation.FieldCreatorID:  {Type: field.TypeInt, Column: risklocation.FieldCreatorID},
+			risklocation.FieldDeleteTime: {Type: field.TypeTime, Column: risklocation.FieldDeleteTime},
+			risklocation.FieldUpdaterID:  {Type: field.TypeInt, Column: risklocation.FieldUpdaterID},
+			risklocation.FieldUpdateTime: {Type: field.TypeTime, Column: risklocation.FieldUpdateTime},
+			risklocation.FieldName:       {Type: field.TypeString, Column: risklocation.FieldName},
 		},
 	}
-	graph.Nodes[13] = &sqlgraph.Node{
+	graph.Nodes[15] = &sqlgraph.Node{
+		NodeSpec: sqlgraph.NodeSpec{
+			Table:   sweep.Table,
+			Columns: sweep.Columns,
+			ID: &sqlgraph.FieldSpec{
+				Type:   field.TypeInt,
+				Column: sweep.FieldID,
+			},
+		},
+		Type: "Sweep",
+		Fields: map[string]*sqlgraph.FieldSpec{
+			sweep.FieldCreateTime:     {Type: field.TypeTime, Column: sweep.FieldCreateTime},
+			sweep.FieldCreatorID:      {Type: field.TypeInt, Column: sweep.FieldCreatorID},
+			sweep.FieldDeleteTime:     {Type: field.TypeTime, Column: sweep.FieldDeleteTime},
+			sweep.FieldUpdaterID:      {Type: field.TypeInt, Column: sweep.FieldUpdaterID},
+			sweep.FieldUpdateTime:     {Type: field.TypeTime, Column: sweep.FieldUpdateTime},
+			sweep.FieldName:           {Type: field.TypeString, Column: sweep.FieldName},
+			sweep.FieldRiskCategoryID: {Type: field.TypeInt, Column: sweep.FieldRiskCategoryID},
+			sweep.FieldRiskLocationID: {Type: field.TypeInt, Column: sweep.FieldRiskLocationID},
+			sweep.FieldSweepJobs:      {Type: field.TypeJSON, Column: sweep.FieldSweepJobs},
+		},
+	}
+	graph.Nodes[16] = &sqlgraph.Node{
+		NodeSpec: sqlgraph.NodeSpec{
+			Table:   sweepresult.Table,
+			Columns: sweepresult.Columns,
+			ID: &sqlgraph.FieldSpec{
+				Type:   field.TypeInt,
+				Column: sweepresult.FieldID,
+			},
+		},
+		Type: "SweepResult",
+		Fields: map[string]*sqlgraph.FieldSpec{
+			sweepresult.FieldCreateTime:      {Type: field.TypeTime, Column: sweepresult.FieldCreateTime},
+			sweepresult.FieldCreatorID:       {Type: field.TypeInt, Column: sweepresult.FieldCreatorID},
+			sweepresult.FieldDeleteTime:      {Type: field.TypeTime, Column: sweepresult.FieldDeleteTime},
+			sweepresult.FieldUpdaterID:       {Type: field.TypeInt, Column: sweepresult.FieldUpdaterID},
+			sweepresult.FieldUpdateTime:      {Type: field.TypeTime, Column: sweepresult.FieldUpdateTime},
+			sweepresult.FieldSweepID:         {Type: field.TypeInt, Column: sweepresult.FieldSweepID},
+			sweepresult.FieldSweepScheduleID: {Type: field.TypeInt, Column: sweepresult.FieldSweepScheduleID},
+			sweepresult.FieldCheckInTime:     {Type: field.TypeTime, Column: sweepresult.FieldCheckInTime},
+			sweepresult.FieldCheckInImage:    {Type: field.TypeJSON, Column: sweepresult.FieldCheckInImage},
+			sweepresult.FieldSweepJobs:       {Type: field.TypeJSON, Column: sweepresult.FieldSweepJobs},
+		},
+	}
+	graph.Nodes[17] = &sqlgraph.Node{
+		NodeSpec: sqlgraph.NodeSpec{
+			Table:   sweepresultdetails.Table,
+			Columns: sweepresultdetails.Columns,
+			ID: &sqlgraph.FieldSpec{
+				Type:   field.TypeInt,
+				Column: sweepresultdetails.FieldID,
+			},
+		},
+		Type: "SweepResultDetails",
+		Fields: map[string]*sqlgraph.FieldSpec{
+			sweepresultdetails.FieldCreateTime:      {Type: field.TypeTime, Column: sweepresultdetails.FieldCreateTime},
+			sweepresultdetails.FieldCreatorID:       {Type: field.TypeInt, Column: sweepresultdetails.FieldCreatorID},
+			sweepresultdetails.FieldDeleteTime:      {Type: field.TypeTime, Column: sweepresultdetails.FieldDeleteTime},
+			sweepresultdetails.FieldUpdaterID:       {Type: field.TypeInt, Column: sweepresultdetails.FieldUpdaterID},
+			sweepresultdetails.FieldUpdateTime:      {Type: field.TypeTime, Column: sweepresultdetails.FieldUpdateTime},
+			sweepresultdetails.FieldSweepID:         {Type: field.TypeInt, Column: sweepresultdetails.FieldSweepID},
+			sweepresultdetails.FieldSweepScheduleID: {Type: field.TypeInt, Column: sweepresultdetails.FieldSweepScheduleID},
+			sweepresultdetails.FieldSweepResultID:   {Type: field.TypeInt, Column: sweepresultdetails.FieldSweepResultID},
+			sweepresultdetails.FieldTitle:           {Type: field.TypeString, Column: sweepresultdetails.FieldTitle},
+			sweepresultdetails.FieldResult:          {Type: field.TypeInt, Column: sweepresultdetails.FieldResult},
+		},
+	}
+	graph.Nodes[18] = &sqlgraph.Node{
+		NodeSpec: sqlgraph.NodeSpec{
+			Table:   sweepschedule.Table,
+			Columns: sweepschedule.Columns,
+			ID: &sqlgraph.FieldSpec{
+				Type:   field.TypeInt,
+				Column: sweepschedule.FieldID,
+			},
+		},
+		Type: "SweepSchedule",
+		Fields: map[string]*sqlgraph.FieldSpec{
+			sweepschedule.FieldCreateTime:     {Type: field.TypeTime, Column: sweepschedule.FieldCreateTime},
+			sweepschedule.FieldCreatorID:      {Type: field.TypeInt, Column: sweepschedule.FieldCreatorID},
+			sweepschedule.FieldDeleteTime:     {Type: field.TypeTime, Column: sweepschedule.FieldDeleteTime},
+			sweepschedule.FieldUpdaterID:      {Type: field.TypeInt, Column: sweepschedule.FieldUpdaterID},
+			sweepschedule.FieldUpdateTime:     {Type: field.TypeTime, Column: sweepschedule.FieldUpdateTime},
+			sweepschedule.FieldName:           {Type: field.TypeString, Column: sweepschedule.FieldName},
+			sweepschedule.FieldSweepID:        {Type: field.TypeInt, Column: sweepschedule.FieldSweepID},
+			sweepschedule.FieldScheduleStatus: {Type: field.TypeInt, Column: sweepschedule.FieldScheduleStatus},
+			sweepschedule.FieldActionTime:     {Type: field.TypeTime, Column: sweepschedule.FieldActionTime},
+			sweepschedule.FieldRemind:         {Type: field.TypeJSON, Column: sweepschedule.FieldRemind},
+			sweepschedule.FieldRepeat:         {Type: field.TypeJSON, Column: sweepschedule.FieldRepeat},
+		},
+	}
+	graph.Nodes[19] = &sqlgraph.Node{
 		NodeSpec: sqlgraph.NodeSpec{
 			Table:   video.Table,
 			Columns: video.Columns,
@@ -327,17 +479,16 @@ var schemaGraph = func() *sqlgraph.Schema {
 		},
 		Type: "Video",
 		Fields: map[string]*sqlgraph.FieldSpec{
-			video.FieldCreatedAt:   {Type: field.TypeTime, Column: video.FieldCreatedAt},
-			video.FieldCreatedBy:   {Type: field.TypeInt, Column: video.FieldCreatedBy},
-			video.FieldDeletedAt:   {Type: field.TypeTime, Column: video.FieldDeletedAt},
-			video.FieldUpdatedBy:   {Type: field.TypeInt, Column: video.FieldUpdatedBy},
-			video.FieldUpdatedAt:   {Type: field.TypeTime, Column: video.FieldUpdatedAt},
-			video.FieldName:        {Type: field.TypeString, Column: video.FieldName},
-			video.FieldURL:         {Type: field.TypeString, Column: video.FieldURL},
-			video.FieldSize:        {Type: field.TypeInt64, Column: video.FieldSize},
-			video.FieldDuration:    {Type: field.TypeString, Column: video.FieldDuration},
-			video.FieldUploadedAt:  {Type: field.TypeTime, Column: video.FieldUploadedAt},
-			video.FieldUploadedAt2: {Type: field.TypeTime, Column: video.FieldUploadedAt2},
+			video.FieldCreateTime: {Type: field.TypeTime, Column: video.FieldCreateTime},
+			video.FieldCreatorID:  {Type: field.TypeInt, Column: video.FieldCreatorID},
+			video.FieldDeleteTime: {Type: field.TypeTime, Column: video.FieldDeleteTime},
+			video.FieldUpdaterID:  {Type: field.TypeInt, Column: video.FieldUpdaterID},
+			video.FieldUpdateTime: {Type: field.TypeTime, Column: video.FieldUpdateTime},
+			video.FieldName:       {Type: field.TypeString, Column: video.FieldName},
+			video.FieldURL:        {Type: field.TypeString, Column: video.FieldURL},
+			video.FieldSize:       {Type: field.TypeInt64, Column: video.FieldSize},
+			video.FieldDuration:   {Type: field.TypeString, Column: video.FieldDuration},
+			video.FieldUploadedAt: {Type: field.TypeTime, Column: video.FieldUploadedAt},
 		},
 	}
 	graph.MustAddE(
@@ -365,16 +516,16 @@ var schemaGraph = func() *sqlgraph.Schema {
 		"Admin",
 	)
 	graph.MustAddE(
-		"admin_roles",
+		"permissions",
 		&sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2M,
 			Inverse: true,
-			Table:   admin.AdminRolesTable,
-			Columns: admin.AdminRolesPrimaryKey,
+			Table:   admin.PermissionsTable,
+			Columns: admin.PermissionsPrimaryKey,
 			Bidi:    false,
 		},
 		"Admin",
-		"AdminRole",
+		"Permission",
 	)
 	graph.MustAddE(
 		"admin_creator",
@@ -401,28 +552,28 @@ var schemaGraph = func() *sqlgraph.Schema {
 		"Admin",
 	)
 	graph.MustAddE(
-		"admin_role_creator",
+		"permission_creator",
 		&sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
-			Table:   admin.AdminRoleCreatorTable,
-			Columns: []string{admin.AdminRoleCreatorColumn},
+			Table:   admin.PermissionCreatorTable,
+			Columns: []string{admin.PermissionCreatorColumn},
 			Bidi:    false,
 		},
 		"Admin",
-		"AdminRole",
+		"Permission",
 	)
 	graph.MustAddE(
-		"admin_role_updater",
+		"permission_updater",
 		&sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
-			Table:   admin.AdminRoleUpdaterTable,
-			Columns: []string{admin.AdminRoleUpdaterColumn},
+			Table:   admin.PermissionUpdaterTable,
+			Columns: []string{admin.PermissionUpdaterColumn},
 			Bidi:    false,
 		},
 		"Admin",
-		"AdminRole",
+		"Permission",
 	)
 	graph.MustAddE(
 		"risk_creator",
@@ -443,6 +594,18 @@ var schemaGraph = func() *sqlgraph.Schema {
 			Inverse: false,
 			Table:   admin.RiskUpdaterTable,
 			Columns: []string{admin.RiskUpdaterColumn},
+			Bidi:    false,
+		},
+		"Admin",
+		"Risk",
+	)
+	graph.MustAddE(
+		"risk_maintainer",
+		&sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   admin.RiskMaintainerTable,
+			Columns: []string{admin.RiskMaintainerColumn},
 			Bidi:    false,
 		},
 		"Admin",
@@ -547,7 +710,7 @@ var schemaGraph = func() *sqlgraph.Schema {
 	graph.MustAddE(
 		"employee",
 		&sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
+			Rel:     sqlgraph.O2O,
 			Inverse: false,
 			Table:   admin.EmployeeTable,
 			Columns: []string{admin.EmployeeColumn},
@@ -581,28 +744,28 @@ var schemaGraph = func() *sqlgraph.Schema {
 		"Occupation",
 	)
 	graph.MustAddE(
-		"ipc_event_creator",
+		"event_creator",
 		&sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
-			Table:   admin.IpcEventCreatorTable,
-			Columns: []string{admin.IpcEventCreatorColumn},
+			Table:   admin.EventCreatorTable,
+			Columns: []string{admin.EventCreatorColumn},
 			Bidi:    false,
 		},
 		"Admin",
-		"IPCEvent",
+		"Event",
 	)
 	graph.MustAddE(
-		"ipc_event_updater",
+		"event_updater",
 		&sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
-			Table:   admin.IpcEventUpdaterTable,
-			Columns: []string{admin.IpcEventUpdaterColumn},
+			Table:   admin.EventUpdaterTable,
+			Columns: []string{admin.EventUpdaterColumn},
 			Bidi:    false,
 		},
 		"Admin",
-		"IPCEvent",
+		"Event",
 	)
 	graph.MustAddE(
 		"video_creator",
@@ -725,40 +888,196 @@ var schemaGraph = func() *sqlgraph.Schema {
 		"EventLevel",
 	)
 	graph.MustAddE(
-		"creator",
+		"fixing_creator",
 		&sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2O,
-			Inverse: true,
-			Table:   adminrole.CreatorTable,
-			Columns: []string{adminrole.CreatorColumn},
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   admin.FixingCreatorTable,
+			Columns: []string{admin.FixingCreatorColumn},
 			Bidi:    false,
 		},
-		"AdminRole",
 		"Admin",
+		"Fixing",
 	)
 	graph.MustAddE(
-		"updater",
+		"fixing_updater",
 		&sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2O,
-			Inverse: true,
-			Table:   adminrole.UpdaterTable,
-			Columns: []string{adminrole.UpdaterColumn},
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   admin.FixingUpdaterTable,
+			Columns: []string{admin.FixingUpdaterColumn},
 			Bidi:    false,
 		},
-		"AdminRole",
 		"Admin",
+		"Fixing",
 	)
 	graph.MustAddE(
-		"admins",
+		"fixer",
+		&sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   admin.FixerTable,
+			Columns: []string{admin.FixerColumn},
+			Bidi:    false,
+		},
+		"Admin",
+		"Fixing",
+	)
+	graph.MustAddE(
+		"event_log_creator",
+		&sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   admin.EventLogCreatorTable,
+			Columns: []string{admin.EventLogCreatorColumn},
+			Bidi:    false,
+		},
+		"Admin",
+		"EventLog",
+	)
+	graph.MustAddE(
+		"event_log_updater",
+		&sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   admin.EventLogUpdaterTable,
+			Columns: []string{admin.EventLogUpdaterColumn},
+			Bidi:    false,
+		},
+		"Admin",
+		"EventLog",
+	)
+	graph.MustAddE(
+		"event_log_actor",
+		&sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   admin.EventLogActorTable,
+			Columns: []string{admin.EventLogActorColumn},
+			Bidi:    false,
+		},
+		"Admin",
+		"EventLog",
+	)
+	graph.MustAddE(
+		"event_log_actor2",
+		&sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   admin.EventLogActor2Table,
+			Columns: []string{admin.EventLogActor2Column},
+			Bidi:    false,
+		},
+		"Admin",
+		"EventLog",
+	)
+	graph.MustAddE(
+		"sweep_creator",
+		&sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   admin.SweepCreatorTable,
+			Columns: []string{admin.SweepCreatorColumn},
+			Bidi:    false,
+		},
+		"Admin",
+		"Sweep",
+	)
+	graph.MustAddE(
+		"sweep_updater",
+		&sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   admin.SweepUpdaterTable,
+			Columns: []string{admin.SweepUpdaterColumn},
+			Bidi:    false,
+		},
+		"Admin",
+		"Sweep",
+	)
+	graph.MustAddE(
+		"sweep_schedule_creator",
+		&sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   admin.SweepScheduleCreatorTable,
+			Columns: []string{admin.SweepScheduleCreatorColumn},
+			Bidi:    false,
+		},
+		"Admin",
+		"SweepSchedule",
+	)
+	graph.MustAddE(
+		"sweep_schedule_updater",
+		&sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   admin.SweepScheduleUpdaterTable,
+			Columns: []string{admin.SweepScheduleUpdaterColumn},
+			Bidi:    false,
+		},
+		"Admin",
+		"SweepSchedule",
+	)
+	graph.MustAddE(
+		"sweep_schedule",
 		&sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2M,
 			Inverse: false,
-			Table:   adminrole.AdminsTable,
-			Columns: adminrole.AdminsPrimaryKey,
+			Table:   admin.SweepScheduleTable,
+			Columns: admin.SweepSchedulePrimaryKey,
 			Bidi:    false,
 		},
-		"AdminRole",
 		"Admin",
+		"SweepSchedule",
+	)
+	graph.MustAddE(
+		"sweep_result_creator",
+		&sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   admin.SweepResultCreatorTable,
+			Columns: []string{admin.SweepResultCreatorColumn},
+			Bidi:    false,
+		},
+		"Admin",
+		"SweepResult",
+	)
+	graph.MustAddE(
+		"sweep_result_updater",
+		&sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   admin.SweepResultUpdaterTable,
+			Columns: []string{admin.SweepResultUpdaterColumn},
+			Bidi:    false,
+		},
+		"Admin",
+		"SweepResult",
+	)
+	graph.MustAddE(
+		"sweep_result_details_creator",
+		&sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   admin.SweepResultDetailsCreatorTable,
+			Columns: []string{admin.SweepResultDetailsCreatorColumn},
+			Bidi:    false,
+		},
+		"Admin",
+		"SweepResultDetails",
+	)
+	graph.MustAddE(
+		"sweep_result_details_updater",
+		&sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   admin.SweepResultDetailsUpdaterTable,
+			Columns: []string{admin.SweepResultDetailsUpdaterColumn},
+			Bidi:    false,
+		},
+		"Admin",
+		"SweepResultDetails",
 	)
 	graph.MustAddE(
 		"creator",
@@ -785,12 +1104,12 @@ var schemaGraph = func() *sqlgraph.Schema {
 		"Admin",
 	)
 	graph.MustAddE(
-		"device_installation_area",
+		"device_installation",
 		&sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
-			Table:   area.DeviceInstallationAreaTable,
-			Columns: []string{area.DeviceInstallationAreaColumn},
+			Table:   area.DeviceInstallationTable,
+			Columns: []string{area.DeviceInstallationColumn},
 			Bidi:    false,
 		},
 		"Area",
@@ -831,6 +1150,18 @@ var schemaGraph = func() *sqlgraph.Schema {
 		},
 		"Department",
 		"Department",
+	)
+	graph.MustAddE(
+		"permissions",
+		&sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: true,
+			Table:   department.PermissionsTable,
+			Columns: department.PermissionsPrimaryKey,
+			Bidi:    false,
+		},
+		"Department",
+		"Permission",
 	)
 	graph.MustAddE(
 		"employees",
@@ -881,28 +1212,52 @@ var schemaGraph = func() *sqlgraph.Schema {
 		"Admin",
 	)
 	graph.MustAddE(
-		"ipc_event_device",
+		"event",
 		&sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
-			Table:   device.IpcEventDeviceTable,
-			Columns: []string{device.IpcEventDeviceColumn},
+			Table:   device.EventTable,
+			Columns: []string{device.EventColumn},
 			Bidi:    false,
 		},
 		"Device",
-		"IPCEvent",
+		"Event",
 	)
 	graph.MustAddE(
-		"device_installation_device",
+		"device_installation",
 		&sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
-			Table:   device.DeviceInstallationDeviceTable,
-			Columns: []string{device.DeviceInstallationDeviceColumn},
+			Table:   device.DeviceInstallationTable,
+			Columns: []string{device.DeviceInstallationColumn},
 			Bidi:    false,
 		},
 		"Device",
 		"DeviceInstallation",
+	)
+	graph.MustAddE(
+		"event_log",
+		&sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   device.EventLogTable,
+			Columns: []string{device.EventLogColumn},
+			Bidi:    false,
+		},
+		"Device",
+		"EventLog",
+	)
+	graph.MustAddE(
+		"fixing",
+		&sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   device.FixingTable,
+			Columns: []string{device.FixingColumn},
+			Bidi:    false,
+		},
+		"Device",
+		"Fixing",
 	)
 	graph.MustAddE(
 		"creator",
@@ -979,7 +1334,7 @@ var schemaGraph = func() *sqlgraph.Schema {
 	graph.MustAddE(
 		"admin",
 		&sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2O,
+			Rel:     sqlgraph.O2O,
 			Inverse: true,
 			Table:   employee.AdminTable,
 			Columns: []string{employee.AdminColumn},
@@ -987,6 +1342,18 @@ var schemaGraph = func() *sqlgraph.Schema {
 		},
 		"Employee",
 		"Admin",
+	)
+	graph.MustAddE(
+		"occupation",
+		&sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   employee.OccupationTable,
+			Columns: []string{employee.OccupationColumn},
+			Bidi:    false,
+		},
+		"Employee",
+		"Occupation",
 	)
 	graph.MustAddE(
 		"department",
@@ -1001,52 +1368,76 @@ var schemaGraph = func() *sqlgraph.Schema {
 		"Department",
 	)
 	graph.MustAddE(
-		"occupations",
+		"creator",
 		&sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
+			Rel:     sqlgraph.M2O,
 			Inverse: true,
-			Table:   employee.OccupationsTable,
-			Columns: employee.OccupationsPrimaryKey,
+			Table:   event.CreatorTable,
+			Columns: []string{event.CreatorColumn},
 			Bidi:    false,
 		},
-		"Employee",
-		"Occupation",
+		"Event",
+		"Admin",
 	)
 	graph.MustAddE(
-		"ipc_events",
+		"updater",
 		&sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
+			Rel:     sqlgraph.M2O,
 			Inverse: true,
-			Table:   employee.IpcEventsTable,
-			Columns: employee.IpcEventsPrimaryKey,
+			Table:   event.UpdaterTable,
+			Columns: []string{event.UpdaterColumn},
 			Bidi:    false,
 		},
-		"Employee",
-		"IPCEvent",
+		"Event",
+		"Admin",
 	)
 	graph.MustAddE(
-		"risk_reporter",
+		"video",
+		&sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   event.VideoTable,
+			Columns: []string{event.VideoColumn},
+			Bidi:    false,
+		},
+		"Event",
+		"Video",
+	)
+	graph.MustAddE(
+		"device",
+		&sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   event.DeviceTable,
+			Columns: []string{event.DeviceColumn},
+			Bidi:    false,
+		},
+		"Event",
+		"Device",
+	)
+	graph.MustAddE(
+		"fixing",
+		&sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2O,
+			Inverse: false,
+			Table:   event.FixingTable,
+			Columns: []string{event.FixingColumn},
+			Bidi:    false,
+		},
+		"Event",
+		"Fixing",
+	)
+	graph.MustAddE(
+		"event_log",
 		&sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
-			Table:   employee.RiskReporterTable,
-			Columns: []string{employee.RiskReporterColumn},
+			Table:   event.EventLogTable,
+			Columns: []string{event.EventLogColumn},
 			Bidi:    false,
 		},
-		"Employee",
-		"Risk",
-	)
-	graph.MustAddE(
-		"risk_maintainer",
-		&sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
-			Inverse: false,
-			Table:   employee.RiskMaintainerTable,
-			Columns: []string{employee.RiskMaintainerColumn},
-			Bidi:    false,
-		},
-		"Employee",
-		"Risk",
+		"Event",
+		"EventLog",
 	)
 	graph.MustAddE(
 		"creator",
@@ -1077,11 +1468,11 @@ var schemaGraph = func() *sqlgraph.Schema {
 		&sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: true,
-			Table:   ipcevent.CreatorTable,
-			Columns: []string{ipcevent.CreatorColumn},
+			Table:   eventlog.CreatorTable,
+			Columns: []string{eventlog.CreatorColumn},
 			Bidi:    false,
 		},
-		"IPCEvent",
+		"EventLog",
 		"Admin",
 	)
 	graph.MustAddE(
@@ -1089,48 +1480,120 @@ var schemaGraph = func() *sqlgraph.Schema {
 		&sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: true,
-			Table:   ipcevent.UpdaterTable,
-			Columns: []string{ipcevent.UpdaterColumn},
+			Table:   eventlog.UpdaterTable,
+			Columns: []string{eventlog.UpdaterColumn},
 			Bidi:    false,
 		},
-		"IPCEvent",
+		"EventLog",
 		"Admin",
 	)
 	graph.MustAddE(
-		"video",
+		"event",
 		&sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: true,
-			Table:   ipcevent.VideoTable,
-			Columns: []string{ipcevent.VideoColumn},
+			Table:   eventlog.EventTable,
+			Columns: []string{eventlog.EventColumn},
 			Bidi:    false,
 		},
-		"IPCEvent",
-		"Video",
+		"EventLog",
+		"Event",
 	)
 	graph.MustAddE(
 		"device",
 		&sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
 			Inverse: true,
-			Table:   ipcevent.DeviceTable,
-			Columns: []string{ipcevent.DeviceColumn},
+			Table:   eventlog.DeviceTable,
+			Columns: []string{eventlog.DeviceColumn},
 			Bidi:    false,
 		},
-		"IPCEvent",
+		"EventLog",
 		"Device",
 	)
 	graph.MustAddE(
-		"fixers",
+		"actor",
 		&sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
-			Inverse: false,
-			Table:   ipcevent.FixersTable,
-			Columns: ipcevent.FixersPrimaryKey,
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   eventlog.ActorTable,
+			Columns: []string{eventlog.ActorColumn},
 			Bidi:    false,
 		},
-		"IPCEvent",
-		"Employee",
+		"EventLog",
+		"Admin",
+	)
+	graph.MustAddE(
+		"actor2",
+		&sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   eventlog.Actor2Table,
+			Columns: []string{eventlog.Actor2Column},
+			Bidi:    false,
+		},
+		"EventLog",
+		"Admin",
+	)
+	graph.MustAddE(
+		"creator",
+		&sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   fixing.CreatorTable,
+			Columns: []string{fixing.CreatorColumn},
+			Bidi:    false,
+		},
+		"Fixing",
+		"Admin",
+	)
+	graph.MustAddE(
+		"updater",
+		&sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   fixing.UpdaterTable,
+			Columns: []string{fixing.UpdaterColumn},
+			Bidi:    false,
+		},
+		"Fixing",
+		"Admin",
+	)
+	graph.MustAddE(
+		"fixer",
+		&sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   fixing.FixerTable,
+			Columns: []string{fixing.FixerColumn},
+			Bidi:    false,
+		},
+		"Fixing",
+		"Admin",
+	)
+	graph.MustAddE(
+		"event",
+		&sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2O,
+			Inverse: true,
+			Table:   fixing.EventTable,
+			Columns: []string{fixing.EventColumn},
+			Bidi:    false,
+		},
+		"Fixing",
+		"Event",
+	)
+	graph.MustAddE(
+		"device",
+		&sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   fixing.DeviceTable,
+			Columns: []string{fixing.DeviceColumn},
+			Bidi:    false,
+		},
+		"Fixing",
+		"Device",
 	)
 	graph.MustAddE(
 		"creator",
@@ -1157,16 +1620,64 @@ var schemaGraph = func() *sqlgraph.Schema {
 		"Admin",
 	)
 	graph.MustAddE(
-		"employees",
+		"employee",
 		&sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
+			Rel:     sqlgraph.O2M,
 			Inverse: false,
-			Table:   occupation.EmployeesTable,
-			Columns: occupation.EmployeesPrimaryKey,
+			Table:   occupation.EmployeeTable,
+			Columns: []string{occupation.EmployeeColumn},
 			Bidi:    false,
 		},
 		"Occupation",
 		"Employee",
+	)
+	graph.MustAddE(
+		"creator",
+		&sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   permission.CreatorTable,
+			Columns: []string{permission.CreatorColumn},
+			Bidi:    false,
+		},
+		"Permission",
+		"Admin",
+	)
+	graph.MustAddE(
+		"updater",
+		&sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   permission.UpdaterTable,
+			Columns: []string{permission.UpdaterColumn},
+			Bidi:    false,
+		},
+		"Permission",
+		"Admin",
+	)
+	graph.MustAddE(
+		"admin",
+		&sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: false,
+			Table:   permission.AdminTable,
+			Columns: permission.AdminPrimaryKey,
+			Bidi:    false,
+		},
+		"Permission",
+		"Admin",
+	)
+	graph.MustAddE(
+		"department",
+		&sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: false,
+			Table:   permission.DepartmentTable,
+			Columns: permission.DepartmentPrimaryKey,
+			Bidi:    false,
+		},
+		"Permission",
+		"Department",
 	)
 	graph.MustAddE(
 		"creator",
@@ -1217,18 +1728,6 @@ var schemaGraph = func() *sqlgraph.Schema {
 		"RiskLocation",
 	)
 	graph.MustAddE(
-		"reporter",
-		&sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2O,
-			Inverse: true,
-			Table:   risk.ReporterTable,
-			Columns: []string{risk.ReporterColumn},
-			Bidi:    false,
-		},
-		"Risk",
-		"Employee",
-	)
-	graph.MustAddE(
 		"maintainer",
 		&sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
@@ -1238,7 +1737,7 @@ var schemaGraph = func() *sqlgraph.Schema {
 			Bidi:    false,
 		},
 		"Risk",
-		"Employee",
+		"Admin",
 	)
 	graph.MustAddE(
 		"creator",
@@ -1277,6 +1776,18 @@ var schemaGraph = func() *sqlgraph.Schema {
 		"Risk",
 	)
 	graph.MustAddE(
+		"sweep",
+		&sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   riskcategory.SweepTable,
+			Columns: []string{riskcategory.SweepColumn},
+			Bidi:    false,
+		},
+		"RiskCategory",
+		"Sweep",
+	)
+	graph.MustAddE(
 		"creator",
 		&sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
@@ -1313,6 +1824,294 @@ var schemaGraph = func() *sqlgraph.Schema {
 		"Risk",
 	)
 	graph.MustAddE(
+		"sweep",
+		&sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   risklocation.SweepTable,
+			Columns: []string{risklocation.SweepColumn},
+			Bidi:    false,
+		},
+		"RiskLocation",
+		"Sweep",
+	)
+	graph.MustAddE(
+		"creator",
+		&sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   sweep.CreatorTable,
+			Columns: []string{sweep.CreatorColumn},
+			Bidi:    false,
+		},
+		"Sweep",
+		"Admin",
+	)
+	graph.MustAddE(
+		"updater",
+		&sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   sweep.UpdaterTable,
+			Columns: []string{sweep.UpdaterColumn},
+			Bidi:    false,
+		},
+		"Sweep",
+		"Admin",
+	)
+	graph.MustAddE(
+		"risk_category",
+		&sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   sweep.RiskCategoryTable,
+			Columns: []string{sweep.RiskCategoryColumn},
+			Bidi:    false,
+		},
+		"Sweep",
+		"RiskCategory",
+	)
+	graph.MustAddE(
+		"risk_location",
+		&sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   sweep.RiskLocationTable,
+			Columns: []string{sweep.RiskLocationColumn},
+			Bidi:    false,
+		},
+		"Sweep",
+		"RiskLocation",
+	)
+	graph.MustAddE(
+		"sweep_schedule",
+		&sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   sweep.SweepScheduleTable,
+			Columns: []string{sweep.SweepScheduleColumn},
+			Bidi:    false,
+		},
+		"Sweep",
+		"SweepSchedule",
+	)
+	graph.MustAddE(
+		"sweep_result",
+		&sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   sweep.SweepResultTable,
+			Columns: []string{sweep.SweepResultColumn},
+			Bidi:    false,
+		},
+		"Sweep",
+		"SweepResult",
+	)
+	graph.MustAddE(
+		"sweep_result_details",
+		&sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   sweep.SweepResultDetailsTable,
+			Columns: []string{sweep.SweepResultDetailsColumn},
+			Bidi:    false,
+		},
+		"Sweep",
+		"SweepResultDetails",
+	)
+	graph.MustAddE(
+		"creator",
+		&sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   sweepresult.CreatorTable,
+			Columns: []string{sweepresult.CreatorColumn},
+			Bidi:    false,
+		},
+		"SweepResult",
+		"Admin",
+	)
+	graph.MustAddE(
+		"updater",
+		&sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   sweepresult.UpdaterTable,
+			Columns: []string{sweepresult.UpdaterColumn},
+			Bidi:    false,
+		},
+		"SweepResult",
+		"Admin",
+	)
+	graph.MustAddE(
+		"sweep",
+		&sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   sweepresult.SweepTable,
+			Columns: []string{sweepresult.SweepColumn},
+			Bidi:    false,
+		},
+		"SweepResult",
+		"Sweep",
+	)
+	graph.MustAddE(
+		"sweep_schedule",
+		&sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   sweepresult.SweepScheduleTable,
+			Columns: []string{sweepresult.SweepScheduleColumn},
+			Bidi:    false,
+		},
+		"SweepResult",
+		"SweepSchedule",
+	)
+	graph.MustAddE(
+		"sweep_result_details",
+		&sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   sweepresult.SweepResultDetailsTable,
+			Columns: []string{sweepresult.SweepResultDetailsColumn},
+			Bidi:    false,
+		},
+		"SweepResult",
+		"SweepResultDetails",
+	)
+	graph.MustAddE(
+		"creator",
+		&sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   sweepresultdetails.CreatorTable,
+			Columns: []string{sweepresultdetails.CreatorColumn},
+			Bidi:    false,
+		},
+		"SweepResultDetails",
+		"Admin",
+	)
+	graph.MustAddE(
+		"updater",
+		&sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   sweepresultdetails.UpdaterTable,
+			Columns: []string{sweepresultdetails.UpdaterColumn},
+			Bidi:    false,
+		},
+		"SweepResultDetails",
+		"Admin",
+	)
+	graph.MustAddE(
+		"sweep",
+		&sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   sweepresultdetails.SweepTable,
+			Columns: []string{sweepresultdetails.SweepColumn},
+			Bidi:    false,
+		},
+		"SweepResultDetails",
+		"Sweep",
+	)
+	graph.MustAddE(
+		"sweep_schedule",
+		&sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   sweepresultdetails.SweepScheduleTable,
+			Columns: []string{sweepresultdetails.SweepScheduleColumn},
+			Bidi:    false,
+		},
+		"SweepResultDetails",
+		"SweepSchedule",
+	)
+	graph.MustAddE(
+		"sweep_result",
+		&sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   sweepresultdetails.SweepResultTable,
+			Columns: []string{sweepresultdetails.SweepResultColumn},
+			Bidi:    false,
+		},
+		"SweepResultDetails",
+		"SweepResult",
+	)
+	graph.MustAddE(
+		"creator",
+		&sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   sweepschedule.CreatorTable,
+			Columns: []string{sweepschedule.CreatorColumn},
+			Bidi:    false,
+		},
+		"SweepSchedule",
+		"Admin",
+	)
+	graph.MustAddE(
+		"updater",
+		&sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   sweepschedule.UpdaterTable,
+			Columns: []string{sweepschedule.UpdaterColumn},
+			Bidi:    false,
+		},
+		"SweepSchedule",
+		"Admin",
+	)
+	graph.MustAddE(
+		"sweep",
+		&sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   sweepschedule.SweepTable,
+			Columns: []string{sweepschedule.SweepColumn},
+			Bidi:    false,
+		},
+		"SweepSchedule",
+		"Sweep",
+	)
+	graph.MustAddE(
+		"workers",
+		&sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: true,
+			Table:   sweepschedule.WorkersTable,
+			Columns: sweepschedule.WorkersPrimaryKey,
+			Bidi:    false,
+		},
+		"SweepSchedule",
+		"Admin",
+	)
+	graph.MustAddE(
+		"sweep_result",
+		&sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   sweepschedule.SweepResultTable,
+			Columns: []string{sweepschedule.SweepResultColumn},
+			Bidi:    false,
+		},
+		"SweepSchedule",
+		"SweepResult",
+	)
+	graph.MustAddE(
+		"sweep_result_details",
+		&sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   sweepschedule.SweepResultDetailsTable,
+			Columns: []string{sweepschedule.SweepResultDetailsColumn},
+			Bidi:    false,
+		},
+		"SweepSchedule",
+		"SweepResultDetails",
+	)
+	graph.MustAddE(
 		"creator",
 		&sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
@@ -1337,16 +2136,16 @@ var schemaGraph = func() *sqlgraph.Schema {
 		"Admin",
 	)
 	graph.MustAddE(
-		"ipc_event_video",
+		"event",
 		&sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
-			Table:   video.IpcEventVideoTable,
-			Columns: []string{video.IpcEventVideoColumn},
+			Table:   video.EventTable,
+			Columns: []string{video.EventColumn},
 			Bidi:    false,
 		},
 		"Video",
-		"IPCEvent",
+		"Event",
 	)
 	return graph
 }()
@@ -1397,29 +2196,29 @@ func (f *AdminFilter) WhereID(p entql.IntP) {
 	f.Where(p.Field(admin.FieldID))
 }
 
-// WhereCreatedAt applies the entql time.Time predicate on the created_at field.
-func (f *AdminFilter) WhereCreatedAt(p entql.TimeP) {
-	f.Where(p.Field(admin.FieldCreatedAt))
+// WhereCreateTime applies the entql time.Time predicate on the create_time field.
+func (f *AdminFilter) WhereCreateTime(p entql.TimeP) {
+	f.Where(p.Field(admin.FieldCreateTime))
 }
 
-// WhereCreatedBy applies the entql int predicate on the created_by field.
-func (f *AdminFilter) WhereCreatedBy(p entql.IntP) {
-	f.Where(p.Field(admin.FieldCreatedBy))
+// WhereCreatorID applies the entql int predicate on the creator_id field.
+func (f *AdminFilter) WhereCreatorID(p entql.IntP) {
+	f.Where(p.Field(admin.FieldCreatorID))
 }
 
-// WhereDeletedAt applies the entql time.Time predicate on the deleted_at field.
-func (f *AdminFilter) WhereDeletedAt(p entql.TimeP) {
-	f.Where(p.Field(admin.FieldDeletedAt))
+// WhereDeleteTime applies the entql time.Time predicate on the delete_time field.
+func (f *AdminFilter) WhereDeleteTime(p entql.TimeP) {
+	f.Where(p.Field(admin.FieldDeleteTime))
 }
 
-// WhereUpdatedBy applies the entql int predicate on the updated_by field.
-func (f *AdminFilter) WhereUpdatedBy(p entql.IntP) {
-	f.Where(p.Field(admin.FieldUpdatedBy))
+// WhereUpdaterID applies the entql int predicate on the updater_id field.
+func (f *AdminFilter) WhereUpdaterID(p entql.IntP) {
+	f.Where(p.Field(admin.FieldUpdaterID))
 }
 
-// WhereUpdatedAt applies the entql time.Time predicate on the updated_at field.
-func (f *AdminFilter) WhereUpdatedAt(p entql.TimeP) {
-	f.Where(p.Field(admin.FieldUpdatedAt))
+// WhereUpdateTime applies the entql time.Time predicate on the update_time field.
+func (f *AdminFilter) WhereUpdateTime(p entql.TimeP) {
+	f.Where(p.Field(admin.FieldUpdateTime))
 }
 
 // WhereUsername applies the entql string predicate on the username field.
@@ -1442,9 +2241,19 @@ func (f *AdminFilter) WhereRealName(p entql.StringP) {
 	f.Where(p.Field(admin.FieldRealName))
 }
 
-// WhereAvatar applies the entql string predicate on the avatar field.
-func (f *AdminFilter) WhereAvatar(p entql.StringP) {
+// WhereMobile applies the entql string predicate on the mobile field.
+func (f *AdminFilter) WhereMobile(p entql.StringP) {
+	f.Where(p.Field(admin.FieldMobile))
+}
+
+// WhereAvatar applies the entql json.RawMessage predicate on the avatar field.
+func (f *AdminFilter) WhereAvatar(p entql.BytesP) {
 	f.Where(p.Field(admin.FieldAvatar))
+}
+
+// WhereAdminStatus applies the entql int predicate on the admin_status field.
+func (f *AdminFilter) WhereAdminStatus(p entql.IntP) {
+	f.Where(p.Field(admin.FieldAdminStatus))
 }
 
 // WhereHasCreator applies a predicate to check if query has an edge creator.
@@ -1475,14 +2284,14 @@ func (f *AdminFilter) WhereHasUpdaterWith(preds ...predicate.Admin) {
 	})))
 }
 
-// WhereHasAdminRoles applies a predicate to check if query has an edge admin_roles.
-func (f *AdminFilter) WhereHasAdminRoles() {
-	f.Where(entql.HasEdge("admin_roles"))
+// WhereHasPermissions applies a predicate to check if query has an edge permissions.
+func (f *AdminFilter) WhereHasPermissions() {
+	f.Where(entql.HasEdge("permissions"))
 }
 
-// WhereHasAdminRolesWith applies a predicate to check if query has an edge admin_roles with a given conditions (other predicates).
-func (f *AdminFilter) WhereHasAdminRolesWith(preds ...predicate.AdminRole) {
-	f.Where(entql.HasEdgeWith("admin_roles", sqlgraph.WrapFunc(func(s *sql.Selector) {
+// WhereHasPermissionsWith applies a predicate to check if query has an edge permissions with a given conditions (other predicates).
+func (f *AdminFilter) WhereHasPermissionsWith(preds ...predicate.Permission) {
+	f.Where(entql.HasEdgeWith("permissions", sqlgraph.WrapFunc(func(s *sql.Selector) {
 		for _, p := range preds {
 			p(s)
 		}
@@ -1517,28 +2326,28 @@ func (f *AdminFilter) WhereHasAdminUpdaterWith(preds ...predicate.Admin) {
 	})))
 }
 
-// WhereHasAdminRoleCreator applies a predicate to check if query has an edge admin_role_creator.
-func (f *AdminFilter) WhereHasAdminRoleCreator() {
-	f.Where(entql.HasEdge("admin_role_creator"))
+// WhereHasPermissionCreator applies a predicate to check if query has an edge permission_creator.
+func (f *AdminFilter) WhereHasPermissionCreator() {
+	f.Where(entql.HasEdge("permission_creator"))
 }
 
-// WhereHasAdminRoleCreatorWith applies a predicate to check if query has an edge admin_role_creator with a given conditions (other predicates).
-func (f *AdminFilter) WhereHasAdminRoleCreatorWith(preds ...predicate.AdminRole) {
-	f.Where(entql.HasEdgeWith("admin_role_creator", sqlgraph.WrapFunc(func(s *sql.Selector) {
+// WhereHasPermissionCreatorWith applies a predicate to check if query has an edge permission_creator with a given conditions (other predicates).
+func (f *AdminFilter) WhereHasPermissionCreatorWith(preds ...predicate.Permission) {
+	f.Where(entql.HasEdgeWith("permission_creator", sqlgraph.WrapFunc(func(s *sql.Selector) {
 		for _, p := range preds {
 			p(s)
 		}
 	})))
 }
 
-// WhereHasAdminRoleUpdater applies a predicate to check if query has an edge admin_role_updater.
-func (f *AdminFilter) WhereHasAdminRoleUpdater() {
-	f.Where(entql.HasEdge("admin_role_updater"))
+// WhereHasPermissionUpdater applies a predicate to check if query has an edge permission_updater.
+func (f *AdminFilter) WhereHasPermissionUpdater() {
+	f.Where(entql.HasEdge("permission_updater"))
 }
 
-// WhereHasAdminRoleUpdaterWith applies a predicate to check if query has an edge admin_role_updater with a given conditions (other predicates).
-func (f *AdminFilter) WhereHasAdminRoleUpdaterWith(preds ...predicate.AdminRole) {
-	f.Where(entql.HasEdgeWith("admin_role_updater", sqlgraph.WrapFunc(func(s *sql.Selector) {
+// WhereHasPermissionUpdaterWith applies a predicate to check if query has an edge permission_updater with a given conditions (other predicates).
+func (f *AdminFilter) WhereHasPermissionUpdaterWith(preds ...predicate.Permission) {
+	f.Where(entql.HasEdgeWith("permission_updater", sqlgraph.WrapFunc(func(s *sql.Selector) {
 		for _, p := range preds {
 			p(s)
 		}
@@ -1567,6 +2376,20 @@ func (f *AdminFilter) WhereHasRiskUpdater() {
 // WhereHasRiskUpdaterWith applies a predicate to check if query has an edge risk_updater with a given conditions (other predicates).
 func (f *AdminFilter) WhereHasRiskUpdaterWith(preds ...predicate.Risk) {
 	f.Where(entql.HasEdgeWith("risk_updater", sqlgraph.WrapFunc(func(s *sql.Selector) {
+		for _, p := range preds {
+			p(s)
+		}
+	})))
+}
+
+// WhereHasRiskMaintainer applies a predicate to check if query has an edge risk_maintainer.
+func (f *AdminFilter) WhereHasRiskMaintainer() {
+	f.Where(entql.HasEdge("risk_maintainer"))
+}
+
+// WhereHasRiskMaintainerWith applies a predicate to check if query has an edge risk_maintainer with a given conditions (other predicates).
+func (f *AdminFilter) WhereHasRiskMaintainerWith(preds ...predicate.Risk) {
+	f.Where(entql.HasEdgeWith("risk_maintainer", sqlgraph.WrapFunc(func(s *sql.Selector) {
 		for _, p := range preds {
 			p(s)
 		}
@@ -1727,28 +2550,28 @@ func (f *AdminFilter) WhereHasOccupationUpdaterWith(preds ...predicate.Occupatio
 	})))
 }
 
-// WhereHasIpcEventCreator applies a predicate to check if query has an edge ipc_event_creator.
-func (f *AdminFilter) WhereHasIpcEventCreator() {
-	f.Where(entql.HasEdge("ipc_event_creator"))
+// WhereHasEventCreator applies a predicate to check if query has an edge event_creator.
+func (f *AdminFilter) WhereHasEventCreator() {
+	f.Where(entql.HasEdge("event_creator"))
 }
 
-// WhereHasIpcEventCreatorWith applies a predicate to check if query has an edge ipc_event_creator with a given conditions (other predicates).
-func (f *AdminFilter) WhereHasIpcEventCreatorWith(preds ...predicate.IPCEvent) {
-	f.Where(entql.HasEdgeWith("ipc_event_creator", sqlgraph.WrapFunc(func(s *sql.Selector) {
+// WhereHasEventCreatorWith applies a predicate to check if query has an edge event_creator with a given conditions (other predicates).
+func (f *AdminFilter) WhereHasEventCreatorWith(preds ...predicate.Event) {
+	f.Where(entql.HasEdgeWith("event_creator", sqlgraph.WrapFunc(func(s *sql.Selector) {
 		for _, p := range preds {
 			p(s)
 		}
 	})))
 }
 
-// WhereHasIpcEventUpdater applies a predicate to check if query has an edge ipc_event_updater.
-func (f *AdminFilter) WhereHasIpcEventUpdater() {
-	f.Where(entql.HasEdge("ipc_event_updater"))
+// WhereHasEventUpdater applies a predicate to check if query has an edge event_updater.
+func (f *AdminFilter) WhereHasEventUpdater() {
+	f.Where(entql.HasEdge("event_updater"))
 }
 
-// WhereHasIpcEventUpdaterWith applies a predicate to check if query has an edge ipc_event_updater with a given conditions (other predicates).
-func (f *AdminFilter) WhereHasIpcEventUpdaterWith(preds ...predicate.IPCEvent) {
-	f.Where(entql.HasEdgeWith("ipc_event_updater", sqlgraph.WrapFunc(func(s *sql.Selector) {
+// WhereHasEventUpdaterWith applies a predicate to check if query has an edge event_updater with a given conditions (other predicates).
+func (f *AdminFilter) WhereHasEventUpdaterWith(preds ...predicate.Event) {
+	f.Where(entql.HasEdgeWith("event_updater", sqlgraph.WrapFunc(func(s *sql.Selector) {
 		for _, p := range preds {
 			p(s)
 		}
@@ -1895,112 +2718,224 @@ func (f *AdminFilter) WhereHasEventLevelUpdaterWith(preds ...predicate.EventLeve
 	})))
 }
 
-// addPredicate implements the predicateAdder interface.
-func (arq *AdminRoleQuery) addPredicate(pred func(s *sql.Selector)) {
-	arq.predicates = append(arq.predicates, pred)
+// WhereHasFixingCreator applies a predicate to check if query has an edge fixing_creator.
+func (f *AdminFilter) WhereHasFixingCreator() {
+	f.Where(entql.HasEdge("fixing_creator"))
 }
 
-// Filter returns a Filter implementation to apply filters on the AdminRoleQuery builder.
-func (arq *AdminRoleQuery) Filter() *AdminRoleFilter {
-	return &AdminRoleFilter{config: arq.config, predicateAdder: arq}
-}
-
-// addPredicate implements the predicateAdder interface.
-func (m *AdminRoleMutation) addPredicate(pred func(s *sql.Selector)) {
-	m.predicates = append(m.predicates, pred)
-}
-
-// Filter returns an entql.Where implementation to apply filters on the AdminRoleMutation builder.
-func (m *AdminRoleMutation) Filter() *AdminRoleFilter {
-	return &AdminRoleFilter{config: m.config, predicateAdder: m}
-}
-
-// AdminRoleFilter provides a generic filtering capability at runtime for AdminRoleQuery.
-type AdminRoleFilter struct {
-	predicateAdder
-	config
-}
-
-// Where applies the entql predicate on the query filter.
-func (f *AdminRoleFilter) Where(p entql.P) {
-	f.addPredicate(func(s *sql.Selector) {
-		if err := schemaGraph.EvalP(schemaGraph.Nodes[1].Type, p, s); err != nil {
-			s.AddError(err)
-		}
-	})
-}
-
-// WhereID applies the entql int predicate on the id field.
-func (f *AdminRoleFilter) WhereID(p entql.IntP) {
-	f.Where(p.Field(adminrole.FieldID))
-}
-
-// WhereCreatedAt applies the entql time.Time predicate on the created_at field.
-func (f *AdminRoleFilter) WhereCreatedAt(p entql.TimeP) {
-	f.Where(p.Field(adminrole.FieldCreatedAt))
-}
-
-// WhereCreatedBy applies the entql int predicate on the created_by field.
-func (f *AdminRoleFilter) WhereCreatedBy(p entql.IntP) {
-	f.Where(p.Field(adminrole.FieldCreatedBy))
-}
-
-// WhereName applies the entql string predicate on the name field.
-func (f *AdminRoleFilter) WhereName(p entql.StringP) {
-	f.Where(p.Field(adminrole.FieldName))
-}
-
-// WhereDeletedAt applies the entql time.Time predicate on the deleted_at field.
-func (f *AdminRoleFilter) WhereDeletedAt(p entql.TimeP) {
-	f.Where(p.Field(adminrole.FieldDeletedAt))
-}
-
-// WhereUpdatedBy applies the entql int predicate on the updated_by field.
-func (f *AdminRoleFilter) WhereUpdatedBy(p entql.IntP) {
-	f.Where(p.Field(adminrole.FieldUpdatedBy))
-}
-
-// WhereUpdatedAt applies the entql time.Time predicate on the updated_at field.
-func (f *AdminRoleFilter) WhereUpdatedAt(p entql.TimeP) {
-	f.Where(p.Field(adminrole.FieldUpdatedAt))
-}
-
-// WhereHasCreator applies a predicate to check if query has an edge creator.
-func (f *AdminRoleFilter) WhereHasCreator() {
-	f.Where(entql.HasEdge("creator"))
-}
-
-// WhereHasCreatorWith applies a predicate to check if query has an edge creator with a given conditions (other predicates).
-func (f *AdminRoleFilter) WhereHasCreatorWith(preds ...predicate.Admin) {
-	f.Where(entql.HasEdgeWith("creator", sqlgraph.WrapFunc(func(s *sql.Selector) {
+// WhereHasFixingCreatorWith applies a predicate to check if query has an edge fixing_creator with a given conditions (other predicates).
+func (f *AdminFilter) WhereHasFixingCreatorWith(preds ...predicate.Fixing) {
+	f.Where(entql.HasEdgeWith("fixing_creator", sqlgraph.WrapFunc(func(s *sql.Selector) {
 		for _, p := range preds {
 			p(s)
 		}
 	})))
 }
 
-// WhereHasUpdater applies a predicate to check if query has an edge updater.
-func (f *AdminRoleFilter) WhereHasUpdater() {
-	f.Where(entql.HasEdge("updater"))
+// WhereHasFixingUpdater applies a predicate to check if query has an edge fixing_updater.
+func (f *AdminFilter) WhereHasFixingUpdater() {
+	f.Where(entql.HasEdge("fixing_updater"))
 }
 
-// WhereHasUpdaterWith applies a predicate to check if query has an edge updater with a given conditions (other predicates).
-func (f *AdminRoleFilter) WhereHasUpdaterWith(preds ...predicate.Admin) {
-	f.Where(entql.HasEdgeWith("updater", sqlgraph.WrapFunc(func(s *sql.Selector) {
+// WhereHasFixingUpdaterWith applies a predicate to check if query has an edge fixing_updater with a given conditions (other predicates).
+func (f *AdminFilter) WhereHasFixingUpdaterWith(preds ...predicate.Fixing) {
+	f.Where(entql.HasEdgeWith("fixing_updater", sqlgraph.WrapFunc(func(s *sql.Selector) {
 		for _, p := range preds {
 			p(s)
 		}
 	})))
 }
 
-// WhereHasAdmins applies a predicate to check if query has an edge admins.
-func (f *AdminRoleFilter) WhereHasAdmins() {
-	f.Where(entql.HasEdge("admins"))
+// WhereHasFixer applies a predicate to check if query has an edge fixer.
+func (f *AdminFilter) WhereHasFixer() {
+	f.Where(entql.HasEdge("fixer"))
 }
 
-// WhereHasAdminsWith applies a predicate to check if query has an edge admins with a given conditions (other predicates).
-func (f *AdminRoleFilter) WhereHasAdminsWith(preds ...predicate.Admin) {
-	f.Where(entql.HasEdgeWith("admins", sqlgraph.WrapFunc(func(s *sql.Selector) {
+// WhereHasFixerWith applies a predicate to check if query has an edge fixer with a given conditions (other predicates).
+func (f *AdminFilter) WhereHasFixerWith(preds ...predicate.Fixing) {
+	f.Where(entql.HasEdgeWith("fixer", sqlgraph.WrapFunc(func(s *sql.Selector) {
+		for _, p := range preds {
+			p(s)
+		}
+	})))
+}
+
+// WhereHasEventLogCreator applies a predicate to check if query has an edge event_log_creator.
+func (f *AdminFilter) WhereHasEventLogCreator() {
+	f.Where(entql.HasEdge("event_log_creator"))
+}
+
+// WhereHasEventLogCreatorWith applies a predicate to check if query has an edge event_log_creator with a given conditions (other predicates).
+func (f *AdminFilter) WhereHasEventLogCreatorWith(preds ...predicate.EventLog) {
+	f.Where(entql.HasEdgeWith("event_log_creator", sqlgraph.WrapFunc(func(s *sql.Selector) {
+		for _, p := range preds {
+			p(s)
+		}
+	})))
+}
+
+// WhereHasEventLogUpdater applies a predicate to check if query has an edge event_log_updater.
+func (f *AdminFilter) WhereHasEventLogUpdater() {
+	f.Where(entql.HasEdge("event_log_updater"))
+}
+
+// WhereHasEventLogUpdaterWith applies a predicate to check if query has an edge event_log_updater with a given conditions (other predicates).
+func (f *AdminFilter) WhereHasEventLogUpdaterWith(preds ...predicate.EventLog) {
+	f.Where(entql.HasEdgeWith("event_log_updater", sqlgraph.WrapFunc(func(s *sql.Selector) {
+		for _, p := range preds {
+			p(s)
+		}
+	})))
+}
+
+// WhereHasEventLogActor applies a predicate to check if query has an edge event_log_actor.
+func (f *AdminFilter) WhereHasEventLogActor() {
+	f.Where(entql.HasEdge("event_log_actor"))
+}
+
+// WhereHasEventLogActorWith applies a predicate to check if query has an edge event_log_actor with a given conditions (other predicates).
+func (f *AdminFilter) WhereHasEventLogActorWith(preds ...predicate.EventLog) {
+	f.Where(entql.HasEdgeWith("event_log_actor", sqlgraph.WrapFunc(func(s *sql.Selector) {
+		for _, p := range preds {
+			p(s)
+		}
+	})))
+}
+
+// WhereHasEventLogActor2 applies a predicate to check if query has an edge event_log_actor2.
+func (f *AdminFilter) WhereHasEventLogActor2() {
+	f.Where(entql.HasEdge("event_log_actor2"))
+}
+
+// WhereHasEventLogActor2With applies a predicate to check if query has an edge event_log_actor2 with a given conditions (other predicates).
+func (f *AdminFilter) WhereHasEventLogActor2With(preds ...predicate.EventLog) {
+	f.Where(entql.HasEdgeWith("event_log_actor2", sqlgraph.WrapFunc(func(s *sql.Selector) {
+		for _, p := range preds {
+			p(s)
+		}
+	})))
+}
+
+// WhereHasSweepCreator applies a predicate to check if query has an edge sweep_creator.
+func (f *AdminFilter) WhereHasSweepCreator() {
+	f.Where(entql.HasEdge("sweep_creator"))
+}
+
+// WhereHasSweepCreatorWith applies a predicate to check if query has an edge sweep_creator with a given conditions (other predicates).
+func (f *AdminFilter) WhereHasSweepCreatorWith(preds ...predicate.Sweep) {
+	f.Where(entql.HasEdgeWith("sweep_creator", sqlgraph.WrapFunc(func(s *sql.Selector) {
+		for _, p := range preds {
+			p(s)
+		}
+	})))
+}
+
+// WhereHasSweepUpdater applies a predicate to check if query has an edge sweep_updater.
+func (f *AdminFilter) WhereHasSweepUpdater() {
+	f.Where(entql.HasEdge("sweep_updater"))
+}
+
+// WhereHasSweepUpdaterWith applies a predicate to check if query has an edge sweep_updater with a given conditions (other predicates).
+func (f *AdminFilter) WhereHasSweepUpdaterWith(preds ...predicate.Sweep) {
+	f.Where(entql.HasEdgeWith("sweep_updater", sqlgraph.WrapFunc(func(s *sql.Selector) {
+		for _, p := range preds {
+			p(s)
+		}
+	})))
+}
+
+// WhereHasSweepScheduleCreator applies a predicate to check if query has an edge sweep_schedule_creator.
+func (f *AdminFilter) WhereHasSweepScheduleCreator() {
+	f.Where(entql.HasEdge("sweep_schedule_creator"))
+}
+
+// WhereHasSweepScheduleCreatorWith applies a predicate to check if query has an edge sweep_schedule_creator with a given conditions (other predicates).
+func (f *AdminFilter) WhereHasSweepScheduleCreatorWith(preds ...predicate.SweepSchedule) {
+	f.Where(entql.HasEdgeWith("sweep_schedule_creator", sqlgraph.WrapFunc(func(s *sql.Selector) {
+		for _, p := range preds {
+			p(s)
+		}
+	})))
+}
+
+// WhereHasSweepScheduleUpdater applies a predicate to check if query has an edge sweep_schedule_updater.
+func (f *AdminFilter) WhereHasSweepScheduleUpdater() {
+	f.Where(entql.HasEdge("sweep_schedule_updater"))
+}
+
+// WhereHasSweepScheduleUpdaterWith applies a predicate to check if query has an edge sweep_schedule_updater with a given conditions (other predicates).
+func (f *AdminFilter) WhereHasSweepScheduleUpdaterWith(preds ...predicate.SweepSchedule) {
+	f.Where(entql.HasEdgeWith("sweep_schedule_updater", sqlgraph.WrapFunc(func(s *sql.Selector) {
+		for _, p := range preds {
+			p(s)
+		}
+	})))
+}
+
+// WhereHasSweepSchedule applies a predicate to check if query has an edge sweep_schedule.
+func (f *AdminFilter) WhereHasSweepSchedule() {
+	f.Where(entql.HasEdge("sweep_schedule"))
+}
+
+// WhereHasSweepScheduleWith applies a predicate to check if query has an edge sweep_schedule with a given conditions (other predicates).
+func (f *AdminFilter) WhereHasSweepScheduleWith(preds ...predicate.SweepSchedule) {
+	f.Where(entql.HasEdgeWith("sweep_schedule", sqlgraph.WrapFunc(func(s *sql.Selector) {
+		for _, p := range preds {
+			p(s)
+		}
+	})))
+}
+
+// WhereHasSweepResultCreator applies a predicate to check if query has an edge sweep_result_creator.
+func (f *AdminFilter) WhereHasSweepResultCreator() {
+	f.Where(entql.HasEdge("sweep_result_creator"))
+}
+
+// WhereHasSweepResultCreatorWith applies a predicate to check if query has an edge sweep_result_creator with a given conditions (other predicates).
+func (f *AdminFilter) WhereHasSweepResultCreatorWith(preds ...predicate.SweepResult) {
+	f.Where(entql.HasEdgeWith("sweep_result_creator", sqlgraph.WrapFunc(func(s *sql.Selector) {
+		for _, p := range preds {
+			p(s)
+		}
+	})))
+}
+
+// WhereHasSweepResultUpdater applies a predicate to check if query has an edge sweep_result_updater.
+func (f *AdminFilter) WhereHasSweepResultUpdater() {
+	f.Where(entql.HasEdge("sweep_result_updater"))
+}
+
+// WhereHasSweepResultUpdaterWith applies a predicate to check if query has an edge sweep_result_updater with a given conditions (other predicates).
+func (f *AdminFilter) WhereHasSweepResultUpdaterWith(preds ...predicate.SweepResult) {
+	f.Where(entql.HasEdgeWith("sweep_result_updater", sqlgraph.WrapFunc(func(s *sql.Selector) {
+		for _, p := range preds {
+			p(s)
+		}
+	})))
+}
+
+// WhereHasSweepResultDetailsCreator applies a predicate to check if query has an edge sweep_result_details_creator.
+func (f *AdminFilter) WhereHasSweepResultDetailsCreator() {
+	f.Where(entql.HasEdge("sweep_result_details_creator"))
+}
+
+// WhereHasSweepResultDetailsCreatorWith applies a predicate to check if query has an edge sweep_result_details_creator with a given conditions (other predicates).
+func (f *AdminFilter) WhereHasSweepResultDetailsCreatorWith(preds ...predicate.SweepResultDetails) {
+	f.Where(entql.HasEdgeWith("sweep_result_details_creator", sqlgraph.WrapFunc(func(s *sql.Selector) {
+		for _, p := range preds {
+			p(s)
+		}
+	})))
+}
+
+// WhereHasSweepResultDetailsUpdater applies a predicate to check if query has an edge sweep_result_details_updater.
+func (f *AdminFilter) WhereHasSweepResultDetailsUpdater() {
+	f.Where(entql.HasEdge("sweep_result_details_updater"))
+}
+
+// WhereHasSweepResultDetailsUpdaterWith applies a predicate to check if query has an edge sweep_result_details_updater with a given conditions (other predicates).
+func (f *AdminFilter) WhereHasSweepResultDetailsUpdaterWith(preds ...predicate.SweepResultDetails) {
+	f.Where(entql.HasEdgeWith("sweep_result_details_updater", sqlgraph.WrapFunc(func(s *sql.Selector) {
 		for _, p := range preds {
 			p(s)
 		}
@@ -2036,7 +2971,7 @@ type AreaFilter struct {
 // Where applies the entql predicate on the query filter.
 func (f *AreaFilter) Where(p entql.P) {
 	f.addPredicate(func(s *sql.Selector) {
-		if err := schemaGraph.EvalP(schemaGraph.Nodes[2].Type, p, s); err != nil {
+		if err := schemaGraph.EvalP(schemaGraph.Nodes[1].Type, p, s); err != nil {
 			s.AddError(err)
 		}
 	})
@@ -2047,29 +2982,29 @@ func (f *AreaFilter) WhereID(p entql.IntP) {
 	f.Where(p.Field(area.FieldID))
 }
 
-// WhereCreatedAt applies the entql time.Time predicate on the created_at field.
-func (f *AreaFilter) WhereCreatedAt(p entql.TimeP) {
-	f.Where(p.Field(area.FieldCreatedAt))
+// WhereCreateTime applies the entql time.Time predicate on the create_time field.
+func (f *AreaFilter) WhereCreateTime(p entql.TimeP) {
+	f.Where(p.Field(area.FieldCreateTime))
 }
 
-// WhereCreatedBy applies the entql int predicate on the created_by field.
-func (f *AreaFilter) WhereCreatedBy(p entql.IntP) {
-	f.Where(p.Field(area.FieldCreatedBy))
+// WhereCreatorID applies the entql int predicate on the creator_id field.
+func (f *AreaFilter) WhereCreatorID(p entql.IntP) {
+	f.Where(p.Field(area.FieldCreatorID))
 }
 
-// WhereDeletedAt applies the entql time.Time predicate on the deleted_at field.
-func (f *AreaFilter) WhereDeletedAt(p entql.TimeP) {
-	f.Where(p.Field(area.FieldDeletedAt))
+// WhereDeleteTime applies the entql time.Time predicate on the delete_time field.
+func (f *AreaFilter) WhereDeleteTime(p entql.TimeP) {
+	f.Where(p.Field(area.FieldDeleteTime))
 }
 
-// WhereUpdatedBy applies the entql int predicate on the updated_by field.
-func (f *AreaFilter) WhereUpdatedBy(p entql.IntP) {
-	f.Where(p.Field(area.FieldUpdatedBy))
+// WhereUpdaterID applies the entql int predicate on the updater_id field.
+func (f *AreaFilter) WhereUpdaterID(p entql.IntP) {
+	f.Where(p.Field(area.FieldUpdaterID))
 }
 
-// WhereUpdatedAt applies the entql time.Time predicate on the updated_at field.
-func (f *AreaFilter) WhereUpdatedAt(p entql.TimeP) {
-	f.Where(p.Field(area.FieldUpdatedAt))
+// WhereUpdateTime applies the entql time.Time predicate on the update_time field.
+func (f *AreaFilter) WhereUpdateTime(p entql.TimeP) {
+	f.Where(p.Field(area.FieldUpdateTime))
 }
 
 // WhereName applies the entql string predicate on the name field.
@@ -2110,14 +3045,14 @@ func (f *AreaFilter) WhereHasUpdaterWith(preds ...predicate.Admin) {
 	})))
 }
 
-// WhereHasDeviceInstallationArea applies a predicate to check if query has an edge device_installation_area.
-func (f *AreaFilter) WhereHasDeviceInstallationArea() {
-	f.Where(entql.HasEdge("device_installation_area"))
+// WhereHasDeviceInstallation applies a predicate to check if query has an edge device_installation.
+func (f *AreaFilter) WhereHasDeviceInstallation() {
+	f.Where(entql.HasEdge("device_installation"))
 }
 
-// WhereHasDeviceInstallationAreaWith applies a predicate to check if query has an edge device_installation_area with a given conditions (other predicates).
-func (f *AreaFilter) WhereHasDeviceInstallationAreaWith(preds ...predicate.DeviceInstallation) {
-	f.Where(entql.HasEdgeWith("device_installation_area", sqlgraph.WrapFunc(func(s *sql.Selector) {
+// WhereHasDeviceInstallationWith applies a predicate to check if query has an edge device_installation with a given conditions (other predicates).
+func (f *AreaFilter) WhereHasDeviceInstallationWith(preds ...predicate.DeviceInstallation) {
+	f.Where(entql.HasEdgeWith("device_installation", sqlgraph.WrapFunc(func(s *sql.Selector) {
 		for _, p := range preds {
 			p(s)
 		}
@@ -2153,7 +3088,7 @@ type DepartmentFilter struct {
 // Where applies the entql predicate on the query filter.
 func (f *DepartmentFilter) Where(p entql.P) {
 	f.addPredicate(func(s *sql.Selector) {
-		if err := schemaGraph.EvalP(schemaGraph.Nodes[3].Type, p, s); err != nil {
+		if err := schemaGraph.EvalP(schemaGraph.Nodes[2].Type, p, s); err != nil {
 			s.AddError(err)
 		}
 	})
@@ -2164,29 +3099,29 @@ func (f *DepartmentFilter) WhereID(p entql.IntP) {
 	f.Where(p.Field(department.FieldID))
 }
 
-// WhereCreatedAt applies the entql time.Time predicate on the created_at field.
-func (f *DepartmentFilter) WhereCreatedAt(p entql.TimeP) {
-	f.Where(p.Field(department.FieldCreatedAt))
+// WhereCreateTime applies the entql time.Time predicate on the create_time field.
+func (f *DepartmentFilter) WhereCreateTime(p entql.TimeP) {
+	f.Where(p.Field(department.FieldCreateTime))
 }
 
-// WhereCreatedBy applies the entql int predicate on the created_by field.
-func (f *DepartmentFilter) WhereCreatedBy(p entql.IntP) {
-	f.Where(p.Field(department.FieldCreatedBy))
+// WhereCreatorID applies the entql int predicate on the creator_id field.
+func (f *DepartmentFilter) WhereCreatorID(p entql.IntP) {
+	f.Where(p.Field(department.FieldCreatorID))
 }
 
-// WhereDeletedAt applies the entql time.Time predicate on the deleted_at field.
-func (f *DepartmentFilter) WhereDeletedAt(p entql.TimeP) {
-	f.Where(p.Field(department.FieldDeletedAt))
+// WhereDeleteTime applies the entql time.Time predicate on the delete_time field.
+func (f *DepartmentFilter) WhereDeleteTime(p entql.TimeP) {
+	f.Where(p.Field(department.FieldDeleteTime))
 }
 
-// WhereUpdatedBy applies the entql int predicate on the updated_by field.
-func (f *DepartmentFilter) WhereUpdatedBy(p entql.IntP) {
-	f.Where(p.Field(department.FieldUpdatedBy))
+// WhereUpdaterID applies the entql int predicate on the updater_id field.
+func (f *DepartmentFilter) WhereUpdaterID(p entql.IntP) {
+	f.Where(p.Field(department.FieldUpdaterID))
 }
 
-// WhereUpdatedAt applies the entql time.Time predicate on the updated_at field.
-func (f *DepartmentFilter) WhereUpdatedAt(p entql.TimeP) {
-	f.Where(p.Field(department.FieldUpdatedAt))
+// WhereUpdateTime applies the entql time.Time predicate on the update_time field.
+func (f *DepartmentFilter) WhereUpdateTime(p entql.TimeP) {
+	f.Where(p.Field(department.FieldUpdateTime))
 }
 
 // WhereName applies the entql string predicate on the name field.
@@ -2197,6 +3132,11 @@ func (f *DepartmentFilter) WhereName(p entql.StringP) {
 // WhereParentID applies the entql int predicate on the parent_id field.
 func (f *DepartmentFilter) WhereParentID(p entql.IntP) {
 	f.Where(p.Field(department.FieldParentID))
+}
+
+// WhereNotes applies the entql string predicate on the notes field.
+func (f *DepartmentFilter) WhereNotes(p entql.StringP) {
+	f.Where(p.Field(department.FieldNotes))
 }
 
 // WhereHasCreator applies a predicate to check if query has an edge creator.
@@ -2235,6 +3175,20 @@ func (f *DepartmentFilter) WhereHasParent() {
 // WhereHasParentWith applies a predicate to check if query has an edge parent with a given conditions (other predicates).
 func (f *DepartmentFilter) WhereHasParentWith(preds ...predicate.Department) {
 	f.Where(entql.HasEdgeWith("parent", sqlgraph.WrapFunc(func(s *sql.Selector) {
+		for _, p := range preds {
+			p(s)
+		}
+	})))
+}
+
+// WhereHasPermissions applies a predicate to check if query has an edge permissions.
+func (f *DepartmentFilter) WhereHasPermissions() {
+	f.Where(entql.HasEdge("permissions"))
+}
+
+// WhereHasPermissionsWith applies a predicate to check if query has an edge permissions with a given conditions (other predicates).
+func (f *DepartmentFilter) WhereHasPermissionsWith(preds ...predicate.Permission) {
+	f.Where(entql.HasEdgeWith("permissions", sqlgraph.WrapFunc(func(s *sql.Selector) {
 		for _, p := range preds {
 			p(s)
 		}
@@ -2298,7 +3252,7 @@ type DeviceFilter struct {
 // Where applies the entql predicate on the query filter.
 func (f *DeviceFilter) Where(p entql.P) {
 	f.addPredicate(func(s *sql.Selector) {
-		if err := schemaGraph.EvalP(schemaGraph.Nodes[4].Type, p, s); err != nil {
+		if err := schemaGraph.EvalP(schemaGraph.Nodes[3].Type, p, s); err != nil {
 			s.AddError(err)
 		}
 	})
@@ -2309,29 +3263,29 @@ func (f *DeviceFilter) WhereID(p entql.IntP) {
 	f.Where(p.Field(device.FieldID))
 }
 
-// WhereCreatedAt applies the entql time.Time predicate on the created_at field.
-func (f *DeviceFilter) WhereCreatedAt(p entql.TimeP) {
-	f.Where(p.Field(device.FieldCreatedAt))
+// WhereCreateTime applies the entql time.Time predicate on the create_time field.
+func (f *DeviceFilter) WhereCreateTime(p entql.TimeP) {
+	f.Where(p.Field(device.FieldCreateTime))
 }
 
-// WhereCreatedBy applies the entql int predicate on the created_by field.
-func (f *DeviceFilter) WhereCreatedBy(p entql.IntP) {
-	f.Where(p.Field(device.FieldCreatedBy))
+// WhereCreatorID applies the entql int predicate on the creator_id field.
+func (f *DeviceFilter) WhereCreatorID(p entql.IntP) {
+	f.Where(p.Field(device.FieldCreatorID))
 }
 
-// WhereDeletedAt applies the entql time.Time predicate on the deleted_at field.
-func (f *DeviceFilter) WhereDeletedAt(p entql.TimeP) {
-	f.Where(p.Field(device.FieldDeletedAt))
+// WhereDeleteTime applies the entql time.Time predicate on the delete_time field.
+func (f *DeviceFilter) WhereDeleteTime(p entql.TimeP) {
+	f.Where(p.Field(device.FieldDeleteTime))
 }
 
-// WhereUpdatedBy applies the entql int predicate on the updated_by field.
-func (f *DeviceFilter) WhereUpdatedBy(p entql.IntP) {
-	f.Where(p.Field(device.FieldUpdatedBy))
+// WhereUpdaterID applies the entql int predicate on the updater_id field.
+func (f *DeviceFilter) WhereUpdaterID(p entql.IntP) {
+	f.Where(p.Field(device.FieldUpdaterID))
 }
 
-// WhereUpdatedAt applies the entql time.Time predicate on the updated_at field.
-func (f *DeviceFilter) WhereUpdatedAt(p entql.TimeP) {
-	f.Where(p.Field(device.FieldUpdatedAt))
+// WhereUpdateTime applies the entql time.Time predicate on the update_time field.
+func (f *DeviceFilter) WhereUpdateTime(p entql.TimeP) {
+	f.Where(p.Field(device.FieldUpdateTime))
 }
 
 // WhereBrand applies the entql int predicate on the brand field.
@@ -2387,28 +3341,56 @@ func (f *DeviceFilter) WhereHasUpdaterWith(preds ...predicate.Admin) {
 	})))
 }
 
-// WhereHasIpcEventDevice applies a predicate to check if query has an edge ipc_event_device.
-func (f *DeviceFilter) WhereHasIpcEventDevice() {
-	f.Where(entql.HasEdge("ipc_event_device"))
+// WhereHasEvent applies a predicate to check if query has an edge event.
+func (f *DeviceFilter) WhereHasEvent() {
+	f.Where(entql.HasEdge("event"))
 }
 
-// WhereHasIpcEventDeviceWith applies a predicate to check if query has an edge ipc_event_device with a given conditions (other predicates).
-func (f *DeviceFilter) WhereHasIpcEventDeviceWith(preds ...predicate.IPCEvent) {
-	f.Where(entql.HasEdgeWith("ipc_event_device", sqlgraph.WrapFunc(func(s *sql.Selector) {
+// WhereHasEventWith applies a predicate to check if query has an edge event with a given conditions (other predicates).
+func (f *DeviceFilter) WhereHasEventWith(preds ...predicate.Event) {
+	f.Where(entql.HasEdgeWith("event", sqlgraph.WrapFunc(func(s *sql.Selector) {
 		for _, p := range preds {
 			p(s)
 		}
 	})))
 }
 
-// WhereHasDeviceInstallationDevice applies a predicate to check if query has an edge device_installation_device.
-func (f *DeviceFilter) WhereHasDeviceInstallationDevice() {
-	f.Where(entql.HasEdge("device_installation_device"))
+// WhereHasDeviceInstallation applies a predicate to check if query has an edge device_installation.
+func (f *DeviceFilter) WhereHasDeviceInstallation() {
+	f.Where(entql.HasEdge("device_installation"))
 }
 
-// WhereHasDeviceInstallationDeviceWith applies a predicate to check if query has an edge device_installation_device with a given conditions (other predicates).
-func (f *DeviceFilter) WhereHasDeviceInstallationDeviceWith(preds ...predicate.DeviceInstallation) {
-	f.Where(entql.HasEdgeWith("device_installation_device", sqlgraph.WrapFunc(func(s *sql.Selector) {
+// WhereHasDeviceInstallationWith applies a predicate to check if query has an edge device_installation with a given conditions (other predicates).
+func (f *DeviceFilter) WhereHasDeviceInstallationWith(preds ...predicate.DeviceInstallation) {
+	f.Where(entql.HasEdgeWith("device_installation", sqlgraph.WrapFunc(func(s *sql.Selector) {
+		for _, p := range preds {
+			p(s)
+		}
+	})))
+}
+
+// WhereHasEventLog applies a predicate to check if query has an edge event_log.
+func (f *DeviceFilter) WhereHasEventLog() {
+	f.Where(entql.HasEdge("event_log"))
+}
+
+// WhereHasEventLogWith applies a predicate to check if query has an edge event_log with a given conditions (other predicates).
+func (f *DeviceFilter) WhereHasEventLogWith(preds ...predicate.EventLog) {
+	f.Where(entql.HasEdgeWith("event_log", sqlgraph.WrapFunc(func(s *sql.Selector) {
+		for _, p := range preds {
+			p(s)
+		}
+	})))
+}
+
+// WhereHasFixing applies a predicate to check if query has an edge fixing.
+func (f *DeviceFilter) WhereHasFixing() {
+	f.Where(entql.HasEdge("fixing"))
+}
+
+// WhereHasFixingWith applies a predicate to check if query has an edge fixing with a given conditions (other predicates).
+func (f *DeviceFilter) WhereHasFixingWith(preds ...predicate.Fixing) {
+	f.Where(entql.HasEdgeWith("fixing", sqlgraph.WrapFunc(func(s *sql.Selector) {
 		for _, p := range preds {
 			p(s)
 		}
@@ -2444,7 +3426,7 @@ type DeviceInstallationFilter struct {
 // Where applies the entql predicate on the query filter.
 func (f *DeviceInstallationFilter) Where(p entql.P) {
 	f.addPredicate(func(s *sql.Selector) {
-		if err := schemaGraph.EvalP(schemaGraph.Nodes[5].Type, p, s); err != nil {
+		if err := schemaGraph.EvalP(schemaGraph.Nodes[4].Type, p, s); err != nil {
 			s.AddError(err)
 		}
 	})
@@ -2455,29 +3437,29 @@ func (f *DeviceInstallationFilter) WhereID(p entql.IntP) {
 	f.Where(p.Field(deviceinstallation.FieldID))
 }
 
-// WhereCreatedAt applies the entql time.Time predicate on the created_at field.
-func (f *DeviceInstallationFilter) WhereCreatedAt(p entql.TimeP) {
-	f.Where(p.Field(deviceinstallation.FieldCreatedAt))
+// WhereCreateTime applies the entql time.Time predicate on the create_time field.
+func (f *DeviceInstallationFilter) WhereCreateTime(p entql.TimeP) {
+	f.Where(p.Field(deviceinstallation.FieldCreateTime))
 }
 
-// WhereCreatedBy applies the entql int predicate on the created_by field.
-func (f *DeviceInstallationFilter) WhereCreatedBy(p entql.IntP) {
-	f.Where(p.Field(deviceinstallation.FieldCreatedBy))
+// WhereCreatorID applies the entql int predicate on the creator_id field.
+func (f *DeviceInstallationFilter) WhereCreatorID(p entql.IntP) {
+	f.Where(p.Field(deviceinstallation.FieldCreatorID))
 }
 
-// WhereDeletedAt applies the entql time.Time predicate on the deleted_at field.
-func (f *DeviceInstallationFilter) WhereDeletedAt(p entql.TimeP) {
-	f.Where(p.Field(deviceinstallation.FieldDeletedAt))
+// WhereDeleteTime applies the entql time.Time predicate on the delete_time field.
+func (f *DeviceInstallationFilter) WhereDeleteTime(p entql.TimeP) {
+	f.Where(p.Field(deviceinstallation.FieldDeleteTime))
 }
 
-// WhereUpdatedBy applies the entql int predicate on the updated_by field.
-func (f *DeviceInstallationFilter) WhereUpdatedBy(p entql.IntP) {
-	f.Where(p.Field(deviceinstallation.FieldUpdatedBy))
+// WhereUpdaterID applies the entql int predicate on the updater_id field.
+func (f *DeviceInstallationFilter) WhereUpdaterID(p entql.IntP) {
+	f.Where(p.Field(deviceinstallation.FieldUpdaterID))
 }
 
-// WhereUpdatedAt applies the entql time.Time predicate on the updated_at field.
-func (f *DeviceInstallationFilter) WhereUpdatedAt(p entql.TimeP) {
-	f.Where(p.Field(deviceinstallation.FieldUpdatedAt))
+// WhereUpdateTime applies the entql time.Time predicate on the update_time field.
+func (f *DeviceInstallationFilter) WhereUpdateTime(p entql.TimeP) {
+	f.Where(p.Field(deviceinstallation.FieldUpdateTime))
 }
 
 // WhereDeviceID applies the entql int predicate on the device_id field.
@@ -2610,7 +3592,7 @@ type EmployeeFilter struct {
 // Where applies the entql predicate on the query filter.
 func (f *EmployeeFilter) Where(p entql.P) {
 	f.addPredicate(func(s *sql.Selector) {
-		if err := schemaGraph.EvalP(schemaGraph.Nodes[6].Type, p, s); err != nil {
+		if err := schemaGraph.EvalP(schemaGraph.Nodes[5].Type, p, s); err != nil {
 			s.AddError(err)
 		}
 	})
@@ -2621,29 +3603,29 @@ func (f *EmployeeFilter) WhereID(p entql.IntP) {
 	f.Where(p.Field(employee.FieldID))
 }
 
-// WhereCreatedAt applies the entql time.Time predicate on the created_at field.
-func (f *EmployeeFilter) WhereCreatedAt(p entql.TimeP) {
-	f.Where(p.Field(employee.FieldCreatedAt))
+// WhereCreateTime applies the entql time.Time predicate on the create_time field.
+func (f *EmployeeFilter) WhereCreateTime(p entql.TimeP) {
+	f.Where(p.Field(employee.FieldCreateTime))
 }
 
-// WhereCreatedBy applies the entql int predicate on the created_by field.
-func (f *EmployeeFilter) WhereCreatedBy(p entql.IntP) {
-	f.Where(p.Field(employee.FieldCreatedBy))
+// WhereCreatorID applies the entql int predicate on the creator_id field.
+func (f *EmployeeFilter) WhereCreatorID(p entql.IntP) {
+	f.Where(p.Field(employee.FieldCreatorID))
 }
 
-// WhereDeletedAt applies the entql time.Time predicate on the deleted_at field.
-func (f *EmployeeFilter) WhereDeletedAt(p entql.TimeP) {
-	f.Where(p.Field(employee.FieldDeletedAt))
+// WhereDeleteTime applies the entql time.Time predicate on the delete_time field.
+func (f *EmployeeFilter) WhereDeleteTime(p entql.TimeP) {
+	f.Where(p.Field(employee.FieldDeleteTime))
 }
 
-// WhereUpdatedBy applies the entql int predicate on the updated_by field.
-func (f *EmployeeFilter) WhereUpdatedBy(p entql.IntP) {
-	f.Where(p.Field(employee.FieldUpdatedBy))
+// WhereUpdaterID applies the entql int predicate on the updater_id field.
+func (f *EmployeeFilter) WhereUpdaterID(p entql.IntP) {
+	f.Where(p.Field(employee.FieldUpdaterID))
 }
 
-// WhereUpdatedAt applies the entql time.Time predicate on the updated_at field.
-func (f *EmployeeFilter) WhereUpdatedAt(p entql.TimeP) {
-	f.Where(p.Field(employee.FieldUpdatedAt))
+// WhereUpdateTime applies the entql time.Time predicate on the update_time field.
+func (f *EmployeeFilter) WhereUpdateTime(p entql.TimeP) {
+	f.Where(p.Field(employee.FieldUpdateTime))
 }
 
 // WhereAdminID applies the entql int predicate on the admin_id field.
@@ -2654,6 +3636,11 @@ func (f *EmployeeFilter) WhereAdminID(p entql.IntP) {
 // WhereDepartmentID applies the entql int predicate on the department_id field.
 func (f *EmployeeFilter) WhereDepartmentID(p entql.IntP) {
 	f.Where(p.Field(employee.FieldDepartmentID))
+}
+
+// WhereOccupationID applies the entql int predicate on the occupation_id field.
+func (f *EmployeeFilter) WhereOccupationID(p entql.IntP) {
+	f.Where(p.Field(employee.FieldOccupationID))
 }
 
 // WhereHasCreator applies a predicate to check if query has an edge creator.
@@ -2698,6 +3685,20 @@ func (f *EmployeeFilter) WhereHasAdminWith(preds ...predicate.Admin) {
 	})))
 }
 
+// WhereHasOccupation applies a predicate to check if query has an edge occupation.
+func (f *EmployeeFilter) WhereHasOccupation() {
+	f.Where(entql.HasEdge("occupation"))
+}
+
+// WhereHasOccupationWith applies a predicate to check if query has an edge occupation with a given conditions (other predicates).
+func (f *EmployeeFilter) WhereHasOccupationWith(preds ...predicate.Occupation) {
+	f.Where(entql.HasEdgeWith("occupation", sqlgraph.WrapFunc(func(s *sql.Selector) {
+		for _, p := range preds {
+			p(s)
+		}
+	})))
+}
+
 // WhereHasDepartment applies a predicate to check if query has an edge department.
 func (f *EmployeeFilter) WhereHasDepartment() {
 	f.Where(entql.HasEdge("department"))
@@ -2712,56 +3713,199 @@ func (f *EmployeeFilter) WhereHasDepartmentWith(preds ...predicate.Department) {
 	})))
 }
 
-// WhereHasOccupations applies a predicate to check if query has an edge occupations.
-func (f *EmployeeFilter) WhereHasOccupations() {
-	f.Where(entql.HasEdge("occupations"))
+// addPredicate implements the predicateAdder interface.
+func (eq *EventQuery) addPredicate(pred func(s *sql.Selector)) {
+	eq.predicates = append(eq.predicates, pred)
 }
 
-// WhereHasOccupationsWith applies a predicate to check if query has an edge occupations with a given conditions (other predicates).
-func (f *EmployeeFilter) WhereHasOccupationsWith(preds ...predicate.Occupation) {
-	f.Where(entql.HasEdgeWith("occupations", sqlgraph.WrapFunc(func(s *sql.Selector) {
+// Filter returns a Filter implementation to apply filters on the EventQuery builder.
+func (eq *EventQuery) Filter() *EventFilter {
+	return &EventFilter{config: eq.config, predicateAdder: eq}
+}
+
+// addPredicate implements the predicateAdder interface.
+func (m *EventMutation) addPredicate(pred func(s *sql.Selector)) {
+	m.predicates = append(m.predicates, pred)
+}
+
+// Filter returns an entql.Where implementation to apply filters on the EventMutation builder.
+func (m *EventMutation) Filter() *EventFilter {
+	return &EventFilter{config: m.config, predicateAdder: m}
+}
+
+// EventFilter provides a generic filtering capability at runtime for EventQuery.
+type EventFilter struct {
+	predicateAdder
+	config
+}
+
+// Where applies the entql predicate on the query filter.
+func (f *EventFilter) Where(p entql.P) {
+	f.addPredicate(func(s *sql.Selector) {
+		if err := schemaGraph.EvalP(schemaGraph.Nodes[6].Type, p, s); err != nil {
+			s.AddError(err)
+		}
+	})
+}
+
+// WhereID applies the entql int predicate on the id field.
+func (f *EventFilter) WhereID(p entql.IntP) {
+	f.Where(p.Field(event.FieldID))
+}
+
+// WhereCreateTime applies the entql time.Time predicate on the create_time field.
+func (f *EventFilter) WhereCreateTime(p entql.TimeP) {
+	f.Where(p.Field(event.FieldCreateTime))
+}
+
+// WhereCreatorID applies the entql int predicate on the creator_id field.
+func (f *EventFilter) WhereCreatorID(p entql.IntP) {
+	f.Where(p.Field(event.FieldCreatorID))
+}
+
+// WhereDeleteTime applies the entql time.Time predicate on the delete_time field.
+func (f *EventFilter) WhereDeleteTime(p entql.TimeP) {
+	f.Where(p.Field(event.FieldDeleteTime))
+}
+
+// WhereUpdaterID applies the entql int predicate on the updater_id field.
+func (f *EventFilter) WhereUpdaterID(p entql.IntP) {
+	f.Where(p.Field(event.FieldUpdaterID))
+}
+
+// WhereUpdateTime applies the entql time.Time predicate on the update_time field.
+func (f *EventFilter) WhereUpdateTime(p entql.TimeP) {
+	f.Where(p.Field(event.FieldUpdateTime))
+}
+
+// WhereDeviceID applies the entql int predicate on the device_id field.
+func (f *EventFilter) WhereDeviceID(p entql.IntP) {
+	f.Where(p.Field(event.FieldDeviceID))
+}
+
+// WhereVideoID applies the entql int predicate on the video_id field.
+func (f *EventFilter) WhereVideoID(p entql.IntP) {
+	f.Where(p.Field(event.FieldVideoID))
+}
+
+// WhereEventTime applies the entql time.Time predicate on the event_time field.
+func (f *EventFilter) WhereEventTime(p entql.TimeP) {
+	f.Where(p.Field(event.FieldEventTime))
+}
+
+// WhereEventType applies the entql int predicate on the event_type field.
+func (f *EventFilter) WhereEventType(p entql.IntP) {
+	f.Where(p.Field(event.FieldEventType))
+}
+
+// WhereEventStatus applies the entql int predicate on the event_status field.
+func (f *EventFilter) WhereEventStatus(p entql.IntP) {
+	f.Where(p.Field(event.FieldEventStatus))
+}
+
+// WhereImages applies the entql json.RawMessage predicate on the images field.
+func (f *EventFilter) WhereImages(p entql.BytesP) {
+	f.Where(p.Field(event.FieldImages))
+}
+
+// WhereLabeledImages applies the entql json.RawMessage predicate on the labeled_images field.
+func (f *EventFilter) WhereLabeledImages(p entql.BytesP) {
+	f.Where(p.Field(event.FieldLabeledImages))
+}
+
+// WhereDataID applies the entql string predicate on the data_id field.
+func (f *EventFilter) WhereDataID(p entql.StringP) {
+	f.Where(p.Field(event.FieldDataID))
+}
+
+// WhereDescription applies the entql string predicate on the description field.
+func (f *EventFilter) WhereDescription(p entql.StringP) {
+	f.Where(p.Field(event.FieldDescription))
+}
+
+// WhereRawData applies the entql string predicate on the raw_data field.
+func (f *EventFilter) WhereRawData(p entql.StringP) {
+	f.Where(p.Field(event.FieldRawData))
+}
+
+// WhereHasCreator applies a predicate to check if query has an edge creator.
+func (f *EventFilter) WhereHasCreator() {
+	f.Where(entql.HasEdge("creator"))
+}
+
+// WhereHasCreatorWith applies a predicate to check if query has an edge creator with a given conditions (other predicates).
+func (f *EventFilter) WhereHasCreatorWith(preds ...predicate.Admin) {
+	f.Where(entql.HasEdgeWith("creator", sqlgraph.WrapFunc(func(s *sql.Selector) {
 		for _, p := range preds {
 			p(s)
 		}
 	})))
 }
 
-// WhereHasIpcEvents applies a predicate to check if query has an edge ipc_events.
-func (f *EmployeeFilter) WhereHasIpcEvents() {
-	f.Where(entql.HasEdge("ipc_events"))
+// WhereHasUpdater applies a predicate to check if query has an edge updater.
+func (f *EventFilter) WhereHasUpdater() {
+	f.Where(entql.HasEdge("updater"))
 }
 
-// WhereHasIpcEventsWith applies a predicate to check if query has an edge ipc_events with a given conditions (other predicates).
-func (f *EmployeeFilter) WhereHasIpcEventsWith(preds ...predicate.IPCEvent) {
-	f.Where(entql.HasEdgeWith("ipc_events", sqlgraph.WrapFunc(func(s *sql.Selector) {
+// WhereHasUpdaterWith applies a predicate to check if query has an edge updater with a given conditions (other predicates).
+func (f *EventFilter) WhereHasUpdaterWith(preds ...predicate.Admin) {
+	f.Where(entql.HasEdgeWith("updater", sqlgraph.WrapFunc(func(s *sql.Selector) {
 		for _, p := range preds {
 			p(s)
 		}
 	})))
 }
 
-// WhereHasRiskReporter applies a predicate to check if query has an edge risk_reporter.
-func (f *EmployeeFilter) WhereHasRiskReporter() {
-	f.Where(entql.HasEdge("risk_reporter"))
+// WhereHasVideo applies a predicate to check if query has an edge video.
+func (f *EventFilter) WhereHasVideo() {
+	f.Where(entql.HasEdge("video"))
 }
 
-// WhereHasRiskReporterWith applies a predicate to check if query has an edge risk_reporter with a given conditions (other predicates).
-func (f *EmployeeFilter) WhereHasRiskReporterWith(preds ...predicate.Risk) {
-	f.Where(entql.HasEdgeWith("risk_reporter", sqlgraph.WrapFunc(func(s *sql.Selector) {
+// WhereHasVideoWith applies a predicate to check if query has an edge video with a given conditions (other predicates).
+func (f *EventFilter) WhereHasVideoWith(preds ...predicate.Video) {
+	f.Where(entql.HasEdgeWith("video", sqlgraph.WrapFunc(func(s *sql.Selector) {
 		for _, p := range preds {
 			p(s)
 		}
 	})))
 }
 
-// WhereHasRiskMaintainer applies a predicate to check if query has an edge risk_maintainer.
-func (f *EmployeeFilter) WhereHasRiskMaintainer() {
-	f.Where(entql.HasEdge("risk_maintainer"))
+// WhereHasDevice applies a predicate to check if query has an edge device.
+func (f *EventFilter) WhereHasDevice() {
+	f.Where(entql.HasEdge("device"))
 }
 
-// WhereHasRiskMaintainerWith applies a predicate to check if query has an edge risk_maintainer with a given conditions (other predicates).
-func (f *EmployeeFilter) WhereHasRiskMaintainerWith(preds ...predicate.Risk) {
-	f.Where(entql.HasEdgeWith("risk_maintainer", sqlgraph.WrapFunc(func(s *sql.Selector) {
+// WhereHasDeviceWith applies a predicate to check if query has an edge device with a given conditions (other predicates).
+func (f *EventFilter) WhereHasDeviceWith(preds ...predicate.Device) {
+	f.Where(entql.HasEdgeWith("device", sqlgraph.WrapFunc(func(s *sql.Selector) {
+		for _, p := range preds {
+			p(s)
+		}
+	})))
+}
+
+// WhereHasFixing applies a predicate to check if query has an edge fixing.
+func (f *EventFilter) WhereHasFixing() {
+	f.Where(entql.HasEdge("fixing"))
+}
+
+// WhereHasFixingWith applies a predicate to check if query has an edge fixing with a given conditions (other predicates).
+func (f *EventFilter) WhereHasFixingWith(preds ...predicate.Fixing) {
+	f.Where(entql.HasEdgeWith("fixing", sqlgraph.WrapFunc(func(s *sql.Selector) {
+		for _, p := range preds {
+			p(s)
+		}
+	})))
+}
+
+// WhereHasEventLog applies a predicate to check if query has an edge event_log.
+func (f *EventFilter) WhereHasEventLog() {
+	f.Where(entql.HasEdge("event_log"))
+}
+
+// WhereHasEventLogWith applies a predicate to check if query has an edge event_log with a given conditions (other predicates).
+func (f *EventFilter) WhereHasEventLogWith(preds ...predicate.EventLog) {
+	f.Where(entql.HasEdgeWith("event_log", sqlgraph.WrapFunc(func(s *sql.Selector) {
 		for _, p := range preds {
 			p(s)
 		}
@@ -2808,29 +3952,29 @@ func (f *EventLevelFilter) WhereID(p entql.IntP) {
 	f.Where(p.Field(eventlevel.FieldID))
 }
 
-// WhereCreatedAt applies the entql time.Time predicate on the created_at field.
-func (f *EventLevelFilter) WhereCreatedAt(p entql.TimeP) {
-	f.Where(p.Field(eventlevel.FieldCreatedAt))
+// WhereCreateTime applies the entql time.Time predicate on the create_time field.
+func (f *EventLevelFilter) WhereCreateTime(p entql.TimeP) {
+	f.Where(p.Field(eventlevel.FieldCreateTime))
 }
 
-// WhereCreatedBy applies the entql int predicate on the created_by field.
-func (f *EventLevelFilter) WhereCreatedBy(p entql.IntP) {
-	f.Where(p.Field(eventlevel.FieldCreatedBy))
+// WhereCreatorID applies the entql int predicate on the creator_id field.
+func (f *EventLevelFilter) WhereCreatorID(p entql.IntP) {
+	f.Where(p.Field(eventlevel.FieldCreatorID))
 }
 
-// WhereDeletedAt applies the entql time.Time predicate on the deleted_at field.
-func (f *EventLevelFilter) WhereDeletedAt(p entql.TimeP) {
-	f.Where(p.Field(eventlevel.FieldDeletedAt))
+// WhereDeleteTime applies the entql time.Time predicate on the delete_time field.
+func (f *EventLevelFilter) WhereDeleteTime(p entql.TimeP) {
+	f.Where(p.Field(eventlevel.FieldDeleteTime))
 }
 
-// WhereUpdatedBy applies the entql int predicate on the updated_by field.
-func (f *EventLevelFilter) WhereUpdatedBy(p entql.IntP) {
-	f.Where(p.Field(eventlevel.FieldUpdatedBy))
+// WhereUpdaterID applies the entql int predicate on the updater_id field.
+func (f *EventLevelFilter) WhereUpdaterID(p entql.IntP) {
+	f.Where(p.Field(eventlevel.FieldUpdaterID))
 }
 
-// WhereUpdatedAt applies the entql time.Time predicate on the updated_at field.
-func (f *EventLevelFilter) WhereUpdatedAt(p entql.TimeP) {
-	f.Where(p.Field(eventlevel.FieldUpdatedAt))
+// WhereUpdateTime applies the entql time.Time predicate on the update_time field.
+func (f *EventLevelFilter) WhereUpdateTime(p entql.TimeP) {
+	f.Where(p.Field(eventlevel.FieldUpdateTime))
 }
 
 // WhereName applies the entql string predicate on the name field.
@@ -2848,9 +3992,14 @@ func (f *EventLevelFilter) WhereDescription(p entql.StringP) {
 	f.Where(p.Field(eventlevel.FieldDescription))
 }
 
-// WhereIsReport applies the entql bool predicate on the is_report field.
-func (f *EventLevelFilter) WhereIsReport(p entql.BoolP) {
-	f.Where(p.Field(eventlevel.FieldIsReport))
+// WhereIcon applies the entql string predicate on the icon field.
+func (f *EventLevelFilter) WhereIcon(p entql.StringP) {
+	f.Where(p.Field(eventlevel.FieldIcon))
+}
+
+// WhereNotifyTypes applies the entql json.RawMessage predicate on the notify_types field.
+func (f *EventLevelFilter) WhereNotifyTypes(p entql.BytesP) {
+	f.Where(p.Field(eventlevel.FieldNotifyTypes))
 }
 
 // WhereHasCreator applies a predicate to check if query has an edge creator.
@@ -2882,33 +4031,33 @@ func (f *EventLevelFilter) WhereHasUpdaterWith(preds ...predicate.Admin) {
 }
 
 // addPredicate implements the predicateAdder interface.
-func (ieq *IPCEventQuery) addPredicate(pred func(s *sql.Selector)) {
-	ieq.predicates = append(ieq.predicates, pred)
+func (elq *EventLogQuery) addPredicate(pred func(s *sql.Selector)) {
+	elq.predicates = append(elq.predicates, pred)
 }
 
-// Filter returns a Filter implementation to apply filters on the IPCEventQuery builder.
-func (ieq *IPCEventQuery) Filter() *IPCEventFilter {
-	return &IPCEventFilter{config: ieq.config, predicateAdder: ieq}
+// Filter returns a Filter implementation to apply filters on the EventLogQuery builder.
+func (elq *EventLogQuery) Filter() *EventLogFilter {
+	return &EventLogFilter{config: elq.config, predicateAdder: elq}
 }
 
 // addPredicate implements the predicateAdder interface.
-func (m *IPCEventMutation) addPredicate(pred func(s *sql.Selector)) {
+func (m *EventLogMutation) addPredicate(pred func(s *sql.Selector)) {
 	m.predicates = append(m.predicates, pred)
 }
 
-// Filter returns an entql.Where implementation to apply filters on the IPCEventMutation builder.
-func (m *IPCEventMutation) Filter() *IPCEventFilter {
-	return &IPCEventFilter{config: m.config, predicateAdder: m}
+// Filter returns an entql.Where implementation to apply filters on the EventLogMutation builder.
+func (m *EventLogMutation) Filter() *EventLogFilter {
+	return &EventLogFilter{config: m.config, predicateAdder: m}
 }
 
-// IPCEventFilter provides a generic filtering capability at runtime for IPCEventQuery.
-type IPCEventFilter struct {
+// EventLogFilter provides a generic filtering capability at runtime for EventLogQuery.
+type EventLogFilter struct {
 	predicateAdder
 	config
 }
 
 // Where applies the entql predicate on the query filter.
-func (f *IPCEventFilter) Where(p entql.P) {
+func (f *EventLogFilter) Where(p entql.P) {
 	f.addPredicate(func(s *sql.Selector) {
 		if err := schemaGraph.EvalP(schemaGraph.Nodes[8].Type, p, s); err != nil {
 			s.AddError(err)
@@ -2917,92 +4066,72 @@ func (f *IPCEventFilter) Where(p entql.P) {
 }
 
 // WhereID applies the entql int predicate on the id field.
-func (f *IPCEventFilter) WhereID(p entql.IntP) {
-	f.Where(p.Field(ipcevent.FieldID))
+func (f *EventLogFilter) WhereID(p entql.IntP) {
+	f.Where(p.Field(eventlog.FieldID))
 }
 
-// WhereCreatedAt applies the entql time.Time predicate on the created_at field.
-func (f *IPCEventFilter) WhereCreatedAt(p entql.TimeP) {
-	f.Where(p.Field(ipcevent.FieldCreatedAt))
+// WhereCreateTime applies the entql time.Time predicate on the create_time field.
+func (f *EventLogFilter) WhereCreateTime(p entql.TimeP) {
+	f.Where(p.Field(eventlog.FieldCreateTime))
 }
 
-// WhereCreatedBy applies the entql int predicate on the created_by field.
-func (f *IPCEventFilter) WhereCreatedBy(p entql.IntP) {
-	f.Where(p.Field(ipcevent.FieldCreatedBy))
+// WhereCreatorID applies the entql int predicate on the creator_id field.
+func (f *EventLogFilter) WhereCreatorID(p entql.IntP) {
+	f.Where(p.Field(eventlog.FieldCreatorID))
 }
 
-// WhereDeletedAt applies the entql time.Time predicate on the deleted_at field.
-func (f *IPCEventFilter) WhereDeletedAt(p entql.TimeP) {
-	f.Where(p.Field(ipcevent.FieldDeletedAt))
+// WhereDeleteTime applies the entql time.Time predicate on the delete_time field.
+func (f *EventLogFilter) WhereDeleteTime(p entql.TimeP) {
+	f.Where(p.Field(eventlog.FieldDeleteTime))
 }
 
-// WhereUpdatedBy applies the entql int predicate on the updated_by field.
-func (f *IPCEventFilter) WhereUpdatedBy(p entql.IntP) {
-	f.Where(p.Field(ipcevent.FieldUpdatedBy))
+// WhereUpdaterID applies the entql int predicate on the updater_id field.
+func (f *EventLogFilter) WhereUpdaterID(p entql.IntP) {
+	f.Where(p.Field(eventlog.FieldUpdaterID))
 }
 
-// WhereUpdatedAt applies the entql time.Time predicate on the updated_at field.
-func (f *IPCEventFilter) WhereUpdatedAt(p entql.TimeP) {
-	f.Where(p.Field(ipcevent.FieldUpdatedAt))
+// WhereUpdateTime applies the entql time.Time predicate on the update_time field.
+func (f *EventLogFilter) WhereUpdateTime(p entql.TimeP) {
+	f.Where(p.Field(eventlog.FieldUpdateTime))
 }
 
 // WhereDeviceID applies the entql int predicate on the device_id field.
-func (f *IPCEventFilter) WhereDeviceID(p entql.IntP) {
-	f.Where(p.Field(ipcevent.FieldDeviceID))
+func (f *EventLogFilter) WhereDeviceID(p entql.IntP) {
+	f.Where(p.Field(eventlog.FieldDeviceID))
 }
 
-// WhereVideoID applies the entql int predicate on the video_id field.
-func (f *IPCEventFilter) WhereVideoID(p entql.IntP) {
-	f.Where(p.Field(ipcevent.FieldVideoID))
+// WhereEventID applies the entql int predicate on the event_id field.
+func (f *EventLogFilter) WhereEventID(p entql.IntP) {
+	f.Where(p.Field(eventlog.FieldEventID))
 }
 
-// WhereEventTime applies the entql time.Time predicate on the event_time field.
-func (f *IPCEventFilter) WhereEventTime(p entql.TimeP) {
-	f.Where(p.Field(ipcevent.FieldEventTime))
+// WhereActorID applies the entql int predicate on the actor_id field.
+func (f *EventLogFilter) WhereActorID(p entql.IntP) {
+	f.Where(p.Field(eventlog.FieldActorID))
 }
 
-// WhereEventType applies the entql int predicate on the event_type field.
-func (f *IPCEventFilter) WhereEventType(p entql.IntP) {
-	f.Where(p.Field(ipcevent.FieldEventType))
+// WhereActor2ID applies the entql int predicate on the actor2_id field.
+func (f *EventLogFilter) WhereActor2ID(p entql.IntP) {
+	f.Where(p.Field(eventlog.FieldActor2ID))
 }
 
-// WhereEventStatus applies the entql int predicate on the event_status field.
-func (f *IPCEventFilter) WhereEventStatus(p entql.IntP) {
-	f.Where(p.Field(ipcevent.FieldEventStatus))
+// WhereLogType applies the entql int predicate on the log_type field.
+func (f *EventLogFilter) WhereLogType(p entql.IntP) {
+	f.Where(p.Field(eventlog.FieldLogType))
 }
 
-// WhereImages applies the entql json.RawMessage predicate on the images field.
-func (f *IPCEventFilter) WhereImages(p entql.BytesP) {
-	f.Where(p.Field(ipcevent.FieldImages))
-}
-
-// WhereLabeledImages applies the entql json.RawMessage predicate on the labeled_images field.
-func (f *IPCEventFilter) WhereLabeledImages(p entql.BytesP) {
-	f.Where(p.Field(ipcevent.FieldLabeledImages))
-}
-
-// WhereEventID applies the entql string predicate on the event_id field.
-func (f *IPCEventFilter) WhereEventID(p entql.StringP) {
-	f.Where(p.Field(ipcevent.FieldEventID))
-}
-
-// WhereDescription applies the entql string predicate on the description field.
-func (f *IPCEventFilter) WhereDescription(p entql.StringP) {
-	f.Where(p.Field(ipcevent.FieldDescription))
-}
-
-// WhereRawData applies the entql string predicate on the raw_data field.
-func (f *IPCEventFilter) WhereRawData(p entql.StringP) {
-	f.Where(p.Field(ipcevent.FieldRawData))
+// WhereNotes applies the entql string predicate on the notes field.
+func (f *EventLogFilter) WhereNotes(p entql.StringP) {
+	f.Where(p.Field(eventlog.FieldNotes))
 }
 
 // WhereHasCreator applies a predicate to check if query has an edge creator.
-func (f *IPCEventFilter) WhereHasCreator() {
+func (f *EventLogFilter) WhereHasCreator() {
 	f.Where(entql.HasEdge("creator"))
 }
 
 // WhereHasCreatorWith applies a predicate to check if query has an edge creator with a given conditions (other predicates).
-func (f *IPCEventFilter) WhereHasCreatorWith(preds ...predicate.Admin) {
+func (f *EventLogFilter) WhereHasCreatorWith(preds ...predicate.Admin) {
 	f.Where(entql.HasEdgeWith("creator", sqlgraph.WrapFunc(func(s *sql.Selector) {
 		for _, p := range preds {
 			p(s)
@@ -3011,12 +4140,12 @@ func (f *IPCEventFilter) WhereHasCreatorWith(preds ...predicate.Admin) {
 }
 
 // WhereHasUpdater applies a predicate to check if query has an edge updater.
-func (f *IPCEventFilter) WhereHasUpdater() {
+func (f *EventLogFilter) WhereHasUpdater() {
 	f.Where(entql.HasEdge("updater"))
 }
 
 // WhereHasUpdaterWith applies a predicate to check if query has an edge updater with a given conditions (other predicates).
-func (f *IPCEventFilter) WhereHasUpdaterWith(preds ...predicate.Admin) {
+func (f *EventLogFilter) WhereHasUpdaterWith(preds ...predicate.Admin) {
 	f.Where(entql.HasEdgeWith("updater", sqlgraph.WrapFunc(func(s *sql.Selector) {
 		for _, p := range preds {
 			p(s)
@@ -3024,14 +4153,14 @@ func (f *IPCEventFilter) WhereHasUpdaterWith(preds ...predicate.Admin) {
 	})))
 }
 
-// WhereHasVideo applies a predicate to check if query has an edge video.
-func (f *IPCEventFilter) WhereHasVideo() {
-	f.Where(entql.HasEdge("video"))
+// WhereHasEvent applies a predicate to check if query has an edge event.
+func (f *EventLogFilter) WhereHasEvent() {
+	f.Where(entql.HasEdge("event"))
 }
 
-// WhereHasVideoWith applies a predicate to check if query has an edge video with a given conditions (other predicates).
-func (f *IPCEventFilter) WhereHasVideoWith(preds ...predicate.Video) {
-	f.Where(entql.HasEdgeWith("video", sqlgraph.WrapFunc(func(s *sql.Selector) {
+// WhereHasEventWith applies a predicate to check if query has an edge event with a given conditions (other predicates).
+func (f *EventLogFilter) WhereHasEventWith(preds ...predicate.Event) {
+	f.Where(entql.HasEdgeWith("event", sqlgraph.WrapFunc(func(s *sql.Selector) {
 		for _, p := range preds {
 			p(s)
 		}
@@ -3039,12 +4168,12 @@ func (f *IPCEventFilter) WhereHasVideoWith(preds ...predicate.Video) {
 }
 
 // WhereHasDevice applies a predicate to check if query has an edge device.
-func (f *IPCEventFilter) WhereHasDevice() {
+func (f *EventLogFilter) WhereHasDevice() {
 	f.Where(entql.HasEdge("device"))
 }
 
 // WhereHasDeviceWith applies a predicate to check if query has an edge device with a given conditions (other predicates).
-func (f *IPCEventFilter) WhereHasDeviceWith(preds ...predicate.Device) {
+func (f *EventLogFilter) WhereHasDeviceWith(preds ...predicate.Device) {
 	f.Where(entql.HasEdgeWith("device", sqlgraph.WrapFunc(func(s *sql.Selector) {
 		for _, p := range preds {
 			p(s)
@@ -3052,14 +4181,198 @@ func (f *IPCEventFilter) WhereHasDeviceWith(preds ...predicate.Device) {
 	})))
 }
 
-// WhereHasFixers applies a predicate to check if query has an edge fixers.
-func (f *IPCEventFilter) WhereHasFixers() {
-	f.Where(entql.HasEdge("fixers"))
+// WhereHasActor applies a predicate to check if query has an edge actor.
+func (f *EventLogFilter) WhereHasActor() {
+	f.Where(entql.HasEdge("actor"))
 }
 
-// WhereHasFixersWith applies a predicate to check if query has an edge fixers with a given conditions (other predicates).
-func (f *IPCEventFilter) WhereHasFixersWith(preds ...predicate.Employee) {
-	f.Where(entql.HasEdgeWith("fixers", sqlgraph.WrapFunc(func(s *sql.Selector) {
+// WhereHasActorWith applies a predicate to check if query has an edge actor with a given conditions (other predicates).
+func (f *EventLogFilter) WhereHasActorWith(preds ...predicate.Admin) {
+	f.Where(entql.HasEdgeWith("actor", sqlgraph.WrapFunc(func(s *sql.Selector) {
+		for _, p := range preds {
+			p(s)
+		}
+	})))
+}
+
+// WhereHasActor2 applies a predicate to check if query has an edge actor2.
+func (f *EventLogFilter) WhereHasActor2() {
+	f.Where(entql.HasEdge("actor2"))
+}
+
+// WhereHasActor2With applies a predicate to check if query has an edge actor2 with a given conditions (other predicates).
+func (f *EventLogFilter) WhereHasActor2With(preds ...predicate.Admin) {
+	f.Where(entql.HasEdgeWith("actor2", sqlgraph.WrapFunc(func(s *sql.Selector) {
+		for _, p := range preds {
+			p(s)
+		}
+	})))
+}
+
+// addPredicate implements the predicateAdder interface.
+func (fq *FixingQuery) addPredicate(pred func(s *sql.Selector)) {
+	fq.predicates = append(fq.predicates, pred)
+}
+
+// Filter returns a Filter implementation to apply filters on the FixingQuery builder.
+func (fq *FixingQuery) Filter() *FixingFilter {
+	return &FixingFilter{config: fq.config, predicateAdder: fq}
+}
+
+// addPredicate implements the predicateAdder interface.
+func (m *FixingMutation) addPredicate(pred func(s *sql.Selector)) {
+	m.predicates = append(m.predicates, pred)
+}
+
+// Filter returns an entql.Where implementation to apply filters on the FixingMutation builder.
+func (m *FixingMutation) Filter() *FixingFilter {
+	return &FixingFilter{config: m.config, predicateAdder: m}
+}
+
+// FixingFilter provides a generic filtering capability at runtime for FixingQuery.
+type FixingFilter struct {
+	predicateAdder
+	config
+}
+
+// Where applies the entql predicate on the query filter.
+func (f *FixingFilter) Where(p entql.P) {
+	f.addPredicate(func(s *sql.Selector) {
+		if err := schemaGraph.EvalP(schemaGraph.Nodes[9].Type, p, s); err != nil {
+			s.AddError(err)
+		}
+	})
+}
+
+// WhereID applies the entql int predicate on the id field.
+func (f *FixingFilter) WhereID(p entql.IntP) {
+	f.Where(p.Field(fixing.FieldID))
+}
+
+// WhereCreateTime applies the entql time.Time predicate on the create_time field.
+func (f *FixingFilter) WhereCreateTime(p entql.TimeP) {
+	f.Where(p.Field(fixing.FieldCreateTime))
+}
+
+// WhereCreatorID applies the entql int predicate on the creator_id field.
+func (f *FixingFilter) WhereCreatorID(p entql.IntP) {
+	f.Where(p.Field(fixing.FieldCreatorID))
+}
+
+// WhereDeleteTime applies the entql time.Time predicate on the delete_time field.
+func (f *FixingFilter) WhereDeleteTime(p entql.TimeP) {
+	f.Where(p.Field(fixing.FieldDeleteTime))
+}
+
+// WhereUpdaterID applies the entql int predicate on the updater_id field.
+func (f *FixingFilter) WhereUpdaterID(p entql.IntP) {
+	f.Where(p.Field(fixing.FieldUpdaterID))
+}
+
+// WhereUpdateTime applies the entql time.Time predicate on the update_time field.
+func (f *FixingFilter) WhereUpdateTime(p entql.TimeP) {
+	f.Where(p.Field(fixing.FieldUpdateTime))
+}
+
+// WhereFixerID applies the entql int predicate on the fixer_id field.
+func (f *FixingFilter) WhereFixerID(p entql.IntP) {
+	f.Where(p.Field(fixing.FieldFixerID))
+}
+
+// WhereEventID applies the entql int predicate on the event_id field.
+func (f *FixingFilter) WhereEventID(p entql.IntP) {
+	f.Where(p.Field(fixing.FieldEventID))
+}
+
+// WhereDeviceID applies the entql int predicate on the device_id field.
+func (f *FixingFilter) WhereDeviceID(p entql.IntP) {
+	f.Where(p.Field(fixing.FieldDeviceID))
+}
+
+// WhereAssignNotes applies the entql string predicate on the assign_notes field.
+func (f *FixingFilter) WhereAssignNotes(p entql.StringP) {
+	f.Where(p.Field(fixing.FieldAssignNotes))
+}
+
+// WhereFixTime applies the entql time.Time predicate on the fix_time field.
+func (f *FixingFilter) WhereFixTime(p entql.TimeP) {
+	f.Where(p.Field(fixing.FieldFixTime))
+}
+
+// WhereCompleteTime applies the entql time.Time predicate on the complete_time field.
+func (f *FixingFilter) WhereCompleteTime(p entql.TimeP) {
+	f.Where(p.Field(fixing.FieldCompleteTime))
+}
+
+// WhereCompleteNotes applies the entql string predicate on the complete_notes field.
+func (f *FixingFilter) WhereCompleteNotes(p entql.StringP) {
+	f.Where(p.Field(fixing.FieldCompleteNotes))
+}
+
+// WhereHasCreator applies a predicate to check if query has an edge creator.
+func (f *FixingFilter) WhereHasCreator() {
+	f.Where(entql.HasEdge("creator"))
+}
+
+// WhereHasCreatorWith applies a predicate to check if query has an edge creator with a given conditions (other predicates).
+func (f *FixingFilter) WhereHasCreatorWith(preds ...predicate.Admin) {
+	f.Where(entql.HasEdgeWith("creator", sqlgraph.WrapFunc(func(s *sql.Selector) {
+		for _, p := range preds {
+			p(s)
+		}
+	})))
+}
+
+// WhereHasUpdater applies a predicate to check if query has an edge updater.
+func (f *FixingFilter) WhereHasUpdater() {
+	f.Where(entql.HasEdge("updater"))
+}
+
+// WhereHasUpdaterWith applies a predicate to check if query has an edge updater with a given conditions (other predicates).
+func (f *FixingFilter) WhereHasUpdaterWith(preds ...predicate.Admin) {
+	f.Where(entql.HasEdgeWith("updater", sqlgraph.WrapFunc(func(s *sql.Selector) {
+		for _, p := range preds {
+			p(s)
+		}
+	})))
+}
+
+// WhereHasFixer applies a predicate to check if query has an edge fixer.
+func (f *FixingFilter) WhereHasFixer() {
+	f.Where(entql.HasEdge("fixer"))
+}
+
+// WhereHasFixerWith applies a predicate to check if query has an edge fixer with a given conditions (other predicates).
+func (f *FixingFilter) WhereHasFixerWith(preds ...predicate.Admin) {
+	f.Where(entql.HasEdgeWith("fixer", sqlgraph.WrapFunc(func(s *sql.Selector) {
+		for _, p := range preds {
+			p(s)
+		}
+	})))
+}
+
+// WhereHasEvent applies a predicate to check if query has an edge event.
+func (f *FixingFilter) WhereHasEvent() {
+	f.Where(entql.HasEdge("event"))
+}
+
+// WhereHasEventWith applies a predicate to check if query has an edge event with a given conditions (other predicates).
+func (f *FixingFilter) WhereHasEventWith(preds ...predicate.Event) {
+	f.Where(entql.HasEdgeWith("event", sqlgraph.WrapFunc(func(s *sql.Selector) {
+		for _, p := range preds {
+			p(s)
+		}
+	})))
+}
+
+// WhereHasDevice applies a predicate to check if query has an edge device.
+func (f *FixingFilter) WhereHasDevice() {
+	f.Where(entql.HasEdge("device"))
+}
+
+// WhereHasDeviceWith applies a predicate to check if query has an edge device with a given conditions (other predicates).
+func (f *FixingFilter) WhereHasDeviceWith(preds ...predicate.Device) {
+	f.Where(entql.HasEdgeWith("device", sqlgraph.WrapFunc(func(s *sql.Selector) {
 		for _, p := range preds {
 			p(s)
 		}
@@ -3095,7 +4408,7 @@ type OccupationFilter struct {
 // Where applies the entql predicate on the query filter.
 func (f *OccupationFilter) Where(p entql.P) {
 	f.addPredicate(func(s *sql.Selector) {
-		if err := schemaGraph.EvalP(schemaGraph.Nodes[9].Type, p, s); err != nil {
+		if err := schemaGraph.EvalP(schemaGraph.Nodes[10].Type, p, s); err != nil {
 			s.AddError(err)
 		}
 	})
@@ -3106,29 +4419,29 @@ func (f *OccupationFilter) WhereID(p entql.IntP) {
 	f.Where(p.Field(occupation.FieldID))
 }
 
-// WhereCreatedAt applies the entql time.Time predicate on the created_at field.
-func (f *OccupationFilter) WhereCreatedAt(p entql.TimeP) {
-	f.Where(p.Field(occupation.FieldCreatedAt))
+// WhereCreateTime applies the entql time.Time predicate on the create_time field.
+func (f *OccupationFilter) WhereCreateTime(p entql.TimeP) {
+	f.Where(p.Field(occupation.FieldCreateTime))
 }
 
-// WhereCreatedBy applies the entql int predicate on the created_by field.
-func (f *OccupationFilter) WhereCreatedBy(p entql.IntP) {
-	f.Where(p.Field(occupation.FieldCreatedBy))
+// WhereCreatorID applies the entql int predicate on the creator_id field.
+func (f *OccupationFilter) WhereCreatorID(p entql.IntP) {
+	f.Where(p.Field(occupation.FieldCreatorID))
 }
 
-// WhereDeletedAt applies the entql time.Time predicate on the deleted_at field.
-func (f *OccupationFilter) WhereDeletedAt(p entql.TimeP) {
-	f.Where(p.Field(occupation.FieldDeletedAt))
+// WhereDeleteTime applies the entql time.Time predicate on the delete_time field.
+func (f *OccupationFilter) WhereDeleteTime(p entql.TimeP) {
+	f.Where(p.Field(occupation.FieldDeleteTime))
 }
 
-// WhereUpdatedBy applies the entql int predicate on the updated_by field.
-func (f *OccupationFilter) WhereUpdatedBy(p entql.IntP) {
-	f.Where(p.Field(occupation.FieldUpdatedBy))
+// WhereUpdaterID applies the entql int predicate on the updater_id field.
+func (f *OccupationFilter) WhereUpdaterID(p entql.IntP) {
+	f.Where(p.Field(occupation.FieldUpdaterID))
 }
 
-// WhereUpdatedAt applies the entql time.Time predicate on the updated_at field.
-func (f *OccupationFilter) WhereUpdatedAt(p entql.TimeP) {
-	f.Where(p.Field(occupation.FieldUpdatedAt))
+// WhereUpdateTime applies the entql time.Time predicate on the update_time field.
+func (f *OccupationFilter) WhereUpdateTime(p entql.TimeP) {
+	f.Where(p.Field(occupation.FieldUpdateTime))
 }
 
 // WhereName applies the entql string predicate on the name field.
@@ -3169,14 +4482,145 @@ func (f *OccupationFilter) WhereHasUpdaterWith(preds ...predicate.Admin) {
 	})))
 }
 
-// WhereHasEmployees applies a predicate to check if query has an edge employees.
-func (f *OccupationFilter) WhereHasEmployees() {
-	f.Where(entql.HasEdge("employees"))
+// WhereHasEmployee applies a predicate to check if query has an edge employee.
+func (f *OccupationFilter) WhereHasEmployee() {
+	f.Where(entql.HasEdge("employee"))
 }
 
-// WhereHasEmployeesWith applies a predicate to check if query has an edge employees with a given conditions (other predicates).
-func (f *OccupationFilter) WhereHasEmployeesWith(preds ...predicate.Employee) {
-	f.Where(entql.HasEdgeWith("employees", sqlgraph.WrapFunc(func(s *sql.Selector) {
+// WhereHasEmployeeWith applies a predicate to check if query has an edge employee with a given conditions (other predicates).
+func (f *OccupationFilter) WhereHasEmployeeWith(preds ...predicate.Employee) {
+	f.Where(entql.HasEdgeWith("employee", sqlgraph.WrapFunc(func(s *sql.Selector) {
+		for _, p := range preds {
+			p(s)
+		}
+	})))
+}
+
+// addPredicate implements the predicateAdder interface.
+func (pq *PermissionQuery) addPredicate(pred func(s *sql.Selector)) {
+	pq.predicates = append(pq.predicates, pred)
+}
+
+// Filter returns a Filter implementation to apply filters on the PermissionQuery builder.
+func (pq *PermissionQuery) Filter() *PermissionFilter {
+	return &PermissionFilter{config: pq.config, predicateAdder: pq}
+}
+
+// addPredicate implements the predicateAdder interface.
+func (m *PermissionMutation) addPredicate(pred func(s *sql.Selector)) {
+	m.predicates = append(m.predicates, pred)
+}
+
+// Filter returns an entql.Where implementation to apply filters on the PermissionMutation builder.
+func (m *PermissionMutation) Filter() *PermissionFilter {
+	return &PermissionFilter{config: m.config, predicateAdder: m}
+}
+
+// PermissionFilter provides a generic filtering capability at runtime for PermissionQuery.
+type PermissionFilter struct {
+	predicateAdder
+	config
+}
+
+// Where applies the entql predicate on the query filter.
+func (f *PermissionFilter) Where(p entql.P) {
+	f.addPredicate(func(s *sql.Selector) {
+		if err := schemaGraph.EvalP(schemaGraph.Nodes[11].Type, p, s); err != nil {
+			s.AddError(err)
+		}
+	})
+}
+
+// WhereID applies the entql int predicate on the id field.
+func (f *PermissionFilter) WhereID(p entql.IntP) {
+	f.Where(p.Field(permission.FieldID))
+}
+
+// WhereCreateTime applies the entql time.Time predicate on the create_time field.
+func (f *PermissionFilter) WhereCreateTime(p entql.TimeP) {
+	f.Where(p.Field(permission.FieldCreateTime))
+}
+
+// WhereCreatorID applies the entql int predicate on the creator_id field.
+func (f *PermissionFilter) WhereCreatorID(p entql.IntP) {
+	f.Where(p.Field(permission.FieldCreatorID))
+}
+
+// WhereDeleteTime applies the entql time.Time predicate on the delete_time field.
+func (f *PermissionFilter) WhereDeleteTime(p entql.TimeP) {
+	f.Where(p.Field(permission.FieldDeleteTime))
+}
+
+// WhereUpdaterID applies the entql int predicate on the updater_id field.
+func (f *PermissionFilter) WhereUpdaterID(p entql.IntP) {
+	f.Where(p.Field(permission.FieldUpdaterID))
+}
+
+// WhereUpdateTime applies the entql time.Time predicate on the update_time field.
+func (f *PermissionFilter) WhereUpdateTime(p entql.TimeP) {
+	f.Where(p.Field(permission.FieldUpdateTime))
+}
+
+// WhereName applies the entql string predicate on the name field.
+func (f *PermissionFilter) WhereName(p entql.StringP) {
+	f.Where(p.Field(permission.FieldName))
+}
+
+// WhereAccessIds applies the entql json.RawMessage predicate on the access_ids field.
+func (f *PermissionFilter) WhereAccessIds(p entql.BytesP) {
+	f.Where(p.Field(permission.FieldAccessIds))
+}
+
+// WhereHasCreator applies a predicate to check if query has an edge creator.
+func (f *PermissionFilter) WhereHasCreator() {
+	f.Where(entql.HasEdge("creator"))
+}
+
+// WhereHasCreatorWith applies a predicate to check if query has an edge creator with a given conditions (other predicates).
+func (f *PermissionFilter) WhereHasCreatorWith(preds ...predicate.Admin) {
+	f.Where(entql.HasEdgeWith("creator", sqlgraph.WrapFunc(func(s *sql.Selector) {
+		for _, p := range preds {
+			p(s)
+		}
+	})))
+}
+
+// WhereHasUpdater applies a predicate to check if query has an edge updater.
+func (f *PermissionFilter) WhereHasUpdater() {
+	f.Where(entql.HasEdge("updater"))
+}
+
+// WhereHasUpdaterWith applies a predicate to check if query has an edge updater with a given conditions (other predicates).
+func (f *PermissionFilter) WhereHasUpdaterWith(preds ...predicate.Admin) {
+	f.Where(entql.HasEdgeWith("updater", sqlgraph.WrapFunc(func(s *sql.Selector) {
+		for _, p := range preds {
+			p(s)
+		}
+	})))
+}
+
+// WhereHasAdmin applies a predicate to check if query has an edge admin.
+func (f *PermissionFilter) WhereHasAdmin() {
+	f.Where(entql.HasEdge("admin"))
+}
+
+// WhereHasAdminWith applies a predicate to check if query has an edge admin with a given conditions (other predicates).
+func (f *PermissionFilter) WhereHasAdminWith(preds ...predicate.Admin) {
+	f.Where(entql.HasEdgeWith("admin", sqlgraph.WrapFunc(func(s *sql.Selector) {
+		for _, p := range preds {
+			p(s)
+		}
+	})))
+}
+
+// WhereHasDepartment applies a predicate to check if query has an edge department.
+func (f *PermissionFilter) WhereHasDepartment() {
+	f.Where(entql.HasEdge("department"))
+}
+
+// WhereHasDepartmentWith applies a predicate to check if query has an edge department with a given conditions (other predicates).
+func (f *PermissionFilter) WhereHasDepartmentWith(preds ...predicate.Department) {
+	f.Where(entql.HasEdgeWith("department", sqlgraph.WrapFunc(func(s *sql.Selector) {
 		for _, p := range preds {
 			p(s)
 		}
@@ -3212,7 +4656,7 @@ type RiskFilter struct {
 // Where applies the entql predicate on the query filter.
 func (f *RiskFilter) Where(p entql.P) {
 	f.addPredicate(func(s *sql.Selector) {
-		if err := schemaGraph.EvalP(schemaGraph.Nodes[10].Type, p, s); err != nil {
+		if err := schemaGraph.EvalP(schemaGraph.Nodes[12].Type, p, s); err != nil {
 			s.AddError(err)
 		}
 	})
@@ -3223,29 +4667,29 @@ func (f *RiskFilter) WhereID(p entql.IntP) {
 	f.Where(p.Field(risk.FieldID))
 }
 
-// WhereCreatedAt applies the entql time.Time predicate on the created_at field.
-func (f *RiskFilter) WhereCreatedAt(p entql.TimeP) {
-	f.Where(p.Field(risk.FieldCreatedAt))
+// WhereCreateTime applies the entql time.Time predicate on the create_time field.
+func (f *RiskFilter) WhereCreateTime(p entql.TimeP) {
+	f.Where(p.Field(risk.FieldCreateTime))
 }
 
-// WhereCreatedBy applies the entql int predicate on the created_by field.
-func (f *RiskFilter) WhereCreatedBy(p entql.IntP) {
-	f.Where(p.Field(risk.FieldCreatedBy))
+// WhereCreatorID applies the entql int predicate on the creator_id field.
+func (f *RiskFilter) WhereCreatorID(p entql.IntP) {
+	f.Where(p.Field(risk.FieldCreatorID))
 }
 
-// WhereDeletedAt applies the entql time.Time predicate on the deleted_at field.
-func (f *RiskFilter) WhereDeletedAt(p entql.TimeP) {
-	f.Where(p.Field(risk.FieldDeletedAt))
+// WhereDeleteTime applies the entql time.Time predicate on the delete_time field.
+func (f *RiskFilter) WhereDeleteTime(p entql.TimeP) {
+	f.Where(p.Field(risk.FieldDeleteTime))
 }
 
-// WhereUpdatedBy applies the entql int predicate on the updated_by field.
-func (f *RiskFilter) WhereUpdatedBy(p entql.IntP) {
-	f.Where(p.Field(risk.FieldUpdatedBy))
+// WhereUpdaterID applies the entql int predicate on the updater_id field.
+func (f *RiskFilter) WhereUpdaterID(p entql.IntP) {
+	f.Where(p.Field(risk.FieldUpdaterID))
 }
 
-// WhereUpdatedAt applies the entql time.Time predicate on the updated_at field.
-func (f *RiskFilter) WhereUpdatedAt(p entql.TimeP) {
-	f.Where(p.Field(risk.FieldUpdatedAt))
+// WhereUpdateTime applies the entql time.Time predicate on the update_time field.
+func (f *RiskFilter) WhereUpdateTime(p entql.TimeP) {
+	f.Where(p.Field(risk.FieldUpdateTime))
 }
 
 // WhereTitle applies the entql string predicate on the title field.
@@ -3271,11 +4715,6 @@ func (f *RiskFilter) WhereRiskCategoryID(p entql.IntP) {
 // WhereRiskLocationID applies the entql int predicate on the risk_location_id field.
 func (f *RiskFilter) WhereRiskLocationID(p entql.IntP) {
 	f.Where(p.Field(risk.FieldRiskLocationID))
-}
-
-// WhereReporterID applies the entql int predicate on the reporter_id field.
-func (f *RiskFilter) WhereReporterID(p entql.IntP) {
-	f.Where(p.Field(risk.FieldReporterID))
 }
 
 // WhereMaintainerID applies the entql int predicate on the maintainer_id field.
@@ -3354,27 +4793,13 @@ func (f *RiskFilter) WhereHasRiskLocationWith(preds ...predicate.RiskLocation) {
 	})))
 }
 
-// WhereHasReporter applies a predicate to check if query has an edge reporter.
-func (f *RiskFilter) WhereHasReporter() {
-	f.Where(entql.HasEdge("reporter"))
-}
-
-// WhereHasReporterWith applies a predicate to check if query has an edge reporter with a given conditions (other predicates).
-func (f *RiskFilter) WhereHasReporterWith(preds ...predicate.Employee) {
-	f.Where(entql.HasEdgeWith("reporter", sqlgraph.WrapFunc(func(s *sql.Selector) {
-		for _, p := range preds {
-			p(s)
-		}
-	})))
-}
-
 // WhereHasMaintainer applies a predicate to check if query has an edge maintainer.
 func (f *RiskFilter) WhereHasMaintainer() {
 	f.Where(entql.HasEdge("maintainer"))
 }
 
 // WhereHasMaintainerWith applies a predicate to check if query has an edge maintainer with a given conditions (other predicates).
-func (f *RiskFilter) WhereHasMaintainerWith(preds ...predicate.Employee) {
+func (f *RiskFilter) WhereHasMaintainerWith(preds ...predicate.Admin) {
 	f.Where(entql.HasEdgeWith("maintainer", sqlgraph.WrapFunc(func(s *sql.Selector) {
 		for _, p := range preds {
 			p(s)
@@ -3411,7 +4836,7 @@ type RiskCategoryFilter struct {
 // Where applies the entql predicate on the query filter.
 func (f *RiskCategoryFilter) Where(p entql.P) {
 	f.addPredicate(func(s *sql.Selector) {
-		if err := schemaGraph.EvalP(schemaGraph.Nodes[11].Type, p, s); err != nil {
+		if err := schemaGraph.EvalP(schemaGraph.Nodes[13].Type, p, s); err != nil {
 			s.AddError(err)
 		}
 	})
@@ -3422,29 +4847,29 @@ func (f *RiskCategoryFilter) WhereID(p entql.IntP) {
 	f.Where(p.Field(riskcategory.FieldID))
 }
 
-// WhereCreatedAt applies the entql time.Time predicate on the created_at field.
-func (f *RiskCategoryFilter) WhereCreatedAt(p entql.TimeP) {
-	f.Where(p.Field(riskcategory.FieldCreatedAt))
+// WhereCreateTime applies the entql time.Time predicate on the create_time field.
+func (f *RiskCategoryFilter) WhereCreateTime(p entql.TimeP) {
+	f.Where(p.Field(riskcategory.FieldCreateTime))
 }
 
-// WhereCreatedBy applies the entql int predicate on the created_by field.
-func (f *RiskCategoryFilter) WhereCreatedBy(p entql.IntP) {
-	f.Where(p.Field(riskcategory.FieldCreatedBy))
+// WhereCreatorID applies the entql int predicate on the creator_id field.
+func (f *RiskCategoryFilter) WhereCreatorID(p entql.IntP) {
+	f.Where(p.Field(riskcategory.FieldCreatorID))
 }
 
-// WhereDeletedAt applies the entql time.Time predicate on the deleted_at field.
-func (f *RiskCategoryFilter) WhereDeletedAt(p entql.TimeP) {
-	f.Where(p.Field(riskcategory.FieldDeletedAt))
+// WhereDeleteTime applies the entql time.Time predicate on the delete_time field.
+func (f *RiskCategoryFilter) WhereDeleteTime(p entql.TimeP) {
+	f.Where(p.Field(riskcategory.FieldDeleteTime))
 }
 
-// WhereUpdatedBy applies the entql int predicate on the updated_by field.
-func (f *RiskCategoryFilter) WhereUpdatedBy(p entql.IntP) {
-	f.Where(p.Field(riskcategory.FieldUpdatedBy))
+// WhereUpdaterID applies the entql int predicate on the updater_id field.
+func (f *RiskCategoryFilter) WhereUpdaterID(p entql.IntP) {
+	f.Where(p.Field(riskcategory.FieldUpdaterID))
 }
 
-// WhereUpdatedAt applies the entql time.Time predicate on the updated_at field.
-func (f *RiskCategoryFilter) WhereUpdatedAt(p entql.TimeP) {
-	f.Where(p.Field(riskcategory.FieldUpdatedAt))
+// WhereUpdateTime applies the entql time.Time predicate on the update_time field.
+func (f *RiskCategoryFilter) WhereUpdateTime(p entql.TimeP) {
+	f.Where(p.Field(riskcategory.FieldUpdateTime))
 }
 
 // WhereName applies the entql string predicate on the name field.
@@ -3494,6 +4919,20 @@ func (f *RiskCategoryFilter) WhereHasRiskWith(preds ...predicate.Risk) {
 	})))
 }
 
+// WhereHasSweep applies a predicate to check if query has an edge sweep.
+func (f *RiskCategoryFilter) WhereHasSweep() {
+	f.Where(entql.HasEdge("sweep"))
+}
+
+// WhereHasSweepWith applies a predicate to check if query has an edge sweep with a given conditions (other predicates).
+func (f *RiskCategoryFilter) WhereHasSweepWith(preds ...predicate.Sweep) {
+	f.Where(entql.HasEdgeWith("sweep", sqlgraph.WrapFunc(func(s *sql.Selector) {
+		for _, p := range preds {
+			p(s)
+		}
+	})))
+}
+
 // addPredicate implements the predicateAdder interface.
 func (rlq *RiskLocationQuery) addPredicate(pred func(s *sql.Selector)) {
 	rlq.predicates = append(rlq.predicates, pred)
@@ -3523,7 +4962,7 @@ type RiskLocationFilter struct {
 // Where applies the entql predicate on the query filter.
 func (f *RiskLocationFilter) Where(p entql.P) {
 	f.addPredicate(func(s *sql.Selector) {
-		if err := schemaGraph.EvalP(schemaGraph.Nodes[12].Type, p, s); err != nil {
+		if err := schemaGraph.EvalP(schemaGraph.Nodes[14].Type, p, s); err != nil {
 			s.AddError(err)
 		}
 	})
@@ -3534,29 +4973,29 @@ func (f *RiskLocationFilter) WhereID(p entql.IntP) {
 	f.Where(p.Field(risklocation.FieldID))
 }
 
-// WhereCreatedAt applies the entql time.Time predicate on the created_at field.
-func (f *RiskLocationFilter) WhereCreatedAt(p entql.TimeP) {
-	f.Where(p.Field(risklocation.FieldCreatedAt))
+// WhereCreateTime applies the entql time.Time predicate on the create_time field.
+func (f *RiskLocationFilter) WhereCreateTime(p entql.TimeP) {
+	f.Where(p.Field(risklocation.FieldCreateTime))
 }
 
-// WhereCreatedBy applies the entql int predicate on the created_by field.
-func (f *RiskLocationFilter) WhereCreatedBy(p entql.IntP) {
-	f.Where(p.Field(risklocation.FieldCreatedBy))
+// WhereCreatorID applies the entql int predicate on the creator_id field.
+func (f *RiskLocationFilter) WhereCreatorID(p entql.IntP) {
+	f.Where(p.Field(risklocation.FieldCreatorID))
 }
 
-// WhereDeletedAt applies the entql time.Time predicate on the deleted_at field.
-func (f *RiskLocationFilter) WhereDeletedAt(p entql.TimeP) {
-	f.Where(p.Field(risklocation.FieldDeletedAt))
+// WhereDeleteTime applies the entql time.Time predicate on the delete_time field.
+func (f *RiskLocationFilter) WhereDeleteTime(p entql.TimeP) {
+	f.Where(p.Field(risklocation.FieldDeleteTime))
 }
 
-// WhereUpdatedBy applies the entql int predicate on the updated_by field.
-func (f *RiskLocationFilter) WhereUpdatedBy(p entql.IntP) {
-	f.Where(p.Field(risklocation.FieldUpdatedBy))
+// WhereUpdaterID applies the entql int predicate on the updater_id field.
+func (f *RiskLocationFilter) WhereUpdaterID(p entql.IntP) {
+	f.Where(p.Field(risklocation.FieldUpdaterID))
 }
 
-// WhereUpdatedAt applies the entql time.Time predicate on the updated_at field.
-func (f *RiskLocationFilter) WhereUpdatedAt(p entql.TimeP) {
-	f.Where(p.Field(risklocation.FieldUpdatedAt))
+// WhereUpdateTime applies the entql time.Time predicate on the update_time field.
+func (f *RiskLocationFilter) WhereUpdateTime(p entql.TimeP) {
+	f.Where(p.Field(risklocation.FieldUpdateTime))
 }
 
 // WhereName applies the entql string predicate on the name field.
@@ -3606,6 +5045,702 @@ func (f *RiskLocationFilter) WhereHasRiskWith(preds ...predicate.Risk) {
 	})))
 }
 
+// WhereHasSweep applies a predicate to check if query has an edge sweep.
+func (f *RiskLocationFilter) WhereHasSweep() {
+	f.Where(entql.HasEdge("sweep"))
+}
+
+// WhereHasSweepWith applies a predicate to check if query has an edge sweep with a given conditions (other predicates).
+func (f *RiskLocationFilter) WhereHasSweepWith(preds ...predicate.Sweep) {
+	f.Where(entql.HasEdgeWith("sweep", sqlgraph.WrapFunc(func(s *sql.Selector) {
+		for _, p := range preds {
+			p(s)
+		}
+	})))
+}
+
+// addPredicate implements the predicateAdder interface.
+func (sq *SweepQuery) addPredicate(pred func(s *sql.Selector)) {
+	sq.predicates = append(sq.predicates, pred)
+}
+
+// Filter returns a Filter implementation to apply filters on the SweepQuery builder.
+func (sq *SweepQuery) Filter() *SweepFilter {
+	return &SweepFilter{config: sq.config, predicateAdder: sq}
+}
+
+// addPredicate implements the predicateAdder interface.
+func (m *SweepMutation) addPredicate(pred func(s *sql.Selector)) {
+	m.predicates = append(m.predicates, pred)
+}
+
+// Filter returns an entql.Where implementation to apply filters on the SweepMutation builder.
+func (m *SweepMutation) Filter() *SweepFilter {
+	return &SweepFilter{config: m.config, predicateAdder: m}
+}
+
+// SweepFilter provides a generic filtering capability at runtime for SweepQuery.
+type SweepFilter struct {
+	predicateAdder
+	config
+}
+
+// Where applies the entql predicate on the query filter.
+func (f *SweepFilter) Where(p entql.P) {
+	f.addPredicate(func(s *sql.Selector) {
+		if err := schemaGraph.EvalP(schemaGraph.Nodes[15].Type, p, s); err != nil {
+			s.AddError(err)
+		}
+	})
+}
+
+// WhereID applies the entql int predicate on the id field.
+func (f *SweepFilter) WhereID(p entql.IntP) {
+	f.Where(p.Field(sweep.FieldID))
+}
+
+// WhereCreateTime applies the entql time.Time predicate on the create_time field.
+func (f *SweepFilter) WhereCreateTime(p entql.TimeP) {
+	f.Where(p.Field(sweep.FieldCreateTime))
+}
+
+// WhereCreatorID applies the entql int predicate on the creator_id field.
+func (f *SweepFilter) WhereCreatorID(p entql.IntP) {
+	f.Where(p.Field(sweep.FieldCreatorID))
+}
+
+// WhereDeleteTime applies the entql time.Time predicate on the delete_time field.
+func (f *SweepFilter) WhereDeleteTime(p entql.TimeP) {
+	f.Where(p.Field(sweep.FieldDeleteTime))
+}
+
+// WhereUpdaterID applies the entql int predicate on the updater_id field.
+func (f *SweepFilter) WhereUpdaterID(p entql.IntP) {
+	f.Where(p.Field(sweep.FieldUpdaterID))
+}
+
+// WhereUpdateTime applies the entql time.Time predicate on the update_time field.
+func (f *SweepFilter) WhereUpdateTime(p entql.TimeP) {
+	f.Where(p.Field(sweep.FieldUpdateTime))
+}
+
+// WhereName applies the entql string predicate on the name field.
+func (f *SweepFilter) WhereName(p entql.StringP) {
+	f.Where(p.Field(sweep.FieldName))
+}
+
+// WhereRiskCategoryID applies the entql int predicate on the risk_category_id field.
+func (f *SweepFilter) WhereRiskCategoryID(p entql.IntP) {
+	f.Where(p.Field(sweep.FieldRiskCategoryID))
+}
+
+// WhereRiskLocationID applies the entql int predicate on the risk_location_id field.
+func (f *SweepFilter) WhereRiskLocationID(p entql.IntP) {
+	f.Where(p.Field(sweep.FieldRiskLocationID))
+}
+
+// WhereSweepJobs applies the entql json.RawMessage predicate on the sweep_jobs field.
+func (f *SweepFilter) WhereSweepJobs(p entql.BytesP) {
+	f.Where(p.Field(sweep.FieldSweepJobs))
+}
+
+// WhereHasCreator applies a predicate to check if query has an edge creator.
+func (f *SweepFilter) WhereHasCreator() {
+	f.Where(entql.HasEdge("creator"))
+}
+
+// WhereHasCreatorWith applies a predicate to check if query has an edge creator with a given conditions (other predicates).
+func (f *SweepFilter) WhereHasCreatorWith(preds ...predicate.Admin) {
+	f.Where(entql.HasEdgeWith("creator", sqlgraph.WrapFunc(func(s *sql.Selector) {
+		for _, p := range preds {
+			p(s)
+		}
+	})))
+}
+
+// WhereHasUpdater applies a predicate to check if query has an edge updater.
+func (f *SweepFilter) WhereHasUpdater() {
+	f.Where(entql.HasEdge("updater"))
+}
+
+// WhereHasUpdaterWith applies a predicate to check if query has an edge updater with a given conditions (other predicates).
+func (f *SweepFilter) WhereHasUpdaterWith(preds ...predicate.Admin) {
+	f.Where(entql.HasEdgeWith("updater", sqlgraph.WrapFunc(func(s *sql.Selector) {
+		for _, p := range preds {
+			p(s)
+		}
+	})))
+}
+
+// WhereHasRiskCategory applies a predicate to check if query has an edge risk_category.
+func (f *SweepFilter) WhereHasRiskCategory() {
+	f.Where(entql.HasEdge("risk_category"))
+}
+
+// WhereHasRiskCategoryWith applies a predicate to check if query has an edge risk_category with a given conditions (other predicates).
+func (f *SweepFilter) WhereHasRiskCategoryWith(preds ...predicate.RiskCategory) {
+	f.Where(entql.HasEdgeWith("risk_category", sqlgraph.WrapFunc(func(s *sql.Selector) {
+		for _, p := range preds {
+			p(s)
+		}
+	})))
+}
+
+// WhereHasRiskLocation applies a predicate to check if query has an edge risk_location.
+func (f *SweepFilter) WhereHasRiskLocation() {
+	f.Where(entql.HasEdge("risk_location"))
+}
+
+// WhereHasRiskLocationWith applies a predicate to check if query has an edge risk_location with a given conditions (other predicates).
+func (f *SweepFilter) WhereHasRiskLocationWith(preds ...predicate.RiskLocation) {
+	f.Where(entql.HasEdgeWith("risk_location", sqlgraph.WrapFunc(func(s *sql.Selector) {
+		for _, p := range preds {
+			p(s)
+		}
+	})))
+}
+
+// WhereHasSweepSchedule applies a predicate to check if query has an edge sweep_schedule.
+func (f *SweepFilter) WhereHasSweepSchedule() {
+	f.Where(entql.HasEdge("sweep_schedule"))
+}
+
+// WhereHasSweepScheduleWith applies a predicate to check if query has an edge sweep_schedule with a given conditions (other predicates).
+func (f *SweepFilter) WhereHasSweepScheduleWith(preds ...predicate.SweepSchedule) {
+	f.Where(entql.HasEdgeWith("sweep_schedule", sqlgraph.WrapFunc(func(s *sql.Selector) {
+		for _, p := range preds {
+			p(s)
+		}
+	})))
+}
+
+// WhereHasSweepResult applies a predicate to check if query has an edge sweep_result.
+func (f *SweepFilter) WhereHasSweepResult() {
+	f.Where(entql.HasEdge("sweep_result"))
+}
+
+// WhereHasSweepResultWith applies a predicate to check if query has an edge sweep_result with a given conditions (other predicates).
+func (f *SweepFilter) WhereHasSweepResultWith(preds ...predicate.SweepResult) {
+	f.Where(entql.HasEdgeWith("sweep_result", sqlgraph.WrapFunc(func(s *sql.Selector) {
+		for _, p := range preds {
+			p(s)
+		}
+	})))
+}
+
+// WhereHasSweepResultDetails applies a predicate to check if query has an edge sweep_result_details.
+func (f *SweepFilter) WhereHasSweepResultDetails() {
+	f.Where(entql.HasEdge("sweep_result_details"))
+}
+
+// WhereHasSweepResultDetailsWith applies a predicate to check if query has an edge sweep_result_details with a given conditions (other predicates).
+func (f *SweepFilter) WhereHasSweepResultDetailsWith(preds ...predicate.SweepResultDetails) {
+	f.Where(entql.HasEdgeWith("sweep_result_details", sqlgraph.WrapFunc(func(s *sql.Selector) {
+		for _, p := range preds {
+			p(s)
+		}
+	})))
+}
+
+// addPredicate implements the predicateAdder interface.
+func (srq *SweepResultQuery) addPredicate(pred func(s *sql.Selector)) {
+	srq.predicates = append(srq.predicates, pred)
+}
+
+// Filter returns a Filter implementation to apply filters on the SweepResultQuery builder.
+func (srq *SweepResultQuery) Filter() *SweepResultFilter {
+	return &SweepResultFilter{config: srq.config, predicateAdder: srq}
+}
+
+// addPredicate implements the predicateAdder interface.
+func (m *SweepResultMutation) addPredicate(pred func(s *sql.Selector)) {
+	m.predicates = append(m.predicates, pred)
+}
+
+// Filter returns an entql.Where implementation to apply filters on the SweepResultMutation builder.
+func (m *SweepResultMutation) Filter() *SweepResultFilter {
+	return &SweepResultFilter{config: m.config, predicateAdder: m}
+}
+
+// SweepResultFilter provides a generic filtering capability at runtime for SweepResultQuery.
+type SweepResultFilter struct {
+	predicateAdder
+	config
+}
+
+// Where applies the entql predicate on the query filter.
+func (f *SweepResultFilter) Where(p entql.P) {
+	f.addPredicate(func(s *sql.Selector) {
+		if err := schemaGraph.EvalP(schemaGraph.Nodes[16].Type, p, s); err != nil {
+			s.AddError(err)
+		}
+	})
+}
+
+// WhereID applies the entql int predicate on the id field.
+func (f *SweepResultFilter) WhereID(p entql.IntP) {
+	f.Where(p.Field(sweepresult.FieldID))
+}
+
+// WhereCreateTime applies the entql time.Time predicate on the create_time field.
+func (f *SweepResultFilter) WhereCreateTime(p entql.TimeP) {
+	f.Where(p.Field(sweepresult.FieldCreateTime))
+}
+
+// WhereCreatorID applies the entql int predicate on the creator_id field.
+func (f *SweepResultFilter) WhereCreatorID(p entql.IntP) {
+	f.Where(p.Field(sweepresult.FieldCreatorID))
+}
+
+// WhereDeleteTime applies the entql time.Time predicate on the delete_time field.
+func (f *SweepResultFilter) WhereDeleteTime(p entql.TimeP) {
+	f.Where(p.Field(sweepresult.FieldDeleteTime))
+}
+
+// WhereUpdaterID applies the entql int predicate on the updater_id field.
+func (f *SweepResultFilter) WhereUpdaterID(p entql.IntP) {
+	f.Where(p.Field(sweepresult.FieldUpdaterID))
+}
+
+// WhereUpdateTime applies the entql time.Time predicate on the update_time field.
+func (f *SweepResultFilter) WhereUpdateTime(p entql.TimeP) {
+	f.Where(p.Field(sweepresult.FieldUpdateTime))
+}
+
+// WhereSweepID applies the entql int predicate on the sweep_id field.
+func (f *SweepResultFilter) WhereSweepID(p entql.IntP) {
+	f.Where(p.Field(sweepresult.FieldSweepID))
+}
+
+// WhereSweepScheduleID applies the entql int predicate on the sweep_schedule_id field.
+func (f *SweepResultFilter) WhereSweepScheduleID(p entql.IntP) {
+	f.Where(p.Field(sweepresult.FieldSweepScheduleID))
+}
+
+// WhereCheckInTime applies the entql time.Time predicate on the check_in_time field.
+func (f *SweepResultFilter) WhereCheckInTime(p entql.TimeP) {
+	f.Where(p.Field(sweepresult.FieldCheckInTime))
+}
+
+// WhereCheckInImage applies the entql json.RawMessage predicate on the check_in_image field.
+func (f *SweepResultFilter) WhereCheckInImage(p entql.BytesP) {
+	f.Where(p.Field(sweepresult.FieldCheckInImage))
+}
+
+// WhereSweepJobs applies the entql json.RawMessage predicate on the sweep_jobs field.
+func (f *SweepResultFilter) WhereSweepJobs(p entql.BytesP) {
+	f.Where(p.Field(sweepresult.FieldSweepJobs))
+}
+
+// WhereHasCreator applies a predicate to check if query has an edge creator.
+func (f *SweepResultFilter) WhereHasCreator() {
+	f.Where(entql.HasEdge("creator"))
+}
+
+// WhereHasCreatorWith applies a predicate to check if query has an edge creator with a given conditions (other predicates).
+func (f *SweepResultFilter) WhereHasCreatorWith(preds ...predicate.Admin) {
+	f.Where(entql.HasEdgeWith("creator", sqlgraph.WrapFunc(func(s *sql.Selector) {
+		for _, p := range preds {
+			p(s)
+		}
+	})))
+}
+
+// WhereHasUpdater applies a predicate to check if query has an edge updater.
+func (f *SweepResultFilter) WhereHasUpdater() {
+	f.Where(entql.HasEdge("updater"))
+}
+
+// WhereHasUpdaterWith applies a predicate to check if query has an edge updater with a given conditions (other predicates).
+func (f *SweepResultFilter) WhereHasUpdaterWith(preds ...predicate.Admin) {
+	f.Where(entql.HasEdgeWith("updater", sqlgraph.WrapFunc(func(s *sql.Selector) {
+		for _, p := range preds {
+			p(s)
+		}
+	})))
+}
+
+// WhereHasSweep applies a predicate to check if query has an edge sweep.
+func (f *SweepResultFilter) WhereHasSweep() {
+	f.Where(entql.HasEdge("sweep"))
+}
+
+// WhereHasSweepWith applies a predicate to check if query has an edge sweep with a given conditions (other predicates).
+func (f *SweepResultFilter) WhereHasSweepWith(preds ...predicate.Sweep) {
+	f.Where(entql.HasEdgeWith("sweep", sqlgraph.WrapFunc(func(s *sql.Selector) {
+		for _, p := range preds {
+			p(s)
+		}
+	})))
+}
+
+// WhereHasSweepSchedule applies a predicate to check if query has an edge sweep_schedule.
+func (f *SweepResultFilter) WhereHasSweepSchedule() {
+	f.Where(entql.HasEdge("sweep_schedule"))
+}
+
+// WhereHasSweepScheduleWith applies a predicate to check if query has an edge sweep_schedule with a given conditions (other predicates).
+func (f *SweepResultFilter) WhereHasSweepScheduleWith(preds ...predicate.SweepSchedule) {
+	f.Where(entql.HasEdgeWith("sweep_schedule", sqlgraph.WrapFunc(func(s *sql.Selector) {
+		for _, p := range preds {
+			p(s)
+		}
+	})))
+}
+
+// WhereHasSweepResultDetails applies a predicate to check if query has an edge sweep_result_details.
+func (f *SweepResultFilter) WhereHasSweepResultDetails() {
+	f.Where(entql.HasEdge("sweep_result_details"))
+}
+
+// WhereHasSweepResultDetailsWith applies a predicate to check if query has an edge sweep_result_details with a given conditions (other predicates).
+func (f *SweepResultFilter) WhereHasSweepResultDetailsWith(preds ...predicate.SweepResultDetails) {
+	f.Where(entql.HasEdgeWith("sweep_result_details", sqlgraph.WrapFunc(func(s *sql.Selector) {
+		for _, p := range preds {
+			p(s)
+		}
+	})))
+}
+
+// addPredicate implements the predicateAdder interface.
+func (srdq *SweepResultDetailsQuery) addPredicate(pred func(s *sql.Selector)) {
+	srdq.predicates = append(srdq.predicates, pred)
+}
+
+// Filter returns a Filter implementation to apply filters on the SweepResultDetailsQuery builder.
+func (srdq *SweepResultDetailsQuery) Filter() *SweepResultDetailsFilter {
+	return &SweepResultDetailsFilter{config: srdq.config, predicateAdder: srdq}
+}
+
+// addPredicate implements the predicateAdder interface.
+func (m *SweepResultDetailsMutation) addPredicate(pred func(s *sql.Selector)) {
+	m.predicates = append(m.predicates, pred)
+}
+
+// Filter returns an entql.Where implementation to apply filters on the SweepResultDetailsMutation builder.
+func (m *SweepResultDetailsMutation) Filter() *SweepResultDetailsFilter {
+	return &SweepResultDetailsFilter{config: m.config, predicateAdder: m}
+}
+
+// SweepResultDetailsFilter provides a generic filtering capability at runtime for SweepResultDetailsQuery.
+type SweepResultDetailsFilter struct {
+	predicateAdder
+	config
+}
+
+// Where applies the entql predicate on the query filter.
+func (f *SweepResultDetailsFilter) Where(p entql.P) {
+	f.addPredicate(func(s *sql.Selector) {
+		if err := schemaGraph.EvalP(schemaGraph.Nodes[17].Type, p, s); err != nil {
+			s.AddError(err)
+		}
+	})
+}
+
+// WhereID applies the entql int predicate on the id field.
+func (f *SweepResultDetailsFilter) WhereID(p entql.IntP) {
+	f.Where(p.Field(sweepresultdetails.FieldID))
+}
+
+// WhereCreateTime applies the entql time.Time predicate on the create_time field.
+func (f *SweepResultDetailsFilter) WhereCreateTime(p entql.TimeP) {
+	f.Where(p.Field(sweepresultdetails.FieldCreateTime))
+}
+
+// WhereCreatorID applies the entql int predicate on the creator_id field.
+func (f *SweepResultDetailsFilter) WhereCreatorID(p entql.IntP) {
+	f.Where(p.Field(sweepresultdetails.FieldCreatorID))
+}
+
+// WhereDeleteTime applies the entql time.Time predicate on the delete_time field.
+func (f *SweepResultDetailsFilter) WhereDeleteTime(p entql.TimeP) {
+	f.Where(p.Field(sweepresultdetails.FieldDeleteTime))
+}
+
+// WhereUpdaterID applies the entql int predicate on the updater_id field.
+func (f *SweepResultDetailsFilter) WhereUpdaterID(p entql.IntP) {
+	f.Where(p.Field(sweepresultdetails.FieldUpdaterID))
+}
+
+// WhereUpdateTime applies the entql time.Time predicate on the update_time field.
+func (f *SweepResultDetailsFilter) WhereUpdateTime(p entql.TimeP) {
+	f.Where(p.Field(sweepresultdetails.FieldUpdateTime))
+}
+
+// WhereSweepID applies the entql int predicate on the sweep_id field.
+func (f *SweepResultDetailsFilter) WhereSweepID(p entql.IntP) {
+	f.Where(p.Field(sweepresultdetails.FieldSweepID))
+}
+
+// WhereSweepScheduleID applies the entql int predicate on the sweep_schedule_id field.
+func (f *SweepResultDetailsFilter) WhereSweepScheduleID(p entql.IntP) {
+	f.Where(p.Field(sweepresultdetails.FieldSweepScheduleID))
+}
+
+// WhereSweepResultID applies the entql int predicate on the sweep_result_id field.
+func (f *SweepResultDetailsFilter) WhereSweepResultID(p entql.IntP) {
+	f.Where(p.Field(sweepresultdetails.FieldSweepResultID))
+}
+
+// WhereTitle applies the entql string predicate on the title field.
+func (f *SweepResultDetailsFilter) WhereTitle(p entql.StringP) {
+	f.Where(p.Field(sweepresultdetails.FieldTitle))
+}
+
+// WhereResult applies the entql int predicate on the result field.
+func (f *SweepResultDetailsFilter) WhereResult(p entql.IntP) {
+	f.Where(p.Field(sweepresultdetails.FieldResult))
+}
+
+// WhereHasCreator applies a predicate to check if query has an edge creator.
+func (f *SweepResultDetailsFilter) WhereHasCreator() {
+	f.Where(entql.HasEdge("creator"))
+}
+
+// WhereHasCreatorWith applies a predicate to check if query has an edge creator with a given conditions (other predicates).
+func (f *SweepResultDetailsFilter) WhereHasCreatorWith(preds ...predicate.Admin) {
+	f.Where(entql.HasEdgeWith("creator", sqlgraph.WrapFunc(func(s *sql.Selector) {
+		for _, p := range preds {
+			p(s)
+		}
+	})))
+}
+
+// WhereHasUpdater applies a predicate to check if query has an edge updater.
+func (f *SweepResultDetailsFilter) WhereHasUpdater() {
+	f.Where(entql.HasEdge("updater"))
+}
+
+// WhereHasUpdaterWith applies a predicate to check if query has an edge updater with a given conditions (other predicates).
+func (f *SweepResultDetailsFilter) WhereHasUpdaterWith(preds ...predicate.Admin) {
+	f.Where(entql.HasEdgeWith("updater", sqlgraph.WrapFunc(func(s *sql.Selector) {
+		for _, p := range preds {
+			p(s)
+		}
+	})))
+}
+
+// WhereHasSweep applies a predicate to check if query has an edge sweep.
+func (f *SweepResultDetailsFilter) WhereHasSweep() {
+	f.Where(entql.HasEdge("sweep"))
+}
+
+// WhereHasSweepWith applies a predicate to check if query has an edge sweep with a given conditions (other predicates).
+func (f *SweepResultDetailsFilter) WhereHasSweepWith(preds ...predicate.Sweep) {
+	f.Where(entql.HasEdgeWith("sweep", sqlgraph.WrapFunc(func(s *sql.Selector) {
+		for _, p := range preds {
+			p(s)
+		}
+	})))
+}
+
+// WhereHasSweepSchedule applies a predicate to check if query has an edge sweep_schedule.
+func (f *SweepResultDetailsFilter) WhereHasSweepSchedule() {
+	f.Where(entql.HasEdge("sweep_schedule"))
+}
+
+// WhereHasSweepScheduleWith applies a predicate to check if query has an edge sweep_schedule with a given conditions (other predicates).
+func (f *SweepResultDetailsFilter) WhereHasSweepScheduleWith(preds ...predicate.SweepSchedule) {
+	f.Where(entql.HasEdgeWith("sweep_schedule", sqlgraph.WrapFunc(func(s *sql.Selector) {
+		for _, p := range preds {
+			p(s)
+		}
+	})))
+}
+
+// WhereHasSweepResult applies a predicate to check if query has an edge sweep_result.
+func (f *SweepResultDetailsFilter) WhereHasSweepResult() {
+	f.Where(entql.HasEdge("sweep_result"))
+}
+
+// WhereHasSweepResultWith applies a predicate to check if query has an edge sweep_result with a given conditions (other predicates).
+func (f *SweepResultDetailsFilter) WhereHasSweepResultWith(preds ...predicate.SweepResult) {
+	f.Where(entql.HasEdgeWith("sweep_result", sqlgraph.WrapFunc(func(s *sql.Selector) {
+		for _, p := range preds {
+			p(s)
+		}
+	})))
+}
+
+// addPredicate implements the predicateAdder interface.
+func (ssq *SweepScheduleQuery) addPredicate(pred func(s *sql.Selector)) {
+	ssq.predicates = append(ssq.predicates, pred)
+}
+
+// Filter returns a Filter implementation to apply filters on the SweepScheduleQuery builder.
+func (ssq *SweepScheduleQuery) Filter() *SweepScheduleFilter {
+	return &SweepScheduleFilter{config: ssq.config, predicateAdder: ssq}
+}
+
+// addPredicate implements the predicateAdder interface.
+func (m *SweepScheduleMutation) addPredicate(pred func(s *sql.Selector)) {
+	m.predicates = append(m.predicates, pred)
+}
+
+// Filter returns an entql.Where implementation to apply filters on the SweepScheduleMutation builder.
+func (m *SweepScheduleMutation) Filter() *SweepScheduleFilter {
+	return &SweepScheduleFilter{config: m.config, predicateAdder: m}
+}
+
+// SweepScheduleFilter provides a generic filtering capability at runtime for SweepScheduleQuery.
+type SweepScheduleFilter struct {
+	predicateAdder
+	config
+}
+
+// Where applies the entql predicate on the query filter.
+func (f *SweepScheduleFilter) Where(p entql.P) {
+	f.addPredicate(func(s *sql.Selector) {
+		if err := schemaGraph.EvalP(schemaGraph.Nodes[18].Type, p, s); err != nil {
+			s.AddError(err)
+		}
+	})
+}
+
+// WhereID applies the entql int predicate on the id field.
+func (f *SweepScheduleFilter) WhereID(p entql.IntP) {
+	f.Where(p.Field(sweepschedule.FieldID))
+}
+
+// WhereCreateTime applies the entql time.Time predicate on the create_time field.
+func (f *SweepScheduleFilter) WhereCreateTime(p entql.TimeP) {
+	f.Where(p.Field(sweepschedule.FieldCreateTime))
+}
+
+// WhereCreatorID applies the entql int predicate on the creator_id field.
+func (f *SweepScheduleFilter) WhereCreatorID(p entql.IntP) {
+	f.Where(p.Field(sweepschedule.FieldCreatorID))
+}
+
+// WhereDeleteTime applies the entql time.Time predicate on the delete_time field.
+func (f *SweepScheduleFilter) WhereDeleteTime(p entql.TimeP) {
+	f.Where(p.Field(sweepschedule.FieldDeleteTime))
+}
+
+// WhereUpdaterID applies the entql int predicate on the updater_id field.
+func (f *SweepScheduleFilter) WhereUpdaterID(p entql.IntP) {
+	f.Where(p.Field(sweepschedule.FieldUpdaterID))
+}
+
+// WhereUpdateTime applies the entql time.Time predicate on the update_time field.
+func (f *SweepScheduleFilter) WhereUpdateTime(p entql.TimeP) {
+	f.Where(p.Field(sweepschedule.FieldUpdateTime))
+}
+
+// WhereName applies the entql string predicate on the name field.
+func (f *SweepScheduleFilter) WhereName(p entql.StringP) {
+	f.Where(p.Field(sweepschedule.FieldName))
+}
+
+// WhereSweepID applies the entql int predicate on the sweep_id field.
+func (f *SweepScheduleFilter) WhereSweepID(p entql.IntP) {
+	f.Where(p.Field(sweepschedule.FieldSweepID))
+}
+
+// WhereScheduleStatus applies the entql int predicate on the schedule_status field.
+func (f *SweepScheduleFilter) WhereScheduleStatus(p entql.IntP) {
+	f.Where(p.Field(sweepschedule.FieldScheduleStatus))
+}
+
+// WhereActionTime applies the entql time.Time predicate on the action_time field.
+func (f *SweepScheduleFilter) WhereActionTime(p entql.TimeP) {
+	f.Where(p.Field(sweepschedule.FieldActionTime))
+}
+
+// WhereRemind applies the entql json.RawMessage predicate on the remind field.
+func (f *SweepScheduleFilter) WhereRemind(p entql.BytesP) {
+	f.Where(p.Field(sweepschedule.FieldRemind))
+}
+
+// WhereRepeat applies the entql json.RawMessage predicate on the repeat field.
+func (f *SweepScheduleFilter) WhereRepeat(p entql.BytesP) {
+	f.Where(p.Field(sweepschedule.FieldRepeat))
+}
+
+// WhereHasCreator applies a predicate to check if query has an edge creator.
+func (f *SweepScheduleFilter) WhereHasCreator() {
+	f.Where(entql.HasEdge("creator"))
+}
+
+// WhereHasCreatorWith applies a predicate to check if query has an edge creator with a given conditions (other predicates).
+func (f *SweepScheduleFilter) WhereHasCreatorWith(preds ...predicate.Admin) {
+	f.Where(entql.HasEdgeWith("creator", sqlgraph.WrapFunc(func(s *sql.Selector) {
+		for _, p := range preds {
+			p(s)
+		}
+	})))
+}
+
+// WhereHasUpdater applies a predicate to check if query has an edge updater.
+func (f *SweepScheduleFilter) WhereHasUpdater() {
+	f.Where(entql.HasEdge("updater"))
+}
+
+// WhereHasUpdaterWith applies a predicate to check if query has an edge updater with a given conditions (other predicates).
+func (f *SweepScheduleFilter) WhereHasUpdaterWith(preds ...predicate.Admin) {
+	f.Where(entql.HasEdgeWith("updater", sqlgraph.WrapFunc(func(s *sql.Selector) {
+		for _, p := range preds {
+			p(s)
+		}
+	})))
+}
+
+// WhereHasSweep applies a predicate to check if query has an edge sweep.
+func (f *SweepScheduleFilter) WhereHasSweep() {
+	f.Where(entql.HasEdge("sweep"))
+}
+
+// WhereHasSweepWith applies a predicate to check if query has an edge sweep with a given conditions (other predicates).
+func (f *SweepScheduleFilter) WhereHasSweepWith(preds ...predicate.Sweep) {
+	f.Where(entql.HasEdgeWith("sweep", sqlgraph.WrapFunc(func(s *sql.Selector) {
+		for _, p := range preds {
+			p(s)
+		}
+	})))
+}
+
+// WhereHasWorkers applies a predicate to check if query has an edge workers.
+func (f *SweepScheduleFilter) WhereHasWorkers() {
+	f.Where(entql.HasEdge("workers"))
+}
+
+// WhereHasWorkersWith applies a predicate to check if query has an edge workers with a given conditions (other predicates).
+func (f *SweepScheduleFilter) WhereHasWorkersWith(preds ...predicate.Admin) {
+	f.Where(entql.HasEdgeWith("workers", sqlgraph.WrapFunc(func(s *sql.Selector) {
+		for _, p := range preds {
+			p(s)
+		}
+	})))
+}
+
+// WhereHasSweepResult applies a predicate to check if query has an edge sweep_result.
+func (f *SweepScheduleFilter) WhereHasSweepResult() {
+	f.Where(entql.HasEdge("sweep_result"))
+}
+
+// WhereHasSweepResultWith applies a predicate to check if query has an edge sweep_result with a given conditions (other predicates).
+func (f *SweepScheduleFilter) WhereHasSweepResultWith(preds ...predicate.SweepResult) {
+	f.Where(entql.HasEdgeWith("sweep_result", sqlgraph.WrapFunc(func(s *sql.Selector) {
+		for _, p := range preds {
+			p(s)
+		}
+	})))
+}
+
+// WhereHasSweepResultDetails applies a predicate to check if query has an edge sweep_result_details.
+func (f *SweepScheduleFilter) WhereHasSweepResultDetails() {
+	f.Where(entql.HasEdge("sweep_result_details"))
+}
+
+// WhereHasSweepResultDetailsWith applies a predicate to check if query has an edge sweep_result_details with a given conditions (other predicates).
+func (f *SweepScheduleFilter) WhereHasSweepResultDetailsWith(preds ...predicate.SweepResultDetails) {
+	f.Where(entql.HasEdgeWith("sweep_result_details", sqlgraph.WrapFunc(func(s *sql.Selector) {
+		for _, p := range preds {
+			p(s)
+		}
+	})))
+}
+
 // addPredicate implements the predicateAdder interface.
 func (vq *VideoQuery) addPredicate(pred func(s *sql.Selector)) {
 	vq.predicates = append(vq.predicates, pred)
@@ -3635,7 +5770,7 @@ type VideoFilter struct {
 // Where applies the entql predicate on the query filter.
 func (f *VideoFilter) Where(p entql.P) {
 	f.addPredicate(func(s *sql.Selector) {
-		if err := schemaGraph.EvalP(schemaGraph.Nodes[13].Type, p, s); err != nil {
+		if err := schemaGraph.EvalP(schemaGraph.Nodes[19].Type, p, s); err != nil {
 			s.AddError(err)
 		}
 	})
@@ -3646,29 +5781,29 @@ func (f *VideoFilter) WhereID(p entql.IntP) {
 	f.Where(p.Field(video.FieldID))
 }
 
-// WhereCreatedAt applies the entql time.Time predicate on the created_at field.
-func (f *VideoFilter) WhereCreatedAt(p entql.TimeP) {
-	f.Where(p.Field(video.FieldCreatedAt))
+// WhereCreateTime applies the entql time.Time predicate on the create_time field.
+func (f *VideoFilter) WhereCreateTime(p entql.TimeP) {
+	f.Where(p.Field(video.FieldCreateTime))
 }
 
-// WhereCreatedBy applies the entql int predicate on the created_by field.
-func (f *VideoFilter) WhereCreatedBy(p entql.IntP) {
-	f.Where(p.Field(video.FieldCreatedBy))
+// WhereCreatorID applies the entql int predicate on the creator_id field.
+func (f *VideoFilter) WhereCreatorID(p entql.IntP) {
+	f.Where(p.Field(video.FieldCreatorID))
 }
 
-// WhereDeletedAt applies the entql time.Time predicate on the deleted_at field.
-func (f *VideoFilter) WhereDeletedAt(p entql.TimeP) {
-	f.Where(p.Field(video.FieldDeletedAt))
+// WhereDeleteTime applies the entql time.Time predicate on the delete_time field.
+func (f *VideoFilter) WhereDeleteTime(p entql.TimeP) {
+	f.Where(p.Field(video.FieldDeleteTime))
 }
 
-// WhereUpdatedBy applies the entql int predicate on the updated_by field.
-func (f *VideoFilter) WhereUpdatedBy(p entql.IntP) {
-	f.Where(p.Field(video.FieldUpdatedBy))
+// WhereUpdaterID applies the entql int predicate on the updater_id field.
+func (f *VideoFilter) WhereUpdaterID(p entql.IntP) {
+	f.Where(p.Field(video.FieldUpdaterID))
 }
 
-// WhereUpdatedAt applies the entql time.Time predicate on the updated_at field.
-func (f *VideoFilter) WhereUpdatedAt(p entql.TimeP) {
-	f.Where(p.Field(video.FieldUpdatedAt))
+// WhereUpdateTime applies the entql time.Time predicate on the update_time field.
+func (f *VideoFilter) WhereUpdateTime(p entql.TimeP) {
+	f.Where(p.Field(video.FieldUpdateTime))
 }
 
 // WhereName applies the entql string predicate on the name field.
@@ -3694,11 +5829,6 @@ func (f *VideoFilter) WhereDuration(p entql.StringP) {
 // WhereUploadedAt applies the entql time.Time predicate on the uploaded_at field.
 func (f *VideoFilter) WhereUploadedAt(p entql.TimeP) {
 	f.Where(p.Field(video.FieldUploadedAt))
-}
-
-// WhereUploadedAt2 applies the entql time.Time predicate on the uploaded_at2 field.
-func (f *VideoFilter) WhereUploadedAt2(p entql.TimeP) {
-	f.Where(p.Field(video.FieldUploadedAt2))
 }
 
 // WhereHasCreator applies a predicate to check if query has an edge creator.
@@ -3729,14 +5859,14 @@ func (f *VideoFilter) WhereHasUpdaterWith(preds ...predicate.Admin) {
 	})))
 }
 
-// WhereHasIpcEventVideo applies a predicate to check if query has an edge ipc_event_video.
-func (f *VideoFilter) WhereHasIpcEventVideo() {
-	f.Where(entql.HasEdge("ipc_event_video"))
+// WhereHasEvent applies a predicate to check if query has an edge event.
+func (f *VideoFilter) WhereHasEvent() {
+	f.Where(entql.HasEdge("event"))
 }
 
-// WhereHasIpcEventVideoWith applies a predicate to check if query has an edge ipc_event_video with a given conditions (other predicates).
-func (f *VideoFilter) WhereHasIpcEventVideoWith(preds ...predicate.IPCEvent) {
-	f.Where(entql.HasEdgeWith("ipc_event_video", sqlgraph.WrapFunc(func(s *sql.Selector) {
+// WhereHasEventWith applies a predicate to check if query has an edge event with a given conditions (other predicates).
+func (f *VideoFilter) WhereHasEventWith(preds ...predicate.Event) {
+	f.Where(entql.HasEdgeWith("event", sqlgraph.WrapFunc(func(s *sql.Selector) {
 		for _, p := range preds {
 			p(s)
 		}

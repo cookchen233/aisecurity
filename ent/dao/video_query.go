@@ -4,7 +4,7 @@ package dao
 
 import (
 	"aisecurity/ent/dao/admin"
-	"aisecurity/ent/dao/ipcevent"
+	"aisecurity/ent/dao/event"
 	"aisecurity/ent/dao/predicate"
 	"aisecurity/ent/dao/video"
 	"context"
@@ -20,13 +20,13 @@ import (
 // VideoQuery is the builder for querying Video entities.
 type VideoQuery struct {
 	config
-	ctx               *QueryContext
-	order             []video.OrderOption
-	inters            []Interceptor
-	predicates        []predicate.Video
-	withCreator       *AdminQuery
-	withUpdater       *AdminQuery
-	withIpcEventVideo *IPCEventQuery
+	ctx         *QueryContext
+	order       []video.OrderOption
+	inters      []Interceptor
+	predicates  []predicate.Video
+	withCreator *AdminQuery
+	withUpdater *AdminQuery
+	withEvent   *EventQuery
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
 	path func(context.Context) (*sql.Selector, error)
@@ -107,9 +107,9 @@ func (vq *VideoQuery) QueryUpdater() *AdminQuery {
 	return query
 }
 
-// QueryIpcEventVideo chains the current query on the "ipc_event_video" edge.
-func (vq *VideoQuery) QueryIpcEventVideo() *IPCEventQuery {
-	query := (&IPCEventClient{config: vq.config}).Query()
+// QueryEvent chains the current query on the "event" edge.
+func (vq *VideoQuery) QueryEvent() *EventQuery {
+	query := (&EventClient{config: vq.config}).Query()
 	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
 		if err := vq.prepareQuery(ctx); err != nil {
 			return nil, err
@@ -120,8 +120,8 @@ func (vq *VideoQuery) QueryIpcEventVideo() *IPCEventQuery {
 		}
 		step := sqlgraph.NewStep(
 			sqlgraph.From(video.Table, video.FieldID, selector),
-			sqlgraph.To(ipcevent.Table, ipcevent.FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, false, video.IpcEventVideoTable, video.IpcEventVideoColumn),
+			sqlgraph.To(event.Table, event.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, video.EventTable, video.EventColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(vq.driver.Dialect(), step)
 		return fromU, nil
@@ -316,14 +316,14 @@ func (vq *VideoQuery) Clone() *VideoQuery {
 		return nil
 	}
 	return &VideoQuery{
-		config:            vq.config,
-		ctx:               vq.ctx.Clone(),
-		order:             append([]video.OrderOption{}, vq.order...),
-		inters:            append([]Interceptor{}, vq.inters...),
-		predicates:        append([]predicate.Video{}, vq.predicates...),
-		withCreator:       vq.withCreator.Clone(),
-		withUpdater:       vq.withUpdater.Clone(),
-		withIpcEventVideo: vq.withIpcEventVideo.Clone(),
+		config:      vq.config,
+		ctx:         vq.ctx.Clone(),
+		order:       append([]video.OrderOption{}, vq.order...),
+		inters:      append([]Interceptor{}, vq.inters...),
+		predicates:  append([]predicate.Video{}, vq.predicates...),
+		withCreator: vq.withCreator.Clone(),
+		withUpdater: vq.withUpdater.Clone(),
+		withEvent:   vq.withEvent.Clone(),
 		// clone intermediate query.
 		sql:  vq.sql.Clone(),
 		path: vq.path,
@@ -352,14 +352,14 @@ func (vq *VideoQuery) WithUpdater(opts ...func(*AdminQuery)) *VideoQuery {
 	return vq
 }
 
-// WithIpcEventVideo tells the query-builder to eager-load the nodes that are connected to
-// the "ipc_event_video" edge. The optional arguments are used to configure the query builder of the edge.
-func (vq *VideoQuery) WithIpcEventVideo(opts ...func(*IPCEventQuery)) *VideoQuery {
-	query := (&IPCEventClient{config: vq.config}).Query()
+// WithEvent tells the query-builder to eager-load the nodes that are connected to
+// the "event" edge. The optional arguments are used to configure the query builder of the edge.
+func (vq *VideoQuery) WithEvent(opts ...func(*EventQuery)) *VideoQuery {
+	query := (&EventClient{config: vq.config}).Query()
 	for _, opt := range opts {
 		opt(query)
 	}
-	vq.withIpcEventVideo = query
+	vq.withEvent = query
 	return vq
 }
 
@@ -369,12 +369,12 @@ func (vq *VideoQuery) WithIpcEventVideo(opts ...func(*IPCEventQuery)) *VideoQuer
 // Example:
 //
 //	var v []struct {
-//		CreatedAt time.Time `json:"created_at"`
+//		CreateTime time.Time `json:"create_time"`
 //		Count int `json:"count,omitempty"`
 //	}
 //
 //	client.Video.Query().
-//		GroupBy(video.FieldCreatedAt).
+//		GroupBy(video.FieldCreateTime).
 //		Aggregate(dao.Count()).
 //		Scan(ctx, &v)
 func (vq *VideoQuery) GroupBy(field string, fields ...string) *VideoGroupBy {
@@ -392,11 +392,11 @@ func (vq *VideoQuery) GroupBy(field string, fields ...string) *VideoGroupBy {
 // Example:
 //
 //	var v []struct {
-//		CreatedAt time.Time `json:"created_at"`
+//		CreateTime time.Time `json:"create_time"`
 //	}
 //
 //	client.Video.Query().
-//		Select(video.FieldCreatedAt).
+//		Select(video.FieldCreateTime).
 //		Scan(ctx, &v)
 func (vq *VideoQuery) Select(fields ...string) *VideoSelect {
 	vq.ctx.Fields = append(vq.ctx.Fields, fields...)
@@ -444,7 +444,7 @@ func (vq *VideoQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Video,
 		loadedTypes = [3]bool{
 			vq.withCreator != nil,
 			vq.withUpdater != nil,
-			vq.withIpcEventVideo != nil,
+			vq.withEvent != nil,
 		}
 	)
 	_spec.ScanValues = func(columns []string) ([]any, error) {
@@ -477,10 +477,10 @@ func (vq *VideoQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Video,
 			return nil, err
 		}
 	}
-	if query := vq.withIpcEventVideo; query != nil {
-		if err := vq.loadIpcEventVideo(ctx, query, nodes,
-			func(n *Video) { n.Edges.IpcEventVideo = []*IPCEvent{} },
-			func(n *Video, e *IPCEvent) { n.Edges.IpcEventVideo = append(n.Edges.IpcEventVideo, e) }); err != nil {
+	if query := vq.withEvent; query != nil {
+		if err := vq.loadEvent(ctx, query, nodes,
+			func(n *Video) { n.Edges.Event = []*Event{} },
+			func(n *Video, e *Event) { n.Edges.Event = append(n.Edges.Event, e) }); err != nil {
 			return nil, err
 		}
 	}
@@ -491,7 +491,7 @@ func (vq *VideoQuery) loadCreator(ctx context.Context, query *AdminQuery, nodes 
 	ids := make([]int, 0, len(nodes))
 	nodeids := make(map[int][]*Video)
 	for i := range nodes {
-		fk := nodes[i].CreatedBy
+		fk := nodes[i].CreatorID
 		if _, ok := nodeids[fk]; !ok {
 			ids = append(ids, fk)
 		}
@@ -508,7 +508,7 @@ func (vq *VideoQuery) loadCreator(ctx context.Context, query *AdminQuery, nodes 
 	for _, n := range neighbors {
 		nodes, ok := nodeids[n.ID]
 		if !ok {
-			return fmt.Errorf(`unexpected foreign-key "created_by" returned %v`, n.ID)
+			return fmt.Errorf(`unexpected foreign-key "creator_id" returned %v`, n.ID)
 		}
 		for i := range nodes {
 			assign(nodes[i], n)
@@ -520,7 +520,7 @@ func (vq *VideoQuery) loadUpdater(ctx context.Context, query *AdminQuery, nodes 
 	ids := make([]int, 0, len(nodes))
 	nodeids := make(map[int][]*Video)
 	for i := range nodes {
-		fk := nodes[i].UpdatedBy
+		fk := nodes[i].UpdaterID
 		if _, ok := nodeids[fk]; !ok {
 			ids = append(ids, fk)
 		}
@@ -537,7 +537,7 @@ func (vq *VideoQuery) loadUpdater(ctx context.Context, query *AdminQuery, nodes 
 	for _, n := range neighbors {
 		nodes, ok := nodeids[n.ID]
 		if !ok {
-			return fmt.Errorf(`unexpected foreign-key "updated_by" returned %v`, n.ID)
+			return fmt.Errorf(`unexpected foreign-key "updater_id" returned %v`, n.ID)
 		}
 		for i := range nodes {
 			assign(nodes[i], n)
@@ -545,7 +545,7 @@ func (vq *VideoQuery) loadUpdater(ctx context.Context, query *AdminQuery, nodes 
 	}
 	return nil
 }
-func (vq *VideoQuery) loadIpcEventVideo(ctx context.Context, query *IPCEventQuery, nodes []*Video, init func(*Video), assign func(*Video, *IPCEvent)) error {
+func (vq *VideoQuery) loadEvent(ctx context.Context, query *EventQuery, nodes []*Video, init func(*Video), assign func(*Video, *Event)) error {
 	fks := make([]driver.Value, 0, len(nodes))
 	nodeids := make(map[int]*Video)
 	for i := range nodes {
@@ -556,10 +556,10 @@ func (vq *VideoQuery) loadIpcEventVideo(ctx context.Context, query *IPCEventQuer
 		}
 	}
 	if len(query.ctx.Fields) > 0 {
-		query.ctx.AppendFieldOnce(ipcevent.FieldVideoID)
+		query.ctx.AppendFieldOnce(event.FieldVideoID)
 	}
-	query.Where(predicate.IPCEvent(func(s *sql.Selector) {
-		s.Where(sql.InValues(s.C(video.IpcEventVideoColumn), fks...))
+	query.Where(predicate.Event(func(s *sql.Selector) {
+		s.Where(sql.InValues(s.C(video.EventColumn), fks...))
 	}))
 	neighbors, err := query.All(ctx)
 	if err != nil {
@@ -602,10 +602,10 @@ func (vq *VideoQuery) querySpec() *sqlgraph.QuerySpec {
 			}
 		}
 		if vq.withCreator != nil {
-			_spec.Node.AddColumnOnce(video.FieldCreatedBy)
+			_spec.Node.AddColumnOnce(video.FieldCreatorID)
 		}
 		if vq.withUpdater != nil {
-			_spec.Node.AddColumnOnce(video.FieldUpdatedBy)
+			_spec.Node.AddColumnOnce(video.FieldUpdaterID)
 		}
 	}
 	if ps := vq.predicates; len(ps) > 0 {

@@ -9,16 +9,20 @@ import (
 	"aisecurity/structs/filters"
 	"aisecurity/utils"
 	"aisecurity/utils/db"
+	"context"
 	"fmt"
 	"github.com/gogf/gf/v2/util/gconv"
 )
 
 type EmployeeService struct {
 	Service
+	entClient *dao.EmployeeClient
 }
 
-func NewEmployeeService() *EmployeeService {
-	return &EmployeeService{}
+func NewEmployeeService(ctx context.Context) *EmployeeService {
+	s := &EmployeeService{entClient: db.EntClient.Employee}
+	s.Ctx = ctx
+	return s
 }
 
 var ()
@@ -28,7 +32,7 @@ func (s *EmployeeService) Create(ent structs.IEntity) (structs.IEntity, error) {
 	save, err := db.EntClient.Employee.Create().
 		SetAdminID(e.AdminID).
 		SetDepartmentID(e.DepartmentID).
-		AddOccupationIDs(e.OccupationID).
+		SetOccupationID(e.OccupationID).
 		Save(s.Ctx)
 	if err != nil {
 		return nil, fmt.Errorf("failed creating Employee: %w", err)
@@ -61,16 +65,17 @@ func (s *EmployeeService) GetList(fit structs.IFilter) ([]structs.IEntity, error
 	list, err := s.query(fit).
 		WithAdmin().
 		WithDepartment().
-		WithOccupations().
+		WithOccupation().
 		Offset(fit.GetOffset()).
 		Limit(fit.GetLimit()).
+		Order(dao.Desc(employee.FieldID)).
 		All(s.Ctx)
 	if err != nil {
 		return nil, err
 	}
 	ents := make([]structs.IEntity, len(list))
 	for i, v := range list {
-		top, err := s.getTopDepartment(v.Edges.Department)
+		top, err := s.GetTopDepartment(v.Edges.Department)
 		if err != nil {
 			return nil, err
 		}
@@ -85,7 +90,7 @@ func (s *EmployeeService) GetList(fit structs.IFilter) ([]structs.IEntity, error
 	return ents, nil
 }
 
-func (s *EmployeeService) getTopDepartment(dept *dao.Department) (*dao.Department, error) {
+func (s *EmployeeService) GetTopDepartment(dept *dao.Department) (*dao.Department, error) {
 	for dept != nil {
 		parent, err := dept.QueryParent().Only(s.Ctx)
 		if err != nil {

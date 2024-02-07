@@ -4,6 +4,10 @@ package dao
 
 import (
 	"aisecurity/ent/dao/admin"
+	"aisecurity/ent/dao/employee"
+	"aisecurity/enums"
+	"aisecurity/structs/types"
+	"encoding/json"
 	"fmt"
 	"strings"
 	"time"
@@ -18,15 +22,15 @@ type Admin struct {
 	// ID of the ent.
 	ID int `json:"id,omitempty"`
 	// 创建时间
-	CreatedAt time.Time `json:"created_at"`
+	CreateTime time.Time `json:"create_time"`
 	// 创建者
-	CreatedBy int `json:"created_by"`
+	CreatorID int `json:"creator_id"`
 	// 删除时间
-	DeletedAt *time.Time `json:"deleted_at"`
+	DeleteTime *time.Time `json:"delete_time"`
 	// 最后更新者
-	UpdatedBy int `json:"updated_by"`
+	UpdaterID int `json:"updater_id"`
 	// 最后更新时间
-	UpdatedAt time.Time `json:"updated_at"`
+	UpdateTime time.Time `json:"update_time"`
 	// 用户名
 	Username string `json:"username" validate:"required"`
 	// 密码
@@ -35,8 +39,12 @@ type Admin struct {
 	Nickname string `json:"nickname" validate:"required"`
 	// 姓名
 	RealName string `json:"real_name" validate:"required"`
+	// 手机号
+	Mobile string `json:"mobile"`
 	// 头像
-	Avatar string `json:"avatar"`
+	Avatar types.UploadedImage `json:"avatar"`
+	// 账户状态
+	AdminStatus enums.AdminStatus `json:"admin_status" validate:"required"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the AdminQuery when eager-loading is set.
 	Edges        AdminEdges `json:"edges"`
@@ -49,20 +57,22 @@ type AdminEdges struct {
 	Creator *Admin `json:"creator,omitempty"`
 	// Updater holds the value of the updater edge.
 	Updater *Admin `json:"updater,omitempty"`
-	// AdminRoles holds the value of the admin_roles edge.
-	AdminRoles []*AdminRole `json:"admin_roles,omitempty"`
+	// Permissions holds the value of the permissions edge.
+	Permissions []*Permission `json:"permissions,omitempty"`
 	// AdminCreator holds the value of the admin_creator edge.
 	AdminCreator []*Admin `json:"admin_creator,omitempty"`
 	// AdminUpdater holds the value of the admin_updater edge.
 	AdminUpdater []*Admin `json:"admin_updater,omitempty"`
-	// AdminRoleCreator holds the value of the admin_role_creator edge.
-	AdminRoleCreator []*AdminRole `json:"admin_role_creator,omitempty"`
-	// AdminRoleUpdater holds the value of the admin_role_updater edge.
-	AdminRoleUpdater []*AdminRole `json:"admin_role_updater,omitempty"`
+	// PermissionCreator holds the value of the permission_creator edge.
+	PermissionCreator []*Permission `json:"permission_creator,omitempty"`
+	// PermissionUpdater holds the value of the permission_updater edge.
+	PermissionUpdater []*Permission `json:"permission_updater,omitempty"`
 	// RiskCreator holds the value of the risk_creator edge.
 	RiskCreator []*Risk `json:"risk_creator,omitempty"`
 	// RiskUpdater holds the value of the risk_updater edge.
 	RiskUpdater []*Risk `json:"risk_updater,omitempty"`
+	// RiskMaintainer holds the value of the risk_maintainer edge.
+	RiskMaintainer []*Risk `json:"risk_maintainer,omitempty"`
 	// RiskLocationCreator holds the value of the risk_location_creator edge.
 	RiskLocationCreator []*RiskLocation `json:"risk_location_creator,omitempty"`
 	// RiskLocationUpdater holds the value of the risk_location_updater edge.
@@ -80,15 +90,15 @@ type AdminEdges struct {
 	// EmployeeUpdater holds the value of the employee_updater edge.
 	EmployeeUpdater []*Employee `json:"employee_updater,omitempty"`
 	// Employee holds the value of the employee edge.
-	Employee []*Employee `json:"employee,omitempty"`
+	Employee *Employee `json:"employee,omitempty"`
 	// OccupationCreator holds the value of the occupation_creator edge.
 	OccupationCreator []*Occupation `json:"occupation_creator,omitempty"`
 	// OccupationUpdater holds the value of the occupation_updater edge.
 	OccupationUpdater []*Occupation `json:"occupation_updater,omitempty"`
-	// IpcEventCreator holds the value of the ipc_event_creator edge.
-	IpcEventCreator []*IPCEvent `json:"ipc_event_creator,omitempty"`
-	// IpcEventUpdater holds the value of the ipc_event_updater edge.
-	IpcEventUpdater []*IPCEvent `json:"ipc_event_updater,omitempty"`
+	// EventCreator holds the value of the event_creator edge.
+	EventCreator []*Event `json:"event_creator,omitempty"`
+	// EventUpdater holds the value of the event_updater edge.
+	EventUpdater []*Event `json:"event_updater,omitempty"`
 	// VideoCreator holds the value of the video_creator edge.
 	VideoCreator []*Video `json:"video_creator,omitempty"`
 	// VideoUpdater holds the value of the video_updater edge.
@@ -109,9 +119,41 @@ type AdminEdges struct {
 	EventLevelCreator []*EventLevel `json:"event_level_creator,omitempty"`
 	// EventLevelUpdater holds the value of the event_level_updater edge.
 	EventLevelUpdater []*EventLevel `json:"event_level_updater,omitempty"`
+	// FixingCreator holds the value of the fixing_creator edge.
+	FixingCreator []*Fixing `json:"fixing_creator,omitempty"`
+	// FixingUpdater holds the value of the fixing_updater edge.
+	FixingUpdater []*Fixing `json:"fixing_updater,omitempty"`
+	// Fixer holds the value of the fixer edge.
+	Fixer []*Fixing `json:"fixer,omitempty"`
+	// EventLogCreator holds the value of the event_log_creator edge.
+	EventLogCreator []*EventLog `json:"event_log_creator,omitempty"`
+	// EventLogUpdater holds the value of the event_log_updater edge.
+	EventLogUpdater []*EventLog `json:"event_log_updater,omitempty"`
+	// EventLogActor holds the value of the event_log_actor edge.
+	EventLogActor []*EventLog `json:"event_log_actor,omitempty"`
+	// EventLogActor2 holds the value of the event_log_actor2 edge.
+	EventLogActor2 []*EventLog `json:"event_log_actor2,omitempty"`
+	// SweepCreator holds the value of the sweep_creator edge.
+	SweepCreator []*Sweep `json:"sweep_creator,omitempty"`
+	// SweepUpdater holds the value of the sweep_updater edge.
+	SweepUpdater []*Sweep `json:"sweep_updater,omitempty"`
+	// SweepScheduleCreator holds the value of the sweep_schedule_creator edge.
+	SweepScheduleCreator []*SweepSchedule `json:"sweep_schedule_creator,omitempty"`
+	// SweepScheduleUpdater holds the value of the sweep_schedule_updater edge.
+	SweepScheduleUpdater []*SweepSchedule `json:"sweep_schedule_updater,omitempty"`
+	// SweepSchedule holds the value of the sweep_schedule edge.
+	SweepSchedule []*SweepSchedule `json:"sweep_schedule,omitempty"`
+	// SweepResultCreator holds the value of the sweep_result_creator edge.
+	SweepResultCreator []*SweepResult `json:"sweep_result_creator,omitempty"`
+	// SweepResultUpdater holds the value of the sweep_result_updater edge.
+	SweepResultUpdater []*SweepResult `json:"sweep_result_updater,omitempty"`
+	// SweepResultDetailsCreator holds the value of the sweep_result_details_creator edge.
+	SweepResultDetailsCreator []*SweepResultDetails `json:"sweep_result_details_creator,omitempty"`
+	// SweepResultDetailsUpdater holds the value of the sweep_result_details_updater edge.
+	SweepResultDetailsUpdater []*SweepResultDetails `json:"sweep_result_details_updater,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
-	loadedTypes [32]bool
+	loadedTypes [49]bool
 }
 
 // CreatorOrErr returns the Creator value or an error if the edge
@@ -140,13 +182,13 @@ func (e AdminEdges) UpdaterOrErr() (*Admin, error) {
 	return nil, &NotLoadedError{edge: "updater"}
 }
 
-// AdminRolesOrErr returns the AdminRoles value or an error if the edge
+// PermissionsOrErr returns the Permissions value or an error if the edge
 // was not loaded in eager-loading.
-func (e AdminEdges) AdminRolesOrErr() ([]*AdminRole, error) {
+func (e AdminEdges) PermissionsOrErr() ([]*Permission, error) {
 	if e.loadedTypes[2] {
-		return e.AdminRoles, nil
+		return e.Permissions, nil
 	}
-	return nil, &NotLoadedError{edge: "admin_roles"}
+	return nil, &NotLoadedError{edge: "permissions"}
 }
 
 // AdminCreatorOrErr returns the AdminCreator value or an error if the edge
@@ -167,22 +209,22 @@ func (e AdminEdges) AdminUpdaterOrErr() ([]*Admin, error) {
 	return nil, &NotLoadedError{edge: "admin_updater"}
 }
 
-// AdminRoleCreatorOrErr returns the AdminRoleCreator value or an error if the edge
+// PermissionCreatorOrErr returns the PermissionCreator value or an error if the edge
 // was not loaded in eager-loading.
-func (e AdminEdges) AdminRoleCreatorOrErr() ([]*AdminRole, error) {
+func (e AdminEdges) PermissionCreatorOrErr() ([]*Permission, error) {
 	if e.loadedTypes[5] {
-		return e.AdminRoleCreator, nil
+		return e.PermissionCreator, nil
 	}
-	return nil, &NotLoadedError{edge: "admin_role_creator"}
+	return nil, &NotLoadedError{edge: "permission_creator"}
 }
 
-// AdminRoleUpdaterOrErr returns the AdminRoleUpdater value or an error if the edge
+// PermissionUpdaterOrErr returns the PermissionUpdater value or an error if the edge
 // was not loaded in eager-loading.
-func (e AdminEdges) AdminRoleUpdaterOrErr() ([]*AdminRole, error) {
+func (e AdminEdges) PermissionUpdaterOrErr() ([]*Permission, error) {
 	if e.loadedTypes[6] {
-		return e.AdminRoleUpdater, nil
+		return e.PermissionUpdater, nil
 	}
-	return nil, &NotLoadedError{edge: "admin_role_updater"}
+	return nil, &NotLoadedError{edge: "permission_updater"}
 }
 
 // RiskCreatorOrErr returns the RiskCreator value or an error if the edge
@@ -203,10 +245,19 @@ func (e AdminEdges) RiskUpdaterOrErr() ([]*Risk, error) {
 	return nil, &NotLoadedError{edge: "risk_updater"}
 }
 
+// RiskMaintainerOrErr returns the RiskMaintainer value or an error if the edge
+// was not loaded in eager-loading.
+func (e AdminEdges) RiskMaintainerOrErr() ([]*Risk, error) {
+	if e.loadedTypes[9] {
+		return e.RiskMaintainer, nil
+	}
+	return nil, &NotLoadedError{edge: "risk_maintainer"}
+}
+
 // RiskLocationCreatorOrErr returns the RiskLocationCreator value or an error if the edge
 // was not loaded in eager-loading.
 func (e AdminEdges) RiskLocationCreatorOrErr() ([]*RiskLocation, error) {
-	if e.loadedTypes[9] {
+	if e.loadedTypes[10] {
 		return e.RiskLocationCreator, nil
 	}
 	return nil, &NotLoadedError{edge: "risk_location_creator"}
@@ -215,7 +266,7 @@ func (e AdminEdges) RiskLocationCreatorOrErr() ([]*RiskLocation, error) {
 // RiskLocationUpdaterOrErr returns the RiskLocationUpdater value or an error if the edge
 // was not loaded in eager-loading.
 func (e AdminEdges) RiskLocationUpdaterOrErr() ([]*RiskLocation, error) {
-	if e.loadedTypes[10] {
+	if e.loadedTypes[11] {
 		return e.RiskLocationUpdater, nil
 	}
 	return nil, &NotLoadedError{edge: "risk_location_updater"}
@@ -224,7 +275,7 @@ func (e AdminEdges) RiskLocationUpdaterOrErr() ([]*RiskLocation, error) {
 // RiskCategoryCreatorOrErr returns the RiskCategoryCreator value or an error if the edge
 // was not loaded in eager-loading.
 func (e AdminEdges) RiskCategoryCreatorOrErr() ([]*RiskCategory, error) {
-	if e.loadedTypes[11] {
+	if e.loadedTypes[12] {
 		return e.RiskCategoryCreator, nil
 	}
 	return nil, &NotLoadedError{edge: "risk_category_creator"}
@@ -233,7 +284,7 @@ func (e AdminEdges) RiskCategoryCreatorOrErr() ([]*RiskCategory, error) {
 // RiskCategoryUpdaterOrErr returns the RiskCategoryUpdater value or an error if the edge
 // was not loaded in eager-loading.
 func (e AdminEdges) RiskCategoryUpdaterOrErr() ([]*RiskCategory, error) {
-	if e.loadedTypes[12] {
+	if e.loadedTypes[13] {
 		return e.RiskCategoryUpdater, nil
 	}
 	return nil, &NotLoadedError{edge: "risk_category_updater"}
@@ -242,7 +293,7 @@ func (e AdminEdges) RiskCategoryUpdaterOrErr() ([]*RiskCategory, error) {
 // DepartmentCreatorOrErr returns the DepartmentCreator value or an error if the edge
 // was not loaded in eager-loading.
 func (e AdminEdges) DepartmentCreatorOrErr() ([]*Department, error) {
-	if e.loadedTypes[13] {
+	if e.loadedTypes[14] {
 		return e.DepartmentCreator, nil
 	}
 	return nil, &NotLoadedError{edge: "department_creator"}
@@ -251,7 +302,7 @@ func (e AdminEdges) DepartmentCreatorOrErr() ([]*Department, error) {
 // DepartmentUpdaterOrErr returns the DepartmentUpdater value or an error if the edge
 // was not loaded in eager-loading.
 func (e AdminEdges) DepartmentUpdaterOrErr() ([]*Department, error) {
-	if e.loadedTypes[14] {
+	if e.loadedTypes[15] {
 		return e.DepartmentUpdater, nil
 	}
 	return nil, &NotLoadedError{edge: "department_updater"}
@@ -260,7 +311,7 @@ func (e AdminEdges) DepartmentUpdaterOrErr() ([]*Department, error) {
 // EmployeeCreatorOrErr returns the EmployeeCreator value or an error if the edge
 // was not loaded in eager-loading.
 func (e AdminEdges) EmployeeCreatorOrErr() ([]*Employee, error) {
-	if e.loadedTypes[15] {
+	if e.loadedTypes[16] {
 		return e.EmployeeCreator, nil
 	}
 	return nil, &NotLoadedError{edge: "employee_creator"}
@@ -269,16 +320,20 @@ func (e AdminEdges) EmployeeCreatorOrErr() ([]*Employee, error) {
 // EmployeeUpdaterOrErr returns the EmployeeUpdater value or an error if the edge
 // was not loaded in eager-loading.
 func (e AdminEdges) EmployeeUpdaterOrErr() ([]*Employee, error) {
-	if e.loadedTypes[16] {
+	if e.loadedTypes[17] {
 		return e.EmployeeUpdater, nil
 	}
 	return nil, &NotLoadedError{edge: "employee_updater"}
 }
 
 // EmployeeOrErr returns the Employee value or an error if the edge
-// was not loaded in eager-loading.
-func (e AdminEdges) EmployeeOrErr() ([]*Employee, error) {
-	if e.loadedTypes[17] {
+// was not loaded in eager-loading, or loaded but was not found.
+func (e AdminEdges) EmployeeOrErr() (*Employee, error) {
+	if e.loadedTypes[18] {
+		if e.Employee == nil {
+			// Edge was loaded but was not found.
+			return nil, &NotFoundError{label: employee.Label}
+		}
 		return e.Employee, nil
 	}
 	return nil, &NotLoadedError{edge: "employee"}
@@ -287,7 +342,7 @@ func (e AdminEdges) EmployeeOrErr() ([]*Employee, error) {
 // OccupationCreatorOrErr returns the OccupationCreator value or an error if the edge
 // was not loaded in eager-loading.
 func (e AdminEdges) OccupationCreatorOrErr() ([]*Occupation, error) {
-	if e.loadedTypes[18] {
+	if e.loadedTypes[19] {
 		return e.OccupationCreator, nil
 	}
 	return nil, &NotLoadedError{edge: "occupation_creator"}
@@ -296,34 +351,34 @@ func (e AdminEdges) OccupationCreatorOrErr() ([]*Occupation, error) {
 // OccupationUpdaterOrErr returns the OccupationUpdater value or an error if the edge
 // was not loaded in eager-loading.
 func (e AdminEdges) OccupationUpdaterOrErr() ([]*Occupation, error) {
-	if e.loadedTypes[19] {
+	if e.loadedTypes[20] {
 		return e.OccupationUpdater, nil
 	}
 	return nil, &NotLoadedError{edge: "occupation_updater"}
 }
 
-// IpcEventCreatorOrErr returns the IpcEventCreator value or an error if the edge
+// EventCreatorOrErr returns the EventCreator value or an error if the edge
 // was not loaded in eager-loading.
-func (e AdminEdges) IpcEventCreatorOrErr() ([]*IPCEvent, error) {
-	if e.loadedTypes[20] {
-		return e.IpcEventCreator, nil
+func (e AdminEdges) EventCreatorOrErr() ([]*Event, error) {
+	if e.loadedTypes[21] {
+		return e.EventCreator, nil
 	}
-	return nil, &NotLoadedError{edge: "ipc_event_creator"}
+	return nil, &NotLoadedError{edge: "event_creator"}
 }
 
-// IpcEventUpdaterOrErr returns the IpcEventUpdater value or an error if the edge
+// EventUpdaterOrErr returns the EventUpdater value or an error if the edge
 // was not loaded in eager-loading.
-func (e AdminEdges) IpcEventUpdaterOrErr() ([]*IPCEvent, error) {
-	if e.loadedTypes[21] {
-		return e.IpcEventUpdater, nil
+func (e AdminEdges) EventUpdaterOrErr() ([]*Event, error) {
+	if e.loadedTypes[22] {
+		return e.EventUpdater, nil
 	}
-	return nil, &NotLoadedError{edge: "ipc_event_updater"}
+	return nil, &NotLoadedError{edge: "event_updater"}
 }
 
 // VideoCreatorOrErr returns the VideoCreator value or an error if the edge
 // was not loaded in eager-loading.
 func (e AdminEdges) VideoCreatorOrErr() ([]*Video, error) {
-	if e.loadedTypes[22] {
+	if e.loadedTypes[23] {
 		return e.VideoCreator, nil
 	}
 	return nil, &NotLoadedError{edge: "video_creator"}
@@ -332,7 +387,7 @@ func (e AdminEdges) VideoCreatorOrErr() ([]*Video, error) {
 // VideoUpdaterOrErr returns the VideoUpdater value or an error if the edge
 // was not loaded in eager-loading.
 func (e AdminEdges) VideoUpdaterOrErr() ([]*Video, error) {
-	if e.loadedTypes[23] {
+	if e.loadedTypes[24] {
 		return e.VideoUpdater, nil
 	}
 	return nil, &NotLoadedError{edge: "video_updater"}
@@ -341,7 +396,7 @@ func (e AdminEdges) VideoUpdaterOrErr() ([]*Video, error) {
 // AreaCreatorOrErr returns the AreaCreator value or an error if the edge
 // was not loaded in eager-loading.
 func (e AdminEdges) AreaCreatorOrErr() ([]*Area, error) {
-	if e.loadedTypes[24] {
+	if e.loadedTypes[25] {
 		return e.AreaCreator, nil
 	}
 	return nil, &NotLoadedError{edge: "area_creator"}
@@ -350,7 +405,7 @@ func (e AdminEdges) AreaCreatorOrErr() ([]*Area, error) {
 // AreaUpdaterOrErr returns the AreaUpdater value or an error if the edge
 // was not loaded in eager-loading.
 func (e AdminEdges) AreaUpdaterOrErr() ([]*Area, error) {
-	if e.loadedTypes[25] {
+	if e.loadedTypes[26] {
 		return e.AreaUpdater, nil
 	}
 	return nil, &NotLoadedError{edge: "area_updater"}
@@ -359,7 +414,7 @@ func (e AdminEdges) AreaUpdaterOrErr() ([]*Area, error) {
 // DeviceCreatorOrErr returns the DeviceCreator value or an error if the edge
 // was not loaded in eager-loading.
 func (e AdminEdges) DeviceCreatorOrErr() ([]*Device, error) {
-	if e.loadedTypes[26] {
+	if e.loadedTypes[27] {
 		return e.DeviceCreator, nil
 	}
 	return nil, &NotLoadedError{edge: "device_creator"}
@@ -368,7 +423,7 @@ func (e AdminEdges) DeviceCreatorOrErr() ([]*Device, error) {
 // DeviceUpdaterOrErr returns the DeviceUpdater value or an error if the edge
 // was not loaded in eager-loading.
 func (e AdminEdges) DeviceUpdaterOrErr() ([]*Device, error) {
-	if e.loadedTypes[27] {
+	if e.loadedTypes[28] {
 		return e.DeviceUpdater, nil
 	}
 	return nil, &NotLoadedError{edge: "device_updater"}
@@ -377,7 +432,7 @@ func (e AdminEdges) DeviceUpdaterOrErr() ([]*Device, error) {
 // DeviceInstallationCreatorOrErr returns the DeviceInstallationCreator value or an error if the edge
 // was not loaded in eager-loading.
 func (e AdminEdges) DeviceInstallationCreatorOrErr() ([]*DeviceInstallation, error) {
-	if e.loadedTypes[28] {
+	if e.loadedTypes[29] {
 		return e.DeviceInstallationCreator, nil
 	}
 	return nil, &NotLoadedError{edge: "device_installation_creator"}
@@ -386,7 +441,7 @@ func (e AdminEdges) DeviceInstallationCreatorOrErr() ([]*DeviceInstallation, err
 // DeviceInstallationUpdaterOrErr returns the DeviceInstallationUpdater value or an error if the edge
 // was not loaded in eager-loading.
 func (e AdminEdges) DeviceInstallationUpdaterOrErr() ([]*DeviceInstallation, error) {
-	if e.loadedTypes[29] {
+	if e.loadedTypes[30] {
 		return e.DeviceInstallationUpdater, nil
 	}
 	return nil, &NotLoadedError{edge: "device_installation_updater"}
@@ -395,7 +450,7 @@ func (e AdminEdges) DeviceInstallationUpdaterOrErr() ([]*DeviceInstallation, err
 // EventLevelCreatorOrErr returns the EventLevelCreator value or an error if the edge
 // was not loaded in eager-loading.
 func (e AdminEdges) EventLevelCreatorOrErr() ([]*EventLevel, error) {
-	if e.loadedTypes[30] {
+	if e.loadedTypes[31] {
 		return e.EventLevelCreator, nil
 	}
 	return nil, &NotLoadedError{edge: "event_level_creator"}
@@ -404,10 +459,154 @@ func (e AdminEdges) EventLevelCreatorOrErr() ([]*EventLevel, error) {
 // EventLevelUpdaterOrErr returns the EventLevelUpdater value or an error if the edge
 // was not loaded in eager-loading.
 func (e AdminEdges) EventLevelUpdaterOrErr() ([]*EventLevel, error) {
-	if e.loadedTypes[31] {
+	if e.loadedTypes[32] {
 		return e.EventLevelUpdater, nil
 	}
 	return nil, &NotLoadedError{edge: "event_level_updater"}
+}
+
+// FixingCreatorOrErr returns the FixingCreator value or an error if the edge
+// was not loaded in eager-loading.
+func (e AdminEdges) FixingCreatorOrErr() ([]*Fixing, error) {
+	if e.loadedTypes[33] {
+		return e.FixingCreator, nil
+	}
+	return nil, &NotLoadedError{edge: "fixing_creator"}
+}
+
+// FixingUpdaterOrErr returns the FixingUpdater value or an error if the edge
+// was not loaded in eager-loading.
+func (e AdminEdges) FixingUpdaterOrErr() ([]*Fixing, error) {
+	if e.loadedTypes[34] {
+		return e.FixingUpdater, nil
+	}
+	return nil, &NotLoadedError{edge: "fixing_updater"}
+}
+
+// FixerOrErr returns the Fixer value or an error if the edge
+// was not loaded in eager-loading.
+func (e AdminEdges) FixerOrErr() ([]*Fixing, error) {
+	if e.loadedTypes[35] {
+		return e.Fixer, nil
+	}
+	return nil, &NotLoadedError{edge: "fixer"}
+}
+
+// EventLogCreatorOrErr returns the EventLogCreator value or an error if the edge
+// was not loaded in eager-loading.
+func (e AdminEdges) EventLogCreatorOrErr() ([]*EventLog, error) {
+	if e.loadedTypes[36] {
+		return e.EventLogCreator, nil
+	}
+	return nil, &NotLoadedError{edge: "event_log_creator"}
+}
+
+// EventLogUpdaterOrErr returns the EventLogUpdater value or an error if the edge
+// was not loaded in eager-loading.
+func (e AdminEdges) EventLogUpdaterOrErr() ([]*EventLog, error) {
+	if e.loadedTypes[37] {
+		return e.EventLogUpdater, nil
+	}
+	return nil, &NotLoadedError{edge: "event_log_updater"}
+}
+
+// EventLogActorOrErr returns the EventLogActor value or an error if the edge
+// was not loaded in eager-loading.
+func (e AdminEdges) EventLogActorOrErr() ([]*EventLog, error) {
+	if e.loadedTypes[38] {
+		return e.EventLogActor, nil
+	}
+	return nil, &NotLoadedError{edge: "event_log_actor"}
+}
+
+// EventLogActor2OrErr returns the EventLogActor2 value or an error if the edge
+// was not loaded in eager-loading.
+func (e AdminEdges) EventLogActor2OrErr() ([]*EventLog, error) {
+	if e.loadedTypes[39] {
+		return e.EventLogActor2, nil
+	}
+	return nil, &NotLoadedError{edge: "event_log_actor2"}
+}
+
+// SweepCreatorOrErr returns the SweepCreator value or an error if the edge
+// was not loaded in eager-loading.
+func (e AdminEdges) SweepCreatorOrErr() ([]*Sweep, error) {
+	if e.loadedTypes[40] {
+		return e.SweepCreator, nil
+	}
+	return nil, &NotLoadedError{edge: "sweep_creator"}
+}
+
+// SweepUpdaterOrErr returns the SweepUpdater value or an error if the edge
+// was not loaded in eager-loading.
+func (e AdminEdges) SweepUpdaterOrErr() ([]*Sweep, error) {
+	if e.loadedTypes[41] {
+		return e.SweepUpdater, nil
+	}
+	return nil, &NotLoadedError{edge: "sweep_updater"}
+}
+
+// SweepScheduleCreatorOrErr returns the SweepScheduleCreator value or an error if the edge
+// was not loaded in eager-loading.
+func (e AdminEdges) SweepScheduleCreatorOrErr() ([]*SweepSchedule, error) {
+	if e.loadedTypes[42] {
+		return e.SweepScheduleCreator, nil
+	}
+	return nil, &NotLoadedError{edge: "sweep_schedule_creator"}
+}
+
+// SweepScheduleUpdaterOrErr returns the SweepScheduleUpdater value or an error if the edge
+// was not loaded in eager-loading.
+func (e AdminEdges) SweepScheduleUpdaterOrErr() ([]*SweepSchedule, error) {
+	if e.loadedTypes[43] {
+		return e.SweepScheduleUpdater, nil
+	}
+	return nil, &NotLoadedError{edge: "sweep_schedule_updater"}
+}
+
+// SweepScheduleOrErr returns the SweepSchedule value or an error if the edge
+// was not loaded in eager-loading.
+func (e AdminEdges) SweepScheduleOrErr() ([]*SweepSchedule, error) {
+	if e.loadedTypes[44] {
+		return e.SweepSchedule, nil
+	}
+	return nil, &NotLoadedError{edge: "sweep_schedule"}
+}
+
+// SweepResultCreatorOrErr returns the SweepResultCreator value or an error if the edge
+// was not loaded in eager-loading.
+func (e AdminEdges) SweepResultCreatorOrErr() ([]*SweepResult, error) {
+	if e.loadedTypes[45] {
+		return e.SweepResultCreator, nil
+	}
+	return nil, &NotLoadedError{edge: "sweep_result_creator"}
+}
+
+// SweepResultUpdaterOrErr returns the SweepResultUpdater value or an error if the edge
+// was not loaded in eager-loading.
+func (e AdminEdges) SweepResultUpdaterOrErr() ([]*SweepResult, error) {
+	if e.loadedTypes[46] {
+		return e.SweepResultUpdater, nil
+	}
+	return nil, &NotLoadedError{edge: "sweep_result_updater"}
+}
+
+// SweepResultDetailsCreatorOrErr returns the SweepResultDetailsCreator value or an error if the edge
+// was not loaded in eager-loading.
+func (e AdminEdges) SweepResultDetailsCreatorOrErr() ([]*SweepResultDetails, error) {
+	if e.loadedTypes[47] {
+		return e.SweepResultDetailsCreator, nil
+	}
+	return nil, &NotLoadedError{edge: "sweep_result_details_creator"}
+}
+
+// SweepResultDetailsUpdaterOrErr returns the SweepResultDetailsUpdater value or an error if the edge
+// was not loaded in eager-loading.
+func (e AdminEdges) SweepResultDetailsUpdaterOrErr() ([]*SweepResultDetails, error) {
+	if e.loadedTypes[48] {
+		return e.SweepResultDetailsUpdater, nil
+	}
+	return nil, &NotLoadedError{edge: "sweep_result_details_updater"}
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
@@ -415,11 +614,13 @@ func (*Admin) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
 	for i := range columns {
 		switch columns[i] {
-		case admin.FieldID, admin.FieldCreatedBy, admin.FieldUpdatedBy:
+		case admin.FieldAvatar:
+			values[i] = new([]byte)
+		case admin.FieldID, admin.FieldCreatorID, admin.FieldUpdaterID, admin.FieldAdminStatus:
 			values[i] = new(sql.NullInt64)
-		case admin.FieldUsername, admin.FieldPassword, admin.FieldNickname, admin.FieldRealName, admin.FieldAvatar:
+		case admin.FieldUsername, admin.FieldPassword, admin.FieldNickname, admin.FieldRealName, admin.FieldMobile:
 			values[i] = new(sql.NullString)
-		case admin.FieldCreatedAt, admin.FieldDeletedAt, admin.FieldUpdatedAt:
+		case admin.FieldCreateTime, admin.FieldDeleteTime, admin.FieldUpdateTime:
 			values[i] = new(sql.NullTime)
 		default:
 			values[i] = new(sql.UnknownType)
@@ -442,36 +643,36 @@ func (a *Admin) assignValues(columns []string, values []any) error {
 				return fmt.Errorf("unexpected type %T for field id", value)
 			}
 			a.ID = int(value.Int64)
-		case admin.FieldCreatedAt:
+		case admin.FieldCreateTime:
 			if value, ok := values[i].(*sql.NullTime); !ok {
-				return fmt.Errorf("unexpected type %T for field created_at", values[i])
+				return fmt.Errorf("unexpected type %T for field create_time", values[i])
 			} else if value.Valid {
-				a.CreatedAt = value.Time
+				a.CreateTime = value.Time
 			}
-		case admin.FieldCreatedBy:
+		case admin.FieldCreatorID:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
-				return fmt.Errorf("unexpected type %T for field created_by", values[i])
+				return fmt.Errorf("unexpected type %T for field creator_id", values[i])
 			} else if value.Valid {
-				a.CreatedBy = int(value.Int64)
+				a.CreatorID = int(value.Int64)
 			}
-		case admin.FieldDeletedAt:
+		case admin.FieldDeleteTime:
 			if value, ok := values[i].(*sql.NullTime); !ok {
-				return fmt.Errorf("unexpected type %T for field deleted_at", values[i])
+				return fmt.Errorf("unexpected type %T for field delete_time", values[i])
 			} else if value.Valid {
-				a.DeletedAt = new(time.Time)
-				*a.DeletedAt = value.Time
+				a.DeleteTime = new(time.Time)
+				*a.DeleteTime = value.Time
 			}
-		case admin.FieldUpdatedBy:
+		case admin.FieldUpdaterID:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
-				return fmt.Errorf("unexpected type %T for field updated_by", values[i])
+				return fmt.Errorf("unexpected type %T for field updater_id", values[i])
 			} else if value.Valid {
-				a.UpdatedBy = int(value.Int64)
+				a.UpdaterID = int(value.Int64)
 			}
-		case admin.FieldUpdatedAt:
+		case admin.FieldUpdateTime:
 			if value, ok := values[i].(*sql.NullTime); !ok {
-				return fmt.Errorf("unexpected type %T for field updated_at", values[i])
+				return fmt.Errorf("unexpected type %T for field update_time", values[i])
 			} else if value.Valid {
-				a.UpdatedAt = value.Time
+				a.UpdateTime = value.Time
 			}
 		case admin.FieldUsername:
 			if value, ok := values[i].(*sql.NullString); !ok {
@@ -497,11 +698,25 @@ func (a *Admin) assignValues(columns []string, values []any) error {
 			} else if value.Valid {
 				a.RealName = value.String
 			}
-		case admin.FieldAvatar:
+		case admin.FieldMobile:
 			if value, ok := values[i].(*sql.NullString); !ok {
-				return fmt.Errorf("unexpected type %T for field avatar", values[i])
+				return fmt.Errorf("unexpected type %T for field mobile", values[i])
 			} else if value.Valid {
-				a.Avatar = value.String
+				a.Mobile = value.String
+			}
+		case admin.FieldAvatar:
+			if value, ok := values[i].(*[]byte); !ok {
+				return fmt.Errorf("unexpected type %T for field avatar", values[i])
+			} else if value != nil && len(*value) > 0 {
+				if err := json.Unmarshal(*value, &a.Avatar); err != nil {
+					return fmt.Errorf("unmarshal field avatar: %w", err)
+				}
+			}
+		case admin.FieldAdminStatus:
+			if value, ok := values[i].(*sql.NullInt64); !ok {
+				return fmt.Errorf("unexpected type %T for field admin_status", values[i])
+			} else if value.Valid {
+				a.AdminStatus = enums.AdminStatus(value.Int64)
 			}
 		default:
 			a.selectValues.Set(columns[i], values[i])
@@ -526,9 +741,9 @@ func (a *Admin) QueryUpdater() *AdminQuery {
 	return NewAdminClient(a.config).QueryUpdater(a)
 }
 
-// QueryAdminRoles queries the "admin_roles" edge of the Admin entity.
-func (a *Admin) QueryAdminRoles() *AdminRoleQuery {
-	return NewAdminClient(a.config).QueryAdminRoles(a)
+// QueryPermissions queries the "permissions" edge of the Admin entity.
+func (a *Admin) QueryPermissions() *PermissionQuery {
+	return NewAdminClient(a.config).QueryPermissions(a)
 }
 
 // QueryAdminCreator queries the "admin_creator" edge of the Admin entity.
@@ -541,14 +756,14 @@ func (a *Admin) QueryAdminUpdater() *AdminQuery {
 	return NewAdminClient(a.config).QueryAdminUpdater(a)
 }
 
-// QueryAdminRoleCreator queries the "admin_role_creator" edge of the Admin entity.
-func (a *Admin) QueryAdminRoleCreator() *AdminRoleQuery {
-	return NewAdminClient(a.config).QueryAdminRoleCreator(a)
+// QueryPermissionCreator queries the "permission_creator" edge of the Admin entity.
+func (a *Admin) QueryPermissionCreator() *PermissionQuery {
+	return NewAdminClient(a.config).QueryPermissionCreator(a)
 }
 
-// QueryAdminRoleUpdater queries the "admin_role_updater" edge of the Admin entity.
-func (a *Admin) QueryAdminRoleUpdater() *AdminRoleQuery {
-	return NewAdminClient(a.config).QueryAdminRoleUpdater(a)
+// QueryPermissionUpdater queries the "permission_updater" edge of the Admin entity.
+func (a *Admin) QueryPermissionUpdater() *PermissionQuery {
+	return NewAdminClient(a.config).QueryPermissionUpdater(a)
 }
 
 // QueryRiskCreator queries the "risk_creator" edge of the Admin entity.
@@ -559,6 +774,11 @@ func (a *Admin) QueryRiskCreator() *RiskQuery {
 // QueryRiskUpdater queries the "risk_updater" edge of the Admin entity.
 func (a *Admin) QueryRiskUpdater() *RiskQuery {
 	return NewAdminClient(a.config).QueryRiskUpdater(a)
+}
+
+// QueryRiskMaintainer queries the "risk_maintainer" edge of the Admin entity.
+func (a *Admin) QueryRiskMaintainer() *RiskQuery {
+	return NewAdminClient(a.config).QueryRiskMaintainer(a)
 }
 
 // QueryRiskLocationCreator queries the "risk_location_creator" edge of the Admin entity.
@@ -616,14 +836,14 @@ func (a *Admin) QueryOccupationUpdater() *OccupationQuery {
 	return NewAdminClient(a.config).QueryOccupationUpdater(a)
 }
 
-// QueryIpcEventCreator queries the "ipc_event_creator" edge of the Admin entity.
-func (a *Admin) QueryIpcEventCreator() *IPCEventQuery {
-	return NewAdminClient(a.config).QueryIpcEventCreator(a)
+// QueryEventCreator queries the "event_creator" edge of the Admin entity.
+func (a *Admin) QueryEventCreator() *EventQuery {
+	return NewAdminClient(a.config).QueryEventCreator(a)
 }
 
-// QueryIpcEventUpdater queries the "ipc_event_updater" edge of the Admin entity.
-func (a *Admin) QueryIpcEventUpdater() *IPCEventQuery {
-	return NewAdminClient(a.config).QueryIpcEventUpdater(a)
+// QueryEventUpdater queries the "event_updater" edge of the Admin entity.
+func (a *Admin) QueryEventUpdater() *EventQuery {
+	return NewAdminClient(a.config).QueryEventUpdater(a)
 }
 
 // QueryVideoCreator queries the "video_creator" edge of the Admin entity.
@@ -676,6 +896,86 @@ func (a *Admin) QueryEventLevelUpdater() *EventLevelQuery {
 	return NewAdminClient(a.config).QueryEventLevelUpdater(a)
 }
 
+// QueryFixingCreator queries the "fixing_creator" edge of the Admin entity.
+func (a *Admin) QueryFixingCreator() *FixingQuery {
+	return NewAdminClient(a.config).QueryFixingCreator(a)
+}
+
+// QueryFixingUpdater queries the "fixing_updater" edge of the Admin entity.
+func (a *Admin) QueryFixingUpdater() *FixingQuery {
+	return NewAdminClient(a.config).QueryFixingUpdater(a)
+}
+
+// QueryFixer queries the "fixer" edge of the Admin entity.
+func (a *Admin) QueryFixer() *FixingQuery {
+	return NewAdminClient(a.config).QueryFixer(a)
+}
+
+// QueryEventLogCreator queries the "event_log_creator" edge of the Admin entity.
+func (a *Admin) QueryEventLogCreator() *EventLogQuery {
+	return NewAdminClient(a.config).QueryEventLogCreator(a)
+}
+
+// QueryEventLogUpdater queries the "event_log_updater" edge of the Admin entity.
+func (a *Admin) QueryEventLogUpdater() *EventLogQuery {
+	return NewAdminClient(a.config).QueryEventLogUpdater(a)
+}
+
+// QueryEventLogActor queries the "event_log_actor" edge of the Admin entity.
+func (a *Admin) QueryEventLogActor() *EventLogQuery {
+	return NewAdminClient(a.config).QueryEventLogActor(a)
+}
+
+// QueryEventLogActor2 queries the "event_log_actor2" edge of the Admin entity.
+func (a *Admin) QueryEventLogActor2() *EventLogQuery {
+	return NewAdminClient(a.config).QueryEventLogActor2(a)
+}
+
+// QuerySweepCreator queries the "sweep_creator" edge of the Admin entity.
+func (a *Admin) QuerySweepCreator() *SweepQuery {
+	return NewAdminClient(a.config).QuerySweepCreator(a)
+}
+
+// QuerySweepUpdater queries the "sweep_updater" edge of the Admin entity.
+func (a *Admin) QuerySweepUpdater() *SweepQuery {
+	return NewAdminClient(a.config).QuerySweepUpdater(a)
+}
+
+// QuerySweepScheduleCreator queries the "sweep_schedule_creator" edge of the Admin entity.
+func (a *Admin) QuerySweepScheduleCreator() *SweepScheduleQuery {
+	return NewAdminClient(a.config).QuerySweepScheduleCreator(a)
+}
+
+// QuerySweepScheduleUpdater queries the "sweep_schedule_updater" edge of the Admin entity.
+func (a *Admin) QuerySweepScheduleUpdater() *SweepScheduleQuery {
+	return NewAdminClient(a.config).QuerySweepScheduleUpdater(a)
+}
+
+// QuerySweepSchedule queries the "sweep_schedule" edge of the Admin entity.
+func (a *Admin) QuerySweepSchedule() *SweepScheduleQuery {
+	return NewAdminClient(a.config).QuerySweepSchedule(a)
+}
+
+// QuerySweepResultCreator queries the "sweep_result_creator" edge of the Admin entity.
+func (a *Admin) QuerySweepResultCreator() *SweepResultQuery {
+	return NewAdminClient(a.config).QuerySweepResultCreator(a)
+}
+
+// QuerySweepResultUpdater queries the "sweep_result_updater" edge of the Admin entity.
+func (a *Admin) QuerySweepResultUpdater() *SweepResultQuery {
+	return NewAdminClient(a.config).QuerySweepResultUpdater(a)
+}
+
+// QuerySweepResultDetailsCreator queries the "sweep_result_details_creator" edge of the Admin entity.
+func (a *Admin) QuerySweepResultDetailsCreator() *SweepResultDetailsQuery {
+	return NewAdminClient(a.config).QuerySweepResultDetailsCreator(a)
+}
+
+// QuerySweepResultDetailsUpdater queries the "sweep_result_details_updater" edge of the Admin entity.
+func (a *Admin) QuerySweepResultDetailsUpdater() *SweepResultDetailsQuery {
+	return NewAdminClient(a.config).QuerySweepResultDetailsUpdater(a)
+}
+
 // Update returns a builder for updating this Admin.
 // Note that you need to call Admin.Unwrap() before calling this method if this Admin
 // was returned from a transaction, and the transaction was committed or rolled back.
@@ -699,22 +999,22 @@ func (a *Admin) String() string {
 	var builder strings.Builder
 	builder.WriteString("Admin(")
 	builder.WriteString(fmt.Sprintf("id=%v, ", a.ID))
-	builder.WriteString("created_at=")
-	builder.WriteString(a.CreatedAt.Format(time.ANSIC))
+	builder.WriteString("create_time=")
+	builder.WriteString(a.CreateTime.Format(time.ANSIC))
 	builder.WriteString(", ")
-	builder.WriteString("created_by=")
-	builder.WriteString(fmt.Sprintf("%v", a.CreatedBy))
+	builder.WriteString("creator_id=")
+	builder.WriteString(fmt.Sprintf("%v", a.CreatorID))
 	builder.WriteString(", ")
-	if v := a.DeletedAt; v != nil {
-		builder.WriteString("deleted_at=")
+	if v := a.DeleteTime; v != nil {
+		builder.WriteString("delete_time=")
 		builder.WriteString(v.Format(time.ANSIC))
 	}
 	builder.WriteString(", ")
-	builder.WriteString("updated_by=")
-	builder.WriteString(fmt.Sprintf("%v", a.UpdatedBy))
+	builder.WriteString("updater_id=")
+	builder.WriteString(fmt.Sprintf("%v", a.UpdaterID))
 	builder.WriteString(", ")
-	builder.WriteString("updated_at=")
-	builder.WriteString(a.UpdatedAt.Format(time.ANSIC))
+	builder.WriteString("update_time=")
+	builder.WriteString(a.UpdateTime.Format(time.ANSIC))
 	builder.WriteString(", ")
 	builder.WriteString("username=")
 	builder.WriteString(a.Username)
@@ -727,8 +1027,14 @@ func (a *Admin) String() string {
 	builder.WriteString("real_name=")
 	builder.WriteString(a.RealName)
 	builder.WriteString(", ")
+	builder.WriteString("mobile=")
+	builder.WriteString(a.Mobile)
+	builder.WriteString(", ")
 	builder.WriteString("avatar=")
-	builder.WriteString(a.Avatar)
+	builder.WriteString(fmt.Sprintf("%v", a.Avatar))
+	builder.WriteString(", ")
+	builder.WriteString("admin_status=")
+	builder.WriteString(fmt.Sprintf("%v", a.AdminStatus))
 	builder.WriteByte(')')
 	return builder.String()
 }

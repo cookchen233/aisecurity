@@ -2,13 +2,11 @@ package handlers
 
 import (
 	"aisecurity/expects"
-	"aisecurity/properties"
 	"aisecurity/services"
 	"aisecurity/structs"
 	"aisecurity/structs/types"
 	"aisecurity/utils"
 	"bytes"
-	"errors"
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/go-playground/locales/zh_Hans_CN"
@@ -16,6 +14,7 @@ import (
 	"github.com/go-playground/validator/v10"
 	"github.com/go-playground/validator/v10/translations/zh"
 	"github.com/gogf/gf/v2/os/gfile"
+	"github.com/pkg/errors"
 	"go.uber.org/zap"
 	"io"
 	"log"
@@ -33,12 +32,14 @@ type IHandler interface {
 	GetService(c *gin.Context) services.IService
 	GetFilter(c *gin.Context) structs.IFilter
 	GetEntity(c *gin.Context) structs.IEntity
+	GetValidator() *validator.Validate
 }
 
 type Handler struct {
-	Service services.IService
-	Filter  structs.IFilter
-	Entity  structs.IEntity
+	Service   services.IService
+	Filter    structs.IFilter
+	Entity    structs.IEntity
+	Validator *validator.Validate
 }
 
 func Convert(handler IHandler, handerFunc gin.HandlerFunc) gin.HandlerFunc {
@@ -61,11 +62,15 @@ func (h *Handler) GetEntity(c *gin.Context) structs.IEntity {
 	utils.Logger.Error("called empty method GetEntity", zap.String("url", c.Request.RequestURI))
 	return h.Entity
 }
+func (h *Handler) GetValidator() *validator.Validate {
+	return nil
+}
 
 func (h *Handler) SetRequestContext(c *gin.Context, childHandler IHandler) {
 	h.Service = childHandler.GetService(c)
 	h.Filter = childHandler.GetFilter(c)
 	h.Entity = childHandler.GetEntity(c)
+	h.Validator = childHandler.GetValidator()
 }
 
 func (h *Handler) Validate(data interface{}) error {
@@ -76,7 +81,10 @@ func (h *Handler) Validate(data interface{}) error {
 	// also see uni.FindTranslator(...)
 	trans, _ := uni.GetTranslator("zh_Hans_CN")
 
-	valid := validator.New()
+	valid := h.Validator
+	if valid == nil {
+		valid = validator.New()
+	}
 	if err := zh.RegisterDefaultTranslations(valid, trans); err != nil {
 		log.Printf("RegisterDefaultTranslations error: %v", err)
 	}
@@ -93,7 +101,7 @@ func (h *Handler) Validate(data interface{}) error {
 	return nil
 }
 
-func (h *Handler) UploadFile(c *gin.Context, basePath string, fileHeaders []*multipart.FileHeader, maxSize int64, allowedMimeTypes *types.AllowedMimeTypes) ([]types.UploadedFile, error, properties.ResponseCode) {
+func (h *Handler) UploadFile(c *gin.Context, basePath string, fileHeaders []*multipart.FileHeader, maxSize int64, allowedMimeTypes *types.AllowedMimeTypes) ([]types.UploadedFile, error) {
 	// Assuming the save_dir parameter is sent in a POST request
 	saveDir := c.PostForm("save_dir")
 	// Resolve the intended path
@@ -101,33 +109,33 @@ func (h *Handler) UploadFile(c *gin.Context, basePath string, fileHeaders []*mul
 	// Ensure the resolved path is within the desired base directory
 	basePath, err := filepath.Abs(basePath)
 	if err != nil {
-		return nil, utils.ErrorWrap(err, "指定的上传目录有误, "+basePath), properties.RequestError
+		return nil, errors.WithStack(expects.NewFileUploadDenied("指定的上传目录有误, " + basePath))
 	}
 	absPath, err := filepath.Abs(intendedPath)
 	if err != nil {
-		return nil, utils.ErrorWrap(err, "指定的上传目录有误2, "+absPath), properties.RequestError
+		return nil, errors.WithStack(expects.NewFileUploadDenied("指定的上传目录有误2, " + absPath))
 	}
 	rel, err := filepath.Rel(basePath, absPath)
 	if err != nil {
-		return nil, utils.ErrorWrap(err, "指定的上传目录有误3, "+rel), properties.RequestError
+		return nil, errors.WithStack(expects.NewFileUploadDenied("指定的上传目录有误3, " + rel))
 	}
 	if strings.Contains(rel, "..") {
-		return nil, utils.ErrorWithStack(expects.NewFileUploadError("指定的上传目录有误4, " + rel)), properties.RequestError
+		return nil, errors.WithStack(expects.NewFileUploadDenied("指定的上传目录有误4, " + rel))
 	}
 
 	var uploadedFiles []types.UploadedFile
 	for _, fh := range fileHeaders {
 		// Check the file size and save the file as usual
 		if fh.Size > maxSize {
-			return nil, utils.ErrorWithStack(expects.NewFileUploadError("文件大小超过了 " + gfile.FormatSize(maxSize))), properties.RequestError
+			return nil, errors.WithStack(expects.NewFileUploadDenied("文件大小超过了 " + gfile.FormatSize(maxSize)))
 		}
 		// Detect the file type
 		buffer, err := utils.ReadFileBuffer(fh)
 		if err != nil {
-			return nil, utils.ErrorWithStack(err), properties.RequestError
+			return nil, errors.WithStack(err)
 		}
 		if !allowedMimeTypes.IsAllowed(http2.DetectContentType(buffer)) {
-			return nil, utils.ErrorWithStack(fmt.Errorf("仅支持: " + strings.Join(allowedMimeTypes.Types, ", ") + " 文件格式")), properties.RequestError
+			return nil, errors.WithStack(expects.NewFileUploadDenied("仅支持: " + strings.Join(allowedMimeTypes.Types, ", ") + " 文件格式"))
 		}
 
 		// Create a new seeded source
@@ -143,7 +151,7 @@ func (h *Handler) UploadFile(c *gin.Context, basePath string, fileHeaders []*mul
 		dirName := filepath.Join(intendedPath, dirFormat)
 		if _, err := os.Stat(dirName); os.IsNotExist(err) {
 			// Create the directory if it does not exist
-			err := os.Mkdir(dirName, 0755) // 0755 permissions
+			err := os.MkdirAll(dirName, 0755) // 0755 permissions
 			if err != nil {
 				utils.Logger.Error("Error creating directory", zap.Error(err))
 			}
@@ -153,11 +161,12 @@ func (h *Handler) UploadFile(c *gin.Context, basePath string, fileHeaders []*mul
 		filename := filepath.Join(dirName, name)
 
 		if err := c.SaveUploadedFile(fh, filename); err != nil {
-			return nil, utils.ErrorWrap(err, "保存失败"), properties.ServerError
+			return nil, errors.WithStack(err)
+
 		}
-		uploadedFiles = append(uploadedFiles, types.UploadedFile{Name: fh.Filename, URL: filename, Size: fh.Size, CreatedAt: time.Now()})
+		uploadedFiles = append(uploadedFiles, types.UploadedFile{Name: fh.Filename, URL: filename, Size: fh.Size, CreateTime: time.Now()})
 	}
-	return uploadedFiles, nil, properties.Success
+	return uploadedFiles, nil
 }
 
 func (h *Handler) GetRequestBody(c *gin.Context) string {

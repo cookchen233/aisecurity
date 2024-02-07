@@ -4,20 +4,28 @@ package dao
 
 import (
 	"aisecurity/ent/dao/admin"
-	"aisecurity/ent/dao/adminrole"
 	"aisecurity/ent/dao/area"
 	"aisecurity/ent/dao/department"
 	"aisecurity/ent/dao/device"
 	"aisecurity/ent/dao/deviceinstallation"
 	"aisecurity/ent/dao/employee"
+	"aisecurity/ent/dao/event"
 	"aisecurity/ent/dao/eventlevel"
-	"aisecurity/ent/dao/ipcevent"
+	"aisecurity/ent/dao/eventlog"
+	"aisecurity/ent/dao/fixing"
 	"aisecurity/ent/dao/occupation"
+	"aisecurity/ent/dao/permission"
 	"aisecurity/ent/dao/predicate"
 	"aisecurity/ent/dao/risk"
 	"aisecurity/ent/dao/riskcategory"
 	"aisecurity/ent/dao/risklocation"
+	"aisecurity/ent/dao/sweep"
+	"aisecurity/ent/dao/sweepresult"
+	"aisecurity/ent/dao/sweepresultdetails"
+	"aisecurity/ent/dao/sweepschedule"
 	"aisecurity/ent/dao/video"
+	"aisecurity/enums"
+	"aisecurity/structs/types"
 	"context"
 	"errors"
 	"fmt"
@@ -41,43 +49,43 @@ func (au *AdminUpdate) Where(ps ...predicate.Admin) *AdminUpdate {
 	return au
 }
 
-// SetDeletedAt sets the "deleted_at" field.
-func (au *AdminUpdate) SetDeletedAt(t time.Time) *AdminUpdate {
-	au.mutation.SetDeletedAt(t)
+// SetDeleteTime sets the "delete_time" field.
+func (au *AdminUpdate) SetDeleteTime(t time.Time) *AdminUpdate {
+	au.mutation.SetDeleteTime(t)
 	return au
 }
 
-// SetNillableDeletedAt sets the "deleted_at" field if the given value is not nil.
-func (au *AdminUpdate) SetNillableDeletedAt(t *time.Time) *AdminUpdate {
+// SetNillableDeleteTime sets the "delete_time" field if the given value is not nil.
+func (au *AdminUpdate) SetNillableDeleteTime(t *time.Time) *AdminUpdate {
 	if t != nil {
-		au.SetDeletedAt(*t)
+		au.SetDeleteTime(*t)
 	}
 	return au
 }
 
-// ClearDeletedAt clears the value of the "deleted_at" field.
-func (au *AdminUpdate) ClearDeletedAt() *AdminUpdate {
-	au.mutation.ClearDeletedAt()
+// ClearDeleteTime clears the value of the "delete_time" field.
+func (au *AdminUpdate) ClearDeleteTime() *AdminUpdate {
+	au.mutation.ClearDeleteTime()
 	return au
 }
 
-// SetUpdatedBy sets the "updated_by" field.
-func (au *AdminUpdate) SetUpdatedBy(i int) *AdminUpdate {
-	au.mutation.SetUpdatedBy(i)
+// SetUpdaterID sets the "updater_id" field.
+func (au *AdminUpdate) SetUpdaterID(i int) *AdminUpdate {
+	au.mutation.SetUpdaterID(i)
 	return au
 }
 
-// SetNillableUpdatedBy sets the "updated_by" field if the given value is not nil.
-func (au *AdminUpdate) SetNillableUpdatedBy(i *int) *AdminUpdate {
+// SetNillableUpdaterID sets the "updater_id" field if the given value is not nil.
+func (au *AdminUpdate) SetNillableUpdaterID(i *int) *AdminUpdate {
 	if i != nil {
-		au.SetUpdatedBy(*i)
+		au.SetUpdaterID(*i)
 	}
 	return au
 }
 
-// SetUpdatedAt sets the "updated_at" field.
-func (au *AdminUpdate) SetUpdatedAt(t time.Time) *AdminUpdate {
-	au.mutation.SetUpdatedAt(t)
+// SetUpdateTime sets the "update_time" field.
+func (au *AdminUpdate) SetUpdateTime(t time.Time) *AdminUpdate {
+	au.mutation.SetUpdateTime(t)
 	return au
 }
 
@@ -137,16 +145,36 @@ func (au *AdminUpdate) SetNillableRealName(s *string) *AdminUpdate {
 	return au
 }
 
+// SetMobile sets the "mobile" field.
+func (au *AdminUpdate) SetMobile(s string) *AdminUpdate {
+	au.mutation.SetMobile(s)
+	return au
+}
+
+// SetNillableMobile sets the "mobile" field if the given value is not nil.
+func (au *AdminUpdate) SetNillableMobile(s *string) *AdminUpdate {
+	if s != nil {
+		au.SetMobile(*s)
+	}
+	return au
+}
+
+// ClearMobile clears the value of the "mobile" field.
+func (au *AdminUpdate) ClearMobile() *AdminUpdate {
+	au.mutation.ClearMobile()
+	return au
+}
+
 // SetAvatar sets the "avatar" field.
-func (au *AdminUpdate) SetAvatar(s string) *AdminUpdate {
-	au.mutation.SetAvatar(s)
+func (au *AdminUpdate) SetAvatar(ti types.UploadedImage) *AdminUpdate {
+	au.mutation.SetAvatar(ti)
 	return au
 }
 
 // SetNillableAvatar sets the "avatar" field if the given value is not nil.
-func (au *AdminUpdate) SetNillableAvatar(s *string) *AdminUpdate {
-	if s != nil {
-		au.SetAvatar(*s)
+func (au *AdminUpdate) SetNillableAvatar(ti *types.UploadedImage) *AdminUpdate {
+	if ti != nil {
+		au.SetAvatar(*ti)
 	}
 	return au
 }
@@ -157,9 +185,24 @@ func (au *AdminUpdate) ClearAvatar() *AdminUpdate {
 	return au
 }
 
-// SetUpdaterID sets the "updater" edge to the Admin entity by ID.
-func (au *AdminUpdate) SetUpdaterID(id int) *AdminUpdate {
-	au.mutation.SetUpdaterID(id)
+// SetAdminStatus sets the "admin_status" field.
+func (au *AdminUpdate) SetAdminStatus(es enums.AdminStatus) *AdminUpdate {
+	au.mutation.ResetAdminStatus()
+	au.mutation.SetAdminStatus(es)
+	return au
+}
+
+// SetNillableAdminStatus sets the "admin_status" field if the given value is not nil.
+func (au *AdminUpdate) SetNillableAdminStatus(es *enums.AdminStatus) *AdminUpdate {
+	if es != nil {
+		au.SetAdminStatus(*es)
+	}
+	return au
+}
+
+// AddAdminStatus adds es to the "admin_status" field.
+func (au *AdminUpdate) AddAdminStatus(es enums.AdminStatus) *AdminUpdate {
+	au.mutation.AddAdminStatus(es)
 	return au
 }
 
@@ -168,19 +211,19 @@ func (au *AdminUpdate) SetUpdater(a *Admin) *AdminUpdate {
 	return au.SetUpdaterID(a.ID)
 }
 
-// AddAdminRoleIDs adds the "admin_roles" edge to the AdminRole entity by IDs.
-func (au *AdminUpdate) AddAdminRoleIDs(ids ...int) *AdminUpdate {
-	au.mutation.AddAdminRoleIDs(ids...)
+// AddPermissionIDs adds the "permissions" edge to the Permission entity by IDs.
+func (au *AdminUpdate) AddPermissionIDs(ids ...int) *AdminUpdate {
+	au.mutation.AddPermissionIDs(ids...)
 	return au
 }
 
-// AddAdminRoles adds the "admin_roles" edges to the AdminRole entity.
-func (au *AdminUpdate) AddAdminRoles(a ...*AdminRole) *AdminUpdate {
-	ids := make([]int, len(a))
-	for i := range a {
-		ids[i] = a[i].ID
+// AddPermissions adds the "permissions" edges to the Permission entity.
+func (au *AdminUpdate) AddPermissions(p ...*Permission) *AdminUpdate {
+	ids := make([]int, len(p))
+	for i := range p {
+		ids[i] = p[i].ID
 	}
-	return au.AddAdminRoleIDs(ids...)
+	return au.AddPermissionIDs(ids...)
 }
 
 // AddAdminCreatorIDs adds the "admin_creator" edge to the Admin entity by IDs.
@@ -213,34 +256,34 @@ func (au *AdminUpdate) AddAdminUpdater(a ...*Admin) *AdminUpdate {
 	return au.AddAdminUpdaterIDs(ids...)
 }
 
-// AddAdminRoleCreatorIDs adds the "admin_role_creator" edge to the AdminRole entity by IDs.
-func (au *AdminUpdate) AddAdminRoleCreatorIDs(ids ...int) *AdminUpdate {
-	au.mutation.AddAdminRoleCreatorIDs(ids...)
+// AddPermissionCreatorIDs adds the "permission_creator" edge to the Permission entity by IDs.
+func (au *AdminUpdate) AddPermissionCreatorIDs(ids ...int) *AdminUpdate {
+	au.mutation.AddPermissionCreatorIDs(ids...)
 	return au
 }
 
-// AddAdminRoleCreator adds the "admin_role_creator" edges to the AdminRole entity.
-func (au *AdminUpdate) AddAdminRoleCreator(a ...*AdminRole) *AdminUpdate {
-	ids := make([]int, len(a))
-	for i := range a {
-		ids[i] = a[i].ID
+// AddPermissionCreator adds the "permission_creator" edges to the Permission entity.
+func (au *AdminUpdate) AddPermissionCreator(p ...*Permission) *AdminUpdate {
+	ids := make([]int, len(p))
+	for i := range p {
+		ids[i] = p[i].ID
 	}
-	return au.AddAdminRoleCreatorIDs(ids...)
+	return au.AddPermissionCreatorIDs(ids...)
 }
 
-// AddAdminRoleUpdaterIDs adds the "admin_role_updater" edge to the AdminRole entity by IDs.
-func (au *AdminUpdate) AddAdminRoleUpdaterIDs(ids ...int) *AdminUpdate {
-	au.mutation.AddAdminRoleUpdaterIDs(ids...)
+// AddPermissionUpdaterIDs adds the "permission_updater" edge to the Permission entity by IDs.
+func (au *AdminUpdate) AddPermissionUpdaterIDs(ids ...int) *AdminUpdate {
+	au.mutation.AddPermissionUpdaterIDs(ids...)
 	return au
 }
 
-// AddAdminRoleUpdater adds the "admin_role_updater" edges to the AdminRole entity.
-func (au *AdminUpdate) AddAdminRoleUpdater(a ...*AdminRole) *AdminUpdate {
-	ids := make([]int, len(a))
-	for i := range a {
-		ids[i] = a[i].ID
+// AddPermissionUpdater adds the "permission_updater" edges to the Permission entity.
+func (au *AdminUpdate) AddPermissionUpdater(p ...*Permission) *AdminUpdate {
+	ids := make([]int, len(p))
+	for i := range p {
+		ids[i] = p[i].ID
 	}
-	return au.AddAdminRoleUpdaterIDs(ids...)
+	return au.AddPermissionUpdaterIDs(ids...)
 }
 
 // AddRiskCreatorIDs adds the "risk_creator" edge to the Risk entity by IDs.
@@ -271,6 +314,21 @@ func (au *AdminUpdate) AddRiskUpdater(r ...*Risk) *AdminUpdate {
 		ids[i] = r[i].ID
 	}
 	return au.AddRiskUpdaterIDs(ids...)
+}
+
+// AddRiskMaintainerIDs adds the "risk_maintainer" edge to the Risk entity by IDs.
+func (au *AdminUpdate) AddRiskMaintainerIDs(ids ...int) *AdminUpdate {
+	au.mutation.AddRiskMaintainerIDs(ids...)
+	return au
+}
+
+// AddRiskMaintainer adds the "risk_maintainer" edges to the Risk entity.
+func (au *AdminUpdate) AddRiskMaintainer(r ...*Risk) *AdminUpdate {
+	ids := make([]int, len(r))
+	for i := range r {
+		ids[i] = r[i].ID
+	}
+	return au.AddRiskMaintainerIDs(ids...)
 }
 
 // AddRiskLocationCreatorIDs adds the "risk_location_creator" edge to the RiskLocation entity by IDs.
@@ -393,19 +451,23 @@ func (au *AdminUpdate) AddEmployeeUpdater(e ...*Employee) *AdminUpdate {
 	return au.AddEmployeeUpdaterIDs(ids...)
 }
 
-// AddEmployeeIDs adds the "employee" edge to the Employee entity by IDs.
-func (au *AdminUpdate) AddEmployeeIDs(ids ...int) *AdminUpdate {
-	au.mutation.AddEmployeeIDs(ids...)
+// SetEmployeeID sets the "employee" edge to the Employee entity by ID.
+func (au *AdminUpdate) SetEmployeeID(id int) *AdminUpdate {
+	au.mutation.SetEmployeeID(id)
 	return au
 }
 
-// AddEmployee adds the "employee" edges to the Employee entity.
-func (au *AdminUpdate) AddEmployee(e ...*Employee) *AdminUpdate {
-	ids := make([]int, len(e))
-	for i := range e {
-		ids[i] = e[i].ID
+// SetNillableEmployeeID sets the "employee" edge to the Employee entity by ID if the given value is not nil.
+func (au *AdminUpdate) SetNillableEmployeeID(id *int) *AdminUpdate {
+	if id != nil {
+		au = au.SetEmployeeID(*id)
 	}
-	return au.AddEmployeeIDs(ids...)
+	return au
+}
+
+// SetEmployee sets the "employee" edge to the Employee entity.
+func (au *AdminUpdate) SetEmployee(e *Employee) *AdminUpdate {
+	return au.SetEmployeeID(e.ID)
 }
 
 // AddOccupationCreatorIDs adds the "occupation_creator" edge to the Occupation entity by IDs.
@@ -438,34 +500,34 @@ func (au *AdminUpdate) AddOccupationUpdater(o ...*Occupation) *AdminUpdate {
 	return au.AddOccupationUpdaterIDs(ids...)
 }
 
-// AddIpcEventCreatorIDs adds the "ipc_event_creator" edge to the IPCEvent entity by IDs.
-func (au *AdminUpdate) AddIpcEventCreatorIDs(ids ...int) *AdminUpdate {
-	au.mutation.AddIpcEventCreatorIDs(ids...)
+// AddEventCreatorIDs adds the "event_creator" edge to the Event entity by IDs.
+func (au *AdminUpdate) AddEventCreatorIDs(ids ...int) *AdminUpdate {
+	au.mutation.AddEventCreatorIDs(ids...)
 	return au
 }
 
-// AddIpcEventCreator adds the "ipc_event_creator" edges to the IPCEvent entity.
-func (au *AdminUpdate) AddIpcEventCreator(i ...*IPCEvent) *AdminUpdate {
-	ids := make([]int, len(i))
-	for j := range i {
-		ids[j] = i[j].ID
+// AddEventCreator adds the "event_creator" edges to the Event entity.
+func (au *AdminUpdate) AddEventCreator(e ...*Event) *AdminUpdate {
+	ids := make([]int, len(e))
+	for i := range e {
+		ids[i] = e[i].ID
 	}
-	return au.AddIpcEventCreatorIDs(ids...)
+	return au.AddEventCreatorIDs(ids...)
 }
 
-// AddIpcEventUpdaterIDs adds the "ipc_event_updater" edge to the IPCEvent entity by IDs.
-func (au *AdminUpdate) AddIpcEventUpdaterIDs(ids ...int) *AdminUpdate {
-	au.mutation.AddIpcEventUpdaterIDs(ids...)
+// AddEventUpdaterIDs adds the "event_updater" edge to the Event entity by IDs.
+func (au *AdminUpdate) AddEventUpdaterIDs(ids ...int) *AdminUpdate {
+	au.mutation.AddEventUpdaterIDs(ids...)
 	return au
 }
 
-// AddIpcEventUpdater adds the "ipc_event_updater" edges to the IPCEvent entity.
-func (au *AdminUpdate) AddIpcEventUpdater(i ...*IPCEvent) *AdminUpdate {
-	ids := make([]int, len(i))
-	for j := range i {
-		ids[j] = i[j].ID
+// AddEventUpdater adds the "event_updater" edges to the Event entity.
+func (au *AdminUpdate) AddEventUpdater(e ...*Event) *AdminUpdate {
+	ids := make([]int, len(e))
+	for i := range e {
+		ids[i] = e[i].ID
 	}
-	return au.AddIpcEventUpdaterIDs(ids...)
+	return au.AddEventUpdaterIDs(ids...)
 }
 
 // AddVideoCreatorIDs adds the "video_creator" edge to the Video entity by IDs.
@@ -618,6 +680,246 @@ func (au *AdminUpdate) AddEventLevelUpdater(e ...*EventLevel) *AdminUpdate {
 	return au.AddEventLevelUpdaterIDs(ids...)
 }
 
+// AddFixingCreatorIDs adds the "fixing_creator" edge to the Fixing entity by IDs.
+func (au *AdminUpdate) AddFixingCreatorIDs(ids ...int) *AdminUpdate {
+	au.mutation.AddFixingCreatorIDs(ids...)
+	return au
+}
+
+// AddFixingCreator adds the "fixing_creator" edges to the Fixing entity.
+func (au *AdminUpdate) AddFixingCreator(f ...*Fixing) *AdminUpdate {
+	ids := make([]int, len(f))
+	for i := range f {
+		ids[i] = f[i].ID
+	}
+	return au.AddFixingCreatorIDs(ids...)
+}
+
+// AddFixingUpdaterIDs adds the "fixing_updater" edge to the Fixing entity by IDs.
+func (au *AdminUpdate) AddFixingUpdaterIDs(ids ...int) *AdminUpdate {
+	au.mutation.AddFixingUpdaterIDs(ids...)
+	return au
+}
+
+// AddFixingUpdater adds the "fixing_updater" edges to the Fixing entity.
+func (au *AdminUpdate) AddFixingUpdater(f ...*Fixing) *AdminUpdate {
+	ids := make([]int, len(f))
+	for i := range f {
+		ids[i] = f[i].ID
+	}
+	return au.AddFixingUpdaterIDs(ids...)
+}
+
+// AddFixerIDs adds the "fixer" edge to the Fixing entity by IDs.
+func (au *AdminUpdate) AddFixerIDs(ids ...int) *AdminUpdate {
+	au.mutation.AddFixerIDs(ids...)
+	return au
+}
+
+// AddFixer adds the "fixer" edges to the Fixing entity.
+func (au *AdminUpdate) AddFixer(f ...*Fixing) *AdminUpdate {
+	ids := make([]int, len(f))
+	for i := range f {
+		ids[i] = f[i].ID
+	}
+	return au.AddFixerIDs(ids...)
+}
+
+// AddEventLogCreatorIDs adds the "event_log_creator" edge to the EventLog entity by IDs.
+func (au *AdminUpdate) AddEventLogCreatorIDs(ids ...int) *AdminUpdate {
+	au.mutation.AddEventLogCreatorIDs(ids...)
+	return au
+}
+
+// AddEventLogCreator adds the "event_log_creator" edges to the EventLog entity.
+func (au *AdminUpdate) AddEventLogCreator(e ...*EventLog) *AdminUpdate {
+	ids := make([]int, len(e))
+	for i := range e {
+		ids[i] = e[i].ID
+	}
+	return au.AddEventLogCreatorIDs(ids...)
+}
+
+// AddEventLogUpdaterIDs adds the "event_log_updater" edge to the EventLog entity by IDs.
+func (au *AdminUpdate) AddEventLogUpdaterIDs(ids ...int) *AdminUpdate {
+	au.mutation.AddEventLogUpdaterIDs(ids...)
+	return au
+}
+
+// AddEventLogUpdater adds the "event_log_updater" edges to the EventLog entity.
+func (au *AdminUpdate) AddEventLogUpdater(e ...*EventLog) *AdminUpdate {
+	ids := make([]int, len(e))
+	for i := range e {
+		ids[i] = e[i].ID
+	}
+	return au.AddEventLogUpdaterIDs(ids...)
+}
+
+// AddEventLogActorIDs adds the "event_log_actor" edge to the EventLog entity by IDs.
+func (au *AdminUpdate) AddEventLogActorIDs(ids ...int) *AdminUpdate {
+	au.mutation.AddEventLogActorIDs(ids...)
+	return au
+}
+
+// AddEventLogActor adds the "event_log_actor" edges to the EventLog entity.
+func (au *AdminUpdate) AddEventLogActor(e ...*EventLog) *AdminUpdate {
+	ids := make([]int, len(e))
+	for i := range e {
+		ids[i] = e[i].ID
+	}
+	return au.AddEventLogActorIDs(ids...)
+}
+
+// AddEventLogActor2IDs adds the "event_log_actor2" edge to the EventLog entity by IDs.
+func (au *AdminUpdate) AddEventLogActor2IDs(ids ...int) *AdminUpdate {
+	au.mutation.AddEventLogActor2IDs(ids...)
+	return au
+}
+
+// AddEventLogActor2 adds the "event_log_actor2" edges to the EventLog entity.
+func (au *AdminUpdate) AddEventLogActor2(e ...*EventLog) *AdminUpdate {
+	ids := make([]int, len(e))
+	for i := range e {
+		ids[i] = e[i].ID
+	}
+	return au.AddEventLogActor2IDs(ids...)
+}
+
+// AddSweepCreatorIDs adds the "sweep_creator" edge to the Sweep entity by IDs.
+func (au *AdminUpdate) AddSweepCreatorIDs(ids ...int) *AdminUpdate {
+	au.mutation.AddSweepCreatorIDs(ids...)
+	return au
+}
+
+// AddSweepCreator adds the "sweep_creator" edges to the Sweep entity.
+func (au *AdminUpdate) AddSweepCreator(s ...*Sweep) *AdminUpdate {
+	ids := make([]int, len(s))
+	for i := range s {
+		ids[i] = s[i].ID
+	}
+	return au.AddSweepCreatorIDs(ids...)
+}
+
+// AddSweepUpdaterIDs adds the "sweep_updater" edge to the Sweep entity by IDs.
+func (au *AdminUpdate) AddSweepUpdaterIDs(ids ...int) *AdminUpdate {
+	au.mutation.AddSweepUpdaterIDs(ids...)
+	return au
+}
+
+// AddSweepUpdater adds the "sweep_updater" edges to the Sweep entity.
+func (au *AdminUpdate) AddSweepUpdater(s ...*Sweep) *AdminUpdate {
+	ids := make([]int, len(s))
+	for i := range s {
+		ids[i] = s[i].ID
+	}
+	return au.AddSweepUpdaterIDs(ids...)
+}
+
+// AddSweepScheduleCreatorIDs adds the "sweep_schedule_creator" edge to the SweepSchedule entity by IDs.
+func (au *AdminUpdate) AddSweepScheduleCreatorIDs(ids ...int) *AdminUpdate {
+	au.mutation.AddSweepScheduleCreatorIDs(ids...)
+	return au
+}
+
+// AddSweepScheduleCreator adds the "sweep_schedule_creator" edges to the SweepSchedule entity.
+func (au *AdminUpdate) AddSweepScheduleCreator(s ...*SweepSchedule) *AdminUpdate {
+	ids := make([]int, len(s))
+	for i := range s {
+		ids[i] = s[i].ID
+	}
+	return au.AddSweepScheduleCreatorIDs(ids...)
+}
+
+// AddSweepScheduleUpdaterIDs adds the "sweep_schedule_updater" edge to the SweepSchedule entity by IDs.
+func (au *AdminUpdate) AddSweepScheduleUpdaterIDs(ids ...int) *AdminUpdate {
+	au.mutation.AddSweepScheduleUpdaterIDs(ids...)
+	return au
+}
+
+// AddSweepScheduleUpdater adds the "sweep_schedule_updater" edges to the SweepSchedule entity.
+func (au *AdminUpdate) AddSweepScheduleUpdater(s ...*SweepSchedule) *AdminUpdate {
+	ids := make([]int, len(s))
+	for i := range s {
+		ids[i] = s[i].ID
+	}
+	return au.AddSweepScheduleUpdaterIDs(ids...)
+}
+
+// AddSweepScheduleIDs adds the "sweep_schedule" edge to the SweepSchedule entity by IDs.
+func (au *AdminUpdate) AddSweepScheduleIDs(ids ...int) *AdminUpdate {
+	au.mutation.AddSweepScheduleIDs(ids...)
+	return au
+}
+
+// AddSweepSchedule adds the "sweep_schedule" edges to the SweepSchedule entity.
+func (au *AdminUpdate) AddSweepSchedule(s ...*SweepSchedule) *AdminUpdate {
+	ids := make([]int, len(s))
+	for i := range s {
+		ids[i] = s[i].ID
+	}
+	return au.AddSweepScheduleIDs(ids...)
+}
+
+// AddSweepResultCreatorIDs adds the "sweep_result_creator" edge to the SweepResult entity by IDs.
+func (au *AdminUpdate) AddSweepResultCreatorIDs(ids ...int) *AdminUpdate {
+	au.mutation.AddSweepResultCreatorIDs(ids...)
+	return au
+}
+
+// AddSweepResultCreator adds the "sweep_result_creator" edges to the SweepResult entity.
+func (au *AdminUpdate) AddSweepResultCreator(s ...*SweepResult) *AdminUpdate {
+	ids := make([]int, len(s))
+	for i := range s {
+		ids[i] = s[i].ID
+	}
+	return au.AddSweepResultCreatorIDs(ids...)
+}
+
+// AddSweepResultUpdaterIDs adds the "sweep_result_updater" edge to the SweepResult entity by IDs.
+func (au *AdminUpdate) AddSweepResultUpdaterIDs(ids ...int) *AdminUpdate {
+	au.mutation.AddSweepResultUpdaterIDs(ids...)
+	return au
+}
+
+// AddSweepResultUpdater adds the "sweep_result_updater" edges to the SweepResult entity.
+func (au *AdminUpdate) AddSweepResultUpdater(s ...*SweepResult) *AdminUpdate {
+	ids := make([]int, len(s))
+	for i := range s {
+		ids[i] = s[i].ID
+	}
+	return au.AddSweepResultUpdaterIDs(ids...)
+}
+
+// AddSweepResultDetailsCreatorIDs adds the "sweep_result_details_creator" edge to the SweepResultDetails entity by IDs.
+func (au *AdminUpdate) AddSweepResultDetailsCreatorIDs(ids ...int) *AdminUpdate {
+	au.mutation.AddSweepResultDetailsCreatorIDs(ids...)
+	return au
+}
+
+// AddSweepResultDetailsCreator adds the "sweep_result_details_creator" edges to the SweepResultDetails entity.
+func (au *AdminUpdate) AddSweepResultDetailsCreator(s ...*SweepResultDetails) *AdminUpdate {
+	ids := make([]int, len(s))
+	for i := range s {
+		ids[i] = s[i].ID
+	}
+	return au.AddSweepResultDetailsCreatorIDs(ids...)
+}
+
+// AddSweepResultDetailsUpdaterIDs adds the "sweep_result_details_updater" edge to the SweepResultDetails entity by IDs.
+func (au *AdminUpdate) AddSweepResultDetailsUpdaterIDs(ids ...int) *AdminUpdate {
+	au.mutation.AddSweepResultDetailsUpdaterIDs(ids...)
+	return au
+}
+
+// AddSweepResultDetailsUpdater adds the "sweep_result_details_updater" edges to the SweepResultDetails entity.
+func (au *AdminUpdate) AddSweepResultDetailsUpdater(s ...*SweepResultDetails) *AdminUpdate {
+	ids := make([]int, len(s))
+	for i := range s {
+		ids[i] = s[i].ID
+	}
+	return au.AddSweepResultDetailsUpdaterIDs(ids...)
+}
+
 // Mutation returns the AdminMutation object of the builder.
 func (au *AdminUpdate) Mutation() *AdminMutation {
 	return au.mutation
@@ -629,25 +931,25 @@ func (au *AdminUpdate) ClearUpdater() *AdminUpdate {
 	return au
 }
 
-// ClearAdminRoles clears all "admin_roles" edges to the AdminRole entity.
-func (au *AdminUpdate) ClearAdminRoles() *AdminUpdate {
-	au.mutation.ClearAdminRoles()
+// ClearPermissions clears all "permissions" edges to the Permission entity.
+func (au *AdminUpdate) ClearPermissions() *AdminUpdate {
+	au.mutation.ClearPermissions()
 	return au
 }
 
-// RemoveAdminRoleIDs removes the "admin_roles" edge to AdminRole entities by IDs.
-func (au *AdminUpdate) RemoveAdminRoleIDs(ids ...int) *AdminUpdate {
-	au.mutation.RemoveAdminRoleIDs(ids...)
+// RemovePermissionIDs removes the "permissions" edge to Permission entities by IDs.
+func (au *AdminUpdate) RemovePermissionIDs(ids ...int) *AdminUpdate {
+	au.mutation.RemovePermissionIDs(ids...)
 	return au
 }
 
-// RemoveAdminRoles removes "admin_roles" edges to AdminRole entities.
-func (au *AdminUpdate) RemoveAdminRoles(a ...*AdminRole) *AdminUpdate {
-	ids := make([]int, len(a))
-	for i := range a {
-		ids[i] = a[i].ID
+// RemovePermissions removes "permissions" edges to Permission entities.
+func (au *AdminUpdate) RemovePermissions(p ...*Permission) *AdminUpdate {
+	ids := make([]int, len(p))
+	for i := range p {
+		ids[i] = p[i].ID
 	}
-	return au.RemoveAdminRoleIDs(ids...)
+	return au.RemovePermissionIDs(ids...)
 }
 
 // ClearAdminCreator clears all "admin_creator" edges to the Admin entity.
@@ -692,46 +994,46 @@ func (au *AdminUpdate) RemoveAdminUpdater(a ...*Admin) *AdminUpdate {
 	return au.RemoveAdminUpdaterIDs(ids...)
 }
 
-// ClearAdminRoleCreator clears all "admin_role_creator" edges to the AdminRole entity.
-func (au *AdminUpdate) ClearAdminRoleCreator() *AdminUpdate {
-	au.mutation.ClearAdminRoleCreator()
+// ClearPermissionCreator clears all "permission_creator" edges to the Permission entity.
+func (au *AdminUpdate) ClearPermissionCreator() *AdminUpdate {
+	au.mutation.ClearPermissionCreator()
 	return au
 }
 
-// RemoveAdminRoleCreatorIDs removes the "admin_role_creator" edge to AdminRole entities by IDs.
-func (au *AdminUpdate) RemoveAdminRoleCreatorIDs(ids ...int) *AdminUpdate {
-	au.mutation.RemoveAdminRoleCreatorIDs(ids...)
+// RemovePermissionCreatorIDs removes the "permission_creator" edge to Permission entities by IDs.
+func (au *AdminUpdate) RemovePermissionCreatorIDs(ids ...int) *AdminUpdate {
+	au.mutation.RemovePermissionCreatorIDs(ids...)
 	return au
 }
 
-// RemoveAdminRoleCreator removes "admin_role_creator" edges to AdminRole entities.
-func (au *AdminUpdate) RemoveAdminRoleCreator(a ...*AdminRole) *AdminUpdate {
-	ids := make([]int, len(a))
-	for i := range a {
-		ids[i] = a[i].ID
+// RemovePermissionCreator removes "permission_creator" edges to Permission entities.
+func (au *AdminUpdate) RemovePermissionCreator(p ...*Permission) *AdminUpdate {
+	ids := make([]int, len(p))
+	for i := range p {
+		ids[i] = p[i].ID
 	}
-	return au.RemoveAdminRoleCreatorIDs(ids...)
+	return au.RemovePermissionCreatorIDs(ids...)
 }
 
-// ClearAdminRoleUpdater clears all "admin_role_updater" edges to the AdminRole entity.
-func (au *AdminUpdate) ClearAdminRoleUpdater() *AdminUpdate {
-	au.mutation.ClearAdminRoleUpdater()
+// ClearPermissionUpdater clears all "permission_updater" edges to the Permission entity.
+func (au *AdminUpdate) ClearPermissionUpdater() *AdminUpdate {
+	au.mutation.ClearPermissionUpdater()
 	return au
 }
 
-// RemoveAdminRoleUpdaterIDs removes the "admin_role_updater" edge to AdminRole entities by IDs.
-func (au *AdminUpdate) RemoveAdminRoleUpdaterIDs(ids ...int) *AdminUpdate {
-	au.mutation.RemoveAdminRoleUpdaterIDs(ids...)
+// RemovePermissionUpdaterIDs removes the "permission_updater" edge to Permission entities by IDs.
+func (au *AdminUpdate) RemovePermissionUpdaterIDs(ids ...int) *AdminUpdate {
+	au.mutation.RemovePermissionUpdaterIDs(ids...)
 	return au
 }
 
-// RemoveAdminRoleUpdater removes "admin_role_updater" edges to AdminRole entities.
-func (au *AdminUpdate) RemoveAdminRoleUpdater(a ...*AdminRole) *AdminUpdate {
-	ids := make([]int, len(a))
-	for i := range a {
-		ids[i] = a[i].ID
+// RemovePermissionUpdater removes "permission_updater" edges to Permission entities.
+func (au *AdminUpdate) RemovePermissionUpdater(p ...*Permission) *AdminUpdate {
+	ids := make([]int, len(p))
+	for i := range p {
+		ids[i] = p[i].ID
 	}
-	return au.RemoveAdminRoleUpdaterIDs(ids...)
+	return au.RemovePermissionUpdaterIDs(ids...)
 }
 
 // ClearRiskCreator clears all "risk_creator" edges to the Risk entity.
@@ -774,6 +1076,27 @@ func (au *AdminUpdate) RemoveRiskUpdater(r ...*Risk) *AdminUpdate {
 		ids[i] = r[i].ID
 	}
 	return au.RemoveRiskUpdaterIDs(ids...)
+}
+
+// ClearRiskMaintainer clears all "risk_maintainer" edges to the Risk entity.
+func (au *AdminUpdate) ClearRiskMaintainer() *AdminUpdate {
+	au.mutation.ClearRiskMaintainer()
+	return au
+}
+
+// RemoveRiskMaintainerIDs removes the "risk_maintainer" edge to Risk entities by IDs.
+func (au *AdminUpdate) RemoveRiskMaintainerIDs(ids ...int) *AdminUpdate {
+	au.mutation.RemoveRiskMaintainerIDs(ids...)
+	return au
+}
+
+// RemoveRiskMaintainer removes "risk_maintainer" edges to Risk entities.
+func (au *AdminUpdate) RemoveRiskMaintainer(r ...*Risk) *AdminUpdate {
+	ids := make([]int, len(r))
+	for i := range r {
+		ids[i] = r[i].ID
+	}
+	return au.RemoveRiskMaintainerIDs(ids...)
 }
 
 // ClearRiskLocationCreator clears all "risk_location_creator" edges to the RiskLocation entity.
@@ -944,25 +1267,10 @@ func (au *AdminUpdate) RemoveEmployeeUpdater(e ...*Employee) *AdminUpdate {
 	return au.RemoveEmployeeUpdaterIDs(ids...)
 }
 
-// ClearEmployee clears all "employee" edges to the Employee entity.
+// ClearEmployee clears the "employee" edge to the Employee entity.
 func (au *AdminUpdate) ClearEmployee() *AdminUpdate {
 	au.mutation.ClearEmployee()
 	return au
-}
-
-// RemoveEmployeeIDs removes the "employee" edge to Employee entities by IDs.
-func (au *AdminUpdate) RemoveEmployeeIDs(ids ...int) *AdminUpdate {
-	au.mutation.RemoveEmployeeIDs(ids...)
-	return au
-}
-
-// RemoveEmployee removes "employee" edges to Employee entities.
-func (au *AdminUpdate) RemoveEmployee(e ...*Employee) *AdminUpdate {
-	ids := make([]int, len(e))
-	for i := range e {
-		ids[i] = e[i].ID
-	}
-	return au.RemoveEmployeeIDs(ids...)
 }
 
 // ClearOccupationCreator clears all "occupation_creator" edges to the Occupation entity.
@@ -1007,46 +1315,46 @@ func (au *AdminUpdate) RemoveOccupationUpdater(o ...*Occupation) *AdminUpdate {
 	return au.RemoveOccupationUpdaterIDs(ids...)
 }
 
-// ClearIpcEventCreator clears all "ipc_event_creator" edges to the IPCEvent entity.
-func (au *AdminUpdate) ClearIpcEventCreator() *AdminUpdate {
-	au.mutation.ClearIpcEventCreator()
+// ClearEventCreator clears all "event_creator" edges to the Event entity.
+func (au *AdminUpdate) ClearEventCreator() *AdminUpdate {
+	au.mutation.ClearEventCreator()
 	return au
 }
 
-// RemoveIpcEventCreatorIDs removes the "ipc_event_creator" edge to IPCEvent entities by IDs.
-func (au *AdminUpdate) RemoveIpcEventCreatorIDs(ids ...int) *AdminUpdate {
-	au.mutation.RemoveIpcEventCreatorIDs(ids...)
+// RemoveEventCreatorIDs removes the "event_creator" edge to Event entities by IDs.
+func (au *AdminUpdate) RemoveEventCreatorIDs(ids ...int) *AdminUpdate {
+	au.mutation.RemoveEventCreatorIDs(ids...)
 	return au
 }
 
-// RemoveIpcEventCreator removes "ipc_event_creator" edges to IPCEvent entities.
-func (au *AdminUpdate) RemoveIpcEventCreator(i ...*IPCEvent) *AdminUpdate {
-	ids := make([]int, len(i))
-	for j := range i {
-		ids[j] = i[j].ID
+// RemoveEventCreator removes "event_creator" edges to Event entities.
+func (au *AdminUpdate) RemoveEventCreator(e ...*Event) *AdminUpdate {
+	ids := make([]int, len(e))
+	for i := range e {
+		ids[i] = e[i].ID
 	}
-	return au.RemoveIpcEventCreatorIDs(ids...)
+	return au.RemoveEventCreatorIDs(ids...)
 }
 
-// ClearIpcEventUpdater clears all "ipc_event_updater" edges to the IPCEvent entity.
-func (au *AdminUpdate) ClearIpcEventUpdater() *AdminUpdate {
-	au.mutation.ClearIpcEventUpdater()
+// ClearEventUpdater clears all "event_updater" edges to the Event entity.
+func (au *AdminUpdate) ClearEventUpdater() *AdminUpdate {
+	au.mutation.ClearEventUpdater()
 	return au
 }
 
-// RemoveIpcEventUpdaterIDs removes the "ipc_event_updater" edge to IPCEvent entities by IDs.
-func (au *AdminUpdate) RemoveIpcEventUpdaterIDs(ids ...int) *AdminUpdate {
-	au.mutation.RemoveIpcEventUpdaterIDs(ids...)
+// RemoveEventUpdaterIDs removes the "event_updater" edge to Event entities by IDs.
+func (au *AdminUpdate) RemoveEventUpdaterIDs(ids ...int) *AdminUpdate {
+	au.mutation.RemoveEventUpdaterIDs(ids...)
 	return au
 }
 
-// RemoveIpcEventUpdater removes "ipc_event_updater" edges to IPCEvent entities.
-func (au *AdminUpdate) RemoveIpcEventUpdater(i ...*IPCEvent) *AdminUpdate {
-	ids := make([]int, len(i))
-	for j := range i {
-		ids[j] = i[j].ID
+// RemoveEventUpdater removes "event_updater" edges to Event entities.
+func (au *AdminUpdate) RemoveEventUpdater(e ...*Event) *AdminUpdate {
+	ids := make([]int, len(e))
+	for i := range e {
+		ids[i] = e[i].ID
 	}
-	return au.RemoveIpcEventUpdaterIDs(ids...)
+	return au.RemoveEventUpdaterIDs(ids...)
 }
 
 // ClearVideoCreator clears all "video_creator" edges to the Video entity.
@@ -1259,6 +1567,342 @@ func (au *AdminUpdate) RemoveEventLevelUpdater(e ...*EventLevel) *AdminUpdate {
 	return au.RemoveEventLevelUpdaterIDs(ids...)
 }
 
+// ClearFixingCreator clears all "fixing_creator" edges to the Fixing entity.
+func (au *AdminUpdate) ClearFixingCreator() *AdminUpdate {
+	au.mutation.ClearFixingCreator()
+	return au
+}
+
+// RemoveFixingCreatorIDs removes the "fixing_creator" edge to Fixing entities by IDs.
+func (au *AdminUpdate) RemoveFixingCreatorIDs(ids ...int) *AdminUpdate {
+	au.mutation.RemoveFixingCreatorIDs(ids...)
+	return au
+}
+
+// RemoveFixingCreator removes "fixing_creator" edges to Fixing entities.
+func (au *AdminUpdate) RemoveFixingCreator(f ...*Fixing) *AdminUpdate {
+	ids := make([]int, len(f))
+	for i := range f {
+		ids[i] = f[i].ID
+	}
+	return au.RemoveFixingCreatorIDs(ids...)
+}
+
+// ClearFixingUpdater clears all "fixing_updater" edges to the Fixing entity.
+func (au *AdminUpdate) ClearFixingUpdater() *AdminUpdate {
+	au.mutation.ClearFixingUpdater()
+	return au
+}
+
+// RemoveFixingUpdaterIDs removes the "fixing_updater" edge to Fixing entities by IDs.
+func (au *AdminUpdate) RemoveFixingUpdaterIDs(ids ...int) *AdminUpdate {
+	au.mutation.RemoveFixingUpdaterIDs(ids...)
+	return au
+}
+
+// RemoveFixingUpdater removes "fixing_updater" edges to Fixing entities.
+func (au *AdminUpdate) RemoveFixingUpdater(f ...*Fixing) *AdminUpdate {
+	ids := make([]int, len(f))
+	for i := range f {
+		ids[i] = f[i].ID
+	}
+	return au.RemoveFixingUpdaterIDs(ids...)
+}
+
+// ClearFixer clears all "fixer" edges to the Fixing entity.
+func (au *AdminUpdate) ClearFixer() *AdminUpdate {
+	au.mutation.ClearFixer()
+	return au
+}
+
+// RemoveFixerIDs removes the "fixer" edge to Fixing entities by IDs.
+func (au *AdminUpdate) RemoveFixerIDs(ids ...int) *AdminUpdate {
+	au.mutation.RemoveFixerIDs(ids...)
+	return au
+}
+
+// RemoveFixer removes "fixer" edges to Fixing entities.
+func (au *AdminUpdate) RemoveFixer(f ...*Fixing) *AdminUpdate {
+	ids := make([]int, len(f))
+	for i := range f {
+		ids[i] = f[i].ID
+	}
+	return au.RemoveFixerIDs(ids...)
+}
+
+// ClearEventLogCreator clears all "event_log_creator" edges to the EventLog entity.
+func (au *AdminUpdate) ClearEventLogCreator() *AdminUpdate {
+	au.mutation.ClearEventLogCreator()
+	return au
+}
+
+// RemoveEventLogCreatorIDs removes the "event_log_creator" edge to EventLog entities by IDs.
+func (au *AdminUpdate) RemoveEventLogCreatorIDs(ids ...int) *AdminUpdate {
+	au.mutation.RemoveEventLogCreatorIDs(ids...)
+	return au
+}
+
+// RemoveEventLogCreator removes "event_log_creator" edges to EventLog entities.
+func (au *AdminUpdate) RemoveEventLogCreator(e ...*EventLog) *AdminUpdate {
+	ids := make([]int, len(e))
+	for i := range e {
+		ids[i] = e[i].ID
+	}
+	return au.RemoveEventLogCreatorIDs(ids...)
+}
+
+// ClearEventLogUpdater clears all "event_log_updater" edges to the EventLog entity.
+func (au *AdminUpdate) ClearEventLogUpdater() *AdminUpdate {
+	au.mutation.ClearEventLogUpdater()
+	return au
+}
+
+// RemoveEventLogUpdaterIDs removes the "event_log_updater" edge to EventLog entities by IDs.
+func (au *AdminUpdate) RemoveEventLogUpdaterIDs(ids ...int) *AdminUpdate {
+	au.mutation.RemoveEventLogUpdaterIDs(ids...)
+	return au
+}
+
+// RemoveEventLogUpdater removes "event_log_updater" edges to EventLog entities.
+func (au *AdminUpdate) RemoveEventLogUpdater(e ...*EventLog) *AdminUpdate {
+	ids := make([]int, len(e))
+	for i := range e {
+		ids[i] = e[i].ID
+	}
+	return au.RemoveEventLogUpdaterIDs(ids...)
+}
+
+// ClearEventLogActor clears all "event_log_actor" edges to the EventLog entity.
+func (au *AdminUpdate) ClearEventLogActor() *AdminUpdate {
+	au.mutation.ClearEventLogActor()
+	return au
+}
+
+// RemoveEventLogActorIDs removes the "event_log_actor" edge to EventLog entities by IDs.
+func (au *AdminUpdate) RemoveEventLogActorIDs(ids ...int) *AdminUpdate {
+	au.mutation.RemoveEventLogActorIDs(ids...)
+	return au
+}
+
+// RemoveEventLogActor removes "event_log_actor" edges to EventLog entities.
+func (au *AdminUpdate) RemoveEventLogActor(e ...*EventLog) *AdminUpdate {
+	ids := make([]int, len(e))
+	for i := range e {
+		ids[i] = e[i].ID
+	}
+	return au.RemoveEventLogActorIDs(ids...)
+}
+
+// ClearEventLogActor2 clears all "event_log_actor2" edges to the EventLog entity.
+func (au *AdminUpdate) ClearEventLogActor2() *AdminUpdate {
+	au.mutation.ClearEventLogActor2()
+	return au
+}
+
+// RemoveEventLogActor2IDs removes the "event_log_actor2" edge to EventLog entities by IDs.
+func (au *AdminUpdate) RemoveEventLogActor2IDs(ids ...int) *AdminUpdate {
+	au.mutation.RemoveEventLogActor2IDs(ids...)
+	return au
+}
+
+// RemoveEventLogActor2 removes "event_log_actor2" edges to EventLog entities.
+func (au *AdminUpdate) RemoveEventLogActor2(e ...*EventLog) *AdminUpdate {
+	ids := make([]int, len(e))
+	for i := range e {
+		ids[i] = e[i].ID
+	}
+	return au.RemoveEventLogActor2IDs(ids...)
+}
+
+// ClearSweepCreator clears all "sweep_creator" edges to the Sweep entity.
+func (au *AdminUpdate) ClearSweepCreator() *AdminUpdate {
+	au.mutation.ClearSweepCreator()
+	return au
+}
+
+// RemoveSweepCreatorIDs removes the "sweep_creator" edge to Sweep entities by IDs.
+func (au *AdminUpdate) RemoveSweepCreatorIDs(ids ...int) *AdminUpdate {
+	au.mutation.RemoveSweepCreatorIDs(ids...)
+	return au
+}
+
+// RemoveSweepCreator removes "sweep_creator" edges to Sweep entities.
+func (au *AdminUpdate) RemoveSweepCreator(s ...*Sweep) *AdminUpdate {
+	ids := make([]int, len(s))
+	for i := range s {
+		ids[i] = s[i].ID
+	}
+	return au.RemoveSweepCreatorIDs(ids...)
+}
+
+// ClearSweepUpdater clears all "sweep_updater" edges to the Sweep entity.
+func (au *AdminUpdate) ClearSweepUpdater() *AdminUpdate {
+	au.mutation.ClearSweepUpdater()
+	return au
+}
+
+// RemoveSweepUpdaterIDs removes the "sweep_updater" edge to Sweep entities by IDs.
+func (au *AdminUpdate) RemoveSweepUpdaterIDs(ids ...int) *AdminUpdate {
+	au.mutation.RemoveSweepUpdaterIDs(ids...)
+	return au
+}
+
+// RemoveSweepUpdater removes "sweep_updater" edges to Sweep entities.
+func (au *AdminUpdate) RemoveSweepUpdater(s ...*Sweep) *AdminUpdate {
+	ids := make([]int, len(s))
+	for i := range s {
+		ids[i] = s[i].ID
+	}
+	return au.RemoveSweepUpdaterIDs(ids...)
+}
+
+// ClearSweepScheduleCreator clears all "sweep_schedule_creator" edges to the SweepSchedule entity.
+func (au *AdminUpdate) ClearSweepScheduleCreator() *AdminUpdate {
+	au.mutation.ClearSweepScheduleCreator()
+	return au
+}
+
+// RemoveSweepScheduleCreatorIDs removes the "sweep_schedule_creator" edge to SweepSchedule entities by IDs.
+func (au *AdminUpdate) RemoveSweepScheduleCreatorIDs(ids ...int) *AdminUpdate {
+	au.mutation.RemoveSweepScheduleCreatorIDs(ids...)
+	return au
+}
+
+// RemoveSweepScheduleCreator removes "sweep_schedule_creator" edges to SweepSchedule entities.
+func (au *AdminUpdate) RemoveSweepScheduleCreator(s ...*SweepSchedule) *AdminUpdate {
+	ids := make([]int, len(s))
+	for i := range s {
+		ids[i] = s[i].ID
+	}
+	return au.RemoveSweepScheduleCreatorIDs(ids...)
+}
+
+// ClearSweepScheduleUpdater clears all "sweep_schedule_updater" edges to the SweepSchedule entity.
+func (au *AdminUpdate) ClearSweepScheduleUpdater() *AdminUpdate {
+	au.mutation.ClearSweepScheduleUpdater()
+	return au
+}
+
+// RemoveSweepScheduleUpdaterIDs removes the "sweep_schedule_updater" edge to SweepSchedule entities by IDs.
+func (au *AdminUpdate) RemoveSweepScheduleUpdaterIDs(ids ...int) *AdminUpdate {
+	au.mutation.RemoveSweepScheduleUpdaterIDs(ids...)
+	return au
+}
+
+// RemoveSweepScheduleUpdater removes "sweep_schedule_updater" edges to SweepSchedule entities.
+func (au *AdminUpdate) RemoveSweepScheduleUpdater(s ...*SweepSchedule) *AdminUpdate {
+	ids := make([]int, len(s))
+	for i := range s {
+		ids[i] = s[i].ID
+	}
+	return au.RemoveSweepScheduleUpdaterIDs(ids...)
+}
+
+// ClearSweepSchedule clears all "sweep_schedule" edges to the SweepSchedule entity.
+func (au *AdminUpdate) ClearSweepSchedule() *AdminUpdate {
+	au.mutation.ClearSweepSchedule()
+	return au
+}
+
+// RemoveSweepScheduleIDs removes the "sweep_schedule" edge to SweepSchedule entities by IDs.
+func (au *AdminUpdate) RemoveSweepScheduleIDs(ids ...int) *AdminUpdate {
+	au.mutation.RemoveSweepScheduleIDs(ids...)
+	return au
+}
+
+// RemoveSweepSchedule removes "sweep_schedule" edges to SweepSchedule entities.
+func (au *AdminUpdate) RemoveSweepSchedule(s ...*SweepSchedule) *AdminUpdate {
+	ids := make([]int, len(s))
+	for i := range s {
+		ids[i] = s[i].ID
+	}
+	return au.RemoveSweepScheduleIDs(ids...)
+}
+
+// ClearSweepResultCreator clears all "sweep_result_creator" edges to the SweepResult entity.
+func (au *AdminUpdate) ClearSweepResultCreator() *AdminUpdate {
+	au.mutation.ClearSweepResultCreator()
+	return au
+}
+
+// RemoveSweepResultCreatorIDs removes the "sweep_result_creator" edge to SweepResult entities by IDs.
+func (au *AdminUpdate) RemoveSweepResultCreatorIDs(ids ...int) *AdminUpdate {
+	au.mutation.RemoveSweepResultCreatorIDs(ids...)
+	return au
+}
+
+// RemoveSweepResultCreator removes "sweep_result_creator" edges to SweepResult entities.
+func (au *AdminUpdate) RemoveSweepResultCreator(s ...*SweepResult) *AdminUpdate {
+	ids := make([]int, len(s))
+	for i := range s {
+		ids[i] = s[i].ID
+	}
+	return au.RemoveSweepResultCreatorIDs(ids...)
+}
+
+// ClearSweepResultUpdater clears all "sweep_result_updater" edges to the SweepResult entity.
+func (au *AdminUpdate) ClearSweepResultUpdater() *AdminUpdate {
+	au.mutation.ClearSweepResultUpdater()
+	return au
+}
+
+// RemoveSweepResultUpdaterIDs removes the "sweep_result_updater" edge to SweepResult entities by IDs.
+func (au *AdminUpdate) RemoveSweepResultUpdaterIDs(ids ...int) *AdminUpdate {
+	au.mutation.RemoveSweepResultUpdaterIDs(ids...)
+	return au
+}
+
+// RemoveSweepResultUpdater removes "sweep_result_updater" edges to SweepResult entities.
+func (au *AdminUpdate) RemoveSweepResultUpdater(s ...*SweepResult) *AdminUpdate {
+	ids := make([]int, len(s))
+	for i := range s {
+		ids[i] = s[i].ID
+	}
+	return au.RemoveSweepResultUpdaterIDs(ids...)
+}
+
+// ClearSweepResultDetailsCreator clears all "sweep_result_details_creator" edges to the SweepResultDetails entity.
+func (au *AdminUpdate) ClearSweepResultDetailsCreator() *AdminUpdate {
+	au.mutation.ClearSweepResultDetailsCreator()
+	return au
+}
+
+// RemoveSweepResultDetailsCreatorIDs removes the "sweep_result_details_creator" edge to SweepResultDetails entities by IDs.
+func (au *AdminUpdate) RemoveSweepResultDetailsCreatorIDs(ids ...int) *AdminUpdate {
+	au.mutation.RemoveSweepResultDetailsCreatorIDs(ids...)
+	return au
+}
+
+// RemoveSweepResultDetailsCreator removes "sweep_result_details_creator" edges to SweepResultDetails entities.
+func (au *AdminUpdate) RemoveSweepResultDetailsCreator(s ...*SweepResultDetails) *AdminUpdate {
+	ids := make([]int, len(s))
+	for i := range s {
+		ids[i] = s[i].ID
+	}
+	return au.RemoveSweepResultDetailsCreatorIDs(ids...)
+}
+
+// ClearSweepResultDetailsUpdater clears all "sweep_result_details_updater" edges to the SweepResultDetails entity.
+func (au *AdminUpdate) ClearSweepResultDetailsUpdater() *AdminUpdate {
+	au.mutation.ClearSweepResultDetailsUpdater()
+	return au
+}
+
+// RemoveSweepResultDetailsUpdaterIDs removes the "sweep_result_details_updater" edge to SweepResultDetails entities by IDs.
+func (au *AdminUpdate) RemoveSweepResultDetailsUpdaterIDs(ids ...int) *AdminUpdate {
+	au.mutation.RemoveSweepResultDetailsUpdaterIDs(ids...)
+	return au
+}
+
+// RemoveSweepResultDetailsUpdater removes "sweep_result_details_updater" edges to SweepResultDetails entities.
+func (au *AdminUpdate) RemoveSweepResultDetailsUpdater(s ...*SweepResultDetails) *AdminUpdate {
+	ids := make([]int, len(s))
+	for i := range s {
+		ids[i] = s[i].ID
+	}
+	return au.RemoveSweepResultDetailsUpdaterIDs(ids...)
+}
+
 // Save executes the query and returns the number of nodes affected by the update operation.
 func (au *AdminUpdate) Save(ctx context.Context) (int, error) {
 	if err := au.defaults(); err != nil {
@@ -1291,21 +1935,21 @@ func (au *AdminUpdate) ExecX(ctx context.Context) {
 
 // defaults sets the default values of the builder before save.
 func (au *AdminUpdate) defaults() error {
-	if _, ok := au.mutation.UpdatedAt(); !ok {
-		if admin.UpdateDefaultUpdatedAt == nil {
-			return fmt.Errorf("dao: uninitialized admin.UpdateDefaultUpdatedAt (forgotten import dao/runtime?)")
+	if _, ok := au.mutation.UpdateTime(); !ok {
+		if admin.UpdateDefaultUpdateTime == nil {
+			return fmt.Errorf("dao: uninitialized admin.UpdateDefaultUpdateTime (forgotten import dao/runtime?)")
 		}
-		v := admin.UpdateDefaultUpdatedAt()
-		au.mutation.SetUpdatedAt(v)
+		v := admin.UpdateDefaultUpdateTime()
+		au.mutation.SetUpdateTime(v)
 	}
 	return nil
 }
 
 // check runs all checks and user-defined validators on the builder.
 func (au *AdminUpdate) check() error {
-	if v, ok := au.mutation.UpdatedBy(); ok {
-		if err := admin.UpdatedByValidator(v); err != nil {
-			return &ValidationError{Name: "updated_by", err: fmt.Errorf(`dao: validator failed for field "Admin.updated_by": %w`, err)}
+	if v, ok := au.mutation.UpdaterID(); ok {
+		if err := admin.UpdaterIDValidator(v); err != nil {
+			return &ValidationError{Name: "updater_id", err: fmt.Errorf(`dao: validator failed for field "Admin.updater_id": %w`, err)}
 		}
 	}
 	if v, ok := au.mutation.Username(); ok {
@@ -1328,9 +1972,14 @@ func (au *AdminUpdate) check() error {
 			return &ValidationError{Name: "real_name", err: fmt.Errorf(`dao: validator failed for field "Admin.real_name": %w`, err)}
 		}
 	}
-	if v, ok := au.mutation.Avatar(); ok {
-		if err := admin.AvatarValidator(v); err != nil {
-			return &ValidationError{Name: "avatar", err: fmt.Errorf(`dao: validator failed for field "Admin.avatar": %w`, err)}
+	if v, ok := au.mutation.Mobile(); ok {
+		if err := admin.MobileValidator(v); err != nil {
+			return &ValidationError{Name: "mobile", err: fmt.Errorf(`dao: validator failed for field "Admin.mobile": %w`, err)}
+		}
+	}
+	if v, ok := au.mutation.AdminStatus(); ok {
+		if err := admin.AdminStatusValidator(int(v)); err != nil {
+			return &ValidationError{Name: "admin_status", err: fmt.Errorf(`dao: validator failed for field "Admin.admin_status": %w`, err)}
 		}
 	}
 	if _, ok := au.mutation.CreatorID(); au.mutation.CreatorCleared() && !ok {
@@ -1354,14 +2003,14 @@ func (au *AdminUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			}
 		}
 	}
-	if value, ok := au.mutation.DeletedAt(); ok {
-		_spec.SetField(admin.FieldDeletedAt, field.TypeTime, value)
+	if value, ok := au.mutation.DeleteTime(); ok {
+		_spec.SetField(admin.FieldDeleteTime, field.TypeTime, value)
 	}
-	if au.mutation.DeletedAtCleared() {
-		_spec.ClearField(admin.FieldDeletedAt, field.TypeTime)
+	if au.mutation.DeleteTimeCleared() {
+		_spec.ClearField(admin.FieldDeleteTime, field.TypeTime)
 	}
-	if value, ok := au.mutation.UpdatedAt(); ok {
-		_spec.SetField(admin.FieldUpdatedAt, field.TypeTime, value)
+	if value, ok := au.mutation.UpdateTime(); ok {
+		_spec.SetField(admin.FieldUpdateTime, field.TypeTime, value)
 	}
 	if value, ok := au.mutation.Username(); ok {
 		_spec.SetField(admin.FieldUsername, field.TypeString, value)
@@ -1375,11 +2024,23 @@ func (au *AdminUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	if value, ok := au.mutation.RealName(); ok {
 		_spec.SetField(admin.FieldRealName, field.TypeString, value)
 	}
+	if value, ok := au.mutation.Mobile(); ok {
+		_spec.SetField(admin.FieldMobile, field.TypeString, value)
+	}
+	if au.mutation.MobileCleared() {
+		_spec.ClearField(admin.FieldMobile, field.TypeString)
+	}
 	if value, ok := au.mutation.Avatar(); ok {
-		_spec.SetField(admin.FieldAvatar, field.TypeString, value)
+		_spec.SetField(admin.FieldAvatar, field.TypeJSON, value)
 	}
 	if au.mutation.AvatarCleared() {
-		_spec.ClearField(admin.FieldAvatar, field.TypeString)
+		_spec.ClearField(admin.FieldAvatar, field.TypeJSON)
+	}
+	if value, ok := au.mutation.AdminStatus(); ok {
+		_spec.SetField(admin.FieldAdminStatus, field.TypeInt, value)
+	}
+	if value, ok := au.mutation.AddedAdminStatus(); ok {
+		_spec.AddField(admin.FieldAdminStatus, field.TypeInt, value)
 	}
 	if au.mutation.UpdaterCleared() {
 		edge := &sqlgraph.EdgeSpec{
@@ -1410,28 +2071,28 @@ func (au *AdminUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if au.mutation.AdminRolesCleared() {
+	if au.mutation.PermissionsCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2M,
 			Inverse: true,
-			Table:   admin.AdminRolesTable,
-			Columns: admin.AdminRolesPrimaryKey,
+			Table:   admin.PermissionsTable,
+			Columns: admin.PermissionsPrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(adminrole.FieldID, field.TypeInt),
+				IDSpec: sqlgraph.NewFieldSpec(permission.FieldID, field.TypeInt),
 			},
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := au.mutation.RemovedAdminRolesIDs(); len(nodes) > 0 && !au.mutation.AdminRolesCleared() {
+	if nodes := au.mutation.RemovedPermissionsIDs(); len(nodes) > 0 && !au.mutation.PermissionsCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2M,
 			Inverse: true,
-			Table:   admin.AdminRolesTable,
-			Columns: admin.AdminRolesPrimaryKey,
+			Table:   admin.PermissionsTable,
+			Columns: admin.PermissionsPrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(adminrole.FieldID, field.TypeInt),
+				IDSpec: sqlgraph.NewFieldSpec(permission.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {
@@ -1439,15 +2100,15 @@ func (au *AdminUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := au.mutation.AdminRolesIDs(); len(nodes) > 0 {
+	if nodes := au.mutation.PermissionsIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2M,
 			Inverse: true,
-			Table:   admin.AdminRolesTable,
-			Columns: admin.AdminRolesPrimaryKey,
+			Table:   admin.PermissionsTable,
+			Columns: admin.PermissionsPrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(adminrole.FieldID, field.TypeInt),
+				IDSpec: sqlgraph.NewFieldSpec(permission.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {
@@ -1545,28 +2206,28 @@ func (au *AdminUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if au.mutation.AdminRoleCreatorCleared() {
+	if au.mutation.PermissionCreatorCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
-			Table:   admin.AdminRoleCreatorTable,
-			Columns: []string{admin.AdminRoleCreatorColumn},
+			Table:   admin.PermissionCreatorTable,
+			Columns: []string{admin.PermissionCreatorColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(adminrole.FieldID, field.TypeInt),
+				IDSpec: sqlgraph.NewFieldSpec(permission.FieldID, field.TypeInt),
 			},
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := au.mutation.RemovedAdminRoleCreatorIDs(); len(nodes) > 0 && !au.mutation.AdminRoleCreatorCleared() {
+	if nodes := au.mutation.RemovedPermissionCreatorIDs(); len(nodes) > 0 && !au.mutation.PermissionCreatorCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
-			Table:   admin.AdminRoleCreatorTable,
-			Columns: []string{admin.AdminRoleCreatorColumn},
+			Table:   admin.PermissionCreatorTable,
+			Columns: []string{admin.PermissionCreatorColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(adminrole.FieldID, field.TypeInt),
+				IDSpec: sqlgraph.NewFieldSpec(permission.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {
@@ -1574,15 +2235,15 @@ func (au *AdminUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := au.mutation.AdminRoleCreatorIDs(); len(nodes) > 0 {
+	if nodes := au.mutation.PermissionCreatorIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
-			Table:   admin.AdminRoleCreatorTable,
-			Columns: []string{admin.AdminRoleCreatorColumn},
+			Table:   admin.PermissionCreatorTable,
+			Columns: []string{admin.PermissionCreatorColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(adminrole.FieldID, field.TypeInt),
+				IDSpec: sqlgraph.NewFieldSpec(permission.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {
@@ -1590,28 +2251,28 @@ func (au *AdminUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if au.mutation.AdminRoleUpdaterCleared() {
+	if au.mutation.PermissionUpdaterCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
-			Table:   admin.AdminRoleUpdaterTable,
-			Columns: []string{admin.AdminRoleUpdaterColumn},
+			Table:   admin.PermissionUpdaterTable,
+			Columns: []string{admin.PermissionUpdaterColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(adminrole.FieldID, field.TypeInt),
+				IDSpec: sqlgraph.NewFieldSpec(permission.FieldID, field.TypeInt),
 			},
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := au.mutation.RemovedAdminRoleUpdaterIDs(); len(nodes) > 0 && !au.mutation.AdminRoleUpdaterCleared() {
+	if nodes := au.mutation.RemovedPermissionUpdaterIDs(); len(nodes) > 0 && !au.mutation.PermissionUpdaterCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
-			Table:   admin.AdminRoleUpdaterTable,
-			Columns: []string{admin.AdminRoleUpdaterColumn},
+			Table:   admin.PermissionUpdaterTable,
+			Columns: []string{admin.PermissionUpdaterColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(adminrole.FieldID, field.TypeInt),
+				IDSpec: sqlgraph.NewFieldSpec(permission.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {
@@ -1619,15 +2280,15 @@ func (au *AdminUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := au.mutation.AdminRoleUpdaterIDs(); len(nodes) > 0 {
+	if nodes := au.mutation.PermissionUpdaterIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
-			Table:   admin.AdminRoleUpdaterTable,
-			Columns: []string{admin.AdminRoleUpdaterColumn},
+			Table:   admin.PermissionUpdaterTable,
+			Columns: []string{admin.PermissionUpdaterColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(adminrole.FieldID, field.TypeInt),
+				IDSpec: sqlgraph.NewFieldSpec(permission.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {
@@ -1715,6 +2376,51 @@ func (au *AdminUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Inverse: false,
 			Table:   admin.RiskUpdaterTable,
 			Columns: []string{admin.RiskUpdaterColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(risk.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if au.mutation.RiskMaintainerCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   admin.RiskMaintainerTable,
+			Columns: []string{admin.RiskMaintainerColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(risk.FieldID, field.TypeInt),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := au.mutation.RemovedRiskMaintainerIDs(); len(nodes) > 0 && !au.mutation.RiskMaintainerCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   admin.RiskMaintainerTable,
+			Columns: []string{admin.RiskMaintainerColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(risk.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := au.mutation.RiskMaintainerIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   admin.RiskMaintainerTable,
+			Columns: []string{admin.RiskMaintainerColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(risk.FieldID, field.TypeInt),
@@ -2087,7 +2793,7 @@ func (au *AdminUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	}
 	if au.mutation.EmployeeCleared() {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
+			Rel:     sqlgraph.O2O,
 			Inverse: false,
 			Table:   admin.EmployeeTable,
 			Columns: []string{admin.EmployeeColumn},
@@ -2095,28 +2801,12 @@ func (au *AdminUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(employee.FieldID, field.TypeInt),
 			},
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := au.mutation.RemovedEmployeeIDs(); len(nodes) > 0 && !au.mutation.EmployeeCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
-			Inverse: false,
-			Table:   admin.EmployeeTable,
-			Columns: []string{admin.EmployeeColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(employee.FieldID, field.TypeInt),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
 	if nodes := au.mutation.EmployeeIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
+			Rel:     sqlgraph.O2O,
 			Inverse: false,
 			Table:   admin.EmployeeTable,
 			Columns: []string{admin.EmployeeColumn},
@@ -2220,28 +2910,28 @@ func (au *AdminUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if au.mutation.IpcEventCreatorCleared() {
+	if au.mutation.EventCreatorCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
-			Table:   admin.IpcEventCreatorTable,
-			Columns: []string{admin.IpcEventCreatorColumn},
+			Table:   admin.EventCreatorTable,
+			Columns: []string{admin.EventCreatorColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(ipcevent.FieldID, field.TypeInt),
+				IDSpec: sqlgraph.NewFieldSpec(event.FieldID, field.TypeInt),
 			},
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := au.mutation.RemovedIpcEventCreatorIDs(); len(nodes) > 0 && !au.mutation.IpcEventCreatorCleared() {
+	if nodes := au.mutation.RemovedEventCreatorIDs(); len(nodes) > 0 && !au.mutation.EventCreatorCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
-			Table:   admin.IpcEventCreatorTable,
-			Columns: []string{admin.IpcEventCreatorColumn},
+			Table:   admin.EventCreatorTable,
+			Columns: []string{admin.EventCreatorColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(ipcevent.FieldID, field.TypeInt),
+				IDSpec: sqlgraph.NewFieldSpec(event.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {
@@ -2249,15 +2939,15 @@ func (au *AdminUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := au.mutation.IpcEventCreatorIDs(); len(nodes) > 0 {
+	if nodes := au.mutation.EventCreatorIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
-			Table:   admin.IpcEventCreatorTable,
-			Columns: []string{admin.IpcEventCreatorColumn},
+			Table:   admin.EventCreatorTable,
+			Columns: []string{admin.EventCreatorColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(ipcevent.FieldID, field.TypeInt),
+				IDSpec: sqlgraph.NewFieldSpec(event.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {
@@ -2265,28 +2955,28 @@ func (au *AdminUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if au.mutation.IpcEventUpdaterCleared() {
+	if au.mutation.EventUpdaterCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
-			Table:   admin.IpcEventUpdaterTable,
-			Columns: []string{admin.IpcEventUpdaterColumn},
+			Table:   admin.EventUpdaterTable,
+			Columns: []string{admin.EventUpdaterColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(ipcevent.FieldID, field.TypeInt),
+				IDSpec: sqlgraph.NewFieldSpec(event.FieldID, field.TypeInt),
 			},
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := au.mutation.RemovedIpcEventUpdaterIDs(); len(nodes) > 0 && !au.mutation.IpcEventUpdaterCleared() {
+	if nodes := au.mutation.RemovedEventUpdaterIDs(); len(nodes) > 0 && !au.mutation.EventUpdaterCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
-			Table:   admin.IpcEventUpdaterTable,
-			Columns: []string{admin.IpcEventUpdaterColumn},
+			Table:   admin.EventUpdaterTable,
+			Columns: []string{admin.EventUpdaterColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(ipcevent.FieldID, field.TypeInt),
+				IDSpec: sqlgraph.NewFieldSpec(event.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {
@@ -2294,15 +2984,15 @@ func (au *AdminUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := au.mutation.IpcEventUpdaterIDs(); len(nodes) > 0 {
+	if nodes := au.mutation.EventUpdaterIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
-			Table:   admin.IpcEventUpdaterTable,
-			Columns: []string{admin.IpcEventUpdaterColumn},
+			Table:   admin.EventUpdaterTable,
+			Columns: []string{admin.EventUpdaterColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(ipcevent.FieldID, field.TypeInt),
+				IDSpec: sqlgraph.NewFieldSpec(event.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {
@@ -2760,6 +3450,726 @@ func (au *AdminUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
+	if au.mutation.FixingCreatorCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   admin.FixingCreatorTable,
+			Columns: []string{admin.FixingCreatorColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(fixing.FieldID, field.TypeInt),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := au.mutation.RemovedFixingCreatorIDs(); len(nodes) > 0 && !au.mutation.FixingCreatorCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   admin.FixingCreatorTable,
+			Columns: []string{admin.FixingCreatorColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(fixing.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := au.mutation.FixingCreatorIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   admin.FixingCreatorTable,
+			Columns: []string{admin.FixingCreatorColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(fixing.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if au.mutation.FixingUpdaterCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   admin.FixingUpdaterTable,
+			Columns: []string{admin.FixingUpdaterColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(fixing.FieldID, field.TypeInt),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := au.mutation.RemovedFixingUpdaterIDs(); len(nodes) > 0 && !au.mutation.FixingUpdaterCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   admin.FixingUpdaterTable,
+			Columns: []string{admin.FixingUpdaterColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(fixing.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := au.mutation.FixingUpdaterIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   admin.FixingUpdaterTable,
+			Columns: []string{admin.FixingUpdaterColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(fixing.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if au.mutation.FixerCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   admin.FixerTable,
+			Columns: []string{admin.FixerColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(fixing.FieldID, field.TypeInt),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := au.mutation.RemovedFixerIDs(); len(nodes) > 0 && !au.mutation.FixerCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   admin.FixerTable,
+			Columns: []string{admin.FixerColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(fixing.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := au.mutation.FixerIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   admin.FixerTable,
+			Columns: []string{admin.FixerColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(fixing.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if au.mutation.EventLogCreatorCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   admin.EventLogCreatorTable,
+			Columns: []string{admin.EventLogCreatorColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(eventlog.FieldID, field.TypeInt),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := au.mutation.RemovedEventLogCreatorIDs(); len(nodes) > 0 && !au.mutation.EventLogCreatorCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   admin.EventLogCreatorTable,
+			Columns: []string{admin.EventLogCreatorColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(eventlog.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := au.mutation.EventLogCreatorIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   admin.EventLogCreatorTable,
+			Columns: []string{admin.EventLogCreatorColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(eventlog.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if au.mutation.EventLogUpdaterCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   admin.EventLogUpdaterTable,
+			Columns: []string{admin.EventLogUpdaterColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(eventlog.FieldID, field.TypeInt),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := au.mutation.RemovedEventLogUpdaterIDs(); len(nodes) > 0 && !au.mutation.EventLogUpdaterCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   admin.EventLogUpdaterTable,
+			Columns: []string{admin.EventLogUpdaterColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(eventlog.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := au.mutation.EventLogUpdaterIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   admin.EventLogUpdaterTable,
+			Columns: []string{admin.EventLogUpdaterColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(eventlog.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if au.mutation.EventLogActorCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   admin.EventLogActorTable,
+			Columns: []string{admin.EventLogActorColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(eventlog.FieldID, field.TypeInt),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := au.mutation.RemovedEventLogActorIDs(); len(nodes) > 0 && !au.mutation.EventLogActorCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   admin.EventLogActorTable,
+			Columns: []string{admin.EventLogActorColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(eventlog.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := au.mutation.EventLogActorIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   admin.EventLogActorTable,
+			Columns: []string{admin.EventLogActorColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(eventlog.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if au.mutation.EventLogActor2Cleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   admin.EventLogActor2Table,
+			Columns: []string{admin.EventLogActor2Column},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(eventlog.FieldID, field.TypeInt),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := au.mutation.RemovedEventLogActor2IDs(); len(nodes) > 0 && !au.mutation.EventLogActor2Cleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   admin.EventLogActor2Table,
+			Columns: []string{admin.EventLogActor2Column},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(eventlog.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := au.mutation.EventLogActor2IDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   admin.EventLogActor2Table,
+			Columns: []string{admin.EventLogActor2Column},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(eventlog.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if au.mutation.SweepCreatorCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   admin.SweepCreatorTable,
+			Columns: []string{admin.SweepCreatorColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(sweep.FieldID, field.TypeInt),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := au.mutation.RemovedSweepCreatorIDs(); len(nodes) > 0 && !au.mutation.SweepCreatorCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   admin.SweepCreatorTable,
+			Columns: []string{admin.SweepCreatorColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(sweep.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := au.mutation.SweepCreatorIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   admin.SweepCreatorTable,
+			Columns: []string{admin.SweepCreatorColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(sweep.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if au.mutation.SweepUpdaterCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   admin.SweepUpdaterTable,
+			Columns: []string{admin.SweepUpdaterColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(sweep.FieldID, field.TypeInt),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := au.mutation.RemovedSweepUpdaterIDs(); len(nodes) > 0 && !au.mutation.SweepUpdaterCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   admin.SweepUpdaterTable,
+			Columns: []string{admin.SweepUpdaterColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(sweep.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := au.mutation.SweepUpdaterIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   admin.SweepUpdaterTable,
+			Columns: []string{admin.SweepUpdaterColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(sweep.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if au.mutation.SweepScheduleCreatorCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   admin.SweepScheduleCreatorTable,
+			Columns: []string{admin.SweepScheduleCreatorColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(sweepschedule.FieldID, field.TypeInt),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := au.mutation.RemovedSweepScheduleCreatorIDs(); len(nodes) > 0 && !au.mutation.SweepScheduleCreatorCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   admin.SweepScheduleCreatorTable,
+			Columns: []string{admin.SweepScheduleCreatorColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(sweepschedule.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := au.mutation.SweepScheduleCreatorIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   admin.SweepScheduleCreatorTable,
+			Columns: []string{admin.SweepScheduleCreatorColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(sweepschedule.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if au.mutation.SweepScheduleUpdaterCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   admin.SweepScheduleUpdaterTable,
+			Columns: []string{admin.SweepScheduleUpdaterColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(sweepschedule.FieldID, field.TypeInt),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := au.mutation.RemovedSweepScheduleUpdaterIDs(); len(nodes) > 0 && !au.mutation.SweepScheduleUpdaterCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   admin.SweepScheduleUpdaterTable,
+			Columns: []string{admin.SweepScheduleUpdaterColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(sweepschedule.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := au.mutation.SweepScheduleUpdaterIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   admin.SweepScheduleUpdaterTable,
+			Columns: []string{admin.SweepScheduleUpdaterColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(sweepschedule.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if au.mutation.SweepScheduleCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: false,
+			Table:   admin.SweepScheduleTable,
+			Columns: admin.SweepSchedulePrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(sweepschedule.FieldID, field.TypeInt),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := au.mutation.RemovedSweepScheduleIDs(); len(nodes) > 0 && !au.mutation.SweepScheduleCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: false,
+			Table:   admin.SweepScheduleTable,
+			Columns: admin.SweepSchedulePrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(sweepschedule.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := au.mutation.SweepScheduleIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: false,
+			Table:   admin.SweepScheduleTable,
+			Columns: admin.SweepSchedulePrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(sweepschedule.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if au.mutation.SweepResultCreatorCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   admin.SweepResultCreatorTable,
+			Columns: []string{admin.SweepResultCreatorColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(sweepresult.FieldID, field.TypeInt),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := au.mutation.RemovedSweepResultCreatorIDs(); len(nodes) > 0 && !au.mutation.SweepResultCreatorCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   admin.SweepResultCreatorTable,
+			Columns: []string{admin.SweepResultCreatorColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(sweepresult.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := au.mutation.SweepResultCreatorIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   admin.SweepResultCreatorTable,
+			Columns: []string{admin.SweepResultCreatorColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(sweepresult.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if au.mutation.SweepResultUpdaterCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   admin.SweepResultUpdaterTable,
+			Columns: []string{admin.SweepResultUpdaterColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(sweepresult.FieldID, field.TypeInt),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := au.mutation.RemovedSweepResultUpdaterIDs(); len(nodes) > 0 && !au.mutation.SweepResultUpdaterCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   admin.SweepResultUpdaterTable,
+			Columns: []string{admin.SweepResultUpdaterColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(sweepresult.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := au.mutation.SweepResultUpdaterIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   admin.SweepResultUpdaterTable,
+			Columns: []string{admin.SweepResultUpdaterColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(sweepresult.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if au.mutation.SweepResultDetailsCreatorCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   admin.SweepResultDetailsCreatorTable,
+			Columns: []string{admin.SweepResultDetailsCreatorColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(sweepresultdetails.FieldID, field.TypeInt),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := au.mutation.RemovedSweepResultDetailsCreatorIDs(); len(nodes) > 0 && !au.mutation.SweepResultDetailsCreatorCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   admin.SweepResultDetailsCreatorTable,
+			Columns: []string{admin.SweepResultDetailsCreatorColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(sweepresultdetails.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := au.mutation.SweepResultDetailsCreatorIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   admin.SweepResultDetailsCreatorTable,
+			Columns: []string{admin.SweepResultDetailsCreatorColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(sweepresultdetails.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if au.mutation.SweepResultDetailsUpdaterCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   admin.SweepResultDetailsUpdaterTable,
+			Columns: []string{admin.SweepResultDetailsUpdaterColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(sweepresultdetails.FieldID, field.TypeInt),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := au.mutation.RemovedSweepResultDetailsUpdaterIDs(); len(nodes) > 0 && !au.mutation.SweepResultDetailsUpdaterCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   admin.SweepResultDetailsUpdaterTable,
+			Columns: []string{admin.SweepResultDetailsUpdaterColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(sweepresultdetails.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := au.mutation.SweepResultDetailsUpdaterIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   admin.SweepResultDetailsUpdaterTable,
+			Columns: []string{admin.SweepResultDetailsUpdaterColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(sweepresultdetails.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
 	if n, err = sqlgraph.UpdateNodes(ctx, au.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
 			err = &NotFoundError{admin.Label}
@@ -2780,43 +4190,43 @@ type AdminUpdateOne struct {
 	mutation *AdminMutation
 }
 
-// SetDeletedAt sets the "deleted_at" field.
-func (auo *AdminUpdateOne) SetDeletedAt(t time.Time) *AdminUpdateOne {
-	auo.mutation.SetDeletedAt(t)
+// SetDeleteTime sets the "delete_time" field.
+func (auo *AdminUpdateOne) SetDeleteTime(t time.Time) *AdminUpdateOne {
+	auo.mutation.SetDeleteTime(t)
 	return auo
 }
 
-// SetNillableDeletedAt sets the "deleted_at" field if the given value is not nil.
-func (auo *AdminUpdateOne) SetNillableDeletedAt(t *time.Time) *AdminUpdateOne {
+// SetNillableDeleteTime sets the "delete_time" field if the given value is not nil.
+func (auo *AdminUpdateOne) SetNillableDeleteTime(t *time.Time) *AdminUpdateOne {
 	if t != nil {
-		auo.SetDeletedAt(*t)
+		auo.SetDeleteTime(*t)
 	}
 	return auo
 }
 
-// ClearDeletedAt clears the value of the "deleted_at" field.
-func (auo *AdminUpdateOne) ClearDeletedAt() *AdminUpdateOne {
-	auo.mutation.ClearDeletedAt()
+// ClearDeleteTime clears the value of the "delete_time" field.
+func (auo *AdminUpdateOne) ClearDeleteTime() *AdminUpdateOne {
+	auo.mutation.ClearDeleteTime()
 	return auo
 }
 
-// SetUpdatedBy sets the "updated_by" field.
-func (auo *AdminUpdateOne) SetUpdatedBy(i int) *AdminUpdateOne {
-	auo.mutation.SetUpdatedBy(i)
+// SetUpdaterID sets the "updater_id" field.
+func (auo *AdminUpdateOne) SetUpdaterID(i int) *AdminUpdateOne {
+	auo.mutation.SetUpdaterID(i)
 	return auo
 }
 
-// SetNillableUpdatedBy sets the "updated_by" field if the given value is not nil.
-func (auo *AdminUpdateOne) SetNillableUpdatedBy(i *int) *AdminUpdateOne {
+// SetNillableUpdaterID sets the "updater_id" field if the given value is not nil.
+func (auo *AdminUpdateOne) SetNillableUpdaterID(i *int) *AdminUpdateOne {
 	if i != nil {
-		auo.SetUpdatedBy(*i)
+		auo.SetUpdaterID(*i)
 	}
 	return auo
 }
 
-// SetUpdatedAt sets the "updated_at" field.
-func (auo *AdminUpdateOne) SetUpdatedAt(t time.Time) *AdminUpdateOne {
-	auo.mutation.SetUpdatedAt(t)
+// SetUpdateTime sets the "update_time" field.
+func (auo *AdminUpdateOne) SetUpdateTime(t time.Time) *AdminUpdateOne {
+	auo.mutation.SetUpdateTime(t)
 	return auo
 }
 
@@ -2876,16 +4286,36 @@ func (auo *AdminUpdateOne) SetNillableRealName(s *string) *AdminUpdateOne {
 	return auo
 }
 
+// SetMobile sets the "mobile" field.
+func (auo *AdminUpdateOne) SetMobile(s string) *AdminUpdateOne {
+	auo.mutation.SetMobile(s)
+	return auo
+}
+
+// SetNillableMobile sets the "mobile" field if the given value is not nil.
+func (auo *AdminUpdateOne) SetNillableMobile(s *string) *AdminUpdateOne {
+	if s != nil {
+		auo.SetMobile(*s)
+	}
+	return auo
+}
+
+// ClearMobile clears the value of the "mobile" field.
+func (auo *AdminUpdateOne) ClearMobile() *AdminUpdateOne {
+	auo.mutation.ClearMobile()
+	return auo
+}
+
 // SetAvatar sets the "avatar" field.
-func (auo *AdminUpdateOne) SetAvatar(s string) *AdminUpdateOne {
-	auo.mutation.SetAvatar(s)
+func (auo *AdminUpdateOne) SetAvatar(ti types.UploadedImage) *AdminUpdateOne {
+	auo.mutation.SetAvatar(ti)
 	return auo
 }
 
 // SetNillableAvatar sets the "avatar" field if the given value is not nil.
-func (auo *AdminUpdateOne) SetNillableAvatar(s *string) *AdminUpdateOne {
-	if s != nil {
-		auo.SetAvatar(*s)
+func (auo *AdminUpdateOne) SetNillableAvatar(ti *types.UploadedImage) *AdminUpdateOne {
+	if ti != nil {
+		auo.SetAvatar(*ti)
 	}
 	return auo
 }
@@ -2896,9 +4326,24 @@ func (auo *AdminUpdateOne) ClearAvatar() *AdminUpdateOne {
 	return auo
 }
 
-// SetUpdaterID sets the "updater" edge to the Admin entity by ID.
-func (auo *AdminUpdateOne) SetUpdaterID(id int) *AdminUpdateOne {
-	auo.mutation.SetUpdaterID(id)
+// SetAdminStatus sets the "admin_status" field.
+func (auo *AdminUpdateOne) SetAdminStatus(es enums.AdminStatus) *AdminUpdateOne {
+	auo.mutation.ResetAdminStatus()
+	auo.mutation.SetAdminStatus(es)
+	return auo
+}
+
+// SetNillableAdminStatus sets the "admin_status" field if the given value is not nil.
+func (auo *AdminUpdateOne) SetNillableAdminStatus(es *enums.AdminStatus) *AdminUpdateOne {
+	if es != nil {
+		auo.SetAdminStatus(*es)
+	}
+	return auo
+}
+
+// AddAdminStatus adds es to the "admin_status" field.
+func (auo *AdminUpdateOne) AddAdminStatus(es enums.AdminStatus) *AdminUpdateOne {
+	auo.mutation.AddAdminStatus(es)
 	return auo
 }
 
@@ -2907,19 +4352,19 @@ func (auo *AdminUpdateOne) SetUpdater(a *Admin) *AdminUpdateOne {
 	return auo.SetUpdaterID(a.ID)
 }
 
-// AddAdminRoleIDs adds the "admin_roles" edge to the AdminRole entity by IDs.
-func (auo *AdminUpdateOne) AddAdminRoleIDs(ids ...int) *AdminUpdateOne {
-	auo.mutation.AddAdminRoleIDs(ids...)
+// AddPermissionIDs adds the "permissions" edge to the Permission entity by IDs.
+func (auo *AdminUpdateOne) AddPermissionIDs(ids ...int) *AdminUpdateOne {
+	auo.mutation.AddPermissionIDs(ids...)
 	return auo
 }
 
-// AddAdminRoles adds the "admin_roles" edges to the AdminRole entity.
-func (auo *AdminUpdateOne) AddAdminRoles(a ...*AdminRole) *AdminUpdateOne {
-	ids := make([]int, len(a))
-	for i := range a {
-		ids[i] = a[i].ID
+// AddPermissions adds the "permissions" edges to the Permission entity.
+func (auo *AdminUpdateOne) AddPermissions(p ...*Permission) *AdminUpdateOne {
+	ids := make([]int, len(p))
+	for i := range p {
+		ids[i] = p[i].ID
 	}
-	return auo.AddAdminRoleIDs(ids...)
+	return auo.AddPermissionIDs(ids...)
 }
 
 // AddAdminCreatorIDs adds the "admin_creator" edge to the Admin entity by IDs.
@@ -2952,34 +4397,34 @@ func (auo *AdminUpdateOne) AddAdminUpdater(a ...*Admin) *AdminUpdateOne {
 	return auo.AddAdminUpdaterIDs(ids...)
 }
 
-// AddAdminRoleCreatorIDs adds the "admin_role_creator" edge to the AdminRole entity by IDs.
-func (auo *AdminUpdateOne) AddAdminRoleCreatorIDs(ids ...int) *AdminUpdateOne {
-	auo.mutation.AddAdminRoleCreatorIDs(ids...)
+// AddPermissionCreatorIDs adds the "permission_creator" edge to the Permission entity by IDs.
+func (auo *AdminUpdateOne) AddPermissionCreatorIDs(ids ...int) *AdminUpdateOne {
+	auo.mutation.AddPermissionCreatorIDs(ids...)
 	return auo
 }
 
-// AddAdminRoleCreator adds the "admin_role_creator" edges to the AdminRole entity.
-func (auo *AdminUpdateOne) AddAdminRoleCreator(a ...*AdminRole) *AdminUpdateOne {
-	ids := make([]int, len(a))
-	for i := range a {
-		ids[i] = a[i].ID
+// AddPermissionCreator adds the "permission_creator" edges to the Permission entity.
+func (auo *AdminUpdateOne) AddPermissionCreator(p ...*Permission) *AdminUpdateOne {
+	ids := make([]int, len(p))
+	for i := range p {
+		ids[i] = p[i].ID
 	}
-	return auo.AddAdminRoleCreatorIDs(ids...)
+	return auo.AddPermissionCreatorIDs(ids...)
 }
 
-// AddAdminRoleUpdaterIDs adds the "admin_role_updater" edge to the AdminRole entity by IDs.
-func (auo *AdminUpdateOne) AddAdminRoleUpdaterIDs(ids ...int) *AdminUpdateOne {
-	auo.mutation.AddAdminRoleUpdaterIDs(ids...)
+// AddPermissionUpdaterIDs adds the "permission_updater" edge to the Permission entity by IDs.
+func (auo *AdminUpdateOne) AddPermissionUpdaterIDs(ids ...int) *AdminUpdateOne {
+	auo.mutation.AddPermissionUpdaterIDs(ids...)
 	return auo
 }
 
-// AddAdminRoleUpdater adds the "admin_role_updater" edges to the AdminRole entity.
-func (auo *AdminUpdateOne) AddAdminRoleUpdater(a ...*AdminRole) *AdminUpdateOne {
-	ids := make([]int, len(a))
-	for i := range a {
-		ids[i] = a[i].ID
+// AddPermissionUpdater adds the "permission_updater" edges to the Permission entity.
+func (auo *AdminUpdateOne) AddPermissionUpdater(p ...*Permission) *AdminUpdateOne {
+	ids := make([]int, len(p))
+	for i := range p {
+		ids[i] = p[i].ID
 	}
-	return auo.AddAdminRoleUpdaterIDs(ids...)
+	return auo.AddPermissionUpdaterIDs(ids...)
 }
 
 // AddRiskCreatorIDs adds the "risk_creator" edge to the Risk entity by IDs.
@@ -3010,6 +4455,21 @@ func (auo *AdminUpdateOne) AddRiskUpdater(r ...*Risk) *AdminUpdateOne {
 		ids[i] = r[i].ID
 	}
 	return auo.AddRiskUpdaterIDs(ids...)
+}
+
+// AddRiskMaintainerIDs adds the "risk_maintainer" edge to the Risk entity by IDs.
+func (auo *AdminUpdateOne) AddRiskMaintainerIDs(ids ...int) *AdminUpdateOne {
+	auo.mutation.AddRiskMaintainerIDs(ids...)
+	return auo
+}
+
+// AddRiskMaintainer adds the "risk_maintainer" edges to the Risk entity.
+func (auo *AdminUpdateOne) AddRiskMaintainer(r ...*Risk) *AdminUpdateOne {
+	ids := make([]int, len(r))
+	for i := range r {
+		ids[i] = r[i].ID
+	}
+	return auo.AddRiskMaintainerIDs(ids...)
 }
 
 // AddRiskLocationCreatorIDs adds the "risk_location_creator" edge to the RiskLocation entity by IDs.
@@ -3132,19 +4592,23 @@ func (auo *AdminUpdateOne) AddEmployeeUpdater(e ...*Employee) *AdminUpdateOne {
 	return auo.AddEmployeeUpdaterIDs(ids...)
 }
 
-// AddEmployeeIDs adds the "employee" edge to the Employee entity by IDs.
-func (auo *AdminUpdateOne) AddEmployeeIDs(ids ...int) *AdminUpdateOne {
-	auo.mutation.AddEmployeeIDs(ids...)
+// SetEmployeeID sets the "employee" edge to the Employee entity by ID.
+func (auo *AdminUpdateOne) SetEmployeeID(id int) *AdminUpdateOne {
+	auo.mutation.SetEmployeeID(id)
 	return auo
 }
 
-// AddEmployee adds the "employee" edges to the Employee entity.
-func (auo *AdminUpdateOne) AddEmployee(e ...*Employee) *AdminUpdateOne {
-	ids := make([]int, len(e))
-	for i := range e {
-		ids[i] = e[i].ID
+// SetNillableEmployeeID sets the "employee" edge to the Employee entity by ID if the given value is not nil.
+func (auo *AdminUpdateOne) SetNillableEmployeeID(id *int) *AdminUpdateOne {
+	if id != nil {
+		auo = auo.SetEmployeeID(*id)
 	}
-	return auo.AddEmployeeIDs(ids...)
+	return auo
+}
+
+// SetEmployee sets the "employee" edge to the Employee entity.
+func (auo *AdminUpdateOne) SetEmployee(e *Employee) *AdminUpdateOne {
+	return auo.SetEmployeeID(e.ID)
 }
 
 // AddOccupationCreatorIDs adds the "occupation_creator" edge to the Occupation entity by IDs.
@@ -3177,34 +4641,34 @@ func (auo *AdminUpdateOne) AddOccupationUpdater(o ...*Occupation) *AdminUpdateOn
 	return auo.AddOccupationUpdaterIDs(ids...)
 }
 
-// AddIpcEventCreatorIDs adds the "ipc_event_creator" edge to the IPCEvent entity by IDs.
-func (auo *AdminUpdateOne) AddIpcEventCreatorIDs(ids ...int) *AdminUpdateOne {
-	auo.mutation.AddIpcEventCreatorIDs(ids...)
+// AddEventCreatorIDs adds the "event_creator" edge to the Event entity by IDs.
+func (auo *AdminUpdateOne) AddEventCreatorIDs(ids ...int) *AdminUpdateOne {
+	auo.mutation.AddEventCreatorIDs(ids...)
 	return auo
 }
 
-// AddIpcEventCreator adds the "ipc_event_creator" edges to the IPCEvent entity.
-func (auo *AdminUpdateOne) AddIpcEventCreator(i ...*IPCEvent) *AdminUpdateOne {
-	ids := make([]int, len(i))
-	for j := range i {
-		ids[j] = i[j].ID
+// AddEventCreator adds the "event_creator" edges to the Event entity.
+func (auo *AdminUpdateOne) AddEventCreator(e ...*Event) *AdminUpdateOne {
+	ids := make([]int, len(e))
+	for i := range e {
+		ids[i] = e[i].ID
 	}
-	return auo.AddIpcEventCreatorIDs(ids...)
+	return auo.AddEventCreatorIDs(ids...)
 }
 
-// AddIpcEventUpdaterIDs adds the "ipc_event_updater" edge to the IPCEvent entity by IDs.
-func (auo *AdminUpdateOne) AddIpcEventUpdaterIDs(ids ...int) *AdminUpdateOne {
-	auo.mutation.AddIpcEventUpdaterIDs(ids...)
+// AddEventUpdaterIDs adds the "event_updater" edge to the Event entity by IDs.
+func (auo *AdminUpdateOne) AddEventUpdaterIDs(ids ...int) *AdminUpdateOne {
+	auo.mutation.AddEventUpdaterIDs(ids...)
 	return auo
 }
 
-// AddIpcEventUpdater adds the "ipc_event_updater" edges to the IPCEvent entity.
-func (auo *AdminUpdateOne) AddIpcEventUpdater(i ...*IPCEvent) *AdminUpdateOne {
-	ids := make([]int, len(i))
-	for j := range i {
-		ids[j] = i[j].ID
+// AddEventUpdater adds the "event_updater" edges to the Event entity.
+func (auo *AdminUpdateOne) AddEventUpdater(e ...*Event) *AdminUpdateOne {
+	ids := make([]int, len(e))
+	for i := range e {
+		ids[i] = e[i].ID
 	}
-	return auo.AddIpcEventUpdaterIDs(ids...)
+	return auo.AddEventUpdaterIDs(ids...)
 }
 
 // AddVideoCreatorIDs adds the "video_creator" edge to the Video entity by IDs.
@@ -3357,6 +4821,246 @@ func (auo *AdminUpdateOne) AddEventLevelUpdater(e ...*EventLevel) *AdminUpdateOn
 	return auo.AddEventLevelUpdaterIDs(ids...)
 }
 
+// AddFixingCreatorIDs adds the "fixing_creator" edge to the Fixing entity by IDs.
+func (auo *AdminUpdateOne) AddFixingCreatorIDs(ids ...int) *AdminUpdateOne {
+	auo.mutation.AddFixingCreatorIDs(ids...)
+	return auo
+}
+
+// AddFixingCreator adds the "fixing_creator" edges to the Fixing entity.
+func (auo *AdminUpdateOne) AddFixingCreator(f ...*Fixing) *AdminUpdateOne {
+	ids := make([]int, len(f))
+	for i := range f {
+		ids[i] = f[i].ID
+	}
+	return auo.AddFixingCreatorIDs(ids...)
+}
+
+// AddFixingUpdaterIDs adds the "fixing_updater" edge to the Fixing entity by IDs.
+func (auo *AdminUpdateOne) AddFixingUpdaterIDs(ids ...int) *AdminUpdateOne {
+	auo.mutation.AddFixingUpdaterIDs(ids...)
+	return auo
+}
+
+// AddFixingUpdater adds the "fixing_updater" edges to the Fixing entity.
+func (auo *AdminUpdateOne) AddFixingUpdater(f ...*Fixing) *AdminUpdateOne {
+	ids := make([]int, len(f))
+	for i := range f {
+		ids[i] = f[i].ID
+	}
+	return auo.AddFixingUpdaterIDs(ids...)
+}
+
+// AddFixerIDs adds the "fixer" edge to the Fixing entity by IDs.
+func (auo *AdminUpdateOne) AddFixerIDs(ids ...int) *AdminUpdateOne {
+	auo.mutation.AddFixerIDs(ids...)
+	return auo
+}
+
+// AddFixer adds the "fixer" edges to the Fixing entity.
+func (auo *AdminUpdateOne) AddFixer(f ...*Fixing) *AdminUpdateOne {
+	ids := make([]int, len(f))
+	for i := range f {
+		ids[i] = f[i].ID
+	}
+	return auo.AddFixerIDs(ids...)
+}
+
+// AddEventLogCreatorIDs adds the "event_log_creator" edge to the EventLog entity by IDs.
+func (auo *AdminUpdateOne) AddEventLogCreatorIDs(ids ...int) *AdminUpdateOne {
+	auo.mutation.AddEventLogCreatorIDs(ids...)
+	return auo
+}
+
+// AddEventLogCreator adds the "event_log_creator" edges to the EventLog entity.
+func (auo *AdminUpdateOne) AddEventLogCreator(e ...*EventLog) *AdminUpdateOne {
+	ids := make([]int, len(e))
+	for i := range e {
+		ids[i] = e[i].ID
+	}
+	return auo.AddEventLogCreatorIDs(ids...)
+}
+
+// AddEventLogUpdaterIDs adds the "event_log_updater" edge to the EventLog entity by IDs.
+func (auo *AdminUpdateOne) AddEventLogUpdaterIDs(ids ...int) *AdminUpdateOne {
+	auo.mutation.AddEventLogUpdaterIDs(ids...)
+	return auo
+}
+
+// AddEventLogUpdater adds the "event_log_updater" edges to the EventLog entity.
+func (auo *AdminUpdateOne) AddEventLogUpdater(e ...*EventLog) *AdminUpdateOne {
+	ids := make([]int, len(e))
+	for i := range e {
+		ids[i] = e[i].ID
+	}
+	return auo.AddEventLogUpdaterIDs(ids...)
+}
+
+// AddEventLogActorIDs adds the "event_log_actor" edge to the EventLog entity by IDs.
+func (auo *AdminUpdateOne) AddEventLogActorIDs(ids ...int) *AdminUpdateOne {
+	auo.mutation.AddEventLogActorIDs(ids...)
+	return auo
+}
+
+// AddEventLogActor adds the "event_log_actor" edges to the EventLog entity.
+func (auo *AdminUpdateOne) AddEventLogActor(e ...*EventLog) *AdminUpdateOne {
+	ids := make([]int, len(e))
+	for i := range e {
+		ids[i] = e[i].ID
+	}
+	return auo.AddEventLogActorIDs(ids...)
+}
+
+// AddEventLogActor2IDs adds the "event_log_actor2" edge to the EventLog entity by IDs.
+func (auo *AdminUpdateOne) AddEventLogActor2IDs(ids ...int) *AdminUpdateOne {
+	auo.mutation.AddEventLogActor2IDs(ids...)
+	return auo
+}
+
+// AddEventLogActor2 adds the "event_log_actor2" edges to the EventLog entity.
+func (auo *AdminUpdateOne) AddEventLogActor2(e ...*EventLog) *AdminUpdateOne {
+	ids := make([]int, len(e))
+	for i := range e {
+		ids[i] = e[i].ID
+	}
+	return auo.AddEventLogActor2IDs(ids...)
+}
+
+// AddSweepCreatorIDs adds the "sweep_creator" edge to the Sweep entity by IDs.
+func (auo *AdminUpdateOne) AddSweepCreatorIDs(ids ...int) *AdminUpdateOne {
+	auo.mutation.AddSweepCreatorIDs(ids...)
+	return auo
+}
+
+// AddSweepCreator adds the "sweep_creator" edges to the Sweep entity.
+func (auo *AdminUpdateOne) AddSweepCreator(s ...*Sweep) *AdminUpdateOne {
+	ids := make([]int, len(s))
+	for i := range s {
+		ids[i] = s[i].ID
+	}
+	return auo.AddSweepCreatorIDs(ids...)
+}
+
+// AddSweepUpdaterIDs adds the "sweep_updater" edge to the Sweep entity by IDs.
+func (auo *AdminUpdateOne) AddSweepUpdaterIDs(ids ...int) *AdminUpdateOne {
+	auo.mutation.AddSweepUpdaterIDs(ids...)
+	return auo
+}
+
+// AddSweepUpdater adds the "sweep_updater" edges to the Sweep entity.
+func (auo *AdminUpdateOne) AddSweepUpdater(s ...*Sweep) *AdminUpdateOne {
+	ids := make([]int, len(s))
+	for i := range s {
+		ids[i] = s[i].ID
+	}
+	return auo.AddSweepUpdaterIDs(ids...)
+}
+
+// AddSweepScheduleCreatorIDs adds the "sweep_schedule_creator" edge to the SweepSchedule entity by IDs.
+func (auo *AdminUpdateOne) AddSweepScheduleCreatorIDs(ids ...int) *AdminUpdateOne {
+	auo.mutation.AddSweepScheduleCreatorIDs(ids...)
+	return auo
+}
+
+// AddSweepScheduleCreator adds the "sweep_schedule_creator" edges to the SweepSchedule entity.
+func (auo *AdminUpdateOne) AddSweepScheduleCreator(s ...*SweepSchedule) *AdminUpdateOne {
+	ids := make([]int, len(s))
+	for i := range s {
+		ids[i] = s[i].ID
+	}
+	return auo.AddSweepScheduleCreatorIDs(ids...)
+}
+
+// AddSweepScheduleUpdaterIDs adds the "sweep_schedule_updater" edge to the SweepSchedule entity by IDs.
+func (auo *AdminUpdateOne) AddSweepScheduleUpdaterIDs(ids ...int) *AdminUpdateOne {
+	auo.mutation.AddSweepScheduleUpdaterIDs(ids...)
+	return auo
+}
+
+// AddSweepScheduleUpdater adds the "sweep_schedule_updater" edges to the SweepSchedule entity.
+func (auo *AdminUpdateOne) AddSweepScheduleUpdater(s ...*SweepSchedule) *AdminUpdateOne {
+	ids := make([]int, len(s))
+	for i := range s {
+		ids[i] = s[i].ID
+	}
+	return auo.AddSweepScheduleUpdaterIDs(ids...)
+}
+
+// AddSweepScheduleIDs adds the "sweep_schedule" edge to the SweepSchedule entity by IDs.
+func (auo *AdminUpdateOne) AddSweepScheduleIDs(ids ...int) *AdminUpdateOne {
+	auo.mutation.AddSweepScheduleIDs(ids...)
+	return auo
+}
+
+// AddSweepSchedule adds the "sweep_schedule" edges to the SweepSchedule entity.
+func (auo *AdminUpdateOne) AddSweepSchedule(s ...*SweepSchedule) *AdminUpdateOne {
+	ids := make([]int, len(s))
+	for i := range s {
+		ids[i] = s[i].ID
+	}
+	return auo.AddSweepScheduleIDs(ids...)
+}
+
+// AddSweepResultCreatorIDs adds the "sweep_result_creator" edge to the SweepResult entity by IDs.
+func (auo *AdminUpdateOne) AddSweepResultCreatorIDs(ids ...int) *AdminUpdateOne {
+	auo.mutation.AddSweepResultCreatorIDs(ids...)
+	return auo
+}
+
+// AddSweepResultCreator adds the "sweep_result_creator" edges to the SweepResult entity.
+func (auo *AdminUpdateOne) AddSweepResultCreator(s ...*SweepResult) *AdminUpdateOne {
+	ids := make([]int, len(s))
+	for i := range s {
+		ids[i] = s[i].ID
+	}
+	return auo.AddSweepResultCreatorIDs(ids...)
+}
+
+// AddSweepResultUpdaterIDs adds the "sweep_result_updater" edge to the SweepResult entity by IDs.
+func (auo *AdminUpdateOne) AddSweepResultUpdaterIDs(ids ...int) *AdminUpdateOne {
+	auo.mutation.AddSweepResultUpdaterIDs(ids...)
+	return auo
+}
+
+// AddSweepResultUpdater adds the "sweep_result_updater" edges to the SweepResult entity.
+func (auo *AdminUpdateOne) AddSweepResultUpdater(s ...*SweepResult) *AdminUpdateOne {
+	ids := make([]int, len(s))
+	for i := range s {
+		ids[i] = s[i].ID
+	}
+	return auo.AddSweepResultUpdaterIDs(ids...)
+}
+
+// AddSweepResultDetailsCreatorIDs adds the "sweep_result_details_creator" edge to the SweepResultDetails entity by IDs.
+func (auo *AdminUpdateOne) AddSweepResultDetailsCreatorIDs(ids ...int) *AdminUpdateOne {
+	auo.mutation.AddSweepResultDetailsCreatorIDs(ids...)
+	return auo
+}
+
+// AddSweepResultDetailsCreator adds the "sweep_result_details_creator" edges to the SweepResultDetails entity.
+func (auo *AdminUpdateOne) AddSweepResultDetailsCreator(s ...*SweepResultDetails) *AdminUpdateOne {
+	ids := make([]int, len(s))
+	for i := range s {
+		ids[i] = s[i].ID
+	}
+	return auo.AddSweepResultDetailsCreatorIDs(ids...)
+}
+
+// AddSweepResultDetailsUpdaterIDs adds the "sweep_result_details_updater" edge to the SweepResultDetails entity by IDs.
+func (auo *AdminUpdateOne) AddSweepResultDetailsUpdaterIDs(ids ...int) *AdminUpdateOne {
+	auo.mutation.AddSweepResultDetailsUpdaterIDs(ids...)
+	return auo
+}
+
+// AddSweepResultDetailsUpdater adds the "sweep_result_details_updater" edges to the SweepResultDetails entity.
+func (auo *AdminUpdateOne) AddSweepResultDetailsUpdater(s ...*SweepResultDetails) *AdminUpdateOne {
+	ids := make([]int, len(s))
+	for i := range s {
+		ids[i] = s[i].ID
+	}
+	return auo.AddSweepResultDetailsUpdaterIDs(ids...)
+}
+
 // Mutation returns the AdminMutation object of the builder.
 func (auo *AdminUpdateOne) Mutation() *AdminMutation {
 	return auo.mutation
@@ -3368,25 +5072,25 @@ func (auo *AdminUpdateOne) ClearUpdater() *AdminUpdateOne {
 	return auo
 }
 
-// ClearAdminRoles clears all "admin_roles" edges to the AdminRole entity.
-func (auo *AdminUpdateOne) ClearAdminRoles() *AdminUpdateOne {
-	auo.mutation.ClearAdminRoles()
+// ClearPermissions clears all "permissions" edges to the Permission entity.
+func (auo *AdminUpdateOne) ClearPermissions() *AdminUpdateOne {
+	auo.mutation.ClearPermissions()
 	return auo
 }
 
-// RemoveAdminRoleIDs removes the "admin_roles" edge to AdminRole entities by IDs.
-func (auo *AdminUpdateOne) RemoveAdminRoleIDs(ids ...int) *AdminUpdateOne {
-	auo.mutation.RemoveAdminRoleIDs(ids...)
+// RemovePermissionIDs removes the "permissions" edge to Permission entities by IDs.
+func (auo *AdminUpdateOne) RemovePermissionIDs(ids ...int) *AdminUpdateOne {
+	auo.mutation.RemovePermissionIDs(ids...)
 	return auo
 }
 
-// RemoveAdminRoles removes "admin_roles" edges to AdminRole entities.
-func (auo *AdminUpdateOne) RemoveAdminRoles(a ...*AdminRole) *AdminUpdateOne {
-	ids := make([]int, len(a))
-	for i := range a {
-		ids[i] = a[i].ID
+// RemovePermissions removes "permissions" edges to Permission entities.
+func (auo *AdminUpdateOne) RemovePermissions(p ...*Permission) *AdminUpdateOne {
+	ids := make([]int, len(p))
+	for i := range p {
+		ids[i] = p[i].ID
 	}
-	return auo.RemoveAdminRoleIDs(ids...)
+	return auo.RemovePermissionIDs(ids...)
 }
 
 // ClearAdminCreator clears all "admin_creator" edges to the Admin entity.
@@ -3431,46 +5135,46 @@ func (auo *AdminUpdateOne) RemoveAdminUpdater(a ...*Admin) *AdminUpdateOne {
 	return auo.RemoveAdminUpdaterIDs(ids...)
 }
 
-// ClearAdminRoleCreator clears all "admin_role_creator" edges to the AdminRole entity.
-func (auo *AdminUpdateOne) ClearAdminRoleCreator() *AdminUpdateOne {
-	auo.mutation.ClearAdminRoleCreator()
+// ClearPermissionCreator clears all "permission_creator" edges to the Permission entity.
+func (auo *AdminUpdateOne) ClearPermissionCreator() *AdminUpdateOne {
+	auo.mutation.ClearPermissionCreator()
 	return auo
 }
 
-// RemoveAdminRoleCreatorIDs removes the "admin_role_creator" edge to AdminRole entities by IDs.
-func (auo *AdminUpdateOne) RemoveAdminRoleCreatorIDs(ids ...int) *AdminUpdateOne {
-	auo.mutation.RemoveAdminRoleCreatorIDs(ids...)
+// RemovePermissionCreatorIDs removes the "permission_creator" edge to Permission entities by IDs.
+func (auo *AdminUpdateOne) RemovePermissionCreatorIDs(ids ...int) *AdminUpdateOne {
+	auo.mutation.RemovePermissionCreatorIDs(ids...)
 	return auo
 }
 
-// RemoveAdminRoleCreator removes "admin_role_creator" edges to AdminRole entities.
-func (auo *AdminUpdateOne) RemoveAdminRoleCreator(a ...*AdminRole) *AdminUpdateOne {
-	ids := make([]int, len(a))
-	for i := range a {
-		ids[i] = a[i].ID
+// RemovePermissionCreator removes "permission_creator" edges to Permission entities.
+func (auo *AdminUpdateOne) RemovePermissionCreator(p ...*Permission) *AdminUpdateOne {
+	ids := make([]int, len(p))
+	for i := range p {
+		ids[i] = p[i].ID
 	}
-	return auo.RemoveAdminRoleCreatorIDs(ids...)
+	return auo.RemovePermissionCreatorIDs(ids...)
 }
 
-// ClearAdminRoleUpdater clears all "admin_role_updater" edges to the AdminRole entity.
-func (auo *AdminUpdateOne) ClearAdminRoleUpdater() *AdminUpdateOne {
-	auo.mutation.ClearAdminRoleUpdater()
+// ClearPermissionUpdater clears all "permission_updater" edges to the Permission entity.
+func (auo *AdminUpdateOne) ClearPermissionUpdater() *AdminUpdateOne {
+	auo.mutation.ClearPermissionUpdater()
 	return auo
 }
 
-// RemoveAdminRoleUpdaterIDs removes the "admin_role_updater" edge to AdminRole entities by IDs.
-func (auo *AdminUpdateOne) RemoveAdminRoleUpdaterIDs(ids ...int) *AdminUpdateOne {
-	auo.mutation.RemoveAdminRoleUpdaterIDs(ids...)
+// RemovePermissionUpdaterIDs removes the "permission_updater" edge to Permission entities by IDs.
+func (auo *AdminUpdateOne) RemovePermissionUpdaterIDs(ids ...int) *AdminUpdateOne {
+	auo.mutation.RemovePermissionUpdaterIDs(ids...)
 	return auo
 }
 
-// RemoveAdminRoleUpdater removes "admin_role_updater" edges to AdminRole entities.
-func (auo *AdminUpdateOne) RemoveAdminRoleUpdater(a ...*AdminRole) *AdminUpdateOne {
-	ids := make([]int, len(a))
-	for i := range a {
-		ids[i] = a[i].ID
+// RemovePermissionUpdater removes "permission_updater" edges to Permission entities.
+func (auo *AdminUpdateOne) RemovePermissionUpdater(p ...*Permission) *AdminUpdateOne {
+	ids := make([]int, len(p))
+	for i := range p {
+		ids[i] = p[i].ID
 	}
-	return auo.RemoveAdminRoleUpdaterIDs(ids...)
+	return auo.RemovePermissionUpdaterIDs(ids...)
 }
 
 // ClearRiskCreator clears all "risk_creator" edges to the Risk entity.
@@ -3513,6 +5217,27 @@ func (auo *AdminUpdateOne) RemoveRiskUpdater(r ...*Risk) *AdminUpdateOne {
 		ids[i] = r[i].ID
 	}
 	return auo.RemoveRiskUpdaterIDs(ids...)
+}
+
+// ClearRiskMaintainer clears all "risk_maintainer" edges to the Risk entity.
+func (auo *AdminUpdateOne) ClearRiskMaintainer() *AdminUpdateOne {
+	auo.mutation.ClearRiskMaintainer()
+	return auo
+}
+
+// RemoveRiskMaintainerIDs removes the "risk_maintainer" edge to Risk entities by IDs.
+func (auo *AdminUpdateOne) RemoveRiskMaintainerIDs(ids ...int) *AdminUpdateOne {
+	auo.mutation.RemoveRiskMaintainerIDs(ids...)
+	return auo
+}
+
+// RemoveRiskMaintainer removes "risk_maintainer" edges to Risk entities.
+func (auo *AdminUpdateOne) RemoveRiskMaintainer(r ...*Risk) *AdminUpdateOne {
+	ids := make([]int, len(r))
+	for i := range r {
+		ids[i] = r[i].ID
+	}
+	return auo.RemoveRiskMaintainerIDs(ids...)
 }
 
 // ClearRiskLocationCreator clears all "risk_location_creator" edges to the RiskLocation entity.
@@ -3683,25 +5408,10 @@ func (auo *AdminUpdateOne) RemoveEmployeeUpdater(e ...*Employee) *AdminUpdateOne
 	return auo.RemoveEmployeeUpdaterIDs(ids...)
 }
 
-// ClearEmployee clears all "employee" edges to the Employee entity.
+// ClearEmployee clears the "employee" edge to the Employee entity.
 func (auo *AdminUpdateOne) ClearEmployee() *AdminUpdateOne {
 	auo.mutation.ClearEmployee()
 	return auo
-}
-
-// RemoveEmployeeIDs removes the "employee" edge to Employee entities by IDs.
-func (auo *AdminUpdateOne) RemoveEmployeeIDs(ids ...int) *AdminUpdateOne {
-	auo.mutation.RemoveEmployeeIDs(ids...)
-	return auo
-}
-
-// RemoveEmployee removes "employee" edges to Employee entities.
-func (auo *AdminUpdateOne) RemoveEmployee(e ...*Employee) *AdminUpdateOne {
-	ids := make([]int, len(e))
-	for i := range e {
-		ids[i] = e[i].ID
-	}
-	return auo.RemoveEmployeeIDs(ids...)
 }
 
 // ClearOccupationCreator clears all "occupation_creator" edges to the Occupation entity.
@@ -3746,46 +5456,46 @@ func (auo *AdminUpdateOne) RemoveOccupationUpdater(o ...*Occupation) *AdminUpdat
 	return auo.RemoveOccupationUpdaterIDs(ids...)
 }
 
-// ClearIpcEventCreator clears all "ipc_event_creator" edges to the IPCEvent entity.
-func (auo *AdminUpdateOne) ClearIpcEventCreator() *AdminUpdateOne {
-	auo.mutation.ClearIpcEventCreator()
+// ClearEventCreator clears all "event_creator" edges to the Event entity.
+func (auo *AdminUpdateOne) ClearEventCreator() *AdminUpdateOne {
+	auo.mutation.ClearEventCreator()
 	return auo
 }
 
-// RemoveIpcEventCreatorIDs removes the "ipc_event_creator" edge to IPCEvent entities by IDs.
-func (auo *AdminUpdateOne) RemoveIpcEventCreatorIDs(ids ...int) *AdminUpdateOne {
-	auo.mutation.RemoveIpcEventCreatorIDs(ids...)
+// RemoveEventCreatorIDs removes the "event_creator" edge to Event entities by IDs.
+func (auo *AdminUpdateOne) RemoveEventCreatorIDs(ids ...int) *AdminUpdateOne {
+	auo.mutation.RemoveEventCreatorIDs(ids...)
 	return auo
 }
 
-// RemoveIpcEventCreator removes "ipc_event_creator" edges to IPCEvent entities.
-func (auo *AdminUpdateOne) RemoveIpcEventCreator(i ...*IPCEvent) *AdminUpdateOne {
-	ids := make([]int, len(i))
-	for j := range i {
-		ids[j] = i[j].ID
+// RemoveEventCreator removes "event_creator" edges to Event entities.
+func (auo *AdminUpdateOne) RemoveEventCreator(e ...*Event) *AdminUpdateOne {
+	ids := make([]int, len(e))
+	for i := range e {
+		ids[i] = e[i].ID
 	}
-	return auo.RemoveIpcEventCreatorIDs(ids...)
+	return auo.RemoveEventCreatorIDs(ids...)
 }
 
-// ClearIpcEventUpdater clears all "ipc_event_updater" edges to the IPCEvent entity.
-func (auo *AdminUpdateOne) ClearIpcEventUpdater() *AdminUpdateOne {
-	auo.mutation.ClearIpcEventUpdater()
+// ClearEventUpdater clears all "event_updater" edges to the Event entity.
+func (auo *AdminUpdateOne) ClearEventUpdater() *AdminUpdateOne {
+	auo.mutation.ClearEventUpdater()
 	return auo
 }
 
-// RemoveIpcEventUpdaterIDs removes the "ipc_event_updater" edge to IPCEvent entities by IDs.
-func (auo *AdminUpdateOne) RemoveIpcEventUpdaterIDs(ids ...int) *AdminUpdateOne {
-	auo.mutation.RemoveIpcEventUpdaterIDs(ids...)
+// RemoveEventUpdaterIDs removes the "event_updater" edge to Event entities by IDs.
+func (auo *AdminUpdateOne) RemoveEventUpdaterIDs(ids ...int) *AdminUpdateOne {
+	auo.mutation.RemoveEventUpdaterIDs(ids...)
 	return auo
 }
 
-// RemoveIpcEventUpdater removes "ipc_event_updater" edges to IPCEvent entities.
-func (auo *AdminUpdateOne) RemoveIpcEventUpdater(i ...*IPCEvent) *AdminUpdateOne {
-	ids := make([]int, len(i))
-	for j := range i {
-		ids[j] = i[j].ID
+// RemoveEventUpdater removes "event_updater" edges to Event entities.
+func (auo *AdminUpdateOne) RemoveEventUpdater(e ...*Event) *AdminUpdateOne {
+	ids := make([]int, len(e))
+	for i := range e {
+		ids[i] = e[i].ID
 	}
-	return auo.RemoveIpcEventUpdaterIDs(ids...)
+	return auo.RemoveEventUpdaterIDs(ids...)
 }
 
 // ClearVideoCreator clears all "video_creator" edges to the Video entity.
@@ -3998,6 +5708,342 @@ func (auo *AdminUpdateOne) RemoveEventLevelUpdater(e ...*EventLevel) *AdminUpdat
 	return auo.RemoveEventLevelUpdaterIDs(ids...)
 }
 
+// ClearFixingCreator clears all "fixing_creator" edges to the Fixing entity.
+func (auo *AdminUpdateOne) ClearFixingCreator() *AdminUpdateOne {
+	auo.mutation.ClearFixingCreator()
+	return auo
+}
+
+// RemoveFixingCreatorIDs removes the "fixing_creator" edge to Fixing entities by IDs.
+func (auo *AdminUpdateOne) RemoveFixingCreatorIDs(ids ...int) *AdminUpdateOne {
+	auo.mutation.RemoveFixingCreatorIDs(ids...)
+	return auo
+}
+
+// RemoveFixingCreator removes "fixing_creator" edges to Fixing entities.
+func (auo *AdminUpdateOne) RemoveFixingCreator(f ...*Fixing) *AdminUpdateOne {
+	ids := make([]int, len(f))
+	for i := range f {
+		ids[i] = f[i].ID
+	}
+	return auo.RemoveFixingCreatorIDs(ids...)
+}
+
+// ClearFixingUpdater clears all "fixing_updater" edges to the Fixing entity.
+func (auo *AdminUpdateOne) ClearFixingUpdater() *AdminUpdateOne {
+	auo.mutation.ClearFixingUpdater()
+	return auo
+}
+
+// RemoveFixingUpdaterIDs removes the "fixing_updater" edge to Fixing entities by IDs.
+func (auo *AdminUpdateOne) RemoveFixingUpdaterIDs(ids ...int) *AdminUpdateOne {
+	auo.mutation.RemoveFixingUpdaterIDs(ids...)
+	return auo
+}
+
+// RemoveFixingUpdater removes "fixing_updater" edges to Fixing entities.
+func (auo *AdminUpdateOne) RemoveFixingUpdater(f ...*Fixing) *AdminUpdateOne {
+	ids := make([]int, len(f))
+	for i := range f {
+		ids[i] = f[i].ID
+	}
+	return auo.RemoveFixingUpdaterIDs(ids...)
+}
+
+// ClearFixer clears all "fixer" edges to the Fixing entity.
+func (auo *AdminUpdateOne) ClearFixer() *AdminUpdateOne {
+	auo.mutation.ClearFixer()
+	return auo
+}
+
+// RemoveFixerIDs removes the "fixer" edge to Fixing entities by IDs.
+func (auo *AdminUpdateOne) RemoveFixerIDs(ids ...int) *AdminUpdateOne {
+	auo.mutation.RemoveFixerIDs(ids...)
+	return auo
+}
+
+// RemoveFixer removes "fixer" edges to Fixing entities.
+func (auo *AdminUpdateOne) RemoveFixer(f ...*Fixing) *AdminUpdateOne {
+	ids := make([]int, len(f))
+	for i := range f {
+		ids[i] = f[i].ID
+	}
+	return auo.RemoveFixerIDs(ids...)
+}
+
+// ClearEventLogCreator clears all "event_log_creator" edges to the EventLog entity.
+func (auo *AdminUpdateOne) ClearEventLogCreator() *AdminUpdateOne {
+	auo.mutation.ClearEventLogCreator()
+	return auo
+}
+
+// RemoveEventLogCreatorIDs removes the "event_log_creator" edge to EventLog entities by IDs.
+func (auo *AdminUpdateOne) RemoveEventLogCreatorIDs(ids ...int) *AdminUpdateOne {
+	auo.mutation.RemoveEventLogCreatorIDs(ids...)
+	return auo
+}
+
+// RemoveEventLogCreator removes "event_log_creator" edges to EventLog entities.
+func (auo *AdminUpdateOne) RemoveEventLogCreator(e ...*EventLog) *AdminUpdateOne {
+	ids := make([]int, len(e))
+	for i := range e {
+		ids[i] = e[i].ID
+	}
+	return auo.RemoveEventLogCreatorIDs(ids...)
+}
+
+// ClearEventLogUpdater clears all "event_log_updater" edges to the EventLog entity.
+func (auo *AdminUpdateOne) ClearEventLogUpdater() *AdminUpdateOne {
+	auo.mutation.ClearEventLogUpdater()
+	return auo
+}
+
+// RemoveEventLogUpdaterIDs removes the "event_log_updater" edge to EventLog entities by IDs.
+func (auo *AdminUpdateOne) RemoveEventLogUpdaterIDs(ids ...int) *AdminUpdateOne {
+	auo.mutation.RemoveEventLogUpdaterIDs(ids...)
+	return auo
+}
+
+// RemoveEventLogUpdater removes "event_log_updater" edges to EventLog entities.
+func (auo *AdminUpdateOne) RemoveEventLogUpdater(e ...*EventLog) *AdminUpdateOne {
+	ids := make([]int, len(e))
+	for i := range e {
+		ids[i] = e[i].ID
+	}
+	return auo.RemoveEventLogUpdaterIDs(ids...)
+}
+
+// ClearEventLogActor clears all "event_log_actor" edges to the EventLog entity.
+func (auo *AdminUpdateOne) ClearEventLogActor() *AdminUpdateOne {
+	auo.mutation.ClearEventLogActor()
+	return auo
+}
+
+// RemoveEventLogActorIDs removes the "event_log_actor" edge to EventLog entities by IDs.
+func (auo *AdminUpdateOne) RemoveEventLogActorIDs(ids ...int) *AdminUpdateOne {
+	auo.mutation.RemoveEventLogActorIDs(ids...)
+	return auo
+}
+
+// RemoveEventLogActor removes "event_log_actor" edges to EventLog entities.
+func (auo *AdminUpdateOne) RemoveEventLogActor(e ...*EventLog) *AdminUpdateOne {
+	ids := make([]int, len(e))
+	for i := range e {
+		ids[i] = e[i].ID
+	}
+	return auo.RemoveEventLogActorIDs(ids...)
+}
+
+// ClearEventLogActor2 clears all "event_log_actor2" edges to the EventLog entity.
+func (auo *AdminUpdateOne) ClearEventLogActor2() *AdminUpdateOne {
+	auo.mutation.ClearEventLogActor2()
+	return auo
+}
+
+// RemoveEventLogActor2IDs removes the "event_log_actor2" edge to EventLog entities by IDs.
+func (auo *AdminUpdateOne) RemoveEventLogActor2IDs(ids ...int) *AdminUpdateOne {
+	auo.mutation.RemoveEventLogActor2IDs(ids...)
+	return auo
+}
+
+// RemoveEventLogActor2 removes "event_log_actor2" edges to EventLog entities.
+func (auo *AdminUpdateOne) RemoveEventLogActor2(e ...*EventLog) *AdminUpdateOne {
+	ids := make([]int, len(e))
+	for i := range e {
+		ids[i] = e[i].ID
+	}
+	return auo.RemoveEventLogActor2IDs(ids...)
+}
+
+// ClearSweepCreator clears all "sweep_creator" edges to the Sweep entity.
+func (auo *AdminUpdateOne) ClearSweepCreator() *AdminUpdateOne {
+	auo.mutation.ClearSweepCreator()
+	return auo
+}
+
+// RemoveSweepCreatorIDs removes the "sweep_creator" edge to Sweep entities by IDs.
+func (auo *AdminUpdateOne) RemoveSweepCreatorIDs(ids ...int) *AdminUpdateOne {
+	auo.mutation.RemoveSweepCreatorIDs(ids...)
+	return auo
+}
+
+// RemoveSweepCreator removes "sweep_creator" edges to Sweep entities.
+func (auo *AdminUpdateOne) RemoveSweepCreator(s ...*Sweep) *AdminUpdateOne {
+	ids := make([]int, len(s))
+	for i := range s {
+		ids[i] = s[i].ID
+	}
+	return auo.RemoveSweepCreatorIDs(ids...)
+}
+
+// ClearSweepUpdater clears all "sweep_updater" edges to the Sweep entity.
+func (auo *AdminUpdateOne) ClearSweepUpdater() *AdminUpdateOne {
+	auo.mutation.ClearSweepUpdater()
+	return auo
+}
+
+// RemoveSweepUpdaterIDs removes the "sweep_updater" edge to Sweep entities by IDs.
+func (auo *AdminUpdateOne) RemoveSweepUpdaterIDs(ids ...int) *AdminUpdateOne {
+	auo.mutation.RemoveSweepUpdaterIDs(ids...)
+	return auo
+}
+
+// RemoveSweepUpdater removes "sweep_updater" edges to Sweep entities.
+func (auo *AdminUpdateOne) RemoveSweepUpdater(s ...*Sweep) *AdminUpdateOne {
+	ids := make([]int, len(s))
+	for i := range s {
+		ids[i] = s[i].ID
+	}
+	return auo.RemoveSweepUpdaterIDs(ids...)
+}
+
+// ClearSweepScheduleCreator clears all "sweep_schedule_creator" edges to the SweepSchedule entity.
+func (auo *AdminUpdateOne) ClearSweepScheduleCreator() *AdminUpdateOne {
+	auo.mutation.ClearSweepScheduleCreator()
+	return auo
+}
+
+// RemoveSweepScheduleCreatorIDs removes the "sweep_schedule_creator" edge to SweepSchedule entities by IDs.
+func (auo *AdminUpdateOne) RemoveSweepScheduleCreatorIDs(ids ...int) *AdminUpdateOne {
+	auo.mutation.RemoveSweepScheduleCreatorIDs(ids...)
+	return auo
+}
+
+// RemoveSweepScheduleCreator removes "sweep_schedule_creator" edges to SweepSchedule entities.
+func (auo *AdminUpdateOne) RemoveSweepScheduleCreator(s ...*SweepSchedule) *AdminUpdateOne {
+	ids := make([]int, len(s))
+	for i := range s {
+		ids[i] = s[i].ID
+	}
+	return auo.RemoveSweepScheduleCreatorIDs(ids...)
+}
+
+// ClearSweepScheduleUpdater clears all "sweep_schedule_updater" edges to the SweepSchedule entity.
+func (auo *AdminUpdateOne) ClearSweepScheduleUpdater() *AdminUpdateOne {
+	auo.mutation.ClearSweepScheduleUpdater()
+	return auo
+}
+
+// RemoveSweepScheduleUpdaterIDs removes the "sweep_schedule_updater" edge to SweepSchedule entities by IDs.
+func (auo *AdminUpdateOne) RemoveSweepScheduleUpdaterIDs(ids ...int) *AdminUpdateOne {
+	auo.mutation.RemoveSweepScheduleUpdaterIDs(ids...)
+	return auo
+}
+
+// RemoveSweepScheduleUpdater removes "sweep_schedule_updater" edges to SweepSchedule entities.
+func (auo *AdminUpdateOne) RemoveSweepScheduleUpdater(s ...*SweepSchedule) *AdminUpdateOne {
+	ids := make([]int, len(s))
+	for i := range s {
+		ids[i] = s[i].ID
+	}
+	return auo.RemoveSweepScheduleUpdaterIDs(ids...)
+}
+
+// ClearSweepSchedule clears all "sweep_schedule" edges to the SweepSchedule entity.
+func (auo *AdminUpdateOne) ClearSweepSchedule() *AdminUpdateOne {
+	auo.mutation.ClearSweepSchedule()
+	return auo
+}
+
+// RemoveSweepScheduleIDs removes the "sweep_schedule" edge to SweepSchedule entities by IDs.
+func (auo *AdminUpdateOne) RemoveSweepScheduleIDs(ids ...int) *AdminUpdateOne {
+	auo.mutation.RemoveSweepScheduleIDs(ids...)
+	return auo
+}
+
+// RemoveSweepSchedule removes "sweep_schedule" edges to SweepSchedule entities.
+func (auo *AdminUpdateOne) RemoveSweepSchedule(s ...*SweepSchedule) *AdminUpdateOne {
+	ids := make([]int, len(s))
+	for i := range s {
+		ids[i] = s[i].ID
+	}
+	return auo.RemoveSweepScheduleIDs(ids...)
+}
+
+// ClearSweepResultCreator clears all "sweep_result_creator" edges to the SweepResult entity.
+func (auo *AdminUpdateOne) ClearSweepResultCreator() *AdminUpdateOne {
+	auo.mutation.ClearSweepResultCreator()
+	return auo
+}
+
+// RemoveSweepResultCreatorIDs removes the "sweep_result_creator" edge to SweepResult entities by IDs.
+func (auo *AdminUpdateOne) RemoveSweepResultCreatorIDs(ids ...int) *AdminUpdateOne {
+	auo.mutation.RemoveSweepResultCreatorIDs(ids...)
+	return auo
+}
+
+// RemoveSweepResultCreator removes "sweep_result_creator" edges to SweepResult entities.
+func (auo *AdminUpdateOne) RemoveSweepResultCreator(s ...*SweepResult) *AdminUpdateOne {
+	ids := make([]int, len(s))
+	for i := range s {
+		ids[i] = s[i].ID
+	}
+	return auo.RemoveSweepResultCreatorIDs(ids...)
+}
+
+// ClearSweepResultUpdater clears all "sweep_result_updater" edges to the SweepResult entity.
+func (auo *AdminUpdateOne) ClearSweepResultUpdater() *AdminUpdateOne {
+	auo.mutation.ClearSweepResultUpdater()
+	return auo
+}
+
+// RemoveSweepResultUpdaterIDs removes the "sweep_result_updater" edge to SweepResult entities by IDs.
+func (auo *AdminUpdateOne) RemoveSweepResultUpdaterIDs(ids ...int) *AdminUpdateOne {
+	auo.mutation.RemoveSweepResultUpdaterIDs(ids...)
+	return auo
+}
+
+// RemoveSweepResultUpdater removes "sweep_result_updater" edges to SweepResult entities.
+func (auo *AdminUpdateOne) RemoveSweepResultUpdater(s ...*SweepResult) *AdminUpdateOne {
+	ids := make([]int, len(s))
+	for i := range s {
+		ids[i] = s[i].ID
+	}
+	return auo.RemoveSweepResultUpdaterIDs(ids...)
+}
+
+// ClearSweepResultDetailsCreator clears all "sweep_result_details_creator" edges to the SweepResultDetails entity.
+func (auo *AdminUpdateOne) ClearSweepResultDetailsCreator() *AdminUpdateOne {
+	auo.mutation.ClearSweepResultDetailsCreator()
+	return auo
+}
+
+// RemoveSweepResultDetailsCreatorIDs removes the "sweep_result_details_creator" edge to SweepResultDetails entities by IDs.
+func (auo *AdminUpdateOne) RemoveSweepResultDetailsCreatorIDs(ids ...int) *AdminUpdateOne {
+	auo.mutation.RemoveSweepResultDetailsCreatorIDs(ids...)
+	return auo
+}
+
+// RemoveSweepResultDetailsCreator removes "sweep_result_details_creator" edges to SweepResultDetails entities.
+func (auo *AdminUpdateOne) RemoveSweepResultDetailsCreator(s ...*SweepResultDetails) *AdminUpdateOne {
+	ids := make([]int, len(s))
+	for i := range s {
+		ids[i] = s[i].ID
+	}
+	return auo.RemoveSweepResultDetailsCreatorIDs(ids...)
+}
+
+// ClearSweepResultDetailsUpdater clears all "sweep_result_details_updater" edges to the SweepResultDetails entity.
+func (auo *AdminUpdateOne) ClearSweepResultDetailsUpdater() *AdminUpdateOne {
+	auo.mutation.ClearSweepResultDetailsUpdater()
+	return auo
+}
+
+// RemoveSweepResultDetailsUpdaterIDs removes the "sweep_result_details_updater" edge to SweepResultDetails entities by IDs.
+func (auo *AdminUpdateOne) RemoveSweepResultDetailsUpdaterIDs(ids ...int) *AdminUpdateOne {
+	auo.mutation.RemoveSweepResultDetailsUpdaterIDs(ids...)
+	return auo
+}
+
+// RemoveSweepResultDetailsUpdater removes "sweep_result_details_updater" edges to SweepResultDetails entities.
+func (auo *AdminUpdateOne) RemoveSweepResultDetailsUpdater(s ...*SweepResultDetails) *AdminUpdateOne {
+	ids := make([]int, len(s))
+	for i := range s {
+		ids[i] = s[i].ID
+	}
+	return auo.RemoveSweepResultDetailsUpdaterIDs(ids...)
+}
+
 // Where appends a list predicates to the AdminUpdate builder.
 func (auo *AdminUpdateOne) Where(ps ...predicate.Admin) *AdminUpdateOne {
 	auo.mutation.Where(ps...)
@@ -4043,21 +6089,21 @@ func (auo *AdminUpdateOne) ExecX(ctx context.Context) {
 
 // defaults sets the default values of the builder before save.
 func (auo *AdminUpdateOne) defaults() error {
-	if _, ok := auo.mutation.UpdatedAt(); !ok {
-		if admin.UpdateDefaultUpdatedAt == nil {
-			return fmt.Errorf("dao: uninitialized admin.UpdateDefaultUpdatedAt (forgotten import dao/runtime?)")
+	if _, ok := auo.mutation.UpdateTime(); !ok {
+		if admin.UpdateDefaultUpdateTime == nil {
+			return fmt.Errorf("dao: uninitialized admin.UpdateDefaultUpdateTime (forgotten import dao/runtime?)")
 		}
-		v := admin.UpdateDefaultUpdatedAt()
-		auo.mutation.SetUpdatedAt(v)
+		v := admin.UpdateDefaultUpdateTime()
+		auo.mutation.SetUpdateTime(v)
 	}
 	return nil
 }
 
 // check runs all checks and user-defined validators on the builder.
 func (auo *AdminUpdateOne) check() error {
-	if v, ok := auo.mutation.UpdatedBy(); ok {
-		if err := admin.UpdatedByValidator(v); err != nil {
-			return &ValidationError{Name: "updated_by", err: fmt.Errorf(`dao: validator failed for field "Admin.updated_by": %w`, err)}
+	if v, ok := auo.mutation.UpdaterID(); ok {
+		if err := admin.UpdaterIDValidator(v); err != nil {
+			return &ValidationError{Name: "updater_id", err: fmt.Errorf(`dao: validator failed for field "Admin.updater_id": %w`, err)}
 		}
 	}
 	if v, ok := auo.mutation.Username(); ok {
@@ -4080,9 +6126,14 @@ func (auo *AdminUpdateOne) check() error {
 			return &ValidationError{Name: "real_name", err: fmt.Errorf(`dao: validator failed for field "Admin.real_name": %w`, err)}
 		}
 	}
-	if v, ok := auo.mutation.Avatar(); ok {
-		if err := admin.AvatarValidator(v); err != nil {
-			return &ValidationError{Name: "avatar", err: fmt.Errorf(`dao: validator failed for field "Admin.avatar": %w`, err)}
+	if v, ok := auo.mutation.Mobile(); ok {
+		if err := admin.MobileValidator(v); err != nil {
+			return &ValidationError{Name: "mobile", err: fmt.Errorf(`dao: validator failed for field "Admin.mobile": %w`, err)}
+		}
+	}
+	if v, ok := auo.mutation.AdminStatus(); ok {
+		if err := admin.AdminStatusValidator(int(v)); err != nil {
+			return &ValidationError{Name: "admin_status", err: fmt.Errorf(`dao: validator failed for field "Admin.admin_status": %w`, err)}
 		}
 	}
 	if _, ok := auo.mutation.CreatorID(); auo.mutation.CreatorCleared() && !ok {
@@ -4123,14 +6174,14 @@ func (auo *AdminUpdateOne) sqlSave(ctx context.Context) (_node *Admin, err error
 			}
 		}
 	}
-	if value, ok := auo.mutation.DeletedAt(); ok {
-		_spec.SetField(admin.FieldDeletedAt, field.TypeTime, value)
+	if value, ok := auo.mutation.DeleteTime(); ok {
+		_spec.SetField(admin.FieldDeleteTime, field.TypeTime, value)
 	}
-	if auo.mutation.DeletedAtCleared() {
-		_spec.ClearField(admin.FieldDeletedAt, field.TypeTime)
+	if auo.mutation.DeleteTimeCleared() {
+		_spec.ClearField(admin.FieldDeleteTime, field.TypeTime)
 	}
-	if value, ok := auo.mutation.UpdatedAt(); ok {
-		_spec.SetField(admin.FieldUpdatedAt, field.TypeTime, value)
+	if value, ok := auo.mutation.UpdateTime(); ok {
+		_spec.SetField(admin.FieldUpdateTime, field.TypeTime, value)
 	}
 	if value, ok := auo.mutation.Username(); ok {
 		_spec.SetField(admin.FieldUsername, field.TypeString, value)
@@ -4144,11 +6195,23 @@ func (auo *AdminUpdateOne) sqlSave(ctx context.Context) (_node *Admin, err error
 	if value, ok := auo.mutation.RealName(); ok {
 		_spec.SetField(admin.FieldRealName, field.TypeString, value)
 	}
+	if value, ok := auo.mutation.Mobile(); ok {
+		_spec.SetField(admin.FieldMobile, field.TypeString, value)
+	}
+	if auo.mutation.MobileCleared() {
+		_spec.ClearField(admin.FieldMobile, field.TypeString)
+	}
 	if value, ok := auo.mutation.Avatar(); ok {
-		_spec.SetField(admin.FieldAvatar, field.TypeString, value)
+		_spec.SetField(admin.FieldAvatar, field.TypeJSON, value)
 	}
 	if auo.mutation.AvatarCleared() {
-		_spec.ClearField(admin.FieldAvatar, field.TypeString)
+		_spec.ClearField(admin.FieldAvatar, field.TypeJSON)
+	}
+	if value, ok := auo.mutation.AdminStatus(); ok {
+		_spec.SetField(admin.FieldAdminStatus, field.TypeInt, value)
+	}
+	if value, ok := auo.mutation.AddedAdminStatus(); ok {
+		_spec.AddField(admin.FieldAdminStatus, field.TypeInt, value)
 	}
 	if auo.mutation.UpdaterCleared() {
 		edge := &sqlgraph.EdgeSpec{
@@ -4179,28 +6242,28 @@ func (auo *AdminUpdateOne) sqlSave(ctx context.Context) (_node *Admin, err error
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if auo.mutation.AdminRolesCleared() {
+	if auo.mutation.PermissionsCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2M,
 			Inverse: true,
-			Table:   admin.AdminRolesTable,
-			Columns: admin.AdminRolesPrimaryKey,
+			Table:   admin.PermissionsTable,
+			Columns: admin.PermissionsPrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(adminrole.FieldID, field.TypeInt),
+				IDSpec: sqlgraph.NewFieldSpec(permission.FieldID, field.TypeInt),
 			},
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := auo.mutation.RemovedAdminRolesIDs(); len(nodes) > 0 && !auo.mutation.AdminRolesCleared() {
+	if nodes := auo.mutation.RemovedPermissionsIDs(); len(nodes) > 0 && !auo.mutation.PermissionsCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2M,
 			Inverse: true,
-			Table:   admin.AdminRolesTable,
-			Columns: admin.AdminRolesPrimaryKey,
+			Table:   admin.PermissionsTable,
+			Columns: admin.PermissionsPrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(adminrole.FieldID, field.TypeInt),
+				IDSpec: sqlgraph.NewFieldSpec(permission.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {
@@ -4208,15 +6271,15 @@ func (auo *AdminUpdateOne) sqlSave(ctx context.Context) (_node *Admin, err error
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := auo.mutation.AdminRolesIDs(); len(nodes) > 0 {
+	if nodes := auo.mutation.PermissionsIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2M,
 			Inverse: true,
-			Table:   admin.AdminRolesTable,
-			Columns: admin.AdminRolesPrimaryKey,
+			Table:   admin.PermissionsTable,
+			Columns: admin.PermissionsPrimaryKey,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(adminrole.FieldID, field.TypeInt),
+				IDSpec: sqlgraph.NewFieldSpec(permission.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {
@@ -4314,28 +6377,28 @@ func (auo *AdminUpdateOne) sqlSave(ctx context.Context) (_node *Admin, err error
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if auo.mutation.AdminRoleCreatorCleared() {
+	if auo.mutation.PermissionCreatorCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
-			Table:   admin.AdminRoleCreatorTable,
-			Columns: []string{admin.AdminRoleCreatorColumn},
+			Table:   admin.PermissionCreatorTable,
+			Columns: []string{admin.PermissionCreatorColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(adminrole.FieldID, field.TypeInt),
+				IDSpec: sqlgraph.NewFieldSpec(permission.FieldID, field.TypeInt),
 			},
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := auo.mutation.RemovedAdminRoleCreatorIDs(); len(nodes) > 0 && !auo.mutation.AdminRoleCreatorCleared() {
+	if nodes := auo.mutation.RemovedPermissionCreatorIDs(); len(nodes) > 0 && !auo.mutation.PermissionCreatorCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
-			Table:   admin.AdminRoleCreatorTable,
-			Columns: []string{admin.AdminRoleCreatorColumn},
+			Table:   admin.PermissionCreatorTable,
+			Columns: []string{admin.PermissionCreatorColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(adminrole.FieldID, field.TypeInt),
+				IDSpec: sqlgraph.NewFieldSpec(permission.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {
@@ -4343,15 +6406,15 @@ func (auo *AdminUpdateOne) sqlSave(ctx context.Context) (_node *Admin, err error
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := auo.mutation.AdminRoleCreatorIDs(); len(nodes) > 0 {
+	if nodes := auo.mutation.PermissionCreatorIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
-			Table:   admin.AdminRoleCreatorTable,
-			Columns: []string{admin.AdminRoleCreatorColumn},
+			Table:   admin.PermissionCreatorTable,
+			Columns: []string{admin.PermissionCreatorColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(adminrole.FieldID, field.TypeInt),
+				IDSpec: sqlgraph.NewFieldSpec(permission.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {
@@ -4359,28 +6422,28 @@ func (auo *AdminUpdateOne) sqlSave(ctx context.Context) (_node *Admin, err error
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if auo.mutation.AdminRoleUpdaterCleared() {
+	if auo.mutation.PermissionUpdaterCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
-			Table:   admin.AdminRoleUpdaterTable,
-			Columns: []string{admin.AdminRoleUpdaterColumn},
+			Table:   admin.PermissionUpdaterTable,
+			Columns: []string{admin.PermissionUpdaterColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(adminrole.FieldID, field.TypeInt),
+				IDSpec: sqlgraph.NewFieldSpec(permission.FieldID, field.TypeInt),
 			},
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := auo.mutation.RemovedAdminRoleUpdaterIDs(); len(nodes) > 0 && !auo.mutation.AdminRoleUpdaterCleared() {
+	if nodes := auo.mutation.RemovedPermissionUpdaterIDs(); len(nodes) > 0 && !auo.mutation.PermissionUpdaterCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
-			Table:   admin.AdminRoleUpdaterTable,
-			Columns: []string{admin.AdminRoleUpdaterColumn},
+			Table:   admin.PermissionUpdaterTable,
+			Columns: []string{admin.PermissionUpdaterColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(adminrole.FieldID, field.TypeInt),
+				IDSpec: sqlgraph.NewFieldSpec(permission.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {
@@ -4388,15 +6451,15 @@ func (auo *AdminUpdateOne) sqlSave(ctx context.Context) (_node *Admin, err error
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := auo.mutation.AdminRoleUpdaterIDs(); len(nodes) > 0 {
+	if nodes := auo.mutation.PermissionUpdaterIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
-			Table:   admin.AdminRoleUpdaterTable,
-			Columns: []string{admin.AdminRoleUpdaterColumn},
+			Table:   admin.PermissionUpdaterTable,
+			Columns: []string{admin.PermissionUpdaterColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(adminrole.FieldID, field.TypeInt),
+				IDSpec: sqlgraph.NewFieldSpec(permission.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {
@@ -4484,6 +6547,51 @@ func (auo *AdminUpdateOne) sqlSave(ctx context.Context) (_node *Admin, err error
 			Inverse: false,
 			Table:   admin.RiskUpdaterTable,
 			Columns: []string{admin.RiskUpdaterColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(risk.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if auo.mutation.RiskMaintainerCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   admin.RiskMaintainerTable,
+			Columns: []string{admin.RiskMaintainerColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(risk.FieldID, field.TypeInt),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := auo.mutation.RemovedRiskMaintainerIDs(); len(nodes) > 0 && !auo.mutation.RiskMaintainerCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   admin.RiskMaintainerTable,
+			Columns: []string{admin.RiskMaintainerColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(risk.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := auo.mutation.RiskMaintainerIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   admin.RiskMaintainerTable,
+			Columns: []string{admin.RiskMaintainerColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(risk.FieldID, field.TypeInt),
@@ -4856,7 +6964,7 @@ func (auo *AdminUpdateOne) sqlSave(ctx context.Context) (_node *Admin, err error
 	}
 	if auo.mutation.EmployeeCleared() {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
+			Rel:     sqlgraph.O2O,
 			Inverse: false,
 			Table:   admin.EmployeeTable,
 			Columns: []string{admin.EmployeeColumn},
@@ -4864,28 +6972,12 @@ func (auo *AdminUpdateOne) sqlSave(ctx context.Context) (_node *Admin, err error
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(employee.FieldID, field.TypeInt),
 			},
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := auo.mutation.RemovedEmployeeIDs(); len(nodes) > 0 && !auo.mutation.EmployeeCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
-			Inverse: false,
-			Table:   admin.EmployeeTable,
-			Columns: []string{admin.EmployeeColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(employee.FieldID, field.TypeInt),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
 	if nodes := auo.mutation.EmployeeIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
+			Rel:     sqlgraph.O2O,
 			Inverse: false,
 			Table:   admin.EmployeeTable,
 			Columns: []string{admin.EmployeeColumn},
@@ -4989,28 +7081,28 @@ func (auo *AdminUpdateOne) sqlSave(ctx context.Context) (_node *Admin, err error
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if auo.mutation.IpcEventCreatorCleared() {
+	if auo.mutation.EventCreatorCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
-			Table:   admin.IpcEventCreatorTable,
-			Columns: []string{admin.IpcEventCreatorColumn},
+			Table:   admin.EventCreatorTable,
+			Columns: []string{admin.EventCreatorColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(ipcevent.FieldID, field.TypeInt),
+				IDSpec: sqlgraph.NewFieldSpec(event.FieldID, field.TypeInt),
 			},
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := auo.mutation.RemovedIpcEventCreatorIDs(); len(nodes) > 0 && !auo.mutation.IpcEventCreatorCleared() {
+	if nodes := auo.mutation.RemovedEventCreatorIDs(); len(nodes) > 0 && !auo.mutation.EventCreatorCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
-			Table:   admin.IpcEventCreatorTable,
-			Columns: []string{admin.IpcEventCreatorColumn},
+			Table:   admin.EventCreatorTable,
+			Columns: []string{admin.EventCreatorColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(ipcevent.FieldID, field.TypeInt),
+				IDSpec: sqlgraph.NewFieldSpec(event.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {
@@ -5018,15 +7110,15 @@ func (auo *AdminUpdateOne) sqlSave(ctx context.Context) (_node *Admin, err error
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := auo.mutation.IpcEventCreatorIDs(); len(nodes) > 0 {
+	if nodes := auo.mutation.EventCreatorIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
-			Table:   admin.IpcEventCreatorTable,
-			Columns: []string{admin.IpcEventCreatorColumn},
+			Table:   admin.EventCreatorTable,
+			Columns: []string{admin.EventCreatorColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(ipcevent.FieldID, field.TypeInt),
+				IDSpec: sqlgraph.NewFieldSpec(event.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {
@@ -5034,28 +7126,28 @@ func (auo *AdminUpdateOne) sqlSave(ctx context.Context) (_node *Admin, err error
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if auo.mutation.IpcEventUpdaterCleared() {
+	if auo.mutation.EventUpdaterCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
-			Table:   admin.IpcEventUpdaterTable,
-			Columns: []string{admin.IpcEventUpdaterColumn},
+			Table:   admin.EventUpdaterTable,
+			Columns: []string{admin.EventUpdaterColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(ipcevent.FieldID, field.TypeInt),
+				IDSpec: sqlgraph.NewFieldSpec(event.FieldID, field.TypeInt),
 			},
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := auo.mutation.RemovedIpcEventUpdaterIDs(); len(nodes) > 0 && !auo.mutation.IpcEventUpdaterCleared() {
+	if nodes := auo.mutation.RemovedEventUpdaterIDs(); len(nodes) > 0 && !auo.mutation.EventUpdaterCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
-			Table:   admin.IpcEventUpdaterTable,
-			Columns: []string{admin.IpcEventUpdaterColumn},
+			Table:   admin.EventUpdaterTable,
+			Columns: []string{admin.EventUpdaterColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(ipcevent.FieldID, field.TypeInt),
+				IDSpec: sqlgraph.NewFieldSpec(event.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {
@@ -5063,15 +7155,15 @@ func (auo *AdminUpdateOne) sqlSave(ctx context.Context) (_node *Admin, err error
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := auo.mutation.IpcEventUpdaterIDs(); len(nodes) > 0 {
+	if nodes := auo.mutation.EventUpdaterIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
-			Table:   admin.IpcEventUpdaterTable,
-			Columns: []string{admin.IpcEventUpdaterColumn},
+			Table:   admin.EventUpdaterTable,
+			Columns: []string{admin.EventUpdaterColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(ipcevent.FieldID, field.TypeInt),
+				IDSpec: sqlgraph.NewFieldSpec(event.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {
@@ -5522,6 +7614,726 @@ func (auo *AdminUpdateOne) sqlSave(ctx context.Context) (_node *Admin, err error
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(eventlevel.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if auo.mutation.FixingCreatorCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   admin.FixingCreatorTable,
+			Columns: []string{admin.FixingCreatorColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(fixing.FieldID, field.TypeInt),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := auo.mutation.RemovedFixingCreatorIDs(); len(nodes) > 0 && !auo.mutation.FixingCreatorCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   admin.FixingCreatorTable,
+			Columns: []string{admin.FixingCreatorColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(fixing.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := auo.mutation.FixingCreatorIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   admin.FixingCreatorTable,
+			Columns: []string{admin.FixingCreatorColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(fixing.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if auo.mutation.FixingUpdaterCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   admin.FixingUpdaterTable,
+			Columns: []string{admin.FixingUpdaterColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(fixing.FieldID, field.TypeInt),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := auo.mutation.RemovedFixingUpdaterIDs(); len(nodes) > 0 && !auo.mutation.FixingUpdaterCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   admin.FixingUpdaterTable,
+			Columns: []string{admin.FixingUpdaterColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(fixing.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := auo.mutation.FixingUpdaterIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   admin.FixingUpdaterTable,
+			Columns: []string{admin.FixingUpdaterColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(fixing.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if auo.mutation.FixerCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   admin.FixerTable,
+			Columns: []string{admin.FixerColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(fixing.FieldID, field.TypeInt),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := auo.mutation.RemovedFixerIDs(); len(nodes) > 0 && !auo.mutation.FixerCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   admin.FixerTable,
+			Columns: []string{admin.FixerColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(fixing.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := auo.mutation.FixerIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   admin.FixerTable,
+			Columns: []string{admin.FixerColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(fixing.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if auo.mutation.EventLogCreatorCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   admin.EventLogCreatorTable,
+			Columns: []string{admin.EventLogCreatorColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(eventlog.FieldID, field.TypeInt),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := auo.mutation.RemovedEventLogCreatorIDs(); len(nodes) > 0 && !auo.mutation.EventLogCreatorCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   admin.EventLogCreatorTable,
+			Columns: []string{admin.EventLogCreatorColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(eventlog.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := auo.mutation.EventLogCreatorIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   admin.EventLogCreatorTable,
+			Columns: []string{admin.EventLogCreatorColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(eventlog.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if auo.mutation.EventLogUpdaterCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   admin.EventLogUpdaterTable,
+			Columns: []string{admin.EventLogUpdaterColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(eventlog.FieldID, field.TypeInt),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := auo.mutation.RemovedEventLogUpdaterIDs(); len(nodes) > 0 && !auo.mutation.EventLogUpdaterCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   admin.EventLogUpdaterTable,
+			Columns: []string{admin.EventLogUpdaterColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(eventlog.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := auo.mutation.EventLogUpdaterIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   admin.EventLogUpdaterTable,
+			Columns: []string{admin.EventLogUpdaterColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(eventlog.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if auo.mutation.EventLogActorCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   admin.EventLogActorTable,
+			Columns: []string{admin.EventLogActorColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(eventlog.FieldID, field.TypeInt),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := auo.mutation.RemovedEventLogActorIDs(); len(nodes) > 0 && !auo.mutation.EventLogActorCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   admin.EventLogActorTable,
+			Columns: []string{admin.EventLogActorColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(eventlog.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := auo.mutation.EventLogActorIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   admin.EventLogActorTable,
+			Columns: []string{admin.EventLogActorColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(eventlog.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if auo.mutation.EventLogActor2Cleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   admin.EventLogActor2Table,
+			Columns: []string{admin.EventLogActor2Column},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(eventlog.FieldID, field.TypeInt),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := auo.mutation.RemovedEventLogActor2IDs(); len(nodes) > 0 && !auo.mutation.EventLogActor2Cleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   admin.EventLogActor2Table,
+			Columns: []string{admin.EventLogActor2Column},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(eventlog.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := auo.mutation.EventLogActor2IDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   admin.EventLogActor2Table,
+			Columns: []string{admin.EventLogActor2Column},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(eventlog.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if auo.mutation.SweepCreatorCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   admin.SweepCreatorTable,
+			Columns: []string{admin.SweepCreatorColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(sweep.FieldID, field.TypeInt),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := auo.mutation.RemovedSweepCreatorIDs(); len(nodes) > 0 && !auo.mutation.SweepCreatorCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   admin.SweepCreatorTable,
+			Columns: []string{admin.SweepCreatorColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(sweep.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := auo.mutation.SweepCreatorIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   admin.SweepCreatorTable,
+			Columns: []string{admin.SweepCreatorColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(sweep.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if auo.mutation.SweepUpdaterCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   admin.SweepUpdaterTable,
+			Columns: []string{admin.SweepUpdaterColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(sweep.FieldID, field.TypeInt),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := auo.mutation.RemovedSweepUpdaterIDs(); len(nodes) > 0 && !auo.mutation.SweepUpdaterCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   admin.SweepUpdaterTable,
+			Columns: []string{admin.SweepUpdaterColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(sweep.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := auo.mutation.SweepUpdaterIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   admin.SweepUpdaterTable,
+			Columns: []string{admin.SweepUpdaterColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(sweep.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if auo.mutation.SweepScheduleCreatorCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   admin.SweepScheduleCreatorTable,
+			Columns: []string{admin.SweepScheduleCreatorColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(sweepschedule.FieldID, field.TypeInt),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := auo.mutation.RemovedSweepScheduleCreatorIDs(); len(nodes) > 0 && !auo.mutation.SweepScheduleCreatorCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   admin.SweepScheduleCreatorTable,
+			Columns: []string{admin.SweepScheduleCreatorColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(sweepschedule.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := auo.mutation.SweepScheduleCreatorIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   admin.SweepScheduleCreatorTable,
+			Columns: []string{admin.SweepScheduleCreatorColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(sweepschedule.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if auo.mutation.SweepScheduleUpdaterCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   admin.SweepScheduleUpdaterTable,
+			Columns: []string{admin.SweepScheduleUpdaterColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(sweepschedule.FieldID, field.TypeInt),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := auo.mutation.RemovedSweepScheduleUpdaterIDs(); len(nodes) > 0 && !auo.mutation.SweepScheduleUpdaterCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   admin.SweepScheduleUpdaterTable,
+			Columns: []string{admin.SweepScheduleUpdaterColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(sweepschedule.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := auo.mutation.SweepScheduleUpdaterIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   admin.SweepScheduleUpdaterTable,
+			Columns: []string{admin.SweepScheduleUpdaterColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(sweepschedule.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if auo.mutation.SweepScheduleCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: false,
+			Table:   admin.SweepScheduleTable,
+			Columns: admin.SweepSchedulePrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(sweepschedule.FieldID, field.TypeInt),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := auo.mutation.RemovedSweepScheduleIDs(); len(nodes) > 0 && !auo.mutation.SweepScheduleCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: false,
+			Table:   admin.SweepScheduleTable,
+			Columns: admin.SweepSchedulePrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(sweepschedule.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := auo.mutation.SweepScheduleIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: false,
+			Table:   admin.SweepScheduleTable,
+			Columns: admin.SweepSchedulePrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(sweepschedule.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if auo.mutation.SweepResultCreatorCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   admin.SweepResultCreatorTable,
+			Columns: []string{admin.SweepResultCreatorColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(sweepresult.FieldID, field.TypeInt),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := auo.mutation.RemovedSweepResultCreatorIDs(); len(nodes) > 0 && !auo.mutation.SweepResultCreatorCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   admin.SweepResultCreatorTable,
+			Columns: []string{admin.SweepResultCreatorColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(sweepresult.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := auo.mutation.SweepResultCreatorIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   admin.SweepResultCreatorTable,
+			Columns: []string{admin.SweepResultCreatorColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(sweepresult.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if auo.mutation.SweepResultUpdaterCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   admin.SweepResultUpdaterTable,
+			Columns: []string{admin.SweepResultUpdaterColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(sweepresult.FieldID, field.TypeInt),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := auo.mutation.RemovedSweepResultUpdaterIDs(); len(nodes) > 0 && !auo.mutation.SweepResultUpdaterCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   admin.SweepResultUpdaterTable,
+			Columns: []string{admin.SweepResultUpdaterColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(sweepresult.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := auo.mutation.SweepResultUpdaterIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   admin.SweepResultUpdaterTable,
+			Columns: []string{admin.SweepResultUpdaterColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(sweepresult.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if auo.mutation.SweepResultDetailsCreatorCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   admin.SweepResultDetailsCreatorTable,
+			Columns: []string{admin.SweepResultDetailsCreatorColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(sweepresultdetails.FieldID, field.TypeInt),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := auo.mutation.RemovedSweepResultDetailsCreatorIDs(); len(nodes) > 0 && !auo.mutation.SweepResultDetailsCreatorCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   admin.SweepResultDetailsCreatorTable,
+			Columns: []string{admin.SweepResultDetailsCreatorColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(sweepresultdetails.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := auo.mutation.SweepResultDetailsCreatorIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   admin.SweepResultDetailsCreatorTable,
+			Columns: []string{admin.SweepResultDetailsCreatorColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(sweepresultdetails.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if auo.mutation.SweepResultDetailsUpdaterCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   admin.SweepResultDetailsUpdaterTable,
+			Columns: []string{admin.SweepResultDetailsUpdaterColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(sweepresultdetails.FieldID, field.TypeInt),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := auo.mutation.RemovedSweepResultDetailsUpdaterIDs(); len(nodes) > 0 && !auo.mutation.SweepResultDetailsUpdaterCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   admin.SweepResultDetailsUpdaterTable,
+			Columns: []string{admin.SweepResultDetailsUpdaterColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(sweepresultdetails.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := auo.mutation.SweepResultDetailsUpdaterIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   admin.SweepResultDetailsUpdaterTable,
+			Columns: []string{admin.SweepResultDetailsUpdaterColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(sweepresultdetails.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {

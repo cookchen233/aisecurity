@@ -27,7 +27,7 @@ func (h *AdminHandler) GetFilter(c *gin.Context) structs.IFilter {
 func (h *AdminHandler) GetEntity(c *gin.Context) structs.IEntity {
 	return h.Entity
 }
-func (h *AdminHandler) SetRequestContext(c *gin.Context, h2 handlers.IHandler) {
+func (h *AdminHandler) SetRequestContext(c *gin.Context, childHandler handlers.IHandler) {
 	h.Service = services.NewAdminService()
 	h.Service.Ctx = c
 	h.Filter = &filters.Admin{}

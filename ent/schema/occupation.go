@@ -29,9 +29,9 @@ func (Occupation) Fields() []ent.Field {
 // Edges of the Occupation.
 func (Occupation) Edges() []ent.Edge {
 	return []ent.Edge{
-		edge.From("creator", Admin.Type).Ref("occupation_creator").Field("created_by").Immutable().Unique().Required(),
-		edge.From("updater", Admin.Type).Ref("occupation_updater").Field("updated_by").Required().Unique(),
+		edge.From("creator", Admin.Type).Ref("occupation_creator").Field("creator_id").Immutable().Unique().Required(),
+		edge.From("updater", Admin.Type).Ref("occupation_updater").Field("updater_id").Required().Unique(),
 
-		edge.To("employees", Employee.Type),
+		edge.To("employee", Employee.Type),
 	}
 }

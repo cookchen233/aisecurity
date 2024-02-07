@@ -36,9 +36,9 @@ func (DeviceInstallation) Fields() []ent.Field {
 // Edges of the DeviceInstallation.
 func (DeviceInstallation) Edges() []ent.Edge {
 	return []ent.Edge{
-		edge.From("creator", Admin.Type).Ref("device_installation_creator").Field("created_by").Immutable().Unique().Required(),
-		edge.From("updater", Admin.Type).Ref("device_installation_updater").Field("updated_by").Required().Unique(),
-		edge.From("area", Area.Type).Ref("device_installation_area").Field("area_id").Required().Unique(),
-		edge.From("device", Device.Type).Ref("device_installation_device").Field("device_id").Required().Unique(),
+		edge.From("creator", Admin.Type).Ref("device_installation_creator").Field("creator_id").Immutable().Unique().Required(),
+		edge.From("updater", Admin.Type).Ref("device_installation_updater").Field("updater_id").Required().Unique(),
+		edge.From("area", Area.Type).Ref("device_installation").Field("area_id").Required().Unique(),
+		edge.From("device", Device.Type).Ref("device_installation").Field("device_id").Required().Unique(),
 	}
 }

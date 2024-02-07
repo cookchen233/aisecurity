@@ -22,56 +22,56 @@ type EventLevelCreate struct {
 	hooks    []Hook
 }
 
-// SetCreatedAt sets the "created_at" field.
-func (elc *EventLevelCreate) SetCreatedAt(t time.Time) *EventLevelCreate {
-	elc.mutation.SetCreatedAt(t)
+// SetCreateTime sets the "create_time" field.
+func (elc *EventLevelCreate) SetCreateTime(t time.Time) *EventLevelCreate {
+	elc.mutation.SetCreateTime(t)
 	return elc
 }
 
-// SetNillableCreatedAt sets the "created_at" field if the given value is not nil.
-func (elc *EventLevelCreate) SetNillableCreatedAt(t *time.Time) *EventLevelCreate {
+// SetNillableCreateTime sets the "create_time" field if the given value is not nil.
+func (elc *EventLevelCreate) SetNillableCreateTime(t *time.Time) *EventLevelCreate {
 	if t != nil {
-		elc.SetCreatedAt(*t)
+		elc.SetCreateTime(*t)
 	}
 	return elc
 }
 
-// SetCreatedBy sets the "created_by" field.
-func (elc *EventLevelCreate) SetCreatedBy(i int) *EventLevelCreate {
-	elc.mutation.SetCreatedBy(i)
+// SetCreatorID sets the "creator_id" field.
+func (elc *EventLevelCreate) SetCreatorID(i int) *EventLevelCreate {
+	elc.mutation.SetCreatorID(i)
 	return elc
 }
 
-// SetDeletedAt sets the "deleted_at" field.
-func (elc *EventLevelCreate) SetDeletedAt(t time.Time) *EventLevelCreate {
-	elc.mutation.SetDeletedAt(t)
+// SetDeleteTime sets the "delete_time" field.
+func (elc *EventLevelCreate) SetDeleteTime(t time.Time) *EventLevelCreate {
+	elc.mutation.SetDeleteTime(t)
 	return elc
 }
 
-// SetNillableDeletedAt sets the "deleted_at" field if the given value is not nil.
-func (elc *EventLevelCreate) SetNillableDeletedAt(t *time.Time) *EventLevelCreate {
+// SetNillableDeleteTime sets the "delete_time" field if the given value is not nil.
+func (elc *EventLevelCreate) SetNillableDeleteTime(t *time.Time) *EventLevelCreate {
 	if t != nil {
-		elc.SetDeletedAt(*t)
+		elc.SetDeleteTime(*t)
 	}
 	return elc
 }
 
-// SetUpdatedBy sets the "updated_by" field.
-func (elc *EventLevelCreate) SetUpdatedBy(i int) *EventLevelCreate {
-	elc.mutation.SetUpdatedBy(i)
+// SetUpdaterID sets the "updater_id" field.
+func (elc *EventLevelCreate) SetUpdaterID(i int) *EventLevelCreate {
+	elc.mutation.SetUpdaterID(i)
 	return elc
 }
 
-// SetUpdatedAt sets the "updated_at" field.
-func (elc *EventLevelCreate) SetUpdatedAt(t time.Time) *EventLevelCreate {
-	elc.mutation.SetUpdatedAt(t)
+// SetUpdateTime sets the "update_time" field.
+func (elc *EventLevelCreate) SetUpdateTime(t time.Time) *EventLevelCreate {
+	elc.mutation.SetUpdateTime(t)
 	return elc
 }
 
-// SetNillableUpdatedAt sets the "updated_at" field if the given value is not nil.
-func (elc *EventLevelCreate) SetNillableUpdatedAt(t *time.Time) *EventLevelCreate {
+// SetNillableUpdateTime sets the "update_time" field if the given value is not nil.
+func (elc *EventLevelCreate) SetNillableUpdateTime(t *time.Time) *EventLevelCreate {
 	if t != nil {
-		elc.SetUpdatedAt(*t)
+		elc.SetUpdateTime(*t)
 	}
 	return elc
 }
@@ -110,35 +110,29 @@ func (elc *EventLevelCreate) SetNillableDescription(s *string) *EventLevelCreate
 	return elc
 }
 
-// SetIsReport sets the "is_report" field.
-func (elc *EventLevelCreate) SetIsReport(b bool) *EventLevelCreate {
-	elc.mutation.SetIsReport(b)
+// SetIcon sets the "icon" field.
+func (elc *EventLevelCreate) SetIcon(s string) *EventLevelCreate {
+	elc.mutation.SetIcon(s)
 	return elc
 }
 
-// SetNillableIsReport sets the "is_report" field if the given value is not nil.
-func (elc *EventLevelCreate) SetNillableIsReport(b *bool) *EventLevelCreate {
-	if b != nil {
-		elc.SetIsReport(*b)
+// SetNillableIcon sets the "icon" field if the given value is not nil.
+func (elc *EventLevelCreate) SetNillableIcon(s *string) *EventLevelCreate {
+	if s != nil {
+		elc.SetIcon(*s)
 	}
 	return elc
 }
 
-// SetCreatorID sets the "creator" edge to the Admin entity by ID.
-func (elc *EventLevelCreate) SetCreatorID(id int) *EventLevelCreate {
-	elc.mutation.SetCreatorID(id)
+// SetNotifyTypes sets the "notify_types" field.
+func (elc *EventLevelCreate) SetNotifyTypes(et []enums.NotifyType) *EventLevelCreate {
+	elc.mutation.SetNotifyTypes(et)
 	return elc
 }
 
 // SetCreator sets the "creator" edge to the Admin entity.
 func (elc *EventLevelCreate) SetCreator(a *Admin) *EventLevelCreate {
 	return elc.SetCreatorID(a.ID)
-}
-
-// SetUpdaterID sets the "updater" edge to the Admin entity by ID.
-func (elc *EventLevelCreate) SetUpdaterID(id int) *EventLevelCreate {
-	elc.mutation.SetUpdaterID(id)
-	return elc
 }
 
 // SetUpdater sets the "updater" edge to the Admin entity.
@@ -183,50 +177,46 @@ func (elc *EventLevelCreate) ExecX(ctx context.Context) {
 
 // defaults sets the default values of the builder before save.
 func (elc *EventLevelCreate) defaults() error {
-	if _, ok := elc.mutation.CreatedAt(); !ok {
-		if eventlevel.DefaultCreatedAt == nil {
-			return fmt.Errorf("dao: uninitialized eventlevel.DefaultCreatedAt (forgotten import dao/runtime?)")
+	if _, ok := elc.mutation.CreateTime(); !ok {
+		if eventlevel.DefaultCreateTime == nil {
+			return fmt.Errorf("dao: uninitialized eventlevel.DefaultCreateTime (forgotten import dao/runtime?)")
 		}
-		v := eventlevel.DefaultCreatedAt()
-		elc.mutation.SetCreatedAt(v)
+		v := eventlevel.DefaultCreateTime()
+		elc.mutation.SetCreateTime(v)
 	}
-	if _, ok := elc.mutation.UpdatedAt(); !ok {
-		if eventlevel.DefaultUpdatedAt == nil {
-			return fmt.Errorf("dao: uninitialized eventlevel.DefaultUpdatedAt (forgotten import dao/runtime?)")
+	if _, ok := elc.mutation.UpdateTime(); !ok {
+		if eventlevel.DefaultUpdateTime == nil {
+			return fmt.Errorf("dao: uninitialized eventlevel.DefaultUpdateTime (forgotten import dao/runtime?)")
 		}
-		v := eventlevel.DefaultUpdatedAt()
-		elc.mutation.SetUpdatedAt(v)
-	}
-	if _, ok := elc.mutation.IsReport(); !ok {
-		v := eventlevel.DefaultIsReport
-		elc.mutation.SetIsReport(v)
+		v := eventlevel.DefaultUpdateTime()
+		elc.mutation.SetUpdateTime(v)
 	}
 	return nil
 }
 
 // check runs all checks and user-defined validators on the builder.
 func (elc *EventLevelCreate) check() error {
-	if _, ok := elc.mutation.CreatedAt(); !ok {
-		return &ValidationError{Name: "created_at", err: errors.New(`dao: missing required field "EventLevel.created_at"`)}
+	if _, ok := elc.mutation.CreateTime(); !ok {
+		return &ValidationError{Name: "create_time", err: errors.New(`dao: missing required field "EventLevel.create_time"`)}
 	}
-	if _, ok := elc.mutation.CreatedBy(); !ok {
-		return &ValidationError{Name: "created_by", err: errors.New(`dao: missing required field "EventLevel.created_by"`)}
+	if _, ok := elc.mutation.CreatorID(); !ok {
+		return &ValidationError{Name: "creator_id", err: errors.New(`dao: missing required field "EventLevel.creator_id"`)}
 	}
-	if v, ok := elc.mutation.CreatedBy(); ok {
-		if err := eventlevel.CreatedByValidator(v); err != nil {
-			return &ValidationError{Name: "created_by", err: fmt.Errorf(`dao: validator failed for field "EventLevel.created_by": %w`, err)}
+	if v, ok := elc.mutation.CreatorID(); ok {
+		if err := eventlevel.CreatorIDValidator(v); err != nil {
+			return &ValidationError{Name: "creator_id", err: fmt.Errorf(`dao: validator failed for field "EventLevel.creator_id": %w`, err)}
 		}
 	}
-	if _, ok := elc.mutation.UpdatedBy(); !ok {
-		return &ValidationError{Name: "updated_by", err: errors.New(`dao: missing required field "EventLevel.updated_by"`)}
+	if _, ok := elc.mutation.UpdaterID(); !ok {
+		return &ValidationError{Name: "updater_id", err: errors.New(`dao: missing required field "EventLevel.updater_id"`)}
 	}
-	if v, ok := elc.mutation.UpdatedBy(); ok {
-		if err := eventlevel.UpdatedByValidator(v); err != nil {
-			return &ValidationError{Name: "updated_by", err: fmt.Errorf(`dao: validator failed for field "EventLevel.updated_by": %w`, err)}
+	if v, ok := elc.mutation.UpdaterID(); ok {
+		if err := eventlevel.UpdaterIDValidator(v); err != nil {
+			return &ValidationError{Name: "updater_id", err: fmt.Errorf(`dao: validator failed for field "EventLevel.updater_id": %w`, err)}
 		}
 	}
-	if _, ok := elc.mutation.UpdatedAt(); !ok {
-		return &ValidationError{Name: "updated_at", err: errors.New(`dao: missing required field "EventLevel.updated_at"`)}
+	if _, ok := elc.mutation.UpdateTime(); !ok {
+		return &ValidationError{Name: "update_time", err: errors.New(`dao: missing required field "EventLevel.update_time"`)}
 	}
 	if v, ok := elc.mutation.Name(); ok {
 		if err := eventlevel.NameValidator(v); err != nil {
@@ -235,6 +225,14 @@ func (elc *EventLevelCreate) check() error {
 	}
 	if _, ok := elc.mutation.EventTypes(); !ok {
 		return &ValidationError{Name: "event_types", err: errors.New(`dao: missing required field "EventLevel.event_types"`)}
+	}
+	if v, ok := elc.mutation.Icon(); ok {
+		if err := eventlevel.IconValidator(v); err != nil {
+			return &ValidationError{Name: "icon", err: fmt.Errorf(`dao: validator failed for field "EventLevel.icon": %w`, err)}
+		}
+	}
+	if _, ok := elc.mutation.NotifyTypes(); !ok {
+		return &ValidationError{Name: "notify_types", err: errors.New(`dao: missing required field "EventLevel.notify_types"`)}
 	}
 	if _, ok := elc.mutation.CreatorID(); !ok {
 		return &ValidationError{Name: "creator", err: errors.New(`dao: missing required edge "EventLevel.creator"`)}
@@ -268,17 +266,17 @@ func (elc *EventLevelCreate) createSpec() (*EventLevel, *sqlgraph.CreateSpec) {
 		_node = &EventLevel{config: elc.config}
 		_spec = sqlgraph.NewCreateSpec(eventlevel.Table, sqlgraph.NewFieldSpec(eventlevel.FieldID, field.TypeInt))
 	)
-	if value, ok := elc.mutation.CreatedAt(); ok {
-		_spec.SetField(eventlevel.FieldCreatedAt, field.TypeTime, value)
-		_node.CreatedAt = value
+	if value, ok := elc.mutation.CreateTime(); ok {
+		_spec.SetField(eventlevel.FieldCreateTime, field.TypeTime, value)
+		_node.CreateTime = value
 	}
-	if value, ok := elc.mutation.DeletedAt(); ok {
-		_spec.SetField(eventlevel.FieldDeletedAt, field.TypeTime, value)
-		_node.DeletedAt = &value
+	if value, ok := elc.mutation.DeleteTime(); ok {
+		_spec.SetField(eventlevel.FieldDeleteTime, field.TypeTime, value)
+		_node.DeleteTime = &value
 	}
-	if value, ok := elc.mutation.UpdatedAt(); ok {
-		_spec.SetField(eventlevel.FieldUpdatedAt, field.TypeTime, value)
-		_node.UpdatedAt = value
+	if value, ok := elc.mutation.UpdateTime(); ok {
+		_spec.SetField(eventlevel.FieldUpdateTime, field.TypeTime, value)
+		_node.UpdateTime = value
 	}
 	if value, ok := elc.mutation.Name(); ok {
 		_spec.SetField(eventlevel.FieldName, field.TypeString, value)
@@ -292,9 +290,13 @@ func (elc *EventLevelCreate) createSpec() (*EventLevel, *sqlgraph.CreateSpec) {
 		_spec.SetField(eventlevel.FieldDescription, field.TypeString, value)
 		_node.Description = value
 	}
-	if value, ok := elc.mutation.IsReport(); ok {
-		_spec.SetField(eventlevel.FieldIsReport, field.TypeBool, value)
-		_node.IsReport = value
+	if value, ok := elc.mutation.Icon(); ok {
+		_spec.SetField(eventlevel.FieldIcon, field.TypeString, value)
+		_node.Icon = value
+	}
+	if value, ok := elc.mutation.NotifyTypes(); ok {
+		_spec.SetField(eventlevel.FieldNotifyTypes, field.TypeJSON, value)
+		_node.NotifyTypes = value
 	}
 	if nodes := elc.mutation.CreatorIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
@@ -310,7 +312,7 @@ func (elc *EventLevelCreate) createSpec() (*EventLevel, *sqlgraph.CreateSpec) {
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
-		_node.CreatedBy = nodes[0]
+		_node.CreatorID = nodes[0]
 		_spec.Edges = append(_spec.Edges, edge)
 	}
 	if nodes := elc.mutation.UpdaterIDs(); len(nodes) > 0 {
@@ -327,7 +329,7 @@ func (elc *EventLevelCreate) createSpec() (*EventLevel, *sqlgraph.CreateSpec) {
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
-		_node.UpdatedBy = nodes[0]
+		_node.UpdaterID = nodes[0]
 		_spec.Edges = append(_spec.Edges, edge)
 	}
 	return _node, _spec

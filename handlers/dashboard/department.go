@@ -24,9 +24,8 @@ func (h *DepartmentHandler) GetFilter(c *gin.Context) structs.IFilter {
 func (h *DepartmentHandler) GetEntity(c *gin.Context) structs.IEntity {
 	return h.Entity
 }
-func (h *DepartmentHandler) SetRequestContext(c *gin.Context, h2 handlers.IHandler) {
-	h.Service = services.NewDepartmentService()
-	h.Service.Ctx = c
+func (h *DepartmentHandler) SetRequestContext(c *gin.Context, childHandler handlers.IHandler) {
+	h.Service = services.NewDepartmentService(c)
 	h.Filter = &filters.Department{}
 	h.Entity = &entities.Department{}
 	h.DashboardHandler.SetRequestContext(c, h)

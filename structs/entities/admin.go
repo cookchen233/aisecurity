@@ -6,5 +6,12 @@ import (
 
 type Admin struct {
 	dao.Admin
-	AdminRoleIDs []int `json:"admin_role_ids"`
+	Occupation  *dao.Occupation   `json:"occupation"`
+	Permissions []*dao.Permission `json:"permissions"`
+	Edges       AdminEdges        `json:"edges"`
+}
+
+type AdminEdges struct {
+	dao.AdminEdges
+	Employee Employee `json:"employee"`
 }

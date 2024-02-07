@@ -16,8 +16,6 @@ type Tx struct {
 	config
 	// Admin is the client for interacting with the Admin builders.
 	Admin *AdminClient
-	// AdminRole is the client for interacting with the AdminRole builders.
-	AdminRole *AdminRoleClient
 	// Area is the client for interacting with the Area builders.
 	Area *AreaClient
 	// Department is the client for interacting with the Department builders.
@@ -28,18 +26,32 @@ type Tx struct {
 	DeviceInstallation *DeviceInstallationClient
 	// Employee is the client for interacting with the Employee builders.
 	Employee *EmployeeClient
+	// Event is the client for interacting with the Event builders.
+	Event *EventClient
 	// EventLevel is the client for interacting with the EventLevel builders.
 	EventLevel *EventLevelClient
-	// IPCEvent is the client for interacting with the IPCEvent builders.
-	IPCEvent *IPCEventClient
+	// EventLog is the client for interacting with the EventLog builders.
+	EventLog *EventLogClient
+	// Fixing is the client for interacting with the Fixing builders.
+	Fixing *FixingClient
 	// Occupation is the client for interacting with the Occupation builders.
 	Occupation *OccupationClient
+	// Permission is the client for interacting with the Permission builders.
+	Permission *PermissionClient
 	// Risk is the client for interacting with the Risk builders.
 	Risk *RiskClient
 	// RiskCategory is the client for interacting with the RiskCategory builders.
 	RiskCategory *RiskCategoryClient
 	// RiskLocation is the client for interacting with the RiskLocation builders.
 	RiskLocation *RiskLocationClient
+	// Sweep is the client for interacting with the Sweep builders.
+	Sweep *SweepClient
+	// SweepResult is the client for interacting with the SweepResult builders.
+	SweepResult *SweepResultClient
+	// SweepResultDetails is the client for interacting with the SweepResultDetails builders.
+	SweepResultDetails *SweepResultDetailsClient
+	// SweepSchedule is the client for interacting with the SweepSchedule builders.
+	SweepSchedule *SweepScheduleClient
 	// Video is the client for interacting with the Video builders.
 	Video *VideoClient
 
@@ -174,18 +186,24 @@ func (tx *Tx) Client() *Client {
 
 func (tx *Tx) init() {
 	tx.Admin = NewAdminClient(tx.config)
-	tx.AdminRole = NewAdminRoleClient(tx.config)
 	tx.Area = NewAreaClient(tx.config)
 	tx.Department = NewDepartmentClient(tx.config)
 	tx.Device = NewDeviceClient(tx.config)
 	tx.DeviceInstallation = NewDeviceInstallationClient(tx.config)
 	tx.Employee = NewEmployeeClient(tx.config)
+	tx.Event = NewEventClient(tx.config)
 	tx.EventLevel = NewEventLevelClient(tx.config)
-	tx.IPCEvent = NewIPCEventClient(tx.config)
+	tx.EventLog = NewEventLogClient(tx.config)
+	tx.Fixing = NewFixingClient(tx.config)
 	tx.Occupation = NewOccupationClient(tx.config)
+	tx.Permission = NewPermissionClient(tx.config)
 	tx.Risk = NewRiskClient(tx.config)
 	tx.RiskCategory = NewRiskCategoryClient(tx.config)
 	tx.RiskLocation = NewRiskLocationClient(tx.config)
+	tx.Sweep = NewSweepClient(tx.config)
+	tx.SweepResult = NewSweepResultClient(tx.config)
+	tx.SweepResultDetails = NewSweepResultDetailsClient(tx.config)
+	tx.SweepSchedule = NewSweepScheduleClient(tx.config)
 	tx.Video = NewVideoClient(tx.config)
 }
 

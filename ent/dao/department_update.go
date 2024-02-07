@@ -6,6 +6,7 @@ import (
 	"aisecurity/ent/dao/admin"
 	"aisecurity/ent/dao/department"
 	"aisecurity/ent/dao/employee"
+	"aisecurity/ent/dao/permission"
 	"aisecurity/ent/dao/predicate"
 	"context"
 	"errors"
@@ -30,43 +31,43 @@ func (du *DepartmentUpdate) Where(ps ...predicate.Department) *DepartmentUpdate 
 	return du
 }
 
-// SetDeletedAt sets the "deleted_at" field.
-func (du *DepartmentUpdate) SetDeletedAt(t time.Time) *DepartmentUpdate {
-	du.mutation.SetDeletedAt(t)
+// SetDeleteTime sets the "delete_time" field.
+func (du *DepartmentUpdate) SetDeleteTime(t time.Time) *DepartmentUpdate {
+	du.mutation.SetDeleteTime(t)
 	return du
 }
 
-// SetNillableDeletedAt sets the "deleted_at" field if the given value is not nil.
-func (du *DepartmentUpdate) SetNillableDeletedAt(t *time.Time) *DepartmentUpdate {
+// SetNillableDeleteTime sets the "delete_time" field if the given value is not nil.
+func (du *DepartmentUpdate) SetNillableDeleteTime(t *time.Time) *DepartmentUpdate {
 	if t != nil {
-		du.SetDeletedAt(*t)
+		du.SetDeleteTime(*t)
 	}
 	return du
 }
 
-// ClearDeletedAt clears the value of the "deleted_at" field.
-func (du *DepartmentUpdate) ClearDeletedAt() *DepartmentUpdate {
-	du.mutation.ClearDeletedAt()
+// ClearDeleteTime clears the value of the "delete_time" field.
+func (du *DepartmentUpdate) ClearDeleteTime() *DepartmentUpdate {
+	du.mutation.ClearDeleteTime()
 	return du
 }
 
-// SetUpdatedBy sets the "updated_by" field.
-func (du *DepartmentUpdate) SetUpdatedBy(i int) *DepartmentUpdate {
-	du.mutation.SetUpdatedBy(i)
+// SetUpdaterID sets the "updater_id" field.
+func (du *DepartmentUpdate) SetUpdaterID(i int) *DepartmentUpdate {
+	du.mutation.SetUpdaterID(i)
 	return du
 }
 
-// SetNillableUpdatedBy sets the "updated_by" field if the given value is not nil.
-func (du *DepartmentUpdate) SetNillableUpdatedBy(i *int) *DepartmentUpdate {
+// SetNillableUpdaterID sets the "updater_id" field if the given value is not nil.
+func (du *DepartmentUpdate) SetNillableUpdaterID(i *int) *DepartmentUpdate {
 	if i != nil {
-		du.SetUpdatedBy(*i)
+		du.SetUpdaterID(*i)
 	}
 	return du
 }
 
-// SetUpdatedAt sets the "updated_at" field.
-func (du *DepartmentUpdate) SetUpdatedAt(t time.Time) *DepartmentUpdate {
-	du.mutation.SetUpdatedAt(t)
+// SetUpdateTime sets the "update_time" field.
+func (du *DepartmentUpdate) SetUpdateTime(t time.Time) *DepartmentUpdate {
+	du.mutation.SetUpdateTime(t)
 	return du
 }
 
@@ -104,9 +105,23 @@ func (du *DepartmentUpdate) ClearParentID() *DepartmentUpdate {
 	return du
 }
 
-// SetUpdaterID sets the "updater" edge to the Admin entity by ID.
-func (du *DepartmentUpdate) SetUpdaterID(id int) *DepartmentUpdate {
-	du.mutation.SetUpdaterID(id)
+// SetNotes sets the "notes" field.
+func (du *DepartmentUpdate) SetNotes(s string) *DepartmentUpdate {
+	du.mutation.SetNotes(s)
+	return du
+}
+
+// SetNillableNotes sets the "notes" field if the given value is not nil.
+func (du *DepartmentUpdate) SetNillableNotes(s *string) *DepartmentUpdate {
+	if s != nil {
+		du.SetNotes(*s)
+	}
+	return du
+}
+
+// ClearNotes clears the value of the "notes" field.
+func (du *DepartmentUpdate) ClearNotes() *DepartmentUpdate {
+	du.mutation.ClearNotes()
 	return du
 }
 
@@ -118,6 +133,21 @@ func (du *DepartmentUpdate) SetUpdater(a *Admin) *DepartmentUpdate {
 // SetParent sets the "parent" edge to the Department entity.
 func (du *DepartmentUpdate) SetParent(d *Department) *DepartmentUpdate {
 	return du.SetParentID(d.ID)
+}
+
+// AddPermissionIDs adds the "permissions" edge to the Permission entity by IDs.
+func (du *DepartmentUpdate) AddPermissionIDs(ids ...int) *DepartmentUpdate {
+	du.mutation.AddPermissionIDs(ids...)
+	return du
+}
+
+// AddPermissions adds the "permissions" edges to the Permission entity.
+func (du *DepartmentUpdate) AddPermissions(p ...*Permission) *DepartmentUpdate {
+	ids := make([]int, len(p))
+	for i := range p {
+		ids[i] = p[i].ID
+	}
+	return du.AddPermissionIDs(ids...)
 }
 
 // AddEmployeeIDs adds the "employees" edge to the Employee entity by IDs.
@@ -165,6 +195,27 @@ func (du *DepartmentUpdate) ClearUpdater() *DepartmentUpdate {
 func (du *DepartmentUpdate) ClearParent() *DepartmentUpdate {
 	du.mutation.ClearParent()
 	return du
+}
+
+// ClearPermissions clears all "permissions" edges to the Permission entity.
+func (du *DepartmentUpdate) ClearPermissions() *DepartmentUpdate {
+	du.mutation.ClearPermissions()
+	return du
+}
+
+// RemovePermissionIDs removes the "permissions" edge to Permission entities by IDs.
+func (du *DepartmentUpdate) RemovePermissionIDs(ids ...int) *DepartmentUpdate {
+	du.mutation.RemovePermissionIDs(ids...)
+	return du
+}
+
+// RemovePermissions removes "permissions" edges to Permission entities.
+func (du *DepartmentUpdate) RemovePermissions(p ...*Permission) *DepartmentUpdate {
+	ids := make([]int, len(p))
+	for i := range p {
+		ids[i] = p[i].ID
+	}
+	return du.RemovePermissionIDs(ids...)
 }
 
 // ClearEmployees clears all "employees" edges to the Employee entity.
@@ -241,21 +292,21 @@ func (du *DepartmentUpdate) ExecX(ctx context.Context) {
 
 // defaults sets the default values of the builder before save.
 func (du *DepartmentUpdate) defaults() error {
-	if _, ok := du.mutation.UpdatedAt(); !ok {
-		if department.UpdateDefaultUpdatedAt == nil {
-			return fmt.Errorf("dao: uninitialized department.UpdateDefaultUpdatedAt (forgotten import dao/runtime?)")
+	if _, ok := du.mutation.UpdateTime(); !ok {
+		if department.UpdateDefaultUpdateTime == nil {
+			return fmt.Errorf("dao: uninitialized department.UpdateDefaultUpdateTime (forgotten import dao/runtime?)")
 		}
-		v := department.UpdateDefaultUpdatedAt()
-		du.mutation.SetUpdatedAt(v)
+		v := department.UpdateDefaultUpdateTime()
+		du.mutation.SetUpdateTime(v)
 	}
 	return nil
 }
 
 // check runs all checks and user-defined validators on the builder.
 func (du *DepartmentUpdate) check() error {
-	if v, ok := du.mutation.UpdatedBy(); ok {
-		if err := department.UpdatedByValidator(v); err != nil {
-			return &ValidationError{Name: "updated_by", err: fmt.Errorf(`dao: validator failed for field "Department.updated_by": %w`, err)}
+	if v, ok := du.mutation.UpdaterID(); ok {
+		if err := department.UpdaterIDValidator(v); err != nil {
+			return &ValidationError{Name: "updater_id", err: fmt.Errorf(`dao: validator failed for field "Department.updater_id": %w`, err)}
 		}
 	}
 	if v, ok := du.mutation.Name(); ok {
@@ -289,17 +340,23 @@ func (du *DepartmentUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			}
 		}
 	}
-	if value, ok := du.mutation.DeletedAt(); ok {
-		_spec.SetField(department.FieldDeletedAt, field.TypeTime, value)
+	if value, ok := du.mutation.DeleteTime(); ok {
+		_spec.SetField(department.FieldDeleteTime, field.TypeTime, value)
 	}
-	if du.mutation.DeletedAtCleared() {
-		_spec.ClearField(department.FieldDeletedAt, field.TypeTime)
+	if du.mutation.DeleteTimeCleared() {
+		_spec.ClearField(department.FieldDeleteTime, field.TypeTime)
 	}
-	if value, ok := du.mutation.UpdatedAt(); ok {
-		_spec.SetField(department.FieldUpdatedAt, field.TypeTime, value)
+	if value, ok := du.mutation.UpdateTime(); ok {
+		_spec.SetField(department.FieldUpdateTime, field.TypeTime, value)
 	}
 	if value, ok := du.mutation.Name(); ok {
 		_spec.SetField(department.FieldName, field.TypeString, value)
+	}
+	if value, ok := du.mutation.Notes(); ok {
+		_spec.SetField(department.FieldNotes, field.TypeString, value)
+	}
+	if du.mutation.NotesCleared() {
+		_spec.ClearField(department.FieldNotes, field.TypeString)
 	}
 	if du.mutation.UpdaterCleared() {
 		edge := &sqlgraph.EdgeSpec{
@@ -352,6 +409,51 @@ func (du *DepartmentUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(department.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if du.mutation.PermissionsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: true,
+			Table:   department.PermissionsTable,
+			Columns: department.PermissionsPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(permission.FieldID, field.TypeInt),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := du.mutation.RemovedPermissionsIDs(); len(nodes) > 0 && !du.mutation.PermissionsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: true,
+			Table:   department.PermissionsTable,
+			Columns: department.PermissionsPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(permission.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := du.mutation.PermissionsIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: true,
+			Table:   department.PermissionsTable,
+			Columns: department.PermissionsPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(permission.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {
@@ -469,43 +571,43 @@ type DepartmentUpdateOne struct {
 	mutation *DepartmentMutation
 }
 
-// SetDeletedAt sets the "deleted_at" field.
-func (duo *DepartmentUpdateOne) SetDeletedAt(t time.Time) *DepartmentUpdateOne {
-	duo.mutation.SetDeletedAt(t)
+// SetDeleteTime sets the "delete_time" field.
+func (duo *DepartmentUpdateOne) SetDeleteTime(t time.Time) *DepartmentUpdateOne {
+	duo.mutation.SetDeleteTime(t)
 	return duo
 }
 
-// SetNillableDeletedAt sets the "deleted_at" field if the given value is not nil.
-func (duo *DepartmentUpdateOne) SetNillableDeletedAt(t *time.Time) *DepartmentUpdateOne {
+// SetNillableDeleteTime sets the "delete_time" field if the given value is not nil.
+func (duo *DepartmentUpdateOne) SetNillableDeleteTime(t *time.Time) *DepartmentUpdateOne {
 	if t != nil {
-		duo.SetDeletedAt(*t)
+		duo.SetDeleteTime(*t)
 	}
 	return duo
 }
 
-// ClearDeletedAt clears the value of the "deleted_at" field.
-func (duo *DepartmentUpdateOne) ClearDeletedAt() *DepartmentUpdateOne {
-	duo.mutation.ClearDeletedAt()
+// ClearDeleteTime clears the value of the "delete_time" field.
+func (duo *DepartmentUpdateOne) ClearDeleteTime() *DepartmentUpdateOne {
+	duo.mutation.ClearDeleteTime()
 	return duo
 }
 
-// SetUpdatedBy sets the "updated_by" field.
-func (duo *DepartmentUpdateOne) SetUpdatedBy(i int) *DepartmentUpdateOne {
-	duo.mutation.SetUpdatedBy(i)
+// SetUpdaterID sets the "updater_id" field.
+func (duo *DepartmentUpdateOne) SetUpdaterID(i int) *DepartmentUpdateOne {
+	duo.mutation.SetUpdaterID(i)
 	return duo
 }
 
-// SetNillableUpdatedBy sets the "updated_by" field if the given value is not nil.
-func (duo *DepartmentUpdateOne) SetNillableUpdatedBy(i *int) *DepartmentUpdateOne {
+// SetNillableUpdaterID sets the "updater_id" field if the given value is not nil.
+func (duo *DepartmentUpdateOne) SetNillableUpdaterID(i *int) *DepartmentUpdateOne {
 	if i != nil {
-		duo.SetUpdatedBy(*i)
+		duo.SetUpdaterID(*i)
 	}
 	return duo
 }
 
-// SetUpdatedAt sets the "updated_at" field.
-func (duo *DepartmentUpdateOne) SetUpdatedAt(t time.Time) *DepartmentUpdateOne {
-	duo.mutation.SetUpdatedAt(t)
+// SetUpdateTime sets the "update_time" field.
+func (duo *DepartmentUpdateOne) SetUpdateTime(t time.Time) *DepartmentUpdateOne {
+	duo.mutation.SetUpdateTime(t)
 	return duo
 }
 
@@ -543,9 +645,23 @@ func (duo *DepartmentUpdateOne) ClearParentID() *DepartmentUpdateOne {
 	return duo
 }
 
-// SetUpdaterID sets the "updater" edge to the Admin entity by ID.
-func (duo *DepartmentUpdateOne) SetUpdaterID(id int) *DepartmentUpdateOne {
-	duo.mutation.SetUpdaterID(id)
+// SetNotes sets the "notes" field.
+func (duo *DepartmentUpdateOne) SetNotes(s string) *DepartmentUpdateOne {
+	duo.mutation.SetNotes(s)
+	return duo
+}
+
+// SetNillableNotes sets the "notes" field if the given value is not nil.
+func (duo *DepartmentUpdateOne) SetNillableNotes(s *string) *DepartmentUpdateOne {
+	if s != nil {
+		duo.SetNotes(*s)
+	}
+	return duo
+}
+
+// ClearNotes clears the value of the "notes" field.
+func (duo *DepartmentUpdateOne) ClearNotes() *DepartmentUpdateOne {
+	duo.mutation.ClearNotes()
 	return duo
 }
 
@@ -557,6 +673,21 @@ func (duo *DepartmentUpdateOne) SetUpdater(a *Admin) *DepartmentUpdateOne {
 // SetParent sets the "parent" edge to the Department entity.
 func (duo *DepartmentUpdateOne) SetParent(d *Department) *DepartmentUpdateOne {
 	return duo.SetParentID(d.ID)
+}
+
+// AddPermissionIDs adds the "permissions" edge to the Permission entity by IDs.
+func (duo *DepartmentUpdateOne) AddPermissionIDs(ids ...int) *DepartmentUpdateOne {
+	duo.mutation.AddPermissionIDs(ids...)
+	return duo
+}
+
+// AddPermissions adds the "permissions" edges to the Permission entity.
+func (duo *DepartmentUpdateOne) AddPermissions(p ...*Permission) *DepartmentUpdateOne {
+	ids := make([]int, len(p))
+	for i := range p {
+		ids[i] = p[i].ID
+	}
+	return duo.AddPermissionIDs(ids...)
 }
 
 // AddEmployeeIDs adds the "employees" edge to the Employee entity by IDs.
@@ -604,6 +735,27 @@ func (duo *DepartmentUpdateOne) ClearUpdater() *DepartmentUpdateOne {
 func (duo *DepartmentUpdateOne) ClearParent() *DepartmentUpdateOne {
 	duo.mutation.ClearParent()
 	return duo
+}
+
+// ClearPermissions clears all "permissions" edges to the Permission entity.
+func (duo *DepartmentUpdateOne) ClearPermissions() *DepartmentUpdateOne {
+	duo.mutation.ClearPermissions()
+	return duo
+}
+
+// RemovePermissionIDs removes the "permissions" edge to Permission entities by IDs.
+func (duo *DepartmentUpdateOne) RemovePermissionIDs(ids ...int) *DepartmentUpdateOne {
+	duo.mutation.RemovePermissionIDs(ids...)
+	return duo
+}
+
+// RemovePermissions removes "permissions" edges to Permission entities.
+func (duo *DepartmentUpdateOne) RemovePermissions(p ...*Permission) *DepartmentUpdateOne {
+	ids := make([]int, len(p))
+	for i := range p {
+		ids[i] = p[i].ID
+	}
+	return duo.RemovePermissionIDs(ids...)
 }
 
 // ClearEmployees clears all "employees" edges to the Employee entity.
@@ -693,21 +845,21 @@ func (duo *DepartmentUpdateOne) ExecX(ctx context.Context) {
 
 // defaults sets the default values of the builder before save.
 func (duo *DepartmentUpdateOne) defaults() error {
-	if _, ok := duo.mutation.UpdatedAt(); !ok {
-		if department.UpdateDefaultUpdatedAt == nil {
-			return fmt.Errorf("dao: uninitialized department.UpdateDefaultUpdatedAt (forgotten import dao/runtime?)")
+	if _, ok := duo.mutation.UpdateTime(); !ok {
+		if department.UpdateDefaultUpdateTime == nil {
+			return fmt.Errorf("dao: uninitialized department.UpdateDefaultUpdateTime (forgotten import dao/runtime?)")
 		}
-		v := department.UpdateDefaultUpdatedAt()
-		duo.mutation.SetUpdatedAt(v)
+		v := department.UpdateDefaultUpdateTime()
+		duo.mutation.SetUpdateTime(v)
 	}
 	return nil
 }
 
 // check runs all checks and user-defined validators on the builder.
 func (duo *DepartmentUpdateOne) check() error {
-	if v, ok := duo.mutation.UpdatedBy(); ok {
-		if err := department.UpdatedByValidator(v); err != nil {
-			return &ValidationError{Name: "updated_by", err: fmt.Errorf(`dao: validator failed for field "Department.updated_by": %w`, err)}
+	if v, ok := duo.mutation.UpdaterID(); ok {
+		if err := department.UpdaterIDValidator(v); err != nil {
+			return &ValidationError{Name: "updater_id", err: fmt.Errorf(`dao: validator failed for field "Department.updater_id": %w`, err)}
 		}
 	}
 	if v, ok := duo.mutation.Name(); ok {
@@ -758,17 +910,23 @@ func (duo *DepartmentUpdateOne) sqlSave(ctx context.Context) (_node *Department,
 			}
 		}
 	}
-	if value, ok := duo.mutation.DeletedAt(); ok {
-		_spec.SetField(department.FieldDeletedAt, field.TypeTime, value)
+	if value, ok := duo.mutation.DeleteTime(); ok {
+		_spec.SetField(department.FieldDeleteTime, field.TypeTime, value)
 	}
-	if duo.mutation.DeletedAtCleared() {
-		_spec.ClearField(department.FieldDeletedAt, field.TypeTime)
+	if duo.mutation.DeleteTimeCleared() {
+		_spec.ClearField(department.FieldDeleteTime, field.TypeTime)
 	}
-	if value, ok := duo.mutation.UpdatedAt(); ok {
-		_spec.SetField(department.FieldUpdatedAt, field.TypeTime, value)
+	if value, ok := duo.mutation.UpdateTime(); ok {
+		_spec.SetField(department.FieldUpdateTime, field.TypeTime, value)
 	}
 	if value, ok := duo.mutation.Name(); ok {
 		_spec.SetField(department.FieldName, field.TypeString, value)
+	}
+	if value, ok := duo.mutation.Notes(); ok {
+		_spec.SetField(department.FieldNotes, field.TypeString, value)
+	}
+	if duo.mutation.NotesCleared() {
+		_spec.ClearField(department.FieldNotes, field.TypeString)
 	}
 	if duo.mutation.UpdaterCleared() {
 		edge := &sqlgraph.EdgeSpec{
@@ -821,6 +979,51 @@ func (duo *DepartmentUpdateOne) sqlSave(ctx context.Context) (_node *Department,
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(department.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if duo.mutation.PermissionsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: true,
+			Table:   department.PermissionsTable,
+			Columns: department.PermissionsPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(permission.FieldID, field.TypeInt),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := duo.mutation.RemovedPermissionsIDs(); len(nodes) > 0 && !duo.mutation.PermissionsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: true,
+			Table:   department.PermissionsTable,
+			Columns: department.PermissionsPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(permission.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := duo.mutation.PermissionsIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: true,
+			Table:   department.PermissionsTable,
+			Columns: department.PermissionsPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(permission.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {

@@ -36,7 +36,7 @@ func (s *EventLevelService) Create(ent structs.IEntity) (structs.IEntity, error)
 		SetName(e.Name).
 		SetDescription(e.Description).
 		SetEventTypes(e.EventTypes).
-		SetIsReport(e.IsReport)
+		SetNotifyTypes(e.NotifyTypes)
 	saved, err := c.Save(s.Ctx)
 	if err != nil {
 		return nil, utils.ErrorWrap(err, "failed creating EventLevelService")
@@ -50,7 +50,7 @@ func (s *EventLevelService) Update(ent structs.IEntity) (structs.IEntity, error)
 	u := s.entClient.UpdateOneID(e.ID).
 		SetDescription(e.Description).
 		SetEventTypes(e.EventTypes).
-		SetIsReport(e.IsReport)
+		SetNotifyTypes(e.NotifyTypes)
 	save, err := u.Save(s.Ctx)
 	if err != nil {
 		return nil, utils.ErrorWrap(err, "failed updating EventLevelService")
@@ -76,6 +76,7 @@ func (s *EventLevelService) GetList(fit structs.IFilter) ([]structs.IEntity, err
 	list, err := s.query(fit).
 		Limit(fit.GetLimit()).
 		Offset(fit.GetOffset()).
+		Order(dao.Desc(eventlevel.FieldID)).
 		All(s.Ctx)
 	if err != nil {
 		return nil, utils.ErrorWithStack(err)

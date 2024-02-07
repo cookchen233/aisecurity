@@ -20,13 +20,13 @@ import (
 // OccupationQuery is the builder for querying Occupation entities.
 type OccupationQuery struct {
 	config
-	ctx           *QueryContext
-	order         []occupation.OrderOption
-	inters        []Interceptor
-	predicates    []predicate.Occupation
-	withCreator   *AdminQuery
-	withUpdater   *AdminQuery
-	withEmployees *EmployeeQuery
+	ctx          *QueryContext
+	order        []occupation.OrderOption
+	inters       []Interceptor
+	predicates   []predicate.Occupation
+	withCreator  *AdminQuery
+	withUpdater  *AdminQuery
+	withEmployee *EmployeeQuery
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
 	path func(context.Context) (*sql.Selector, error)
@@ -107,8 +107,8 @@ func (oq *OccupationQuery) QueryUpdater() *AdminQuery {
 	return query
 }
 
-// QueryEmployees chains the current query on the "employees" edge.
-func (oq *OccupationQuery) QueryEmployees() *EmployeeQuery {
+// QueryEmployee chains the current query on the "employee" edge.
+func (oq *OccupationQuery) QueryEmployee() *EmployeeQuery {
 	query := (&EmployeeClient{config: oq.config}).Query()
 	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
 		if err := oq.prepareQuery(ctx); err != nil {
@@ -121,7 +121,7 @@ func (oq *OccupationQuery) QueryEmployees() *EmployeeQuery {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(occupation.Table, occupation.FieldID, selector),
 			sqlgraph.To(employee.Table, employee.FieldID),
-			sqlgraph.Edge(sqlgraph.M2M, false, occupation.EmployeesTable, occupation.EmployeesPrimaryKey...),
+			sqlgraph.Edge(sqlgraph.O2M, false, occupation.EmployeeTable, occupation.EmployeeColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(oq.driver.Dialect(), step)
 		return fromU, nil
@@ -316,14 +316,14 @@ func (oq *OccupationQuery) Clone() *OccupationQuery {
 		return nil
 	}
 	return &OccupationQuery{
-		config:        oq.config,
-		ctx:           oq.ctx.Clone(),
-		order:         append([]occupation.OrderOption{}, oq.order...),
-		inters:        append([]Interceptor{}, oq.inters...),
-		predicates:    append([]predicate.Occupation{}, oq.predicates...),
-		withCreator:   oq.withCreator.Clone(),
-		withUpdater:   oq.withUpdater.Clone(),
-		withEmployees: oq.withEmployees.Clone(),
+		config:       oq.config,
+		ctx:          oq.ctx.Clone(),
+		order:        append([]occupation.OrderOption{}, oq.order...),
+		inters:       append([]Interceptor{}, oq.inters...),
+		predicates:   append([]predicate.Occupation{}, oq.predicates...),
+		withCreator:  oq.withCreator.Clone(),
+		withUpdater:  oq.withUpdater.Clone(),
+		withEmployee: oq.withEmployee.Clone(),
 		// clone intermediate query.
 		sql:  oq.sql.Clone(),
 		path: oq.path,
@@ -352,14 +352,14 @@ func (oq *OccupationQuery) WithUpdater(opts ...func(*AdminQuery)) *OccupationQue
 	return oq
 }
 
-// WithEmployees tells the query-builder to eager-load the nodes that are connected to
-// the "employees" edge. The optional arguments are used to configure the query builder of the edge.
-func (oq *OccupationQuery) WithEmployees(opts ...func(*EmployeeQuery)) *OccupationQuery {
+// WithEmployee tells the query-builder to eager-load the nodes that are connected to
+// the "employee" edge. The optional arguments are used to configure the query builder of the edge.
+func (oq *OccupationQuery) WithEmployee(opts ...func(*EmployeeQuery)) *OccupationQuery {
 	query := (&EmployeeClient{config: oq.config}).Query()
 	for _, opt := range opts {
 		opt(query)
 	}
-	oq.withEmployees = query
+	oq.withEmployee = query
 	return oq
 }
 
@@ -369,12 +369,12 @@ func (oq *OccupationQuery) WithEmployees(opts ...func(*EmployeeQuery)) *Occupati
 // Example:
 //
 //	var v []struct {
-//		CreatedAt time.Time `json:"created_at"`
+//		CreateTime time.Time `json:"create_time"`
 //		Count int `json:"count,omitempty"`
 //	}
 //
 //	client.Occupation.Query().
-//		GroupBy(occupation.FieldCreatedAt).
+//		GroupBy(occupation.FieldCreateTime).
 //		Aggregate(dao.Count()).
 //		Scan(ctx, &v)
 func (oq *OccupationQuery) GroupBy(field string, fields ...string) *OccupationGroupBy {
@@ -392,11 +392,11 @@ func (oq *OccupationQuery) GroupBy(field string, fields ...string) *OccupationGr
 // Example:
 //
 //	var v []struct {
-//		CreatedAt time.Time `json:"created_at"`
+//		CreateTime time.Time `json:"create_time"`
 //	}
 //
 //	client.Occupation.Query().
-//		Select(occupation.FieldCreatedAt).
+//		Select(occupation.FieldCreateTime).
 //		Scan(ctx, &v)
 func (oq *OccupationQuery) Select(fields ...string) *OccupationSelect {
 	oq.ctx.Fields = append(oq.ctx.Fields, fields...)
@@ -444,7 +444,7 @@ func (oq *OccupationQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*O
 		loadedTypes = [3]bool{
 			oq.withCreator != nil,
 			oq.withUpdater != nil,
-			oq.withEmployees != nil,
+			oq.withEmployee != nil,
 		}
 	)
 	_spec.ScanValues = func(columns []string) ([]any, error) {
@@ -477,10 +477,10 @@ func (oq *OccupationQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*O
 			return nil, err
 		}
 	}
-	if query := oq.withEmployees; query != nil {
-		if err := oq.loadEmployees(ctx, query, nodes,
-			func(n *Occupation) { n.Edges.Employees = []*Employee{} },
-			func(n *Occupation, e *Employee) { n.Edges.Employees = append(n.Edges.Employees, e) }); err != nil {
+	if query := oq.withEmployee; query != nil {
+		if err := oq.loadEmployee(ctx, query, nodes,
+			func(n *Occupation) { n.Edges.Employee = []*Employee{} },
+			func(n *Occupation, e *Employee) { n.Edges.Employee = append(n.Edges.Employee, e) }); err != nil {
 			return nil, err
 		}
 	}
@@ -491,7 +491,7 @@ func (oq *OccupationQuery) loadCreator(ctx context.Context, query *AdminQuery, n
 	ids := make([]int, 0, len(nodes))
 	nodeids := make(map[int][]*Occupation)
 	for i := range nodes {
-		fk := nodes[i].CreatedBy
+		fk := nodes[i].CreatorID
 		if _, ok := nodeids[fk]; !ok {
 			ids = append(ids, fk)
 		}
@@ -508,7 +508,7 @@ func (oq *OccupationQuery) loadCreator(ctx context.Context, query *AdminQuery, n
 	for _, n := range neighbors {
 		nodes, ok := nodeids[n.ID]
 		if !ok {
-			return fmt.Errorf(`unexpected foreign-key "created_by" returned %v`, n.ID)
+			return fmt.Errorf(`unexpected foreign-key "creator_id" returned %v`, n.ID)
 		}
 		for i := range nodes {
 			assign(nodes[i], n)
@@ -520,7 +520,7 @@ func (oq *OccupationQuery) loadUpdater(ctx context.Context, query *AdminQuery, n
 	ids := make([]int, 0, len(nodes))
 	nodeids := make(map[int][]*Occupation)
 	for i := range nodes {
-		fk := nodes[i].UpdatedBy
+		fk := nodes[i].UpdaterID
 		if _, ok := nodeids[fk]; !ok {
 			ids = append(ids, fk)
 		}
@@ -537,7 +537,7 @@ func (oq *OccupationQuery) loadUpdater(ctx context.Context, query *AdminQuery, n
 	for _, n := range neighbors {
 		nodes, ok := nodeids[n.ID]
 		if !ok {
-			return fmt.Errorf(`unexpected foreign-key "updated_by" returned %v`, n.ID)
+			return fmt.Errorf(`unexpected foreign-key "updater_id" returned %v`, n.ID)
 		}
 		for i := range nodes {
 			assign(nodes[i], n)
@@ -545,64 +545,33 @@ func (oq *OccupationQuery) loadUpdater(ctx context.Context, query *AdminQuery, n
 	}
 	return nil
 }
-func (oq *OccupationQuery) loadEmployees(ctx context.Context, query *EmployeeQuery, nodes []*Occupation, init func(*Occupation), assign func(*Occupation, *Employee)) error {
-	edgeIDs := make([]driver.Value, len(nodes))
-	byID := make(map[int]*Occupation)
-	nids := make(map[int]map[*Occupation]struct{})
-	for i, node := range nodes {
-		edgeIDs[i] = node.ID
-		byID[node.ID] = node
+func (oq *OccupationQuery) loadEmployee(ctx context.Context, query *EmployeeQuery, nodes []*Occupation, init func(*Occupation), assign func(*Occupation, *Employee)) error {
+	fks := make([]driver.Value, 0, len(nodes))
+	nodeids := make(map[int]*Occupation)
+	for i := range nodes {
+		fks = append(fks, nodes[i].ID)
+		nodeids[nodes[i].ID] = nodes[i]
 		if init != nil {
-			init(node)
+			init(nodes[i])
 		}
 	}
-	query.Where(func(s *sql.Selector) {
-		joinT := sql.Table(occupation.EmployeesTable)
-		s.Join(joinT).On(s.C(employee.FieldID), joinT.C(occupation.EmployeesPrimaryKey[1]))
-		s.Where(sql.InValues(joinT.C(occupation.EmployeesPrimaryKey[0]), edgeIDs...))
-		columns := s.SelectedColumns()
-		s.Select(joinT.C(occupation.EmployeesPrimaryKey[0]))
-		s.AppendSelect(columns...)
-		s.SetDistinct(false)
-	})
-	if err := query.prepareQuery(ctx); err != nil {
-		return err
+	if len(query.ctx.Fields) > 0 {
+		query.ctx.AppendFieldOnce(employee.FieldOccupationID)
 	}
-	qr := QuerierFunc(func(ctx context.Context, q Query) (Value, error) {
-		return query.sqlAll(ctx, func(_ context.Context, spec *sqlgraph.QuerySpec) {
-			assign := spec.Assign
-			values := spec.ScanValues
-			spec.ScanValues = func(columns []string) ([]any, error) {
-				values, err := values(columns[1:])
-				if err != nil {
-					return nil, err
-				}
-				return append([]any{new(sql.NullInt64)}, values...), nil
-			}
-			spec.Assign = func(columns []string, values []any) error {
-				outValue := int(values[0].(*sql.NullInt64).Int64)
-				inValue := int(values[1].(*sql.NullInt64).Int64)
-				if nids[inValue] == nil {
-					nids[inValue] = map[*Occupation]struct{}{byID[outValue]: {}}
-					return assign(columns[1:], values[1:])
-				}
-				nids[inValue][byID[outValue]] = struct{}{}
-				return nil
-			}
-		})
-	})
-	neighbors, err := withInterceptors[[]*Employee](ctx, query, qr, query.inters)
+	query.Where(predicate.Employee(func(s *sql.Selector) {
+		s.Where(sql.InValues(s.C(occupation.EmployeeColumn), fks...))
+	}))
+	neighbors, err := query.All(ctx)
 	if err != nil {
 		return err
 	}
 	for _, n := range neighbors {
-		nodes, ok := nids[n.ID]
+		fk := n.OccupationID
+		node, ok := nodeids[fk]
 		if !ok {
-			return fmt.Errorf(`unexpected "employees" node returned %v`, n.ID)
+			return fmt.Errorf(`unexpected referenced foreign-key "occupation_id" returned %v for node %v`, fk, n.ID)
 		}
-		for kn := range nodes {
-			assign(kn, n)
-		}
+		assign(node, n)
 	}
 	return nil
 }
@@ -633,10 +602,10 @@ func (oq *OccupationQuery) querySpec() *sqlgraph.QuerySpec {
 			}
 		}
 		if oq.withCreator != nil {
-			_spec.Node.AddColumnOnce(occupation.FieldCreatedBy)
+			_spec.Node.AddColumnOnce(occupation.FieldCreatorID)
 		}
 		if oq.withUpdater != nil {
-			_spec.Node.AddColumnOnce(occupation.FieldUpdatedBy)
+			_spec.Node.AddColumnOnce(occupation.FieldUpdaterID)
 		}
 	}
 	if ps := oq.predicates; len(ps) > 0 {

@@ -89,30 +89,25 @@ func JoyRequestLog() gin.HandlerFunc {
 		c.Writer = blw
 
 		c.Next()
-		// after this 'c.Next()' part is for request response logs
-		// i standartize responses with a struct called ResponseModel
-		// and unmarshalled to get the response message
 
-		var mdl = http2.Payload{
-			Code:    0,
-			Message: "non debug mode",
-			Data:    nil,
-			Ref:     "",
-			Traceid: "",
+		var p http2.Payload
+		payload, ex := c.Get("payload")
+		if !ex {
+			utils.Logger.Error("payload not set")
+		} else {
+			p = payload.(http2.Payload)
 		}
-
-		if gin.Mode() == "debug" || blw.Status() >= 500 {
-			resp, err := io.ReadAll(blw.body)
+		var respBody = "non debug mode"
+		if gin.Mode() == "debug" {
+			bd, err := io.ReadAll(blw.body)
 			if err != nil {
 				utils.Logger.Error("Failed to read response body", zap.Error(err))
 			}
-			if json.Unmarshal(resp, &mdl) != nil {
-				mdl.Message = fmt.Sprintf("failed to Unmarshal resp, %v", err)
-			}
-			bs = bodyString
+			respBody = string(bd)
+			bb := []rune(bodyString)
+			bs = string(bb[:min(len(bb), 256)])
 		}
-
-		go _log.Printf("JOY RESPONSE:\n traceid: %v\n status: %v\n resp: %v\n body: %v\n%v\n\n\n", c.GetString("traceid"), blw.Status(), mdl, bs, strings.Repeat("=", 128))
+		go _log.Printf("JOY RESPONSE:\n traceid: %v\n status: %v\n payload: %v\n respBody: %v\n reqBody: %v\n%v\n\n\n", c.GetString("traceid"), blw.Status(), p, respBody, bs, strings.Repeat("=", 128))
 	}
 }
 

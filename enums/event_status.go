@@ -4,24 +4,24 @@ type EventStatus int
 
 const (
 	ESUnknown EventStatus = iota
-	ESPending
-	ESProcessing
-	ESProcessed
+	ES1
+	ES2
+	ES3
 )
 
 func (EventStatus) GetAll() []EventStatus {
 	return []EventStatus{
-		ESUnknown, ESPending, ESProcessing, ESProcessed,
+		ESUnknown, ES1, ES2, ES3,
 	}
 }
 
 func (p EventStatus) Label() string {
 	switch p {
-	case ESPending:
+	case ES1:
 		return "待处理"
-	case ESProcessing:
+	case ES2:
 		return "处理中"
-	case ESProcessed:
+	case ES3:
 		return "已处理"
 	default:
 		return "Unknown"

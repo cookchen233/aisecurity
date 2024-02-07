@@ -31,43 +31,43 @@ func (elu *EventLevelUpdate) Where(ps ...predicate.EventLevel) *EventLevelUpdate
 	return elu
 }
 
-// SetDeletedAt sets the "deleted_at" field.
-func (elu *EventLevelUpdate) SetDeletedAt(t time.Time) *EventLevelUpdate {
-	elu.mutation.SetDeletedAt(t)
+// SetDeleteTime sets the "delete_time" field.
+func (elu *EventLevelUpdate) SetDeleteTime(t time.Time) *EventLevelUpdate {
+	elu.mutation.SetDeleteTime(t)
 	return elu
 }
 
-// SetNillableDeletedAt sets the "deleted_at" field if the given value is not nil.
-func (elu *EventLevelUpdate) SetNillableDeletedAt(t *time.Time) *EventLevelUpdate {
+// SetNillableDeleteTime sets the "delete_time" field if the given value is not nil.
+func (elu *EventLevelUpdate) SetNillableDeleteTime(t *time.Time) *EventLevelUpdate {
 	if t != nil {
-		elu.SetDeletedAt(*t)
+		elu.SetDeleteTime(*t)
 	}
 	return elu
 }
 
-// ClearDeletedAt clears the value of the "deleted_at" field.
-func (elu *EventLevelUpdate) ClearDeletedAt() *EventLevelUpdate {
-	elu.mutation.ClearDeletedAt()
+// ClearDeleteTime clears the value of the "delete_time" field.
+func (elu *EventLevelUpdate) ClearDeleteTime() *EventLevelUpdate {
+	elu.mutation.ClearDeleteTime()
 	return elu
 }
 
-// SetUpdatedBy sets the "updated_by" field.
-func (elu *EventLevelUpdate) SetUpdatedBy(i int) *EventLevelUpdate {
-	elu.mutation.SetUpdatedBy(i)
+// SetUpdaterID sets the "updater_id" field.
+func (elu *EventLevelUpdate) SetUpdaterID(i int) *EventLevelUpdate {
+	elu.mutation.SetUpdaterID(i)
 	return elu
 }
 
-// SetNillableUpdatedBy sets the "updated_by" field if the given value is not nil.
-func (elu *EventLevelUpdate) SetNillableUpdatedBy(i *int) *EventLevelUpdate {
+// SetNillableUpdaterID sets the "updater_id" field if the given value is not nil.
+func (elu *EventLevelUpdate) SetNillableUpdaterID(i *int) *EventLevelUpdate {
 	if i != nil {
-		elu.SetUpdatedBy(*i)
+		elu.SetUpdaterID(*i)
 	}
 	return elu
 }
 
-// SetUpdatedAt sets the "updated_at" field.
-func (elu *EventLevelUpdate) SetUpdatedAt(t time.Time) *EventLevelUpdate {
-	elu.mutation.SetUpdatedAt(t)
+// SetUpdateTime sets the "update_time" field.
+func (elu *EventLevelUpdate) SetUpdateTime(t time.Time) *EventLevelUpdate {
+	elu.mutation.SetUpdateTime(t)
 	return elu
 }
 
@@ -123,29 +123,35 @@ func (elu *EventLevelUpdate) ClearDescription() *EventLevelUpdate {
 	return elu
 }
 
-// SetIsReport sets the "is_report" field.
-func (elu *EventLevelUpdate) SetIsReport(b bool) *EventLevelUpdate {
-	elu.mutation.SetIsReport(b)
+// SetIcon sets the "icon" field.
+func (elu *EventLevelUpdate) SetIcon(s string) *EventLevelUpdate {
+	elu.mutation.SetIcon(s)
 	return elu
 }
 
-// SetNillableIsReport sets the "is_report" field if the given value is not nil.
-func (elu *EventLevelUpdate) SetNillableIsReport(b *bool) *EventLevelUpdate {
-	if b != nil {
-		elu.SetIsReport(*b)
+// SetNillableIcon sets the "icon" field if the given value is not nil.
+func (elu *EventLevelUpdate) SetNillableIcon(s *string) *EventLevelUpdate {
+	if s != nil {
+		elu.SetIcon(*s)
 	}
 	return elu
 }
 
-// ClearIsReport clears the value of the "is_report" field.
-func (elu *EventLevelUpdate) ClearIsReport() *EventLevelUpdate {
-	elu.mutation.ClearIsReport()
+// ClearIcon clears the value of the "icon" field.
+func (elu *EventLevelUpdate) ClearIcon() *EventLevelUpdate {
+	elu.mutation.ClearIcon()
 	return elu
 }
 
-// SetUpdaterID sets the "updater" edge to the Admin entity by ID.
-func (elu *EventLevelUpdate) SetUpdaterID(id int) *EventLevelUpdate {
-	elu.mutation.SetUpdaterID(id)
+// SetNotifyTypes sets the "notify_types" field.
+func (elu *EventLevelUpdate) SetNotifyTypes(et []enums.NotifyType) *EventLevelUpdate {
+	elu.mutation.SetNotifyTypes(et)
+	return elu
+}
+
+// AppendNotifyTypes appends et to the "notify_types" field.
+func (elu *EventLevelUpdate) AppendNotifyTypes(et []enums.NotifyType) *EventLevelUpdate {
+	elu.mutation.AppendNotifyTypes(et)
 	return elu
 }
 
@@ -197,26 +203,31 @@ func (elu *EventLevelUpdate) ExecX(ctx context.Context) {
 
 // defaults sets the default values of the builder before save.
 func (elu *EventLevelUpdate) defaults() error {
-	if _, ok := elu.mutation.UpdatedAt(); !ok {
-		if eventlevel.UpdateDefaultUpdatedAt == nil {
-			return fmt.Errorf("dao: uninitialized eventlevel.UpdateDefaultUpdatedAt (forgotten import dao/runtime?)")
+	if _, ok := elu.mutation.UpdateTime(); !ok {
+		if eventlevel.UpdateDefaultUpdateTime == nil {
+			return fmt.Errorf("dao: uninitialized eventlevel.UpdateDefaultUpdateTime (forgotten import dao/runtime?)")
 		}
-		v := eventlevel.UpdateDefaultUpdatedAt()
-		elu.mutation.SetUpdatedAt(v)
+		v := eventlevel.UpdateDefaultUpdateTime()
+		elu.mutation.SetUpdateTime(v)
 	}
 	return nil
 }
 
 // check runs all checks and user-defined validators on the builder.
 func (elu *EventLevelUpdate) check() error {
-	if v, ok := elu.mutation.UpdatedBy(); ok {
-		if err := eventlevel.UpdatedByValidator(v); err != nil {
-			return &ValidationError{Name: "updated_by", err: fmt.Errorf(`dao: validator failed for field "EventLevel.updated_by": %w`, err)}
+	if v, ok := elu.mutation.UpdaterID(); ok {
+		if err := eventlevel.UpdaterIDValidator(v); err != nil {
+			return &ValidationError{Name: "updater_id", err: fmt.Errorf(`dao: validator failed for field "EventLevel.updater_id": %w`, err)}
 		}
 	}
 	if v, ok := elu.mutation.Name(); ok {
 		if err := eventlevel.NameValidator(v); err != nil {
 			return &ValidationError{Name: "name", err: fmt.Errorf(`dao: validator failed for field "EventLevel.name": %w`, err)}
+		}
+	}
+	if v, ok := elu.mutation.Icon(); ok {
+		if err := eventlevel.IconValidator(v); err != nil {
+			return &ValidationError{Name: "icon", err: fmt.Errorf(`dao: validator failed for field "EventLevel.icon": %w`, err)}
 		}
 	}
 	if _, ok := elu.mutation.CreatorID(); elu.mutation.CreatorCleared() && !ok {
@@ -240,14 +251,14 @@ func (elu *EventLevelUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			}
 		}
 	}
-	if value, ok := elu.mutation.DeletedAt(); ok {
-		_spec.SetField(eventlevel.FieldDeletedAt, field.TypeTime, value)
+	if value, ok := elu.mutation.DeleteTime(); ok {
+		_spec.SetField(eventlevel.FieldDeleteTime, field.TypeTime, value)
 	}
-	if elu.mutation.DeletedAtCleared() {
-		_spec.ClearField(eventlevel.FieldDeletedAt, field.TypeTime)
+	if elu.mutation.DeleteTimeCleared() {
+		_spec.ClearField(eventlevel.FieldDeleteTime, field.TypeTime)
 	}
-	if value, ok := elu.mutation.UpdatedAt(); ok {
-		_spec.SetField(eventlevel.FieldUpdatedAt, field.TypeTime, value)
+	if value, ok := elu.mutation.UpdateTime(); ok {
+		_spec.SetField(eventlevel.FieldUpdateTime, field.TypeTime, value)
 	}
 	if value, ok := elu.mutation.Name(); ok {
 		_spec.SetField(eventlevel.FieldName, field.TypeString, value)
@@ -269,11 +280,19 @@ func (elu *EventLevelUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	if elu.mutation.DescriptionCleared() {
 		_spec.ClearField(eventlevel.FieldDescription, field.TypeString)
 	}
-	if value, ok := elu.mutation.IsReport(); ok {
-		_spec.SetField(eventlevel.FieldIsReport, field.TypeBool, value)
+	if value, ok := elu.mutation.Icon(); ok {
+		_spec.SetField(eventlevel.FieldIcon, field.TypeString, value)
 	}
-	if elu.mutation.IsReportCleared() {
-		_spec.ClearField(eventlevel.FieldIsReport, field.TypeBool)
+	if elu.mutation.IconCleared() {
+		_spec.ClearField(eventlevel.FieldIcon, field.TypeString)
+	}
+	if value, ok := elu.mutation.NotifyTypes(); ok {
+		_spec.SetField(eventlevel.FieldNotifyTypes, field.TypeJSON, value)
+	}
+	if value, ok := elu.mutation.AppendedNotifyTypes(); ok {
+		_spec.AddModifier(func(u *sql.UpdateBuilder) {
+			sqljson.Append(u, eventlevel.FieldNotifyTypes, value)
+		})
 	}
 	if elu.mutation.UpdaterCleared() {
 		edge := &sqlgraph.EdgeSpec{
@@ -324,43 +343,43 @@ type EventLevelUpdateOne struct {
 	mutation *EventLevelMutation
 }
 
-// SetDeletedAt sets the "deleted_at" field.
-func (eluo *EventLevelUpdateOne) SetDeletedAt(t time.Time) *EventLevelUpdateOne {
-	eluo.mutation.SetDeletedAt(t)
+// SetDeleteTime sets the "delete_time" field.
+func (eluo *EventLevelUpdateOne) SetDeleteTime(t time.Time) *EventLevelUpdateOne {
+	eluo.mutation.SetDeleteTime(t)
 	return eluo
 }
 
-// SetNillableDeletedAt sets the "deleted_at" field if the given value is not nil.
-func (eluo *EventLevelUpdateOne) SetNillableDeletedAt(t *time.Time) *EventLevelUpdateOne {
+// SetNillableDeleteTime sets the "delete_time" field if the given value is not nil.
+func (eluo *EventLevelUpdateOne) SetNillableDeleteTime(t *time.Time) *EventLevelUpdateOne {
 	if t != nil {
-		eluo.SetDeletedAt(*t)
+		eluo.SetDeleteTime(*t)
 	}
 	return eluo
 }
 
-// ClearDeletedAt clears the value of the "deleted_at" field.
-func (eluo *EventLevelUpdateOne) ClearDeletedAt() *EventLevelUpdateOne {
-	eluo.mutation.ClearDeletedAt()
+// ClearDeleteTime clears the value of the "delete_time" field.
+func (eluo *EventLevelUpdateOne) ClearDeleteTime() *EventLevelUpdateOne {
+	eluo.mutation.ClearDeleteTime()
 	return eluo
 }
 
-// SetUpdatedBy sets the "updated_by" field.
-func (eluo *EventLevelUpdateOne) SetUpdatedBy(i int) *EventLevelUpdateOne {
-	eluo.mutation.SetUpdatedBy(i)
+// SetUpdaterID sets the "updater_id" field.
+func (eluo *EventLevelUpdateOne) SetUpdaterID(i int) *EventLevelUpdateOne {
+	eluo.mutation.SetUpdaterID(i)
 	return eluo
 }
 
-// SetNillableUpdatedBy sets the "updated_by" field if the given value is not nil.
-func (eluo *EventLevelUpdateOne) SetNillableUpdatedBy(i *int) *EventLevelUpdateOne {
+// SetNillableUpdaterID sets the "updater_id" field if the given value is not nil.
+func (eluo *EventLevelUpdateOne) SetNillableUpdaterID(i *int) *EventLevelUpdateOne {
 	if i != nil {
-		eluo.SetUpdatedBy(*i)
+		eluo.SetUpdaterID(*i)
 	}
 	return eluo
 }
 
-// SetUpdatedAt sets the "updated_at" field.
-func (eluo *EventLevelUpdateOne) SetUpdatedAt(t time.Time) *EventLevelUpdateOne {
-	eluo.mutation.SetUpdatedAt(t)
+// SetUpdateTime sets the "update_time" field.
+func (eluo *EventLevelUpdateOne) SetUpdateTime(t time.Time) *EventLevelUpdateOne {
+	eluo.mutation.SetUpdateTime(t)
 	return eluo
 }
 
@@ -416,29 +435,35 @@ func (eluo *EventLevelUpdateOne) ClearDescription() *EventLevelUpdateOne {
 	return eluo
 }
 
-// SetIsReport sets the "is_report" field.
-func (eluo *EventLevelUpdateOne) SetIsReport(b bool) *EventLevelUpdateOne {
-	eluo.mutation.SetIsReport(b)
+// SetIcon sets the "icon" field.
+func (eluo *EventLevelUpdateOne) SetIcon(s string) *EventLevelUpdateOne {
+	eluo.mutation.SetIcon(s)
 	return eluo
 }
 
-// SetNillableIsReport sets the "is_report" field if the given value is not nil.
-func (eluo *EventLevelUpdateOne) SetNillableIsReport(b *bool) *EventLevelUpdateOne {
-	if b != nil {
-		eluo.SetIsReport(*b)
+// SetNillableIcon sets the "icon" field if the given value is not nil.
+func (eluo *EventLevelUpdateOne) SetNillableIcon(s *string) *EventLevelUpdateOne {
+	if s != nil {
+		eluo.SetIcon(*s)
 	}
 	return eluo
 }
 
-// ClearIsReport clears the value of the "is_report" field.
-func (eluo *EventLevelUpdateOne) ClearIsReport() *EventLevelUpdateOne {
-	eluo.mutation.ClearIsReport()
+// ClearIcon clears the value of the "icon" field.
+func (eluo *EventLevelUpdateOne) ClearIcon() *EventLevelUpdateOne {
+	eluo.mutation.ClearIcon()
 	return eluo
 }
 
-// SetUpdaterID sets the "updater" edge to the Admin entity by ID.
-func (eluo *EventLevelUpdateOne) SetUpdaterID(id int) *EventLevelUpdateOne {
-	eluo.mutation.SetUpdaterID(id)
+// SetNotifyTypes sets the "notify_types" field.
+func (eluo *EventLevelUpdateOne) SetNotifyTypes(et []enums.NotifyType) *EventLevelUpdateOne {
+	eluo.mutation.SetNotifyTypes(et)
+	return eluo
+}
+
+// AppendNotifyTypes appends et to the "notify_types" field.
+func (eluo *EventLevelUpdateOne) AppendNotifyTypes(et []enums.NotifyType) *EventLevelUpdateOne {
+	eluo.mutation.AppendNotifyTypes(et)
 	return eluo
 }
 
@@ -503,26 +528,31 @@ func (eluo *EventLevelUpdateOne) ExecX(ctx context.Context) {
 
 // defaults sets the default values of the builder before save.
 func (eluo *EventLevelUpdateOne) defaults() error {
-	if _, ok := eluo.mutation.UpdatedAt(); !ok {
-		if eventlevel.UpdateDefaultUpdatedAt == nil {
-			return fmt.Errorf("dao: uninitialized eventlevel.UpdateDefaultUpdatedAt (forgotten import dao/runtime?)")
+	if _, ok := eluo.mutation.UpdateTime(); !ok {
+		if eventlevel.UpdateDefaultUpdateTime == nil {
+			return fmt.Errorf("dao: uninitialized eventlevel.UpdateDefaultUpdateTime (forgotten import dao/runtime?)")
 		}
-		v := eventlevel.UpdateDefaultUpdatedAt()
-		eluo.mutation.SetUpdatedAt(v)
+		v := eventlevel.UpdateDefaultUpdateTime()
+		eluo.mutation.SetUpdateTime(v)
 	}
 	return nil
 }
 
 // check runs all checks and user-defined validators on the builder.
 func (eluo *EventLevelUpdateOne) check() error {
-	if v, ok := eluo.mutation.UpdatedBy(); ok {
-		if err := eventlevel.UpdatedByValidator(v); err != nil {
-			return &ValidationError{Name: "updated_by", err: fmt.Errorf(`dao: validator failed for field "EventLevel.updated_by": %w`, err)}
+	if v, ok := eluo.mutation.UpdaterID(); ok {
+		if err := eventlevel.UpdaterIDValidator(v); err != nil {
+			return &ValidationError{Name: "updater_id", err: fmt.Errorf(`dao: validator failed for field "EventLevel.updater_id": %w`, err)}
 		}
 	}
 	if v, ok := eluo.mutation.Name(); ok {
 		if err := eventlevel.NameValidator(v); err != nil {
 			return &ValidationError{Name: "name", err: fmt.Errorf(`dao: validator failed for field "EventLevel.name": %w`, err)}
+		}
+	}
+	if v, ok := eluo.mutation.Icon(); ok {
+		if err := eventlevel.IconValidator(v); err != nil {
+			return &ValidationError{Name: "icon", err: fmt.Errorf(`dao: validator failed for field "EventLevel.icon": %w`, err)}
 		}
 	}
 	if _, ok := eluo.mutation.CreatorID(); eluo.mutation.CreatorCleared() && !ok {
@@ -563,14 +593,14 @@ func (eluo *EventLevelUpdateOne) sqlSave(ctx context.Context) (_node *EventLevel
 			}
 		}
 	}
-	if value, ok := eluo.mutation.DeletedAt(); ok {
-		_spec.SetField(eventlevel.FieldDeletedAt, field.TypeTime, value)
+	if value, ok := eluo.mutation.DeleteTime(); ok {
+		_spec.SetField(eventlevel.FieldDeleteTime, field.TypeTime, value)
 	}
-	if eluo.mutation.DeletedAtCleared() {
-		_spec.ClearField(eventlevel.FieldDeletedAt, field.TypeTime)
+	if eluo.mutation.DeleteTimeCleared() {
+		_spec.ClearField(eventlevel.FieldDeleteTime, field.TypeTime)
 	}
-	if value, ok := eluo.mutation.UpdatedAt(); ok {
-		_spec.SetField(eventlevel.FieldUpdatedAt, field.TypeTime, value)
+	if value, ok := eluo.mutation.UpdateTime(); ok {
+		_spec.SetField(eventlevel.FieldUpdateTime, field.TypeTime, value)
 	}
 	if value, ok := eluo.mutation.Name(); ok {
 		_spec.SetField(eventlevel.FieldName, field.TypeString, value)
@@ -592,11 +622,19 @@ func (eluo *EventLevelUpdateOne) sqlSave(ctx context.Context) (_node *EventLevel
 	if eluo.mutation.DescriptionCleared() {
 		_spec.ClearField(eventlevel.FieldDescription, field.TypeString)
 	}
-	if value, ok := eluo.mutation.IsReport(); ok {
-		_spec.SetField(eventlevel.FieldIsReport, field.TypeBool, value)
+	if value, ok := eluo.mutation.Icon(); ok {
+		_spec.SetField(eventlevel.FieldIcon, field.TypeString, value)
 	}
-	if eluo.mutation.IsReportCleared() {
-		_spec.ClearField(eventlevel.FieldIsReport, field.TypeBool)
+	if eluo.mutation.IconCleared() {
+		_spec.ClearField(eventlevel.FieldIcon, field.TypeString)
+	}
+	if value, ok := eluo.mutation.NotifyTypes(); ok {
+		_spec.SetField(eventlevel.FieldNotifyTypes, field.TypeJSON, value)
+	}
+	if value, ok := eluo.mutation.AppendedNotifyTypes(); ok {
+		_spec.AddModifier(func(u *sql.UpdateBuilder) {
+			sqljson.Append(u, eventlevel.FieldNotifyTypes, value)
+		})
 	}
 	if eluo.mutation.UpdaterCleared() {
 		edge := &sqlgraph.EdgeSpec{

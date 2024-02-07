@@ -31,43 +31,43 @@ func (diu *DeviceInstallationUpdate) Where(ps ...predicate.DeviceInstallation) *
 	return diu
 }
 
-// SetDeletedAt sets the "deleted_at" field.
-func (diu *DeviceInstallationUpdate) SetDeletedAt(t time.Time) *DeviceInstallationUpdate {
-	diu.mutation.SetDeletedAt(t)
+// SetDeleteTime sets the "delete_time" field.
+func (diu *DeviceInstallationUpdate) SetDeleteTime(t time.Time) *DeviceInstallationUpdate {
+	diu.mutation.SetDeleteTime(t)
 	return diu
 }
 
-// SetNillableDeletedAt sets the "deleted_at" field if the given value is not nil.
-func (diu *DeviceInstallationUpdate) SetNillableDeletedAt(t *time.Time) *DeviceInstallationUpdate {
+// SetNillableDeleteTime sets the "delete_time" field if the given value is not nil.
+func (diu *DeviceInstallationUpdate) SetNillableDeleteTime(t *time.Time) *DeviceInstallationUpdate {
 	if t != nil {
-		diu.SetDeletedAt(*t)
+		diu.SetDeleteTime(*t)
 	}
 	return diu
 }
 
-// ClearDeletedAt clears the value of the "deleted_at" field.
-func (diu *DeviceInstallationUpdate) ClearDeletedAt() *DeviceInstallationUpdate {
-	diu.mutation.ClearDeletedAt()
+// ClearDeleteTime clears the value of the "delete_time" field.
+func (diu *DeviceInstallationUpdate) ClearDeleteTime() *DeviceInstallationUpdate {
+	diu.mutation.ClearDeleteTime()
 	return diu
 }
 
-// SetUpdatedBy sets the "updated_by" field.
-func (diu *DeviceInstallationUpdate) SetUpdatedBy(i int) *DeviceInstallationUpdate {
-	diu.mutation.SetUpdatedBy(i)
+// SetUpdaterID sets the "updater_id" field.
+func (diu *DeviceInstallationUpdate) SetUpdaterID(i int) *DeviceInstallationUpdate {
+	diu.mutation.SetUpdaterID(i)
 	return diu
 }
 
-// SetNillableUpdatedBy sets the "updated_by" field if the given value is not nil.
-func (diu *DeviceInstallationUpdate) SetNillableUpdatedBy(i *int) *DeviceInstallationUpdate {
+// SetNillableUpdaterID sets the "updater_id" field if the given value is not nil.
+func (diu *DeviceInstallationUpdate) SetNillableUpdaterID(i *int) *DeviceInstallationUpdate {
 	if i != nil {
-		diu.SetUpdatedBy(*i)
+		diu.SetUpdaterID(*i)
 	}
 	return diu
 }
 
-// SetUpdatedAt sets the "updated_at" field.
-func (diu *DeviceInstallationUpdate) SetUpdatedAt(t time.Time) *DeviceInstallationUpdate {
-	diu.mutation.SetUpdatedAt(t)
+// SetUpdateTime sets the "update_time" field.
+func (diu *DeviceInstallationUpdate) SetUpdateTime(t time.Time) *DeviceInstallationUpdate {
+	diu.mutation.SetUpdateTime(t)
 	return diu
 }
 
@@ -241,12 +241,6 @@ func (diu *DeviceInstallationUpdate) ClearInstallTime() *DeviceInstallationUpdat
 	return diu
 }
 
-// SetUpdaterID sets the "updater" edge to the Admin entity by ID.
-func (diu *DeviceInstallationUpdate) SetUpdaterID(id int) *DeviceInstallationUpdate {
-	diu.mutation.SetUpdaterID(id)
-	return diu
-}
-
 // SetUpdater sets the "updater" edge to the Admin entity.
 func (diu *DeviceInstallationUpdate) SetUpdater(a *Admin) *DeviceInstallationUpdate {
 	return diu.SetUpdaterID(a.ID)
@@ -317,21 +311,21 @@ func (diu *DeviceInstallationUpdate) ExecX(ctx context.Context) {
 
 // defaults sets the default values of the builder before save.
 func (diu *DeviceInstallationUpdate) defaults() error {
-	if _, ok := diu.mutation.UpdatedAt(); !ok {
-		if deviceinstallation.UpdateDefaultUpdatedAt == nil {
-			return fmt.Errorf("dao: uninitialized deviceinstallation.UpdateDefaultUpdatedAt (forgotten import dao/runtime?)")
+	if _, ok := diu.mutation.UpdateTime(); !ok {
+		if deviceinstallation.UpdateDefaultUpdateTime == nil {
+			return fmt.Errorf("dao: uninitialized deviceinstallation.UpdateDefaultUpdateTime (forgotten import dao/runtime?)")
 		}
-		v := deviceinstallation.UpdateDefaultUpdatedAt()
-		diu.mutation.SetUpdatedAt(v)
+		v := deviceinstallation.UpdateDefaultUpdateTime()
+		diu.mutation.SetUpdateTime(v)
 	}
 	return nil
 }
 
 // check runs all checks and user-defined validators on the builder.
 func (diu *DeviceInstallationUpdate) check() error {
-	if v, ok := diu.mutation.UpdatedBy(); ok {
-		if err := deviceinstallation.UpdatedByValidator(v); err != nil {
-			return &ValidationError{Name: "updated_by", err: fmt.Errorf(`dao: validator failed for field "DeviceInstallation.updated_by": %w`, err)}
+	if v, ok := diu.mutation.UpdaterID(); ok {
+		if err := deviceinstallation.UpdaterIDValidator(v); err != nil {
+			return &ValidationError{Name: "updater_id", err: fmt.Errorf(`dao: validator failed for field "DeviceInstallation.updater_id": %w`, err)}
 		}
 	}
 	if v, ok := diu.mutation.DeviceID(); ok {
@@ -376,14 +370,14 @@ func (diu *DeviceInstallationUpdate) sqlSave(ctx context.Context) (n int, err er
 			}
 		}
 	}
-	if value, ok := diu.mutation.DeletedAt(); ok {
-		_spec.SetField(deviceinstallation.FieldDeletedAt, field.TypeTime, value)
+	if value, ok := diu.mutation.DeleteTime(); ok {
+		_spec.SetField(deviceinstallation.FieldDeleteTime, field.TypeTime, value)
 	}
-	if diu.mutation.DeletedAtCleared() {
-		_spec.ClearField(deviceinstallation.FieldDeletedAt, field.TypeTime)
+	if diu.mutation.DeleteTimeCleared() {
+		_spec.ClearField(deviceinstallation.FieldDeleteTime, field.TypeTime)
 	}
-	if value, ok := diu.mutation.UpdatedAt(); ok {
-		_spec.SetField(deviceinstallation.FieldUpdatedAt, field.TypeTime, value)
+	if value, ok := diu.mutation.UpdateTime(); ok {
+		_spec.SetField(deviceinstallation.FieldUpdateTime, field.TypeTime, value)
 	}
 	if value, ok := diu.mutation.AliasName(); ok {
 		_spec.SetField(deviceinstallation.FieldAliasName, field.TypeString, value)
@@ -534,43 +528,43 @@ type DeviceInstallationUpdateOne struct {
 	mutation *DeviceInstallationMutation
 }
 
-// SetDeletedAt sets the "deleted_at" field.
-func (diuo *DeviceInstallationUpdateOne) SetDeletedAt(t time.Time) *DeviceInstallationUpdateOne {
-	diuo.mutation.SetDeletedAt(t)
+// SetDeleteTime sets the "delete_time" field.
+func (diuo *DeviceInstallationUpdateOne) SetDeleteTime(t time.Time) *DeviceInstallationUpdateOne {
+	diuo.mutation.SetDeleteTime(t)
 	return diuo
 }
 
-// SetNillableDeletedAt sets the "deleted_at" field if the given value is not nil.
-func (diuo *DeviceInstallationUpdateOne) SetNillableDeletedAt(t *time.Time) *DeviceInstallationUpdateOne {
+// SetNillableDeleteTime sets the "delete_time" field if the given value is not nil.
+func (diuo *DeviceInstallationUpdateOne) SetNillableDeleteTime(t *time.Time) *DeviceInstallationUpdateOne {
 	if t != nil {
-		diuo.SetDeletedAt(*t)
+		diuo.SetDeleteTime(*t)
 	}
 	return diuo
 }
 
-// ClearDeletedAt clears the value of the "deleted_at" field.
-func (diuo *DeviceInstallationUpdateOne) ClearDeletedAt() *DeviceInstallationUpdateOne {
-	diuo.mutation.ClearDeletedAt()
+// ClearDeleteTime clears the value of the "delete_time" field.
+func (diuo *DeviceInstallationUpdateOne) ClearDeleteTime() *DeviceInstallationUpdateOne {
+	diuo.mutation.ClearDeleteTime()
 	return diuo
 }
 
-// SetUpdatedBy sets the "updated_by" field.
-func (diuo *DeviceInstallationUpdateOne) SetUpdatedBy(i int) *DeviceInstallationUpdateOne {
-	diuo.mutation.SetUpdatedBy(i)
+// SetUpdaterID sets the "updater_id" field.
+func (diuo *DeviceInstallationUpdateOne) SetUpdaterID(i int) *DeviceInstallationUpdateOne {
+	diuo.mutation.SetUpdaterID(i)
 	return diuo
 }
 
-// SetNillableUpdatedBy sets the "updated_by" field if the given value is not nil.
-func (diuo *DeviceInstallationUpdateOne) SetNillableUpdatedBy(i *int) *DeviceInstallationUpdateOne {
+// SetNillableUpdaterID sets the "updater_id" field if the given value is not nil.
+func (diuo *DeviceInstallationUpdateOne) SetNillableUpdaterID(i *int) *DeviceInstallationUpdateOne {
 	if i != nil {
-		diuo.SetUpdatedBy(*i)
+		diuo.SetUpdaterID(*i)
 	}
 	return diuo
 }
 
-// SetUpdatedAt sets the "updated_at" field.
-func (diuo *DeviceInstallationUpdateOne) SetUpdatedAt(t time.Time) *DeviceInstallationUpdateOne {
-	diuo.mutation.SetUpdatedAt(t)
+// SetUpdateTime sets the "update_time" field.
+func (diuo *DeviceInstallationUpdateOne) SetUpdateTime(t time.Time) *DeviceInstallationUpdateOne {
+	diuo.mutation.SetUpdateTime(t)
 	return diuo
 }
 
@@ -744,12 +738,6 @@ func (diuo *DeviceInstallationUpdateOne) ClearInstallTime() *DeviceInstallationU
 	return diuo
 }
 
-// SetUpdaterID sets the "updater" edge to the Admin entity by ID.
-func (diuo *DeviceInstallationUpdateOne) SetUpdaterID(id int) *DeviceInstallationUpdateOne {
-	diuo.mutation.SetUpdaterID(id)
-	return diuo
-}
-
 // SetUpdater sets the "updater" edge to the Admin entity.
 func (diuo *DeviceInstallationUpdateOne) SetUpdater(a *Admin) *DeviceInstallationUpdateOne {
 	return diuo.SetUpdaterID(a.ID)
@@ -833,21 +821,21 @@ func (diuo *DeviceInstallationUpdateOne) ExecX(ctx context.Context) {
 
 // defaults sets the default values of the builder before save.
 func (diuo *DeviceInstallationUpdateOne) defaults() error {
-	if _, ok := diuo.mutation.UpdatedAt(); !ok {
-		if deviceinstallation.UpdateDefaultUpdatedAt == nil {
-			return fmt.Errorf("dao: uninitialized deviceinstallation.UpdateDefaultUpdatedAt (forgotten import dao/runtime?)")
+	if _, ok := diuo.mutation.UpdateTime(); !ok {
+		if deviceinstallation.UpdateDefaultUpdateTime == nil {
+			return fmt.Errorf("dao: uninitialized deviceinstallation.UpdateDefaultUpdateTime (forgotten import dao/runtime?)")
 		}
-		v := deviceinstallation.UpdateDefaultUpdatedAt()
-		diuo.mutation.SetUpdatedAt(v)
+		v := deviceinstallation.UpdateDefaultUpdateTime()
+		diuo.mutation.SetUpdateTime(v)
 	}
 	return nil
 }
 
 // check runs all checks and user-defined validators on the builder.
 func (diuo *DeviceInstallationUpdateOne) check() error {
-	if v, ok := diuo.mutation.UpdatedBy(); ok {
-		if err := deviceinstallation.UpdatedByValidator(v); err != nil {
-			return &ValidationError{Name: "updated_by", err: fmt.Errorf(`dao: validator failed for field "DeviceInstallation.updated_by": %w`, err)}
+	if v, ok := diuo.mutation.UpdaterID(); ok {
+		if err := deviceinstallation.UpdaterIDValidator(v); err != nil {
+			return &ValidationError{Name: "updater_id", err: fmt.Errorf(`dao: validator failed for field "DeviceInstallation.updater_id": %w`, err)}
 		}
 	}
 	if v, ok := diuo.mutation.DeviceID(); ok {
@@ -909,14 +897,14 @@ func (diuo *DeviceInstallationUpdateOne) sqlSave(ctx context.Context) (_node *De
 			}
 		}
 	}
-	if value, ok := diuo.mutation.DeletedAt(); ok {
-		_spec.SetField(deviceinstallation.FieldDeletedAt, field.TypeTime, value)
+	if value, ok := diuo.mutation.DeleteTime(); ok {
+		_spec.SetField(deviceinstallation.FieldDeleteTime, field.TypeTime, value)
 	}
-	if diuo.mutation.DeletedAtCleared() {
-		_spec.ClearField(deviceinstallation.FieldDeletedAt, field.TypeTime)
+	if diuo.mutation.DeleteTimeCleared() {
+		_spec.ClearField(deviceinstallation.FieldDeleteTime, field.TypeTime)
 	}
-	if value, ok := diuo.mutation.UpdatedAt(); ok {
-		_spec.SetField(deviceinstallation.FieldUpdatedAt, field.TypeTime, value)
+	if value, ok := diuo.mutation.UpdateTime(); ok {
+		_spec.SetField(deviceinstallation.FieldUpdateTime, field.TypeTime, value)
 	}
 	if value, ok := diuo.mutation.AliasName(); ok {
 		_spec.SetField(deviceinstallation.FieldAliasName, field.TypeString, value)

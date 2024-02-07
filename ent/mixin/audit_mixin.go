@@ -22,11 +22,11 @@ type AuditMixin struct {
 // Fields of the Admin.
 func (AuditMixin) Fields() []ent.Field {
 	return []ent.Field{
-		field.Time("created_at").Comment("创建时间").Default(time.Now).Immutable(),
-		field.Int("created_by").Comment("创建者").Positive().Immutable(),
-		field.Time("deleted_at").Comment("删除时间").Optional().Nillable(),
-		field.Int("updated_by").Comment("最后更新者").Positive(),
-		field.Time("updated_at").Comment("最后更新时间").Default(time.Now).UpdateDefault(time.Now),
+		field.Time("create_time").Comment("创建时间").Default(time.Now).Immutable(),
+		field.Int("creator_id").Comment("创建者").Positive().Immutable(),
+		field.Time("delete_time").Comment("删除时间").Optional().Nillable(),
+		field.Int("updater_id").Comment("最后更新者").Positive(),
+		field.Time("update_time").Comment("最后更新时间").Default(time.Now).UpdateDefault(time.Now),
 	}
 }
 
@@ -42,10 +42,10 @@ func AuditHook(next ent.Mutator) ent.Mutator {
 	// schemas that embed the AuditLog mixin. The variable "exists" is true, if
 	// the field already exists in the mutation (e.g. was set by a different hook).
 	type AuditLogger interface {
-		SetCreatedBy(int)
-		CreatedBy() (id int, exists bool)
-		SetUpdatedBy(int)
-		UpdatedBy() (id int, exists bool)
+		SetCreatorID(int)
+		CreatorID() (id int, exists bool)
+		SetUpdaterID(int)
+		UpdaterID() (id int, exists bool)
 	}
 
 	return ent.MutateFunc(func(ctx context.Context, m ent.Mutation) (ent.Value, error) {
@@ -58,30 +58,26 @@ func AuditHook(next ent.Mutator) ent.Mutator {
 		if !ok {
 			return nil, errors.WithStack(fmt.Errorf("unexpected context type %T", ctx))
 		}
+
 		// set the admin id
 		adminID := max(1, ginCtx.GetInt("admin_id"))
-		//currentAdmin := auth.GetCurrentAdmin()
-		//if currentAdmin == nil {
-		//	log.Println("failed getting current admin, set the admin id to 1")
-		//	adminID = 1
-		//} else {
-		//	adminID = currentAdmin.ID
-		//}
-		switch op := m.Op(); {
-		case op.Is(ent.OpCreate):
-			if _, exists := ml.CreatedBy(); !exists {
-				ml.SetCreatedBy(adminID)
-			}
-			if _, exists := ml.UpdatedBy(); !exists {
-				ml.SetUpdatedBy(adminID)
-			}
-		case op.Is(ent.OpUpdateOne | ent.OpUpdate):
-			if _, exists := ml.UpdatedBy(); !exists {
-				ml.SetUpdatedBy(adminID)
+		if adminID > 0 {
+			switch op := m.Op(); {
+			case op.Is(ent.OpCreate):
+				if _, exists := ml.CreatorID(); !exists {
+					ml.SetCreatorID(adminID)
+				}
+				if _, exists := ml.UpdaterID(); !exists {
+					ml.SetUpdaterID(adminID)
+				}
+			case op.Is(ent.OpUpdateOne | ent.OpUpdate):
+				if _, exists := ml.UpdaterID(); !exists {
+					ml.SetUpdaterID(adminID)
+				}
 			}
 		}
+
 		// record data to audit log
-		//var f ent.Value
 		type fieldData struct {
 			Field string
 			Value ent.Value
@@ -103,6 +99,7 @@ func AuditHook(next ent.Mutator) ent.Mutator {
 				zap.Any("fields", fields),
 			)
 		}
+
 		return next.Mutate(ctx, m)
 	})
 }

@@ -55,29 +55,29 @@ func IDLTE(id int) predicate.Area {
 	return predicate.Area(sql.FieldLTE(FieldID, id))
 }
 
-// CreatedAt applies equality check predicate on the "created_at" field. It's identical to CreatedAtEQ.
-func CreatedAt(v time.Time) predicate.Area {
-	return predicate.Area(sql.FieldEQ(FieldCreatedAt, v))
+// CreateTime applies equality check predicate on the "create_time" field. It's identical to CreateTimeEQ.
+func CreateTime(v time.Time) predicate.Area {
+	return predicate.Area(sql.FieldEQ(FieldCreateTime, v))
 }
 
-// CreatedBy applies equality check predicate on the "created_by" field. It's identical to CreatedByEQ.
-func CreatedBy(v int) predicate.Area {
-	return predicate.Area(sql.FieldEQ(FieldCreatedBy, v))
+// CreatorID applies equality check predicate on the "creator_id" field. It's identical to CreatorIDEQ.
+func CreatorID(v int) predicate.Area {
+	return predicate.Area(sql.FieldEQ(FieldCreatorID, v))
 }
 
-// DeletedAt applies equality check predicate on the "deleted_at" field. It's identical to DeletedAtEQ.
-func DeletedAt(v time.Time) predicate.Area {
-	return predicate.Area(sql.FieldEQ(FieldDeletedAt, v))
+// DeleteTime applies equality check predicate on the "delete_time" field. It's identical to DeleteTimeEQ.
+func DeleteTime(v time.Time) predicate.Area {
+	return predicate.Area(sql.FieldEQ(FieldDeleteTime, v))
 }
 
-// UpdatedBy applies equality check predicate on the "updated_by" field. It's identical to UpdatedByEQ.
-func UpdatedBy(v int) predicate.Area {
-	return predicate.Area(sql.FieldEQ(FieldUpdatedBy, v))
+// UpdaterID applies equality check predicate on the "updater_id" field. It's identical to UpdaterIDEQ.
+func UpdaterID(v int) predicate.Area {
+	return predicate.Area(sql.FieldEQ(FieldUpdaterID, v))
 }
 
-// UpdatedAt applies equality check predicate on the "updated_at" field. It's identical to UpdatedAtEQ.
-func UpdatedAt(v time.Time) predicate.Area {
-	return predicate.Area(sql.FieldEQ(FieldUpdatedAt, v))
+// UpdateTime applies equality check predicate on the "update_time" field. It's identical to UpdateTimeEQ.
+func UpdateTime(v time.Time) predicate.Area {
+	return predicate.Area(sql.FieldEQ(FieldUpdateTime, v))
 }
 
 // Name applies equality check predicate on the "name" field. It's identical to NameEQ.
@@ -90,174 +90,174 @@ func Description(v string) predicate.Area {
 	return predicate.Area(sql.FieldEQ(FieldDescription, v))
 }
 
-// CreatedAtEQ applies the EQ predicate on the "created_at" field.
-func CreatedAtEQ(v time.Time) predicate.Area {
-	return predicate.Area(sql.FieldEQ(FieldCreatedAt, v))
+// CreateTimeEQ applies the EQ predicate on the "create_time" field.
+func CreateTimeEQ(v time.Time) predicate.Area {
+	return predicate.Area(sql.FieldEQ(FieldCreateTime, v))
 }
 
-// CreatedAtNEQ applies the NEQ predicate on the "created_at" field.
-func CreatedAtNEQ(v time.Time) predicate.Area {
-	return predicate.Area(sql.FieldNEQ(FieldCreatedAt, v))
+// CreateTimeNEQ applies the NEQ predicate on the "create_time" field.
+func CreateTimeNEQ(v time.Time) predicate.Area {
+	return predicate.Area(sql.FieldNEQ(FieldCreateTime, v))
 }
 
-// CreatedAtIn applies the In predicate on the "created_at" field.
-func CreatedAtIn(vs ...time.Time) predicate.Area {
-	return predicate.Area(sql.FieldIn(FieldCreatedAt, vs...))
+// CreateTimeIn applies the In predicate on the "create_time" field.
+func CreateTimeIn(vs ...time.Time) predicate.Area {
+	return predicate.Area(sql.FieldIn(FieldCreateTime, vs...))
 }
 
-// CreatedAtNotIn applies the NotIn predicate on the "created_at" field.
-func CreatedAtNotIn(vs ...time.Time) predicate.Area {
-	return predicate.Area(sql.FieldNotIn(FieldCreatedAt, vs...))
+// CreateTimeNotIn applies the NotIn predicate on the "create_time" field.
+func CreateTimeNotIn(vs ...time.Time) predicate.Area {
+	return predicate.Area(sql.FieldNotIn(FieldCreateTime, vs...))
 }
 
-// CreatedAtGT applies the GT predicate on the "created_at" field.
-func CreatedAtGT(v time.Time) predicate.Area {
-	return predicate.Area(sql.FieldGT(FieldCreatedAt, v))
+// CreateTimeGT applies the GT predicate on the "create_time" field.
+func CreateTimeGT(v time.Time) predicate.Area {
+	return predicate.Area(sql.FieldGT(FieldCreateTime, v))
 }
 
-// CreatedAtGTE applies the GTE predicate on the "created_at" field.
-func CreatedAtGTE(v time.Time) predicate.Area {
-	return predicate.Area(sql.FieldGTE(FieldCreatedAt, v))
+// CreateTimeGTE applies the GTE predicate on the "create_time" field.
+func CreateTimeGTE(v time.Time) predicate.Area {
+	return predicate.Area(sql.FieldGTE(FieldCreateTime, v))
 }
 
-// CreatedAtLT applies the LT predicate on the "created_at" field.
-func CreatedAtLT(v time.Time) predicate.Area {
-	return predicate.Area(sql.FieldLT(FieldCreatedAt, v))
+// CreateTimeLT applies the LT predicate on the "create_time" field.
+func CreateTimeLT(v time.Time) predicate.Area {
+	return predicate.Area(sql.FieldLT(FieldCreateTime, v))
 }
 
-// CreatedAtLTE applies the LTE predicate on the "created_at" field.
-func CreatedAtLTE(v time.Time) predicate.Area {
-	return predicate.Area(sql.FieldLTE(FieldCreatedAt, v))
+// CreateTimeLTE applies the LTE predicate on the "create_time" field.
+func CreateTimeLTE(v time.Time) predicate.Area {
+	return predicate.Area(sql.FieldLTE(FieldCreateTime, v))
 }
 
-// CreatedByEQ applies the EQ predicate on the "created_by" field.
-func CreatedByEQ(v int) predicate.Area {
-	return predicate.Area(sql.FieldEQ(FieldCreatedBy, v))
+// CreatorIDEQ applies the EQ predicate on the "creator_id" field.
+func CreatorIDEQ(v int) predicate.Area {
+	return predicate.Area(sql.FieldEQ(FieldCreatorID, v))
 }
 
-// CreatedByNEQ applies the NEQ predicate on the "created_by" field.
-func CreatedByNEQ(v int) predicate.Area {
-	return predicate.Area(sql.FieldNEQ(FieldCreatedBy, v))
+// CreatorIDNEQ applies the NEQ predicate on the "creator_id" field.
+func CreatorIDNEQ(v int) predicate.Area {
+	return predicate.Area(sql.FieldNEQ(FieldCreatorID, v))
 }
 
-// CreatedByIn applies the In predicate on the "created_by" field.
-func CreatedByIn(vs ...int) predicate.Area {
-	return predicate.Area(sql.FieldIn(FieldCreatedBy, vs...))
+// CreatorIDIn applies the In predicate on the "creator_id" field.
+func CreatorIDIn(vs ...int) predicate.Area {
+	return predicate.Area(sql.FieldIn(FieldCreatorID, vs...))
 }
 
-// CreatedByNotIn applies the NotIn predicate on the "created_by" field.
-func CreatedByNotIn(vs ...int) predicate.Area {
-	return predicate.Area(sql.FieldNotIn(FieldCreatedBy, vs...))
+// CreatorIDNotIn applies the NotIn predicate on the "creator_id" field.
+func CreatorIDNotIn(vs ...int) predicate.Area {
+	return predicate.Area(sql.FieldNotIn(FieldCreatorID, vs...))
 }
 
-// DeletedAtEQ applies the EQ predicate on the "deleted_at" field.
-func DeletedAtEQ(v time.Time) predicate.Area {
-	return predicate.Area(sql.FieldEQ(FieldDeletedAt, v))
+// DeleteTimeEQ applies the EQ predicate on the "delete_time" field.
+func DeleteTimeEQ(v time.Time) predicate.Area {
+	return predicate.Area(sql.FieldEQ(FieldDeleteTime, v))
 }
 
-// DeletedAtNEQ applies the NEQ predicate on the "deleted_at" field.
-func DeletedAtNEQ(v time.Time) predicate.Area {
-	return predicate.Area(sql.FieldNEQ(FieldDeletedAt, v))
+// DeleteTimeNEQ applies the NEQ predicate on the "delete_time" field.
+func DeleteTimeNEQ(v time.Time) predicate.Area {
+	return predicate.Area(sql.FieldNEQ(FieldDeleteTime, v))
 }
 
-// DeletedAtIn applies the In predicate on the "deleted_at" field.
-func DeletedAtIn(vs ...time.Time) predicate.Area {
-	return predicate.Area(sql.FieldIn(FieldDeletedAt, vs...))
+// DeleteTimeIn applies the In predicate on the "delete_time" field.
+func DeleteTimeIn(vs ...time.Time) predicate.Area {
+	return predicate.Area(sql.FieldIn(FieldDeleteTime, vs...))
 }
 
-// DeletedAtNotIn applies the NotIn predicate on the "deleted_at" field.
-func DeletedAtNotIn(vs ...time.Time) predicate.Area {
-	return predicate.Area(sql.FieldNotIn(FieldDeletedAt, vs...))
+// DeleteTimeNotIn applies the NotIn predicate on the "delete_time" field.
+func DeleteTimeNotIn(vs ...time.Time) predicate.Area {
+	return predicate.Area(sql.FieldNotIn(FieldDeleteTime, vs...))
 }
 
-// DeletedAtGT applies the GT predicate on the "deleted_at" field.
-func DeletedAtGT(v time.Time) predicate.Area {
-	return predicate.Area(sql.FieldGT(FieldDeletedAt, v))
+// DeleteTimeGT applies the GT predicate on the "delete_time" field.
+func DeleteTimeGT(v time.Time) predicate.Area {
+	return predicate.Area(sql.FieldGT(FieldDeleteTime, v))
 }
 
-// DeletedAtGTE applies the GTE predicate on the "deleted_at" field.
-func DeletedAtGTE(v time.Time) predicate.Area {
-	return predicate.Area(sql.FieldGTE(FieldDeletedAt, v))
+// DeleteTimeGTE applies the GTE predicate on the "delete_time" field.
+func DeleteTimeGTE(v time.Time) predicate.Area {
+	return predicate.Area(sql.FieldGTE(FieldDeleteTime, v))
 }
 
-// DeletedAtLT applies the LT predicate on the "deleted_at" field.
-func DeletedAtLT(v time.Time) predicate.Area {
-	return predicate.Area(sql.FieldLT(FieldDeletedAt, v))
+// DeleteTimeLT applies the LT predicate on the "delete_time" field.
+func DeleteTimeLT(v time.Time) predicate.Area {
+	return predicate.Area(sql.FieldLT(FieldDeleteTime, v))
 }
 
-// DeletedAtLTE applies the LTE predicate on the "deleted_at" field.
-func DeletedAtLTE(v time.Time) predicate.Area {
-	return predicate.Area(sql.FieldLTE(FieldDeletedAt, v))
+// DeleteTimeLTE applies the LTE predicate on the "delete_time" field.
+func DeleteTimeLTE(v time.Time) predicate.Area {
+	return predicate.Area(sql.FieldLTE(FieldDeleteTime, v))
 }
 
-// DeletedAtIsNil applies the IsNil predicate on the "deleted_at" field.
-func DeletedAtIsNil() predicate.Area {
-	return predicate.Area(sql.FieldIsNull(FieldDeletedAt))
+// DeleteTimeIsNil applies the IsNil predicate on the "delete_time" field.
+func DeleteTimeIsNil() predicate.Area {
+	return predicate.Area(sql.FieldIsNull(FieldDeleteTime))
 }
 
-// DeletedAtNotNil applies the NotNil predicate on the "deleted_at" field.
-func DeletedAtNotNil() predicate.Area {
-	return predicate.Area(sql.FieldNotNull(FieldDeletedAt))
+// DeleteTimeNotNil applies the NotNil predicate on the "delete_time" field.
+func DeleteTimeNotNil() predicate.Area {
+	return predicate.Area(sql.FieldNotNull(FieldDeleteTime))
 }
 
-// UpdatedByEQ applies the EQ predicate on the "updated_by" field.
-func UpdatedByEQ(v int) predicate.Area {
-	return predicate.Area(sql.FieldEQ(FieldUpdatedBy, v))
+// UpdaterIDEQ applies the EQ predicate on the "updater_id" field.
+func UpdaterIDEQ(v int) predicate.Area {
+	return predicate.Area(sql.FieldEQ(FieldUpdaterID, v))
 }
 
-// UpdatedByNEQ applies the NEQ predicate on the "updated_by" field.
-func UpdatedByNEQ(v int) predicate.Area {
-	return predicate.Area(sql.FieldNEQ(FieldUpdatedBy, v))
+// UpdaterIDNEQ applies the NEQ predicate on the "updater_id" field.
+func UpdaterIDNEQ(v int) predicate.Area {
+	return predicate.Area(sql.FieldNEQ(FieldUpdaterID, v))
 }
 
-// UpdatedByIn applies the In predicate on the "updated_by" field.
-func UpdatedByIn(vs ...int) predicate.Area {
-	return predicate.Area(sql.FieldIn(FieldUpdatedBy, vs...))
+// UpdaterIDIn applies the In predicate on the "updater_id" field.
+func UpdaterIDIn(vs ...int) predicate.Area {
+	return predicate.Area(sql.FieldIn(FieldUpdaterID, vs...))
 }
 
-// UpdatedByNotIn applies the NotIn predicate on the "updated_by" field.
-func UpdatedByNotIn(vs ...int) predicate.Area {
-	return predicate.Area(sql.FieldNotIn(FieldUpdatedBy, vs...))
+// UpdaterIDNotIn applies the NotIn predicate on the "updater_id" field.
+func UpdaterIDNotIn(vs ...int) predicate.Area {
+	return predicate.Area(sql.FieldNotIn(FieldUpdaterID, vs...))
 }
 
-// UpdatedAtEQ applies the EQ predicate on the "updated_at" field.
-func UpdatedAtEQ(v time.Time) predicate.Area {
-	return predicate.Area(sql.FieldEQ(FieldUpdatedAt, v))
+// UpdateTimeEQ applies the EQ predicate on the "update_time" field.
+func UpdateTimeEQ(v time.Time) predicate.Area {
+	return predicate.Area(sql.FieldEQ(FieldUpdateTime, v))
 }
 
-// UpdatedAtNEQ applies the NEQ predicate on the "updated_at" field.
-func UpdatedAtNEQ(v time.Time) predicate.Area {
-	return predicate.Area(sql.FieldNEQ(FieldUpdatedAt, v))
+// UpdateTimeNEQ applies the NEQ predicate on the "update_time" field.
+func UpdateTimeNEQ(v time.Time) predicate.Area {
+	return predicate.Area(sql.FieldNEQ(FieldUpdateTime, v))
 }
 
-// UpdatedAtIn applies the In predicate on the "updated_at" field.
-func UpdatedAtIn(vs ...time.Time) predicate.Area {
-	return predicate.Area(sql.FieldIn(FieldUpdatedAt, vs...))
+// UpdateTimeIn applies the In predicate on the "update_time" field.
+func UpdateTimeIn(vs ...time.Time) predicate.Area {
+	return predicate.Area(sql.FieldIn(FieldUpdateTime, vs...))
 }
 
-// UpdatedAtNotIn applies the NotIn predicate on the "updated_at" field.
-func UpdatedAtNotIn(vs ...time.Time) predicate.Area {
-	return predicate.Area(sql.FieldNotIn(FieldUpdatedAt, vs...))
+// UpdateTimeNotIn applies the NotIn predicate on the "update_time" field.
+func UpdateTimeNotIn(vs ...time.Time) predicate.Area {
+	return predicate.Area(sql.FieldNotIn(FieldUpdateTime, vs...))
 }
 
-// UpdatedAtGT applies the GT predicate on the "updated_at" field.
-func UpdatedAtGT(v time.Time) predicate.Area {
-	return predicate.Area(sql.FieldGT(FieldUpdatedAt, v))
+// UpdateTimeGT applies the GT predicate on the "update_time" field.
+func UpdateTimeGT(v time.Time) predicate.Area {
+	return predicate.Area(sql.FieldGT(FieldUpdateTime, v))
 }
 
-// UpdatedAtGTE applies the GTE predicate on the "updated_at" field.
-func UpdatedAtGTE(v time.Time) predicate.Area {
-	return predicate.Area(sql.FieldGTE(FieldUpdatedAt, v))
+// UpdateTimeGTE applies the GTE predicate on the "update_time" field.
+func UpdateTimeGTE(v time.Time) predicate.Area {
+	return predicate.Area(sql.FieldGTE(FieldUpdateTime, v))
 }
 
-// UpdatedAtLT applies the LT predicate on the "updated_at" field.
-func UpdatedAtLT(v time.Time) predicate.Area {
-	return predicate.Area(sql.FieldLT(FieldUpdatedAt, v))
+// UpdateTimeLT applies the LT predicate on the "update_time" field.
+func UpdateTimeLT(v time.Time) predicate.Area {
+	return predicate.Area(sql.FieldLT(FieldUpdateTime, v))
 }
 
-// UpdatedAtLTE applies the LTE predicate on the "updated_at" field.
-func UpdatedAtLTE(v time.Time) predicate.Area {
-	return predicate.Area(sql.FieldLTE(FieldUpdatedAt, v))
+// UpdateTimeLTE applies the LTE predicate on the "update_time" field.
+func UpdateTimeLTE(v time.Time) predicate.Area {
+	return predicate.Area(sql.FieldLTE(FieldUpdateTime, v))
 }
 
 // NameEQ applies the EQ predicate on the "name" field.
@@ -456,21 +456,21 @@ func HasUpdaterWith(preds ...predicate.Admin) predicate.Area {
 	})
 }
 
-// HasDeviceInstallationArea applies the HasEdge predicate on the "device_installation_area" edge.
-func HasDeviceInstallationArea() predicate.Area {
+// HasDeviceInstallation applies the HasEdge predicate on the "device_installation" edge.
+func HasDeviceInstallation() predicate.Area {
 	return predicate.Area(func(s *sql.Selector) {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(Table, FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, false, DeviceInstallationAreaTable, DeviceInstallationAreaColumn),
+			sqlgraph.Edge(sqlgraph.O2M, false, DeviceInstallationTable, DeviceInstallationColumn),
 		)
 		sqlgraph.HasNeighbors(s, step)
 	})
 }
 
-// HasDeviceInstallationAreaWith applies the HasEdge predicate on the "device_installation_area" edge with a given conditions (other predicates).
-func HasDeviceInstallationAreaWith(preds ...predicate.DeviceInstallation) predicate.Area {
+// HasDeviceInstallationWith applies the HasEdge predicate on the "device_installation" edge with a given conditions (other predicates).
+func HasDeviceInstallationWith(preds ...predicate.DeviceInstallation) predicate.Area {
 	return predicate.Area(func(s *sql.Selector) {
-		step := newDeviceInstallationAreaStep()
+		step := newDeviceInstallationStep()
 		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
 			for _, p := range preds {
 				p(s)

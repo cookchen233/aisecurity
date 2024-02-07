@@ -1,6 +1,6 @@
 package posts
 
-type TwoIPCEvent struct {
+type TwoEvent struct {
 	Addition    any    `json:"Addition"`
 	AlarmID     string `json:"AlarmId"`
 	BoardID     string `json:"BoardId"`

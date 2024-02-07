@@ -20,15 +20,15 @@ type Device struct {
 	// ID of the ent.
 	ID int `json:"id,omitempty"`
 	// 创建时间
-	CreatedAt time.Time `json:"created_at"`
+	CreateTime time.Time `json:"create_time"`
 	// 创建者
-	CreatedBy int `json:"created_by"`
+	CreatorID int `json:"creator_id"`
 	// 删除时间
-	DeletedAt *time.Time `json:"deleted_at"`
+	DeleteTime *time.Time `json:"delete_time"`
 	// 最后更新者
-	UpdatedBy int `json:"updated_by"`
+	UpdaterID int `json:"updater_id"`
 	// 最后更新时间
-	UpdatedAt time.Time `json:"updated_at"`
+	UpdateTime time.Time `json:"update_time"`
 	// 设备品牌
 	Brand enums.DeviceBrand `json:"brand" validate:"required"`
 	// 设备型号
@@ -51,13 +51,17 @@ type DeviceEdges struct {
 	Creator *Admin `json:"creator,omitempty"`
 	// Updater holds the value of the updater edge.
 	Updater *Admin `json:"updater,omitempty"`
-	// IpcEventDevice holds the value of the ipc_event_device edge.
-	IpcEventDevice []*IPCEvent `json:"ipc_event_device,omitempty"`
-	// DeviceInstallationDevice holds the value of the device_installation_device edge.
-	DeviceInstallationDevice []*DeviceInstallation `json:"device_installation_device,omitempty"`
+	// Event holds the value of the event edge.
+	Event []*Event `json:"event,omitempty"`
+	// DeviceInstallation holds the value of the device_installation edge.
+	DeviceInstallation []*DeviceInstallation `json:"device_installation,omitempty"`
+	// EventLog holds the value of the event_log edge.
+	EventLog []*EventLog `json:"event_log,omitempty"`
+	// Fixing holds the value of the fixing edge.
+	Fixing []*Fixing `json:"fixing,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
-	loadedTypes [4]bool
+	loadedTypes [6]bool
 }
 
 // CreatorOrErr returns the Creator value or an error if the edge
@@ -86,22 +90,40 @@ func (e DeviceEdges) UpdaterOrErr() (*Admin, error) {
 	return nil, &NotLoadedError{edge: "updater"}
 }
 
-// IpcEventDeviceOrErr returns the IpcEventDevice value or an error if the edge
+// EventOrErr returns the Event value or an error if the edge
 // was not loaded in eager-loading.
-func (e DeviceEdges) IpcEventDeviceOrErr() ([]*IPCEvent, error) {
+func (e DeviceEdges) EventOrErr() ([]*Event, error) {
 	if e.loadedTypes[2] {
-		return e.IpcEventDevice, nil
+		return e.Event, nil
 	}
-	return nil, &NotLoadedError{edge: "ipc_event_device"}
+	return nil, &NotLoadedError{edge: "event"}
 }
 
-// DeviceInstallationDeviceOrErr returns the DeviceInstallationDevice value or an error if the edge
+// DeviceInstallationOrErr returns the DeviceInstallation value or an error if the edge
 // was not loaded in eager-loading.
-func (e DeviceEdges) DeviceInstallationDeviceOrErr() ([]*DeviceInstallation, error) {
+func (e DeviceEdges) DeviceInstallationOrErr() ([]*DeviceInstallation, error) {
 	if e.loadedTypes[3] {
-		return e.DeviceInstallationDevice, nil
+		return e.DeviceInstallation, nil
 	}
-	return nil, &NotLoadedError{edge: "device_installation_device"}
+	return nil, &NotLoadedError{edge: "device_installation"}
+}
+
+// EventLogOrErr returns the EventLog value or an error if the edge
+// was not loaded in eager-loading.
+func (e DeviceEdges) EventLogOrErr() ([]*EventLog, error) {
+	if e.loadedTypes[4] {
+		return e.EventLog, nil
+	}
+	return nil, &NotLoadedError{edge: "event_log"}
+}
+
+// FixingOrErr returns the Fixing value or an error if the edge
+// was not loaded in eager-loading.
+func (e DeviceEdges) FixingOrErr() ([]*Fixing, error) {
+	if e.loadedTypes[5] {
+		return e.Fixing, nil
+	}
+	return nil, &NotLoadedError{edge: "fixing"}
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
@@ -109,11 +131,11 @@ func (*Device) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
 	for i := range columns {
 		switch columns[i] {
-		case device.FieldID, device.FieldCreatedBy, device.FieldUpdatedBy, device.FieldBrand, device.FieldModel, device.FieldDeviceType:
+		case device.FieldID, device.FieldCreatorID, device.FieldUpdaterID, device.FieldBrand, device.FieldModel, device.FieldDeviceType:
 			values[i] = new(sql.NullInt64)
 		case device.FieldName, device.FieldSn:
 			values[i] = new(sql.NullString)
-		case device.FieldCreatedAt, device.FieldDeletedAt, device.FieldUpdatedAt:
+		case device.FieldCreateTime, device.FieldDeleteTime, device.FieldUpdateTime:
 			values[i] = new(sql.NullTime)
 		default:
 			values[i] = new(sql.UnknownType)
@@ -136,36 +158,36 @@ func (d *Device) assignValues(columns []string, values []any) error {
 				return fmt.Errorf("unexpected type %T for field id", value)
 			}
 			d.ID = int(value.Int64)
-		case device.FieldCreatedAt:
+		case device.FieldCreateTime:
 			if value, ok := values[i].(*sql.NullTime); !ok {
-				return fmt.Errorf("unexpected type %T for field created_at", values[i])
+				return fmt.Errorf("unexpected type %T for field create_time", values[i])
 			} else if value.Valid {
-				d.CreatedAt = value.Time
+				d.CreateTime = value.Time
 			}
-		case device.FieldCreatedBy:
+		case device.FieldCreatorID:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
-				return fmt.Errorf("unexpected type %T for field created_by", values[i])
+				return fmt.Errorf("unexpected type %T for field creator_id", values[i])
 			} else if value.Valid {
-				d.CreatedBy = int(value.Int64)
+				d.CreatorID = int(value.Int64)
 			}
-		case device.FieldDeletedAt:
+		case device.FieldDeleteTime:
 			if value, ok := values[i].(*sql.NullTime); !ok {
-				return fmt.Errorf("unexpected type %T for field deleted_at", values[i])
+				return fmt.Errorf("unexpected type %T for field delete_time", values[i])
 			} else if value.Valid {
-				d.DeletedAt = new(time.Time)
-				*d.DeletedAt = value.Time
+				d.DeleteTime = new(time.Time)
+				*d.DeleteTime = value.Time
 			}
-		case device.FieldUpdatedBy:
+		case device.FieldUpdaterID:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
-				return fmt.Errorf("unexpected type %T for field updated_by", values[i])
+				return fmt.Errorf("unexpected type %T for field updater_id", values[i])
 			} else if value.Valid {
-				d.UpdatedBy = int(value.Int64)
+				d.UpdaterID = int(value.Int64)
 			}
-		case device.FieldUpdatedAt:
+		case device.FieldUpdateTime:
 			if value, ok := values[i].(*sql.NullTime); !ok {
-				return fmt.Errorf("unexpected type %T for field updated_at", values[i])
+				return fmt.Errorf("unexpected type %T for field update_time", values[i])
 			} else if value.Valid {
-				d.UpdatedAt = value.Time
+				d.UpdateTime = value.Time
 			}
 		case device.FieldBrand:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
@@ -220,14 +242,24 @@ func (d *Device) QueryUpdater() *AdminQuery {
 	return NewDeviceClient(d.config).QueryUpdater(d)
 }
 
-// QueryIpcEventDevice queries the "ipc_event_device" edge of the Device entity.
-func (d *Device) QueryIpcEventDevice() *IPCEventQuery {
-	return NewDeviceClient(d.config).QueryIpcEventDevice(d)
+// QueryEvent queries the "event" edge of the Device entity.
+func (d *Device) QueryEvent() *EventQuery {
+	return NewDeviceClient(d.config).QueryEvent(d)
 }
 
-// QueryDeviceInstallationDevice queries the "device_installation_device" edge of the Device entity.
-func (d *Device) QueryDeviceInstallationDevice() *DeviceInstallationQuery {
-	return NewDeviceClient(d.config).QueryDeviceInstallationDevice(d)
+// QueryDeviceInstallation queries the "device_installation" edge of the Device entity.
+func (d *Device) QueryDeviceInstallation() *DeviceInstallationQuery {
+	return NewDeviceClient(d.config).QueryDeviceInstallation(d)
+}
+
+// QueryEventLog queries the "event_log" edge of the Device entity.
+func (d *Device) QueryEventLog() *EventLogQuery {
+	return NewDeviceClient(d.config).QueryEventLog(d)
+}
+
+// QueryFixing queries the "fixing" edge of the Device entity.
+func (d *Device) QueryFixing() *FixingQuery {
+	return NewDeviceClient(d.config).QueryFixing(d)
 }
 
 // Update returns a builder for updating this Device.
@@ -253,22 +285,22 @@ func (d *Device) String() string {
 	var builder strings.Builder
 	builder.WriteString("Device(")
 	builder.WriteString(fmt.Sprintf("id=%v, ", d.ID))
-	builder.WriteString("created_at=")
-	builder.WriteString(d.CreatedAt.Format(time.ANSIC))
+	builder.WriteString("create_time=")
+	builder.WriteString(d.CreateTime.Format(time.ANSIC))
 	builder.WriteString(", ")
-	builder.WriteString("created_by=")
-	builder.WriteString(fmt.Sprintf("%v", d.CreatedBy))
+	builder.WriteString("creator_id=")
+	builder.WriteString(fmt.Sprintf("%v", d.CreatorID))
 	builder.WriteString(", ")
-	if v := d.DeletedAt; v != nil {
-		builder.WriteString("deleted_at=")
+	if v := d.DeleteTime; v != nil {
+		builder.WriteString("delete_time=")
 		builder.WriteString(v.Format(time.ANSIC))
 	}
 	builder.WriteString(", ")
-	builder.WriteString("updated_by=")
-	builder.WriteString(fmt.Sprintf("%v", d.UpdatedBy))
+	builder.WriteString("updater_id=")
+	builder.WriteString(fmt.Sprintf("%v", d.UpdaterID))
 	builder.WriteString(", ")
-	builder.WriteString("updated_at=")
-	builder.WriteString(d.UpdatedAt.Format(time.ANSIC))
+	builder.WriteString("update_time=")
+	builder.WriteString(d.UpdateTime.Format(time.ANSIC))
 	builder.WriteString(", ")
 	builder.WriteString("brand=")
 	builder.WriteString(fmt.Sprintf("%v", d.Brand))

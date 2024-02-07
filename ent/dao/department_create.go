@@ -6,6 +6,7 @@ import (
 	"aisecurity/ent/dao/admin"
 	"aisecurity/ent/dao/department"
 	"aisecurity/ent/dao/employee"
+	"aisecurity/ent/dao/permission"
 	"context"
 	"errors"
 	"fmt"
@@ -22,56 +23,56 @@ type DepartmentCreate struct {
 	hooks    []Hook
 }
 
-// SetCreatedAt sets the "created_at" field.
-func (dc *DepartmentCreate) SetCreatedAt(t time.Time) *DepartmentCreate {
-	dc.mutation.SetCreatedAt(t)
+// SetCreateTime sets the "create_time" field.
+func (dc *DepartmentCreate) SetCreateTime(t time.Time) *DepartmentCreate {
+	dc.mutation.SetCreateTime(t)
 	return dc
 }
 
-// SetNillableCreatedAt sets the "created_at" field if the given value is not nil.
-func (dc *DepartmentCreate) SetNillableCreatedAt(t *time.Time) *DepartmentCreate {
+// SetNillableCreateTime sets the "create_time" field if the given value is not nil.
+func (dc *DepartmentCreate) SetNillableCreateTime(t *time.Time) *DepartmentCreate {
 	if t != nil {
-		dc.SetCreatedAt(*t)
+		dc.SetCreateTime(*t)
 	}
 	return dc
 }
 
-// SetCreatedBy sets the "created_by" field.
-func (dc *DepartmentCreate) SetCreatedBy(i int) *DepartmentCreate {
-	dc.mutation.SetCreatedBy(i)
+// SetCreatorID sets the "creator_id" field.
+func (dc *DepartmentCreate) SetCreatorID(i int) *DepartmentCreate {
+	dc.mutation.SetCreatorID(i)
 	return dc
 }
 
-// SetDeletedAt sets the "deleted_at" field.
-func (dc *DepartmentCreate) SetDeletedAt(t time.Time) *DepartmentCreate {
-	dc.mutation.SetDeletedAt(t)
+// SetDeleteTime sets the "delete_time" field.
+func (dc *DepartmentCreate) SetDeleteTime(t time.Time) *DepartmentCreate {
+	dc.mutation.SetDeleteTime(t)
 	return dc
 }
 
-// SetNillableDeletedAt sets the "deleted_at" field if the given value is not nil.
-func (dc *DepartmentCreate) SetNillableDeletedAt(t *time.Time) *DepartmentCreate {
+// SetNillableDeleteTime sets the "delete_time" field if the given value is not nil.
+func (dc *DepartmentCreate) SetNillableDeleteTime(t *time.Time) *DepartmentCreate {
 	if t != nil {
-		dc.SetDeletedAt(*t)
+		dc.SetDeleteTime(*t)
 	}
 	return dc
 }
 
-// SetUpdatedBy sets the "updated_by" field.
-func (dc *DepartmentCreate) SetUpdatedBy(i int) *DepartmentCreate {
-	dc.mutation.SetUpdatedBy(i)
+// SetUpdaterID sets the "updater_id" field.
+func (dc *DepartmentCreate) SetUpdaterID(i int) *DepartmentCreate {
+	dc.mutation.SetUpdaterID(i)
 	return dc
 }
 
-// SetUpdatedAt sets the "updated_at" field.
-func (dc *DepartmentCreate) SetUpdatedAt(t time.Time) *DepartmentCreate {
-	dc.mutation.SetUpdatedAt(t)
+// SetUpdateTime sets the "update_time" field.
+func (dc *DepartmentCreate) SetUpdateTime(t time.Time) *DepartmentCreate {
+	dc.mutation.SetUpdateTime(t)
 	return dc
 }
 
-// SetNillableUpdatedAt sets the "updated_at" field if the given value is not nil.
-func (dc *DepartmentCreate) SetNillableUpdatedAt(t *time.Time) *DepartmentCreate {
+// SetNillableUpdateTime sets the "update_time" field if the given value is not nil.
+func (dc *DepartmentCreate) SetNillableUpdateTime(t *time.Time) *DepartmentCreate {
 	if t != nil {
-		dc.SetUpdatedAt(*t)
+		dc.SetUpdateTime(*t)
 	}
 	return dc
 }
@@ -96,21 +97,23 @@ func (dc *DepartmentCreate) SetNillableParentID(i *int) *DepartmentCreate {
 	return dc
 }
 
-// SetCreatorID sets the "creator" edge to the Admin entity by ID.
-func (dc *DepartmentCreate) SetCreatorID(id int) *DepartmentCreate {
-	dc.mutation.SetCreatorID(id)
+// SetNotes sets the "notes" field.
+func (dc *DepartmentCreate) SetNotes(s string) *DepartmentCreate {
+	dc.mutation.SetNotes(s)
+	return dc
+}
+
+// SetNillableNotes sets the "notes" field if the given value is not nil.
+func (dc *DepartmentCreate) SetNillableNotes(s *string) *DepartmentCreate {
+	if s != nil {
+		dc.SetNotes(*s)
+	}
 	return dc
 }
 
 // SetCreator sets the "creator" edge to the Admin entity.
 func (dc *DepartmentCreate) SetCreator(a *Admin) *DepartmentCreate {
 	return dc.SetCreatorID(a.ID)
-}
-
-// SetUpdaterID sets the "updater" edge to the Admin entity by ID.
-func (dc *DepartmentCreate) SetUpdaterID(id int) *DepartmentCreate {
-	dc.mutation.SetUpdaterID(id)
-	return dc
 }
 
 // SetUpdater sets the "updater" edge to the Admin entity.
@@ -121,6 +124,21 @@ func (dc *DepartmentCreate) SetUpdater(a *Admin) *DepartmentCreate {
 // SetParent sets the "parent" edge to the Department entity.
 func (dc *DepartmentCreate) SetParent(d *Department) *DepartmentCreate {
 	return dc.SetParentID(d.ID)
+}
+
+// AddPermissionIDs adds the "permissions" edge to the Permission entity by IDs.
+func (dc *DepartmentCreate) AddPermissionIDs(ids ...int) *DepartmentCreate {
+	dc.mutation.AddPermissionIDs(ids...)
+	return dc
+}
+
+// AddPermissions adds the "permissions" edges to the Permission entity.
+func (dc *DepartmentCreate) AddPermissions(p ...*Permission) *DepartmentCreate {
+	ids := make([]int, len(p))
+	for i := range p {
+		ids[i] = p[i].ID
+	}
+	return dc.AddPermissionIDs(ids...)
 }
 
 // AddEmployeeIDs adds the "employees" edge to the Employee entity by IDs.
@@ -190,46 +208,46 @@ func (dc *DepartmentCreate) ExecX(ctx context.Context) {
 
 // defaults sets the default values of the builder before save.
 func (dc *DepartmentCreate) defaults() error {
-	if _, ok := dc.mutation.CreatedAt(); !ok {
-		if department.DefaultCreatedAt == nil {
-			return fmt.Errorf("dao: uninitialized department.DefaultCreatedAt (forgotten import dao/runtime?)")
+	if _, ok := dc.mutation.CreateTime(); !ok {
+		if department.DefaultCreateTime == nil {
+			return fmt.Errorf("dao: uninitialized department.DefaultCreateTime (forgotten import dao/runtime?)")
 		}
-		v := department.DefaultCreatedAt()
-		dc.mutation.SetCreatedAt(v)
+		v := department.DefaultCreateTime()
+		dc.mutation.SetCreateTime(v)
 	}
-	if _, ok := dc.mutation.UpdatedAt(); !ok {
-		if department.DefaultUpdatedAt == nil {
-			return fmt.Errorf("dao: uninitialized department.DefaultUpdatedAt (forgotten import dao/runtime?)")
+	if _, ok := dc.mutation.UpdateTime(); !ok {
+		if department.DefaultUpdateTime == nil {
+			return fmt.Errorf("dao: uninitialized department.DefaultUpdateTime (forgotten import dao/runtime?)")
 		}
-		v := department.DefaultUpdatedAt()
-		dc.mutation.SetUpdatedAt(v)
+		v := department.DefaultUpdateTime()
+		dc.mutation.SetUpdateTime(v)
 	}
 	return nil
 }
 
 // check runs all checks and user-defined validators on the builder.
 func (dc *DepartmentCreate) check() error {
-	if _, ok := dc.mutation.CreatedAt(); !ok {
-		return &ValidationError{Name: "created_at", err: errors.New(`dao: missing required field "Department.created_at"`)}
+	if _, ok := dc.mutation.CreateTime(); !ok {
+		return &ValidationError{Name: "create_time", err: errors.New(`dao: missing required field "Department.create_time"`)}
 	}
-	if _, ok := dc.mutation.CreatedBy(); !ok {
-		return &ValidationError{Name: "created_by", err: errors.New(`dao: missing required field "Department.created_by"`)}
+	if _, ok := dc.mutation.CreatorID(); !ok {
+		return &ValidationError{Name: "creator_id", err: errors.New(`dao: missing required field "Department.creator_id"`)}
 	}
-	if v, ok := dc.mutation.CreatedBy(); ok {
-		if err := department.CreatedByValidator(v); err != nil {
-			return &ValidationError{Name: "created_by", err: fmt.Errorf(`dao: validator failed for field "Department.created_by": %w`, err)}
+	if v, ok := dc.mutation.CreatorID(); ok {
+		if err := department.CreatorIDValidator(v); err != nil {
+			return &ValidationError{Name: "creator_id", err: fmt.Errorf(`dao: validator failed for field "Department.creator_id": %w`, err)}
 		}
 	}
-	if _, ok := dc.mutation.UpdatedBy(); !ok {
-		return &ValidationError{Name: "updated_by", err: errors.New(`dao: missing required field "Department.updated_by"`)}
+	if _, ok := dc.mutation.UpdaterID(); !ok {
+		return &ValidationError{Name: "updater_id", err: errors.New(`dao: missing required field "Department.updater_id"`)}
 	}
-	if v, ok := dc.mutation.UpdatedBy(); ok {
-		if err := department.UpdatedByValidator(v); err != nil {
-			return &ValidationError{Name: "updated_by", err: fmt.Errorf(`dao: validator failed for field "Department.updated_by": %w`, err)}
+	if v, ok := dc.mutation.UpdaterID(); ok {
+		if err := department.UpdaterIDValidator(v); err != nil {
+			return &ValidationError{Name: "updater_id", err: fmt.Errorf(`dao: validator failed for field "Department.updater_id": %w`, err)}
 		}
 	}
-	if _, ok := dc.mutation.UpdatedAt(); !ok {
-		return &ValidationError{Name: "updated_at", err: errors.New(`dao: missing required field "Department.updated_at"`)}
+	if _, ok := dc.mutation.UpdateTime(); !ok {
+		return &ValidationError{Name: "update_time", err: errors.New(`dao: missing required field "Department.update_time"`)}
 	}
 	if _, ok := dc.mutation.Name(); !ok {
 		return &ValidationError{Name: "name", err: errors.New(`dao: missing required field "Department.name"`)}
@@ -276,21 +294,25 @@ func (dc *DepartmentCreate) createSpec() (*Department, *sqlgraph.CreateSpec) {
 		_node = &Department{config: dc.config}
 		_spec = sqlgraph.NewCreateSpec(department.Table, sqlgraph.NewFieldSpec(department.FieldID, field.TypeInt))
 	)
-	if value, ok := dc.mutation.CreatedAt(); ok {
-		_spec.SetField(department.FieldCreatedAt, field.TypeTime, value)
-		_node.CreatedAt = value
+	if value, ok := dc.mutation.CreateTime(); ok {
+		_spec.SetField(department.FieldCreateTime, field.TypeTime, value)
+		_node.CreateTime = value
 	}
-	if value, ok := dc.mutation.DeletedAt(); ok {
-		_spec.SetField(department.FieldDeletedAt, field.TypeTime, value)
-		_node.DeletedAt = &value
+	if value, ok := dc.mutation.DeleteTime(); ok {
+		_spec.SetField(department.FieldDeleteTime, field.TypeTime, value)
+		_node.DeleteTime = &value
 	}
-	if value, ok := dc.mutation.UpdatedAt(); ok {
-		_spec.SetField(department.FieldUpdatedAt, field.TypeTime, value)
-		_node.UpdatedAt = value
+	if value, ok := dc.mutation.UpdateTime(); ok {
+		_spec.SetField(department.FieldUpdateTime, field.TypeTime, value)
+		_node.UpdateTime = value
 	}
 	if value, ok := dc.mutation.Name(); ok {
 		_spec.SetField(department.FieldName, field.TypeString, value)
 		_node.Name = value
+	}
+	if value, ok := dc.mutation.Notes(); ok {
+		_spec.SetField(department.FieldNotes, field.TypeString, value)
+		_node.Notes = value
 	}
 	if nodes := dc.mutation.CreatorIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
@@ -306,7 +328,7 @@ func (dc *DepartmentCreate) createSpec() (*Department, *sqlgraph.CreateSpec) {
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
-		_node.CreatedBy = nodes[0]
+		_node.CreatorID = nodes[0]
 		_spec.Edges = append(_spec.Edges, edge)
 	}
 	if nodes := dc.mutation.UpdaterIDs(); len(nodes) > 0 {
@@ -323,7 +345,7 @@ func (dc *DepartmentCreate) createSpec() (*Department, *sqlgraph.CreateSpec) {
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
-		_node.UpdatedBy = nodes[0]
+		_node.UpdaterID = nodes[0]
 		_spec.Edges = append(_spec.Edges, edge)
 	}
 	if nodes := dc.mutation.ParentIDs(); len(nodes) > 0 {
@@ -341,6 +363,22 @@ func (dc *DepartmentCreate) createSpec() (*Department, *sqlgraph.CreateSpec) {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
 		_node.ParentID = nodes[0]
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := dc.mutation.PermissionsIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2M,
+			Inverse: true,
+			Table:   department.PermissionsTable,
+			Columns: department.PermissionsPrimaryKey,
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(permission.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
 		_spec.Edges = append(_spec.Edges, edge)
 	}
 	if nodes := dc.mutation.EmployeesIDs(); len(nodes) > 0 {

@@ -23,56 +23,56 @@ type DeviceInstallationCreate struct {
 	hooks    []Hook
 }
 
-// SetCreatedAt sets the "created_at" field.
-func (dic *DeviceInstallationCreate) SetCreatedAt(t time.Time) *DeviceInstallationCreate {
-	dic.mutation.SetCreatedAt(t)
+// SetCreateTime sets the "create_time" field.
+func (dic *DeviceInstallationCreate) SetCreateTime(t time.Time) *DeviceInstallationCreate {
+	dic.mutation.SetCreateTime(t)
 	return dic
 }
 
-// SetNillableCreatedAt sets the "created_at" field if the given value is not nil.
-func (dic *DeviceInstallationCreate) SetNillableCreatedAt(t *time.Time) *DeviceInstallationCreate {
+// SetNillableCreateTime sets the "create_time" field if the given value is not nil.
+func (dic *DeviceInstallationCreate) SetNillableCreateTime(t *time.Time) *DeviceInstallationCreate {
 	if t != nil {
-		dic.SetCreatedAt(*t)
+		dic.SetCreateTime(*t)
 	}
 	return dic
 }
 
-// SetCreatedBy sets the "created_by" field.
-func (dic *DeviceInstallationCreate) SetCreatedBy(i int) *DeviceInstallationCreate {
-	dic.mutation.SetCreatedBy(i)
+// SetCreatorID sets the "creator_id" field.
+func (dic *DeviceInstallationCreate) SetCreatorID(i int) *DeviceInstallationCreate {
+	dic.mutation.SetCreatorID(i)
 	return dic
 }
 
-// SetDeletedAt sets the "deleted_at" field.
-func (dic *DeviceInstallationCreate) SetDeletedAt(t time.Time) *DeviceInstallationCreate {
-	dic.mutation.SetDeletedAt(t)
+// SetDeleteTime sets the "delete_time" field.
+func (dic *DeviceInstallationCreate) SetDeleteTime(t time.Time) *DeviceInstallationCreate {
+	dic.mutation.SetDeleteTime(t)
 	return dic
 }
 
-// SetNillableDeletedAt sets the "deleted_at" field if the given value is not nil.
-func (dic *DeviceInstallationCreate) SetNillableDeletedAt(t *time.Time) *DeviceInstallationCreate {
+// SetNillableDeleteTime sets the "delete_time" field if the given value is not nil.
+func (dic *DeviceInstallationCreate) SetNillableDeleteTime(t *time.Time) *DeviceInstallationCreate {
 	if t != nil {
-		dic.SetDeletedAt(*t)
+		dic.SetDeleteTime(*t)
 	}
 	return dic
 }
 
-// SetUpdatedBy sets the "updated_by" field.
-func (dic *DeviceInstallationCreate) SetUpdatedBy(i int) *DeviceInstallationCreate {
-	dic.mutation.SetUpdatedBy(i)
+// SetUpdaterID sets the "updater_id" field.
+func (dic *DeviceInstallationCreate) SetUpdaterID(i int) *DeviceInstallationCreate {
+	dic.mutation.SetUpdaterID(i)
 	return dic
 }
 
-// SetUpdatedAt sets the "updated_at" field.
-func (dic *DeviceInstallationCreate) SetUpdatedAt(t time.Time) *DeviceInstallationCreate {
-	dic.mutation.SetUpdatedAt(t)
+// SetUpdateTime sets the "update_time" field.
+func (dic *DeviceInstallationCreate) SetUpdateTime(t time.Time) *DeviceInstallationCreate {
+	dic.mutation.SetUpdateTime(t)
 	return dic
 }
 
-// SetNillableUpdatedAt sets the "updated_at" field if the given value is not nil.
-func (dic *DeviceInstallationCreate) SetNillableUpdatedAt(t *time.Time) *DeviceInstallationCreate {
+// SetNillableUpdateTime sets the "update_time" field if the given value is not nil.
+func (dic *DeviceInstallationCreate) SetNillableUpdateTime(t *time.Time) *DeviceInstallationCreate {
 	if t != nil {
-		dic.SetUpdatedAt(*t)
+		dic.SetUpdateTime(*t)
 	}
 	return dic
 }
@@ -171,21 +171,9 @@ func (dic *DeviceInstallationCreate) SetNillableInstallTime(t *time.Time) *Devic
 	return dic
 }
 
-// SetCreatorID sets the "creator" edge to the Admin entity by ID.
-func (dic *DeviceInstallationCreate) SetCreatorID(id int) *DeviceInstallationCreate {
-	dic.mutation.SetCreatorID(id)
-	return dic
-}
-
 // SetCreator sets the "creator" edge to the Admin entity.
 func (dic *DeviceInstallationCreate) SetCreator(a *Admin) *DeviceInstallationCreate {
 	return dic.SetCreatorID(a.ID)
-}
-
-// SetUpdaterID sets the "updater" edge to the Admin entity by ID.
-func (dic *DeviceInstallationCreate) SetUpdaterID(id int) *DeviceInstallationCreate {
-	dic.mutation.SetUpdaterID(id)
-	return dic
 }
 
 // SetUpdater sets the "updater" edge to the Admin entity.
@@ -240,46 +228,46 @@ func (dic *DeviceInstallationCreate) ExecX(ctx context.Context) {
 
 // defaults sets the default values of the builder before save.
 func (dic *DeviceInstallationCreate) defaults() error {
-	if _, ok := dic.mutation.CreatedAt(); !ok {
-		if deviceinstallation.DefaultCreatedAt == nil {
-			return fmt.Errorf("dao: uninitialized deviceinstallation.DefaultCreatedAt (forgotten import dao/runtime?)")
+	if _, ok := dic.mutation.CreateTime(); !ok {
+		if deviceinstallation.DefaultCreateTime == nil {
+			return fmt.Errorf("dao: uninitialized deviceinstallation.DefaultCreateTime (forgotten import dao/runtime?)")
 		}
-		v := deviceinstallation.DefaultCreatedAt()
-		dic.mutation.SetCreatedAt(v)
+		v := deviceinstallation.DefaultCreateTime()
+		dic.mutation.SetCreateTime(v)
 	}
-	if _, ok := dic.mutation.UpdatedAt(); !ok {
-		if deviceinstallation.DefaultUpdatedAt == nil {
-			return fmt.Errorf("dao: uninitialized deviceinstallation.DefaultUpdatedAt (forgotten import dao/runtime?)")
+	if _, ok := dic.mutation.UpdateTime(); !ok {
+		if deviceinstallation.DefaultUpdateTime == nil {
+			return fmt.Errorf("dao: uninitialized deviceinstallation.DefaultUpdateTime (forgotten import dao/runtime?)")
 		}
-		v := deviceinstallation.DefaultUpdatedAt()
-		dic.mutation.SetUpdatedAt(v)
+		v := deviceinstallation.DefaultUpdateTime()
+		dic.mutation.SetUpdateTime(v)
 	}
 	return nil
 }
 
 // check runs all checks and user-defined validators on the builder.
 func (dic *DeviceInstallationCreate) check() error {
-	if _, ok := dic.mutation.CreatedAt(); !ok {
-		return &ValidationError{Name: "created_at", err: errors.New(`dao: missing required field "DeviceInstallation.created_at"`)}
+	if _, ok := dic.mutation.CreateTime(); !ok {
+		return &ValidationError{Name: "create_time", err: errors.New(`dao: missing required field "DeviceInstallation.create_time"`)}
 	}
-	if _, ok := dic.mutation.CreatedBy(); !ok {
-		return &ValidationError{Name: "created_by", err: errors.New(`dao: missing required field "DeviceInstallation.created_by"`)}
+	if _, ok := dic.mutation.CreatorID(); !ok {
+		return &ValidationError{Name: "creator_id", err: errors.New(`dao: missing required field "DeviceInstallation.creator_id"`)}
 	}
-	if v, ok := dic.mutation.CreatedBy(); ok {
-		if err := deviceinstallation.CreatedByValidator(v); err != nil {
-			return &ValidationError{Name: "created_by", err: fmt.Errorf(`dao: validator failed for field "DeviceInstallation.created_by": %w`, err)}
+	if v, ok := dic.mutation.CreatorID(); ok {
+		if err := deviceinstallation.CreatorIDValidator(v); err != nil {
+			return &ValidationError{Name: "creator_id", err: fmt.Errorf(`dao: validator failed for field "DeviceInstallation.creator_id": %w`, err)}
 		}
 	}
-	if _, ok := dic.mutation.UpdatedBy(); !ok {
-		return &ValidationError{Name: "updated_by", err: errors.New(`dao: missing required field "DeviceInstallation.updated_by"`)}
+	if _, ok := dic.mutation.UpdaterID(); !ok {
+		return &ValidationError{Name: "updater_id", err: errors.New(`dao: missing required field "DeviceInstallation.updater_id"`)}
 	}
-	if v, ok := dic.mutation.UpdatedBy(); ok {
-		if err := deviceinstallation.UpdatedByValidator(v); err != nil {
-			return &ValidationError{Name: "updated_by", err: fmt.Errorf(`dao: validator failed for field "DeviceInstallation.updated_by": %w`, err)}
+	if v, ok := dic.mutation.UpdaterID(); ok {
+		if err := deviceinstallation.UpdaterIDValidator(v); err != nil {
+			return &ValidationError{Name: "updater_id", err: fmt.Errorf(`dao: validator failed for field "DeviceInstallation.updater_id": %w`, err)}
 		}
 	}
-	if _, ok := dic.mutation.UpdatedAt(); !ok {
-		return &ValidationError{Name: "updated_at", err: errors.New(`dao: missing required field "DeviceInstallation.updated_at"`)}
+	if _, ok := dic.mutation.UpdateTime(); !ok {
+		return &ValidationError{Name: "update_time", err: errors.New(`dao: missing required field "DeviceInstallation.update_time"`)}
 	}
 	if _, ok := dic.mutation.DeviceID(); !ok {
 		return &ValidationError{Name: "device_id", err: errors.New(`dao: missing required field "DeviceInstallation.device_id"`)}
@@ -346,17 +334,17 @@ func (dic *DeviceInstallationCreate) createSpec() (*DeviceInstallation, *sqlgrap
 		_node = &DeviceInstallation{config: dic.config}
 		_spec = sqlgraph.NewCreateSpec(deviceinstallation.Table, sqlgraph.NewFieldSpec(deviceinstallation.FieldID, field.TypeInt))
 	)
-	if value, ok := dic.mutation.CreatedAt(); ok {
-		_spec.SetField(deviceinstallation.FieldCreatedAt, field.TypeTime, value)
-		_node.CreatedAt = value
+	if value, ok := dic.mutation.CreateTime(); ok {
+		_spec.SetField(deviceinstallation.FieldCreateTime, field.TypeTime, value)
+		_node.CreateTime = value
 	}
-	if value, ok := dic.mutation.DeletedAt(); ok {
-		_spec.SetField(deviceinstallation.FieldDeletedAt, field.TypeTime, value)
-		_node.DeletedAt = &value
+	if value, ok := dic.mutation.DeleteTime(); ok {
+		_spec.SetField(deviceinstallation.FieldDeleteTime, field.TypeTime, value)
+		_node.DeleteTime = &value
 	}
-	if value, ok := dic.mutation.UpdatedAt(); ok {
-		_spec.SetField(deviceinstallation.FieldUpdatedAt, field.TypeTime, value)
-		_node.UpdatedAt = value
+	if value, ok := dic.mutation.UpdateTime(); ok {
+		_spec.SetField(deviceinstallation.FieldUpdateTime, field.TypeTime, value)
+		_node.UpdateTime = value
 	}
 	if value, ok := dic.mutation.AliasName(); ok {
 		_spec.SetField(deviceinstallation.FieldAliasName, field.TypeString, value)
@@ -400,7 +388,7 @@ func (dic *DeviceInstallationCreate) createSpec() (*DeviceInstallation, *sqlgrap
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
-		_node.CreatedBy = nodes[0]
+		_node.CreatorID = nodes[0]
 		_spec.Edges = append(_spec.Edges, edge)
 	}
 	if nodes := dic.mutation.UpdaterIDs(); len(nodes) > 0 {
@@ -417,7 +405,7 @@ func (dic *DeviceInstallationCreate) createSpec() (*DeviceInstallation, *sqlgrap
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
-		_node.UpdatedBy = nodes[0]
+		_node.UpdaterID = nodes[0]
 		_spec.Edges = append(_spec.Edges, edge)
 	}
 	if nodes := dic.mutation.AreaIDs(); len(nodes) > 0 {

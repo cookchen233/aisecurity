@@ -30,43 +30,43 @@ func (ou *OccupationUpdate) Where(ps ...predicate.Occupation) *OccupationUpdate 
 	return ou
 }
 
-// SetDeletedAt sets the "deleted_at" field.
-func (ou *OccupationUpdate) SetDeletedAt(t time.Time) *OccupationUpdate {
-	ou.mutation.SetDeletedAt(t)
+// SetDeleteTime sets the "delete_time" field.
+func (ou *OccupationUpdate) SetDeleteTime(t time.Time) *OccupationUpdate {
+	ou.mutation.SetDeleteTime(t)
 	return ou
 }
 
-// SetNillableDeletedAt sets the "deleted_at" field if the given value is not nil.
-func (ou *OccupationUpdate) SetNillableDeletedAt(t *time.Time) *OccupationUpdate {
+// SetNillableDeleteTime sets the "delete_time" field if the given value is not nil.
+func (ou *OccupationUpdate) SetNillableDeleteTime(t *time.Time) *OccupationUpdate {
 	if t != nil {
-		ou.SetDeletedAt(*t)
+		ou.SetDeleteTime(*t)
 	}
 	return ou
 }
 
-// ClearDeletedAt clears the value of the "deleted_at" field.
-func (ou *OccupationUpdate) ClearDeletedAt() *OccupationUpdate {
-	ou.mutation.ClearDeletedAt()
+// ClearDeleteTime clears the value of the "delete_time" field.
+func (ou *OccupationUpdate) ClearDeleteTime() *OccupationUpdate {
+	ou.mutation.ClearDeleteTime()
 	return ou
 }
 
-// SetUpdatedBy sets the "updated_by" field.
-func (ou *OccupationUpdate) SetUpdatedBy(i int) *OccupationUpdate {
-	ou.mutation.SetUpdatedBy(i)
+// SetUpdaterID sets the "updater_id" field.
+func (ou *OccupationUpdate) SetUpdaterID(i int) *OccupationUpdate {
+	ou.mutation.SetUpdaterID(i)
 	return ou
 }
 
-// SetNillableUpdatedBy sets the "updated_by" field if the given value is not nil.
-func (ou *OccupationUpdate) SetNillableUpdatedBy(i *int) *OccupationUpdate {
+// SetNillableUpdaterID sets the "updater_id" field if the given value is not nil.
+func (ou *OccupationUpdate) SetNillableUpdaterID(i *int) *OccupationUpdate {
 	if i != nil {
-		ou.SetUpdatedBy(*i)
+		ou.SetUpdaterID(*i)
 	}
 	return ou
 }
 
-// SetUpdatedAt sets the "updated_at" field.
-func (ou *OccupationUpdate) SetUpdatedAt(t time.Time) *OccupationUpdate {
-	ou.mutation.SetUpdatedAt(t)
+// SetUpdateTime sets the "update_time" field.
+func (ou *OccupationUpdate) SetUpdateTime(t time.Time) *OccupationUpdate {
+	ou.mutation.SetUpdateTime(t)
 	return ou
 }
 
@@ -104,25 +104,19 @@ func (ou *OccupationUpdate) ClearDescription() *OccupationUpdate {
 	return ou
 }
 
-// SetUpdaterID sets the "updater" edge to the Admin entity by ID.
-func (ou *OccupationUpdate) SetUpdaterID(id int) *OccupationUpdate {
-	ou.mutation.SetUpdaterID(id)
-	return ou
-}
-
 // SetUpdater sets the "updater" edge to the Admin entity.
 func (ou *OccupationUpdate) SetUpdater(a *Admin) *OccupationUpdate {
 	return ou.SetUpdaterID(a.ID)
 }
 
-// AddEmployeeIDs adds the "employees" edge to the Employee entity by IDs.
+// AddEmployeeIDs adds the "employee" edge to the Employee entity by IDs.
 func (ou *OccupationUpdate) AddEmployeeIDs(ids ...int) *OccupationUpdate {
 	ou.mutation.AddEmployeeIDs(ids...)
 	return ou
 }
 
-// AddEmployees adds the "employees" edges to the Employee entity.
-func (ou *OccupationUpdate) AddEmployees(e ...*Employee) *OccupationUpdate {
+// AddEmployee adds the "employee" edges to the Employee entity.
+func (ou *OccupationUpdate) AddEmployee(e ...*Employee) *OccupationUpdate {
 	ids := make([]int, len(e))
 	for i := range e {
 		ids[i] = e[i].ID
@@ -141,20 +135,20 @@ func (ou *OccupationUpdate) ClearUpdater() *OccupationUpdate {
 	return ou
 }
 
-// ClearEmployees clears all "employees" edges to the Employee entity.
-func (ou *OccupationUpdate) ClearEmployees() *OccupationUpdate {
-	ou.mutation.ClearEmployees()
+// ClearEmployee clears all "employee" edges to the Employee entity.
+func (ou *OccupationUpdate) ClearEmployee() *OccupationUpdate {
+	ou.mutation.ClearEmployee()
 	return ou
 }
 
-// RemoveEmployeeIDs removes the "employees" edge to Employee entities by IDs.
+// RemoveEmployeeIDs removes the "employee" edge to Employee entities by IDs.
 func (ou *OccupationUpdate) RemoveEmployeeIDs(ids ...int) *OccupationUpdate {
 	ou.mutation.RemoveEmployeeIDs(ids...)
 	return ou
 }
 
-// RemoveEmployees removes "employees" edges to Employee entities.
-func (ou *OccupationUpdate) RemoveEmployees(e ...*Employee) *OccupationUpdate {
+// RemoveEmployee removes "employee" edges to Employee entities.
+func (ou *OccupationUpdate) RemoveEmployee(e ...*Employee) *OccupationUpdate {
 	ids := make([]int, len(e))
 	for i := range e {
 		ids[i] = e[i].ID
@@ -194,21 +188,21 @@ func (ou *OccupationUpdate) ExecX(ctx context.Context) {
 
 // defaults sets the default values of the builder before save.
 func (ou *OccupationUpdate) defaults() error {
-	if _, ok := ou.mutation.UpdatedAt(); !ok {
-		if occupation.UpdateDefaultUpdatedAt == nil {
-			return fmt.Errorf("dao: uninitialized occupation.UpdateDefaultUpdatedAt (forgotten import dao/runtime?)")
+	if _, ok := ou.mutation.UpdateTime(); !ok {
+		if occupation.UpdateDefaultUpdateTime == nil {
+			return fmt.Errorf("dao: uninitialized occupation.UpdateDefaultUpdateTime (forgotten import dao/runtime?)")
 		}
-		v := occupation.UpdateDefaultUpdatedAt()
-		ou.mutation.SetUpdatedAt(v)
+		v := occupation.UpdateDefaultUpdateTime()
+		ou.mutation.SetUpdateTime(v)
 	}
 	return nil
 }
 
 // check runs all checks and user-defined validators on the builder.
 func (ou *OccupationUpdate) check() error {
-	if v, ok := ou.mutation.UpdatedBy(); ok {
-		if err := occupation.UpdatedByValidator(v); err != nil {
-			return &ValidationError{Name: "updated_by", err: fmt.Errorf(`dao: validator failed for field "Occupation.updated_by": %w`, err)}
+	if v, ok := ou.mutation.UpdaterID(); ok {
+		if err := occupation.UpdaterIDValidator(v); err != nil {
+			return &ValidationError{Name: "updater_id", err: fmt.Errorf(`dao: validator failed for field "Occupation.updater_id": %w`, err)}
 		}
 	}
 	if v, ok := ou.mutation.Name(); ok {
@@ -237,14 +231,14 @@ func (ou *OccupationUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			}
 		}
 	}
-	if value, ok := ou.mutation.DeletedAt(); ok {
-		_spec.SetField(occupation.FieldDeletedAt, field.TypeTime, value)
+	if value, ok := ou.mutation.DeleteTime(); ok {
+		_spec.SetField(occupation.FieldDeleteTime, field.TypeTime, value)
 	}
-	if ou.mutation.DeletedAtCleared() {
-		_spec.ClearField(occupation.FieldDeletedAt, field.TypeTime)
+	if ou.mutation.DeleteTimeCleared() {
+		_spec.ClearField(occupation.FieldDeleteTime, field.TypeTime)
 	}
-	if value, ok := ou.mutation.UpdatedAt(); ok {
-		_spec.SetField(occupation.FieldUpdatedAt, field.TypeTime, value)
+	if value, ok := ou.mutation.UpdateTime(); ok {
+		_spec.SetField(occupation.FieldUpdateTime, field.TypeTime, value)
 	}
 	if value, ok := ou.mutation.Name(); ok {
 		_spec.SetField(occupation.FieldName, field.TypeString, value)
@@ -284,12 +278,12 @@ func (ou *OccupationUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if ou.mutation.EmployeesCleared() {
+	if ou.mutation.EmployeeCleared() {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
+			Rel:     sqlgraph.O2M,
 			Inverse: false,
-			Table:   occupation.EmployeesTable,
-			Columns: occupation.EmployeesPrimaryKey,
+			Table:   occupation.EmployeeTable,
+			Columns: []string{occupation.EmployeeColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(employee.FieldID, field.TypeInt),
@@ -297,12 +291,12 @@ func (ou *OccupationUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := ou.mutation.RemovedEmployeesIDs(); len(nodes) > 0 && !ou.mutation.EmployeesCleared() {
+	if nodes := ou.mutation.RemovedEmployeeIDs(); len(nodes) > 0 && !ou.mutation.EmployeeCleared() {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
+			Rel:     sqlgraph.O2M,
 			Inverse: false,
-			Table:   occupation.EmployeesTable,
-			Columns: occupation.EmployeesPrimaryKey,
+			Table:   occupation.EmployeeTable,
+			Columns: []string{occupation.EmployeeColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(employee.FieldID, field.TypeInt),
@@ -313,12 +307,12 @@ func (ou *OccupationUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := ou.mutation.EmployeesIDs(); len(nodes) > 0 {
+	if nodes := ou.mutation.EmployeeIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
+			Rel:     sqlgraph.O2M,
 			Inverse: false,
-			Table:   occupation.EmployeesTable,
-			Columns: occupation.EmployeesPrimaryKey,
+			Table:   occupation.EmployeeTable,
+			Columns: []string{occupation.EmployeeColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(employee.FieldID, field.TypeInt),
@@ -349,43 +343,43 @@ type OccupationUpdateOne struct {
 	mutation *OccupationMutation
 }
 
-// SetDeletedAt sets the "deleted_at" field.
-func (ouo *OccupationUpdateOne) SetDeletedAt(t time.Time) *OccupationUpdateOne {
-	ouo.mutation.SetDeletedAt(t)
+// SetDeleteTime sets the "delete_time" field.
+func (ouo *OccupationUpdateOne) SetDeleteTime(t time.Time) *OccupationUpdateOne {
+	ouo.mutation.SetDeleteTime(t)
 	return ouo
 }
 
-// SetNillableDeletedAt sets the "deleted_at" field if the given value is not nil.
-func (ouo *OccupationUpdateOne) SetNillableDeletedAt(t *time.Time) *OccupationUpdateOne {
+// SetNillableDeleteTime sets the "delete_time" field if the given value is not nil.
+func (ouo *OccupationUpdateOne) SetNillableDeleteTime(t *time.Time) *OccupationUpdateOne {
 	if t != nil {
-		ouo.SetDeletedAt(*t)
+		ouo.SetDeleteTime(*t)
 	}
 	return ouo
 }
 
-// ClearDeletedAt clears the value of the "deleted_at" field.
-func (ouo *OccupationUpdateOne) ClearDeletedAt() *OccupationUpdateOne {
-	ouo.mutation.ClearDeletedAt()
+// ClearDeleteTime clears the value of the "delete_time" field.
+func (ouo *OccupationUpdateOne) ClearDeleteTime() *OccupationUpdateOne {
+	ouo.mutation.ClearDeleteTime()
 	return ouo
 }
 
-// SetUpdatedBy sets the "updated_by" field.
-func (ouo *OccupationUpdateOne) SetUpdatedBy(i int) *OccupationUpdateOne {
-	ouo.mutation.SetUpdatedBy(i)
+// SetUpdaterID sets the "updater_id" field.
+func (ouo *OccupationUpdateOne) SetUpdaterID(i int) *OccupationUpdateOne {
+	ouo.mutation.SetUpdaterID(i)
 	return ouo
 }
 
-// SetNillableUpdatedBy sets the "updated_by" field if the given value is not nil.
-func (ouo *OccupationUpdateOne) SetNillableUpdatedBy(i *int) *OccupationUpdateOne {
+// SetNillableUpdaterID sets the "updater_id" field if the given value is not nil.
+func (ouo *OccupationUpdateOne) SetNillableUpdaterID(i *int) *OccupationUpdateOne {
 	if i != nil {
-		ouo.SetUpdatedBy(*i)
+		ouo.SetUpdaterID(*i)
 	}
 	return ouo
 }
 
-// SetUpdatedAt sets the "updated_at" field.
-func (ouo *OccupationUpdateOne) SetUpdatedAt(t time.Time) *OccupationUpdateOne {
-	ouo.mutation.SetUpdatedAt(t)
+// SetUpdateTime sets the "update_time" field.
+func (ouo *OccupationUpdateOne) SetUpdateTime(t time.Time) *OccupationUpdateOne {
+	ouo.mutation.SetUpdateTime(t)
 	return ouo
 }
 
@@ -423,25 +417,19 @@ func (ouo *OccupationUpdateOne) ClearDescription() *OccupationUpdateOne {
 	return ouo
 }
 
-// SetUpdaterID sets the "updater" edge to the Admin entity by ID.
-func (ouo *OccupationUpdateOne) SetUpdaterID(id int) *OccupationUpdateOne {
-	ouo.mutation.SetUpdaterID(id)
-	return ouo
-}
-
 // SetUpdater sets the "updater" edge to the Admin entity.
 func (ouo *OccupationUpdateOne) SetUpdater(a *Admin) *OccupationUpdateOne {
 	return ouo.SetUpdaterID(a.ID)
 }
 
-// AddEmployeeIDs adds the "employees" edge to the Employee entity by IDs.
+// AddEmployeeIDs adds the "employee" edge to the Employee entity by IDs.
 func (ouo *OccupationUpdateOne) AddEmployeeIDs(ids ...int) *OccupationUpdateOne {
 	ouo.mutation.AddEmployeeIDs(ids...)
 	return ouo
 }
 
-// AddEmployees adds the "employees" edges to the Employee entity.
-func (ouo *OccupationUpdateOne) AddEmployees(e ...*Employee) *OccupationUpdateOne {
+// AddEmployee adds the "employee" edges to the Employee entity.
+func (ouo *OccupationUpdateOne) AddEmployee(e ...*Employee) *OccupationUpdateOne {
 	ids := make([]int, len(e))
 	for i := range e {
 		ids[i] = e[i].ID
@@ -460,20 +448,20 @@ func (ouo *OccupationUpdateOne) ClearUpdater() *OccupationUpdateOne {
 	return ouo
 }
 
-// ClearEmployees clears all "employees" edges to the Employee entity.
-func (ouo *OccupationUpdateOne) ClearEmployees() *OccupationUpdateOne {
-	ouo.mutation.ClearEmployees()
+// ClearEmployee clears all "employee" edges to the Employee entity.
+func (ouo *OccupationUpdateOne) ClearEmployee() *OccupationUpdateOne {
+	ouo.mutation.ClearEmployee()
 	return ouo
 }
 
-// RemoveEmployeeIDs removes the "employees" edge to Employee entities by IDs.
+// RemoveEmployeeIDs removes the "employee" edge to Employee entities by IDs.
 func (ouo *OccupationUpdateOne) RemoveEmployeeIDs(ids ...int) *OccupationUpdateOne {
 	ouo.mutation.RemoveEmployeeIDs(ids...)
 	return ouo
 }
 
-// RemoveEmployees removes "employees" edges to Employee entities.
-func (ouo *OccupationUpdateOne) RemoveEmployees(e ...*Employee) *OccupationUpdateOne {
+// RemoveEmployee removes "employee" edges to Employee entities.
+func (ouo *OccupationUpdateOne) RemoveEmployee(e ...*Employee) *OccupationUpdateOne {
 	ids := make([]int, len(e))
 	for i := range e {
 		ids[i] = e[i].ID
@@ -526,21 +514,21 @@ func (ouo *OccupationUpdateOne) ExecX(ctx context.Context) {
 
 // defaults sets the default values of the builder before save.
 func (ouo *OccupationUpdateOne) defaults() error {
-	if _, ok := ouo.mutation.UpdatedAt(); !ok {
-		if occupation.UpdateDefaultUpdatedAt == nil {
-			return fmt.Errorf("dao: uninitialized occupation.UpdateDefaultUpdatedAt (forgotten import dao/runtime?)")
+	if _, ok := ouo.mutation.UpdateTime(); !ok {
+		if occupation.UpdateDefaultUpdateTime == nil {
+			return fmt.Errorf("dao: uninitialized occupation.UpdateDefaultUpdateTime (forgotten import dao/runtime?)")
 		}
-		v := occupation.UpdateDefaultUpdatedAt()
-		ouo.mutation.SetUpdatedAt(v)
+		v := occupation.UpdateDefaultUpdateTime()
+		ouo.mutation.SetUpdateTime(v)
 	}
 	return nil
 }
 
 // check runs all checks and user-defined validators on the builder.
 func (ouo *OccupationUpdateOne) check() error {
-	if v, ok := ouo.mutation.UpdatedBy(); ok {
-		if err := occupation.UpdatedByValidator(v); err != nil {
-			return &ValidationError{Name: "updated_by", err: fmt.Errorf(`dao: validator failed for field "Occupation.updated_by": %w`, err)}
+	if v, ok := ouo.mutation.UpdaterID(); ok {
+		if err := occupation.UpdaterIDValidator(v); err != nil {
+			return &ValidationError{Name: "updater_id", err: fmt.Errorf(`dao: validator failed for field "Occupation.updater_id": %w`, err)}
 		}
 	}
 	if v, ok := ouo.mutation.Name(); ok {
@@ -586,14 +574,14 @@ func (ouo *OccupationUpdateOne) sqlSave(ctx context.Context) (_node *Occupation,
 			}
 		}
 	}
-	if value, ok := ouo.mutation.DeletedAt(); ok {
-		_spec.SetField(occupation.FieldDeletedAt, field.TypeTime, value)
+	if value, ok := ouo.mutation.DeleteTime(); ok {
+		_spec.SetField(occupation.FieldDeleteTime, field.TypeTime, value)
 	}
-	if ouo.mutation.DeletedAtCleared() {
-		_spec.ClearField(occupation.FieldDeletedAt, field.TypeTime)
+	if ouo.mutation.DeleteTimeCleared() {
+		_spec.ClearField(occupation.FieldDeleteTime, field.TypeTime)
 	}
-	if value, ok := ouo.mutation.UpdatedAt(); ok {
-		_spec.SetField(occupation.FieldUpdatedAt, field.TypeTime, value)
+	if value, ok := ouo.mutation.UpdateTime(); ok {
+		_spec.SetField(occupation.FieldUpdateTime, field.TypeTime, value)
 	}
 	if value, ok := ouo.mutation.Name(); ok {
 		_spec.SetField(occupation.FieldName, field.TypeString, value)
@@ -633,12 +621,12 @@ func (ouo *OccupationUpdateOne) sqlSave(ctx context.Context) (_node *Occupation,
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if ouo.mutation.EmployeesCleared() {
+	if ouo.mutation.EmployeeCleared() {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
+			Rel:     sqlgraph.O2M,
 			Inverse: false,
-			Table:   occupation.EmployeesTable,
-			Columns: occupation.EmployeesPrimaryKey,
+			Table:   occupation.EmployeeTable,
+			Columns: []string{occupation.EmployeeColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(employee.FieldID, field.TypeInt),
@@ -646,12 +634,12 @@ func (ouo *OccupationUpdateOne) sqlSave(ctx context.Context) (_node *Occupation,
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := ouo.mutation.RemovedEmployeesIDs(); len(nodes) > 0 && !ouo.mutation.EmployeesCleared() {
+	if nodes := ouo.mutation.RemovedEmployeeIDs(); len(nodes) > 0 && !ouo.mutation.EmployeeCleared() {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
+			Rel:     sqlgraph.O2M,
 			Inverse: false,
-			Table:   occupation.EmployeesTable,
-			Columns: occupation.EmployeesPrimaryKey,
+			Table:   occupation.EmployeeTable,
+			Columns: []string{occupation.EmployeeColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(employee.FieldID, field.TypeInt),
@@ -662,12 +650,12 @@ func (ouo *OccupationUpdateOne) sqlSave(ctx context.Context) (_node *Occupation,
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := ouo.mutation.EmployeesIDs(); len(nodes) > 0 {
+	if nodes := ouo.mutation.EmployeeIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
+			Rel:     sqlgraph.O2M,
 			Inverse: false,
-			Table:   occupation.EmployeesTable,
-			Columns: occupation.EmployeesPrimaryKey,
+			Table:   occupation.EmployeeTable,
+			Columns: []string{occupation.EmployeeColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(employee.FieldID, field.TypeInt),

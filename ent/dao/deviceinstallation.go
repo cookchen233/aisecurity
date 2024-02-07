@@ -21,15 +21,15 @@ type DeviceInstallation struct {
 	// ID of the ent.
 	ID int `json:"id,omitempty"`
 	// 创建时间
-	CreatedAt time.Time `json:"created_at"`
+	CreateTime time.Time `json:"create_time"`
 	// 创建者
-	CreatedBy int `json:"created_by"`
+	CreatorID int `json:"creator_id"`
 	// 删除时间
-	DeletedAt *time.Time `json:"deleted_at"`
+	DeleteTime *time.Time `json:"delete_time"`
 	// 最后更新者
-	UpdatedBy int `json:"updated_by"`
+	UpdaterID int `json:"updater_id"`
 	// 最后更新时间
-	UpdatedAt time.Time `json:"updated_at"`
+	UpdateTime time.Time `json:"update_time"`
 	// 设备ID
 	DeviceID int `json:"device_id" validate:"required"`
 	// 区域ID
@@ -52,6 +52,9 @@ type DeviceInstallation struct {
 	// The values are being populated by the DeviceInstallationQuery when eager-loading is set.
 	Edges        DeviceInstallationEdges `json:"edges"`
 	selectValues sql.SelectValues
+
+	AreaName              string `json:"area_name"`
+	LocationWithAliasName string `json:"location_with_alias_name"`
 }
 
 // DeviceInstallationEdges holds the relations/edges for other nodes in the graph.
@@ -128,11 +131,11 @@ func (*DeviceInstallation) scanValues(columns []string) ([]any, error) {
 		switch columns[i] {
 		case deviceinstallation.FieldLongitude, deviceinstallation.FieldLatitude:
 			values[i] = new(sql.NullFloat64)
-		case deviceinstallation.FieldID, deviceinstallation.FieldCreatedBy, deviceinstallation.FieldUpdatedBy, deviceinstallation.FieldDeviceID, deviceinstallation.FieldAreaID:
+		case deviceinstallation.FieldID, deviceinstallation.FieldCreatorID, deviceinstallation.FieldUpdaterID, deviceinstallation.FieldDeviceID, deviceinstallation.FieldAreaID:
 			values[i] = new(sql.NullInt64)
 		case deviceinstallation.FieldAliasName, deviceinstallation.FieldLocationData, deviceinstallation.FieldLocation, deviceinstallation.FieldInstaller:
 			values[i] = new(sql.NullString)
-		case deviceinstallation.FieldCreatedAt, deviceinstallation.FieldDeletedAt, deviceinstallation.FieldUpdatedAt, deviceinstallation.FieldInstallTime:
+		case deviceinstallation.FieldCreateTime, deviceinstallation.FieldDeleteTime, deviceinstallation.FieldUpdateTime, deviceinstallation.FieldInstallTime:
 			values[i] = new(sql.NullTime)
 		default:
 			values[i] = new(sql.UnknownType)
@@ -155,36 +158,36 @@ func (di *DeviceInstallation) assignValues(columns []string, values []any) error
 				return fmt.Errorf("unexpected type %T for field id", value)
 			}
 			di.ID = int(value.Int64)
-		case deviceinstallation.FieldCreatedAt:
+		case deviceinstallation.FieldCreateTime:
 			if value, ok := values[i].(*sql.NullTime); !ok {
-				return fmt.Errorf("unexpected type %T for field created_at", values[i])
+				return fmt.Errorf("unexpected type %T for field create_time", values[i])
 			} else if value.Valid {
-				di.CreatedAt = value.Time
+				di.CreateTime = value.Time
 			}
-		case deviceinstallation.FieldCreatedBy:
+		case deviceinstallation.FieldCreatorID:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
-				return fmt.Errorf("unexpected type %T for field created_by", values[i])
+				return fmt.Errorf("unexpected type %T for field creator_id", values[i])
 			} else if value.Valid {
-				di.CreatedBy = int(value.Int64)
+				di.CreatorID = int(value.Int64)
 			}
-		case deviceinstallation.FieldDeletedAt:
+		case deviceinstallation.FieldDeleteTime:
 			if value, ok := values[i].(*sql.NullTime); !ok {
-				return fmt.Errorf("unexpected type %T for field deleted_at", values[i])
+				return fmt.Errorf("unexpected type %T for field delete_time", values[i])
 			} else if value.Valid {
-				di.DeletedAt = new(time.Time)
-				*di.DeletedAt = value.Time
+				di.DeleteTime = new(time.Time)
+				*di.DeleteTime = value.Time
 			}
-		case deviceinstallation.FieldUpdatedBy:
+		case deviceinstallation.FieldUpdaterID:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
-				return fmt.Errorf("unexpected type %T for field updated_by", values[i])
+				return fmt.Errorf("unexpected type %T for field updater_id", values[i])
 			} else if value.Valid {
-				di.UpdatedBy = int(value.Int64)
+				di.UpdaterID = int(value.Int64)
 			}
-		case deviceinstallation.FieldUpdatedAt:
+		case deviceinstallation.FieldUpdateTime:
 			if value, ok := values[i].(*sql.NullTime); !ok {
-				return fmt.Errorf("unexpected type %T for field updated_at", values[i])
+				return fmt.Errorf("unexpected type %T for field update_time", values[i])
 			} else if value.Valid {
-				di.UpdatedAt = value.Time
+				di.UpdateTime = value.Time
 			}
 		case deviceinstallation.FieldDeviceID:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
@@ -296,22 +299,22 @@ func (di *DeviceInstallation) String() string {
 	var builder strings.Builder
 	builder.WriteString("DeviceInstallation(")
 	builder.WriteString(fmt.Sprintf("id=%v, ", di.ID))
-	builder.WriteString("created_at=")
-	builder.WriteString(di.CreatedAt.Format(time.ANSIC))
+	builder.WriteString("create_time=")
+	builder.WriteString(di.CreateTime.Format(time.ANSIC))
 	builder.WriteString(", ")
-	builder.WriteString("created_by=")
-	builder.WriteString(fmt.Sprintf("%v", di.CreatedBy))
+	builder.WriteString("creator_id=")
+	builder.WriteString(fmt.Sprintf("%v", di.CreatorID))
 	builder.WriteString(", ")
-	if v := di.DeletedAt; v != nil {
-		builder.WriteString("deleted_at=")
+	if v := di.DeleteTime; v != nil {
+		builder.WriteString("delete_time=")
 		builder.WriteString(v.Format(time.ANSIC))
 	}
 	builder.WriteString(", ")
-	builder.WriteString("updated_by=")
-	builder.WriteString(fmt.Sprintf("%v", di.UpdatedBy))
+	builder.WriteString("updater_id=")
+	builder.WriteString(fmt.Sprintf("%v", di.UpdaterID))
 	builder.WriteString(", ")
-	builder.WriteString("updated_at=")
-	builder.WriteString(di.UpdatedAt.Format(time.ANSIC))
+	builder.WriteString("update_time=")
+	builder.WriteString(di.UpdateTime.Format(time.ANSIC))
 	builder.WriteString(", ")
 	builder.WriteString("device_id=")
 	builder.WriteString(fmt.Sprintf("%v", di.DeviceID))

@@ -25,14 +25,15 @@ func (EventLevel) Fields() []ent.Field {
 		field.String("name").Comment("名称").Optional().MaxLen(255).StructTag(`validate:"required"`),
 		field.JSON("event_types", []enums.EventType{}).Comment("包含事件类型").StructTag(`validate:"required"`),
 		field.String("description").Comment("描述").Optional(),
-		field.Bool("is_report").Comment("是否上报").Optional().Default(false),
+		field.String("icon").Comment("图标").Optional().MaxLen(255),
+		field.JSON("notify_types", []enums.NotifyType{}).Comment("通知方式"),
 	}
 }
 
 // Edges of the EventLevel.
 func (EventLevel) Edges() []ent.Edge {
 	return []ent.Edge{
-		edge.From("creator", Admin.Type).Ref("event_level_creator").Field("created_by").Immutable().Unique().Required(),
-		edge.From("updater", Admin.Type).Ref("event_level_updater").Field("updated_by").Required().Unique(),
+		edge.From("creator", Admin.Type).Ref("event_level_creator").Field("creator_id").Immutable().Unique().Required(),
+		edge.From("updater", Admin.Type).Ref("event_level_updater").Field("updater_id").Required().Unique(),
 	}
 }

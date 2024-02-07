@@ -55,29 +55,29 @@ func IDLTE(id int) predicate.Department {
 	return predicate.Department(sql.FieldLTE(FieldID, id))
 }
 
-// CreatedAt applies equality check predicate on the "created_at" field. It's identical to CreatedAtEQ.
-func CreatedAt(v time.Time) predicate.Department {
-	return predicate.Department(sql.FieldEQ(FieldCreatedAt, v))
+// CreateTime applies equality check predicate on the "create_time" field. It's identical to CreateTimeEQ.
+func CreateTime(v time.Time) predicate.Department {
+	return predicate.Department(sql.FieldEQ(FieldCreateTime, v))
 }
 
-// CreatedBy applies equality check predicate on the "created_by" field. It's identical to CreatedByEQ.
-func CreatedBy(v int) predicate.Department {
-	return predicate.Department(sql.FieldEQ(FieldCreatedBy, v))
+// CreatorID applies equality check predicate on the "creator_id" field. It's identical to CreatorIDEQ.
+func CreatorID(v int) predicate.Department {
+	return predicate.Department(sql.FieldEQ(FieldCreatorID, v))
 }
 
-// DeletedAt applies equality check predicate on the "deleted_at" field. It's identical to DeletedAtEQ.
-func DeletedAt(v time.Time) predicate.Department {
-	return predicate.Department(sql.FieldEQ(FieldDeletedAt, v))
+// DeleteTime applies equality check predicate on the "delete_time" field. It's identical to DeleteTimeEQ.
+func DeleteTime(v time.Time) predicate.Department {
+	return predicate.Department(sql.FieldEQ(FieldDeleteTime, v))
 }
 
-// UpdatedBy applies equality check predicate on the "updated_by" field. It's identical to UpdatedByEQ.
-func UpdatedBy(v int) predicate.Department {
-	return predicate.Department(sql.FieldEQ(FieldUpdatedBy, v))
+// UpdaterID applies equality check predicate on the "updater_id" field. It's identical to UpdaterIDEQ.
+func UpdaterID(v int) predicate.Department {
+	return predicate.Department(sql.FieldEQ(FieldUpdaterID, v))
 }
 
-// UpdatedAt applies equality check predicate on the "updated_at" field. It's identical to UpdatedAtEQ.
-func UpdatedAt(v time.Time) predicate.Department {
-	return predicate.Department(sql.FieldEQ(FieldUpdatedAt, v))
+// UpdateTime applies equality check predicate on the "update_time" field. It's identical to UpdateTimeEQ.
+func UpdateTime(v time.Time) predicate.Department {
+	return predicate.Department(sql.FieldEQ(FieldUpdateTime, v))
 }
 
 // Name applies equality check predicate on the "name" field. It's identical to NameEQ.
@@ -90,174 +90,179 @@ func ParentID(v int) predicate.Department {
 	return predicate.Department(sql.FieldEQ(FieldParentID, v))
 }
 
-// CreatedAtEQ applies the EQ predicate on the "created_at" field.
-func CreatedAtEQ(v time.Time) predicate.Department {
-	return predicate.Department(sql.FieldEQ(FieldCreatedAt, v))
+// Notes applies equality check predicate on the "notes" field. It's identical to NotesEQ.
+func Notes(v string) predicate.Department {
+	return predicate.Department(sql.FieldEQ(FieldNotes, v))
 }
 
-// CreatedAtNEQ applies the NEQ predicate on the "created_at" field.
-func CreatedAtNEQ(v time.Time) predicate.Department {
-	return predicate.Department(sql.FieldNEQ(FieldCreatedAt, v))
+// CreateTimeEQ applies the EQ predicate on the "create_time" field.
+func CreateTimeEQ(v time.Time) predicate.Department {
+	return predicate.Department(sql.FieldEQ(FieldCreateTime, v))
 }
 
-// CreatedAtIn applies the In predicate on the "created_at" field.
-func CreatedAtIn(vs ...time.Time) predicate.Department {
-	return predicate.Department(sql.FieldIn(FieldCreatedAt, vs...))
+// CreateTimeNEQ applies the NEQ predicate on the "create_time" field.
+func CreateTimeNEQ(v time.Time) predicate.Department {
+	return predicate.Department(sql.FieldNEQ(FieldCreateTime, v))
 }
 
-// CreatedAtNotIn applies the NotIn predicate on the "created_at" field.
-func CreatedAtNotIn(vs ...time.Time) predicate.Department {
-	return predicate.Department(sql.FieldNotIn(FieldCreatedAt, vs...))
+// CreateTimeIn applies the In predicate on the "create_time" field.
+func CreateTimeIn(vs ...time.Time) predicate.Department {
+	return predicate.Department(sql.FieldIn(FieldCreateTime, vs...))
 }
 
-// CreatedAtGT applies the GT predicate on the "created_at" field.
-func CreatedAtGT(v time.Time) predicate.Department {
-	return predicate.Department(sql.FieldGT(FieldCreatedAt, v))
+// CreateTimeNotIn applies the NotIn predicate on the "create_time" field.
+func CreateTimeNotIn(vs ...time.Time) predicate.Department {
+	return predicate.Department(sql.FieldNotIn(FieldCreateTime, vs...))
 }
 
-// CreatedAtGTE applies the GTE predicate on the "created_at" field.
-func CreatedAtGTE(v time.Time) predicate.Department {
-	return predicate.Department(sql.FieldGTE(FieldCreatedAt, v))
+// CreateTimeGT applies the GT predicate on the "create_time" field.
+func CreateTimeGT(v time.Time) predicate.Department {
+	return predicate.Department(sql.FieldGT(FieldCreateTime, v))
 }
 
-// CreatedAtLT applies the LT predicate on the "created_at" field.
-func CreatedAtLT(v time.Time) predicate.Department {
-	return predicate.Department(sql.FieldLT(FieldCreatedAt, v))
+// CreateTimeGTE applies the GTE predicate on the "create_time" field.
+func CreateTimeGTE(v time.Time) predicate.Department {
+	return predicate.Department(sql.FieldGTE(FieldCreateTime, v))
 }
 
-// CreatedAtLTE applies the LTE predicate on the "created_at" field.
-func CreatedAtLTE(v time.Time) predicate.Department {
-	return predicate.Department(sql.FieldLTE(FieldCreatedAt, v))
+// CreateTimeLT applies the LT predicate on the "create_time" field.
+func CreateTimeLT(v time.Time) predicate.Department {
+	return predicate.Department(sql.FieldLT(FieldCreateTime, v))
 }
 
-// CreatedByEQ applies the EQ predicate on the "created_by" field.
-func CreatedByEQ(v int) predicate.Department {
-	return predicate.Department(sql.FieldEQ(FieldCreatedBy, v))
+// CreateTimeLTE applies the LTE predicate on the "create_time" field.
+func CreateTimeLTE(v time.Time) predicate.Department {
+	return predicate.Department(sql.FieldLTE(FieldCreateTime, v))
 }
 
-// CreatedByNEQ applies the NEQ predicate on the "created_by" field.
-func CreatedByNEQ(v int) predicate.Department {
-	return predicate.Department(sql.FieldNEQ(FieldCreatedBy, v))
+// CreatorIDEQ applies the EQ predicate on the "creator_id" field.
+func CreatorIDEQ(v int) predicate.Department {
+	return predicate.Department(sql.FieldEQ(FieldCreatorID, v))
 }
 
-// CreatedByIn applies the In predicate on the "created_by" field.
-func CreatedByIn(vs ...int) predicate.Department {
-	return predicate.Department(sql.FieldIn(FieldCreatedBy, vs...))
+// CreatorIDNEQ applies the NEQ predicate on the "creator_id" field.
+func CreatorIDNEQ(v int) predicate.Department {
+	return predicate.Department(sql.FieldNEQ(FieldCreatorID, v))
 }
 
-// CreatedByNotIn applies the NotIn predicate on the "created_by" field.
-func CreatedByNotIn(vs ...int) predicate.Department {
-	return predicate.Department(sql.FieldNotIn(FieldCreatedBy, vs...))
+// CreatorIDIn applies the In predicate on the "creator_id" field.
+func CreatorIDIn(vs ...int) predicate.Department {
+	return predicate.Department(sql.FieldIn(FieldCreatorID, vs...))
 }
 
-// DeletedAtEQ applies the EQ predicate on the "deleted_at" field.
-func DeletedAtEQ(v time.Time) predicate.Department {
-	return predicate.Department(sql.FieldEQ(FieldDeletedAt, v))
+// CreatorIDNotIn applies the NotIn predicate on the "creator_id" field.
+func CreatorIDNotIn(vs ...int) predicate.Department {
+	return predicate.Department(sql.FieldNotIn(FieldCreatorID, vs...))
 }
 
-// DeletedAtNEQ applies the NEQ predicate on the "deleted_at" field.
-func DeletedAtNEQ(v time.Time) predicate.Department {
-	return predicate.Department(sql.FieldNEQ(FieldDeletedAt, v))
+// DeleteTimeEQ applies the EQ predicate on the "delete_time" field.
+func DeleteTimeEQ(v time.Time) predicate.Department {
+	return predicate.Department(sql.FieldEQ(FieldDeleteTime, v))
 }
 
-// DeletedAtIn applies the In predicate on the "deleted_at" field.
-func DeletedAtIn(vs ...time.Time) predicate.Department {
-	return predicate.Department(sql.FieldIn(FieldDeletedAt, vs...))
+// DeleteTimeNEQ applies the NEQ predicate on the "delete_time" field.
+func DeleteTimeNEQ(v time.Time) predicate.Department {
+	return predicate.Department(sql.FieldNEQ(FieldDeleteTime, v))
 }
 
-// DeletedAtNotIn applies the NotIn predicate on the "deleted_at" field.
-func DeletedAtNotIn(vs ...time.Time) predicate.Department {
-	return predicate.Department(sql.FieldNotIn(FieldDeletedAt, vs...))
+// DeleteTimeIn applies the In predicate on the "delete_time" field.
+func DeleteTimeIn(vs ...time.Time) predicate.Department {
+	return predicate.Department(sql.FieldIn(FieldDeleteTime, vs...))
 }
 
-// DeletedAtGT applies the GT predicate on the "deleted_at" field.
-func DeletedAtGT(v time.Time) predicate.Department {
-	return predicate.Department(sql.FieldGT(FieldDeletedAt, v))
+// DeleteTimeNotIn applies the NotIn predicate on the "delete_time" field.
+func DeleteTimeNotIn(vs ...time.Time) predicate.Department {
+	return predicate.Department(sql.FieldNotIn(FieldDeleteTime, vs...))
 }
 
-// DeletedAtGTE applies the GTE predicate on the "deleted_at" field.
-func DeletedAtGTE(v time.Time) predicate.Department {
-	return predicate.Department(sql.FieldGTE(FieldDeletedAt, v))
+// DeleteTimeGT applies the GT predicate on the "delete_time" field.
+func DeleteTimeGT(v time.Time) predicate.Department {
+	return predicate.Department(sql.FieldGT(FieldDeleteTime, v))
 }
 
-// DeletedAtLT applies the LT predicate on the "deleted_at" field.
-func DeletedAtLT(v time.Time) predicate.Department {
-	return predicate.Department(sql.FieldLT(FieldDeletedAt, v))
+// DeleteTimeGTE applies the GTE predicate on the "delete_time" field.
+func DeleteTimeGTE(v time.Time) predicate.Department {
+	return predicate.Department(sql.FieldGTE(FieldDeleteTime, v))
 }
 
-// DeletedAtLTE applies the LTE predicate on the "deleted_at" field.
-func DeletedAtLTE(v time.Time) predicate.Department {
-	return predicate.Department(sql.FieldLTE(FieldDeletedAt, v))
+// DeleteTimeLT applies the LT predicate on the "delete_time" field.
+func DeleteTimeLT(v time.Time) predicate.Department {
+	return predicate.Department(sql.FieldLT(FieldDeleteTime, v))
 }
 
-// DeletedAtIsNil applies the IsNil predicate on the "deleted_at" field.
-func DeletedAtIsNil() predicate.Department {
-	return predicate.Department(sql.FieldIsNull(FieldDeletedAt))
+// DeleteTimeLTE applies the LTE predicate on the "delete_time" field.
+func DeleteTimeLTE(v time.Time) predicate.Department {
+	return predicate.Department(sql.FieldLTE(FieldDeleteTime, v))
 }
 
-// DeletedAtNotNil applies the NotNil predicate on the "deleted_at" field.
-func DeletedAtNotNil() predicate.Department {
-	return predicate.Department(sql.FieldNotNull(FieldDeletedAt))
+// DeleteTimeIsNil applies the IsNil predicate on the "delete_time" field.
+func DeleteTimeIsNil() predicate.Department {
+	return predicate.Department(sql.FieldIsNull(FieldDeleteTime))
 }
 
-// UpdatedByEQ applies the EQ predicate on the "updated_by" field.
-func UpdatedByEQ(v int) predicate.Department {
-	return predicate.Department(sql.FieldEQ(FieldUpdatedBy, v))
+// DeleteTimeNotNil applies the NotNil predicate on the "delete_time" field.
+func DeleteTimeNotNil() predicate.Department {
+	return predicate.Department(sql.FieldNotNull(FieldDeleteTime))
 }
 
-// UpdatedByNEQ applies the NEQ predicate on the "updated_by" field.
-func UpdatedByNEQ(v int) predicate.Department {
-	return predicate.Department(sql.FieldNEQ(FieldUpdatedBy, v))
+// UpdaterIDEQ applies the EQ predicate on the "updater_id" field.
+func UpdaterIDEQ(v int) predicate.Department {
+	return predicate.Department(sql.FieldEQ(FieldUpdaterID, v))
 }
 
-// UpdatedByIn applies the In predicate on the "updated_by" field.
-func UpdatedByIn(vs ...int) predicate.Department {
-	return predicate.Department(sql.FieldIn(FieldUpdatedBy, vs...))
+// UpdaterIDNEQ applies the NEQ predicate on the "updater_id" field.
+func UpdaterIDNEQ(v int) predicate.Department {
+	return predicate.Department(sql.FieldNEQ(FieldUpdaterID, v))
 }
 
-// UpdatedByNotIn applies the NotIn predicate on the "updated_by" field.
-func UpdatedByNotIn(vs ...int) predicate.Department {
-	return predicate.Department(sql.FieldNotIn(FieldUpdatedBy, vs...))
+// UpdaterIDIn applies the In predicate on the "updater_id" field.
+func UpdaterIDIn(vs ...int) predicate.Department {
+	return predicate.Department(sql.FieldIn(FieldUpdaterID, vs...))
 }
 
-// UpdatedAtEQ applies the EQ predicate on the "updated_at" field.
-func UpdatedAtEQ(v time.Time) predicate.Department {
-	return predicate.Department(sql.FieldEQ(FieldUpdatedAt, v))
+// UpdaterIDNotIn applies the NotIn predicate on the "updater_id" field.
+func UpdaterIDNotIn(vs ...int) predicate.Department {
+	return predicate.Department(sql.FieldNotIn(FieldUpdaterID, vs...))
 }
 
-// UpdatedAtNEQ applies the NEQ predicate on the "updated_at" field.
-func UpdatedAtNEQ(v time.Time) predicate.Department {
-	return predicate.Department(sql.FieldNEQ(FieldUpdatedAt, v))
+// UpdateTimeEQ applies the EQ predicate on the "update_time" field.
+func UpdateTimeEQ(v time.Time) predicate.Department {
+	return predicate.Department(sql.FieldEQ(FieldUpdateTime, v))
 }
 
-// UpdatedAtIn applies the In predicate on the "updated_at" field.
-func UpdatedAtIn(vs ...time.Time) predicate.Department {
-	return predicate.Department(sql.FieldIn(FieldUpdatedAt, vs...))
+// UpdateTimeNEQ applies the NEQ predicate on the "update_time" field.
+func UpdateTimeNEQ(v time.Time) predicate.Department {
+	return predicate.Department(sql.FieldNEQ(FieldUpdateTime, v))
 }
 
-// UpdatedAtNotIn applies the NotIn predicate on the "updated_at" field.
-func UpdatedAtNotIn(vs ...time.Time) predicate.Department {
-	return predicate.Department(sql.FieldNotIn(FieldUpdatedAt, vs...))
+// UpdateTimeIn applies the In predicate on the "update_time" field.
+func UpdateTimeIn(vs ...time.Time) predicate.Department {
+	return predicate.Department(sql.FieldIn(FieldUpdateTime, vs...))
 }
 
-// UpdatedAtGT applies the GT predicate on the "updated_at" field.
-func UpdatedAtGT(v time.Time) predicate.Department {
-	return predicate.Department(sql.FieldGT(FieldUpdatedAt, v))
+// UpdateTimeNotIn applies the NotIn predicate on the "update_time" field.
+func UpdateTimeNotIn(vs ...time.Time) predicate.Department {
+	return predicate.Department(sql.FieldNotIn(FieldUpdateTime, vs...))
 }
 
-// UpdatedAtGTE applies the GTE predicate on the "updated_at" field.
-func UpdatedAtGTE(v time.Time) predicate.Department {
-	return predicate.Department(sql.FieldGTE(FieldUpdatedAt, v))
+// UpdateTimeGT applies the GT predicate on the "update_time" field.
+func UpdateTimeGT(v time.Time) predicate.Department {
+	return predicate.Department(sql.FieldGT(FieldUpdateTime, v))
 }
 
-// UpdatedAtLT applies the LT predicate on the "updated_at" field.
-func UpdatedAtLT(v time.Time) predicate.Department {
-	return predicate.Department(sql.FieldLT(FieldUpdatedAt, v))
+// UpdateTimeGTE applies the GTE predicate on the "update_time" field.
+func UpdateTimeGTE(v time.Time) predicate.Department {
+	return predicate.Department(sql.FieldGTE(FieldUpdateTime, v))
 }
 
-// UpdatedAtLTE applies the LTE predicate on the "updated_at" field.
-func UpdatedAtLTE(v time.Time) predicate.Department {
-	return predicate.Department(sql.FieldLTE(FieldUpdatedAt, v))
+// UpdateTimeLT applies the LT predicate on the "update_time" field.
+func UpdateTimeLT(v time.Time) predicate.Department {
+	return predicate.Department(sql.FieldLT(FieldUpdateTime, v))
+}
+
+// UpdateTimeLTE applies the LTE predicate on the "update_time" field.
+func UpdateTimeLTE(v time.Time) predicate.Department {
+	return predicate.Department(sql.FieldLTE(FieldUpdateTime, v))
 }
 
 // NameEQ applies the EQ predicate on the "name" field.
@@ -355,6 +360,81 @@ func ParentIDNotNil() predicate.Department {
 	return predicate.Department(sql.FieldNotNull(FieldParentID))
 }
 
+// NotesEQ applies the EQ predicate on the "notes" field.
+func NotesEQ(v string) predicate.Department {
+	return predicate.Department(sql.FieldEQ(FieldNotes, v))
+}
+
+// NotesNEQ applies the NEQ predicate on the "notes" field.
+func NotesNEQ(v string) predicate.Department {
+	return predicate.Department(sql.FieldNEQ(FieldNotes, v))
+}
+
+// NotesIn applies the In predicate on the "notes" field.
+func NotesIn(vs ...string) predicate.Department {
+	return predicate.Department(sql.FieldIn(FieldNotes, vs...))
+}
+
+// NotesNotIn applies the NotIn predicate on the "notes" field.
+func NotesNotIn(vs ...string) predicate.Department {
+	return predicate.Department(sql.FieldNotIn(FieldNotes, vs...))
+}
+
+// NotesGT applies the GT predicate on the "notes" field.
+func NotesGT(v string) predicate.Department {
+	return predicate.Department(sql.FieldGT(FieldNotes, v))
+}
+
+// NotesGTE applies the GTE predicate on the "notes" field.
+func NotesGTE(v string) predicate.Department {
+	return predicate.Department(sql.FieldGTE(FieldNotes, v))
+}
+
+// NotesLT applies the LT predicate on the "notes" field.
+func NotesLT(v string) predicate.Department {
+	return predicate.Department(sql.FieldLT(FieldNotes, v))
+}
+
+// NotesLTE applies the LTE predicate on the "notes" field.
+func NotesLTE(v string) predicate.Department {
+	return predicate.Department(sql.FieldLTE(FieldNotes, v))
+}
+
+// NotesContains applies the Contains predicate on the "notes" field.
+func NotesContains(v string) predicate.Department {
+	return predicate.Department(sql.FieldContains(FieldNotes, v))
+}
+
+// NotesHasPrefix applies the HasPrefix predicate on the "notes" field.
+func NotesHasPrefix(v string) predicate.Department {
+	return predicate.Department(sql.FieldHasPrefix(FieldNotes, v))
+}
+
+// NotesHasSuffix applies the HasSuffix predicate on the "notes" field.
+func NotesHasSuffix(v string) predicate.Department {
+	return predicate.Department(sql.FieldHasSuffix(FieldNotes, v))
+}
+
+// NotesIsNil applies the IsNil predicate on the "notes" field.
+func NotesIsNil() predicate.Department {
+	return predicate.Department(sql.FieldIsNull(FieldNotes))
+}
+
+// NotesNotNil applies the NotNil predicate on the "notes" field.
+func NotesNotNil() predicate.Department {
+	return predicate.Department(sql.FieldNotNull(FieldNotes))
+}
+
+// NotesEqualFold applies the EqualFold predicate on the "notes" field.
+func NotesEqualFold(v string) predicate.Department {
+	return predicate.Department(sql.FieldEqualFold(FieldNotes, v))
+}
+
+// NotesContainsFold applies the ContainsFold predicate on the "notes" field.
+func NotesContainsFold(v string) predicate.Department {
+	return predicate.Department(sql.FieldContainsFold(FieldNotes, v))
+}
+
 // HasCreator applies the HasEdge predicate on the "creator" edge.
 func HasCreator() predicate.Department {
 	return predicate.Department(func(s *sql.Selector) {
@@ -416,6 +496,29 @@ func HasParent() predicate.Department {
 func HasParentWith(preds ...predicate.Department) predicate.Department {
 	return predicate.Department(func(s *sql.Selector) {
 		step := newParentStep()
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
+}
+
+// HasPermissions applies the HasEdge predicate on the "permissions" edge.
+func HasPermissions() predicate.Department {
+	return predicate.Department(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.M2M, true, PermissionsTable, PermissionsPrimaryKey...),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasPermissionsWith applies the HasEdge predicate on the "permissions" edge with a given conditions (other predicates).
+func HasPermissionsWith(preds ...predicate.Permission) predicate.Department {
+	return predicate.Department(func(s *sql.Selector) {
+		step := newPermissionsStep()
 		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
 			for _, p := range preds {
 				p(s)

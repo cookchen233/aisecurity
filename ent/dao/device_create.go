@@ -6,7 +6,9 @@ import (
 	"aisecurity/ent/dao/admin"
 	"aisecurity/ent/dao/device"
 	"aisecurity/ent/dao/deviceinstallation"
-	"aisecurity/ent/dao/ipcevent"
+	"aisecurity/ent/dao/event"
+	"aisecurity/ent/dao/eventlog"
+	"aisecurity/ent/dao/fixing"
 	"aisecurity/enums"
 	"context"
 	"errors"
@@ -24,56 +26,56 @@ type DeviceCreate struct {
 	hooks    []Hook
 }
 
-// SetCreatedAt sets the "created_at" field.
-func (dc *DeviceCreate) SetCreatedAt(t time.Time) *DeviceCreate {
-	dc.mutation.SetCreatedAt(t)
+// SetCreateTime sets the "create_time" field.
+func (dc *DeviceCreate) SetCreateTime(t time.Time) *DeviceCreate {
+	dc.mutation.SetCreateTime(t)
 	return dc
 }
 
-// SetNillableCreatedAt sets the "created_at" field if the given value is not nil.
-func (dc *DeviceCreate) SetNillableCreatedAt(t *time.Time) *DeviceCreate {
+// SetNillableCreateTime sets the "create_time" field if the given value is not nil.
+func (dc *DeviceCreate) SetNillableCreateTime(t *time.Time) *DeviceCreate {
 	if t != nil {
-		dc.SetCreatedAt(*t)
+		dc.SetCreateTime(*t)
 	}
 	return dc
 }
 
-// SetCreatedBy sets the "created_by" field.
-func (dc *DeviceCreate) SetCreatedBy(i int) *DeviceCreate {
-	dc.mutation.SetCreatedBy(i)
+// SetCreatorID sets the "creator_id" field.
+func (dc *DeviceCreate) SetCreatorID(i int) *DeviceCreate {
+	dc.mutation.SetCreatorID(i)
 	return dc
 }
 
-// SetDeletedAt sets the "deleted_at" field.
-func (dc *DeviceCreate) SetDeletedAt(t time.Time) *DeviceCreate {
-	dc.mutation.SetDeletedAt(t)
+// SetDeleteTime sets the "delete_time" field.
+func (dc *DeviceCreate) SetDeleteTime(t time.Time) *DeviceCreate {
+	dc.mutation.SetDeleteTime(t)
 	return dc
 }
 
-// SetNillableDeletedAt sets the "deleted_at" field if the given value is not nil.
-func (dc *DeviceCreate) SetNillableDeletedAt(t *time.Time) *DeviceCreate {
+// SetNillableDeleteTime sets the "delete_time" field if the given value is not nil.
+func (dc *DeviceCreate) SetNillableDeleteTime(t *time.Time) *DeviceCreate {
 	if t != nil {
-		dc.SetDeletedAt(*t)
+		dc.SetDeleteTime(*t)
 	}
 	return dc
 }
 
-// SetUpdatedBy sets the "updated_by" field.
-func (dc *DeviceCreate) SetUpdatedBy(i int) *DeviceCreate {
-	dc.mutation.SetUpdatedBy(i)
+// SetUpdaterID sets the "updater_id" field.
+func (dc *DeviceCreate) SetUpdaterID(i int) *DeviceCreate {
+	dc.mutation.SetUpdaterID(i)
 	return dc
 }
 
-// SetUpdatedAt sets the "updated_at" field.
-func (dc *DeviceCreate) SetUpdatedAt(t time.Time) *DeviceCreate {
-	dc.mutation.SetUpdatedAt(t)
+// SetUpdateTime sets the "update_time" field.
+func (dc *DeviceCreate) SetUpdateTime(t time.Time) *DeviceCreate {
+	dc.mutation.SetUpdateTime(t)
 	return dc
 }
 
-// SetNillableUpdatedAt sets the "updated_at" field if the given value is not nil.
-func (dc *DeviceCreate) SetNillableUpdatedAt(t *time.Time) *DeviceCreate {
+// SetNillableUpdateTime sets the "update_time" field if the given value is not nil.
+func (dc *DeviceCreate) SetNillableUpdateTime(t *time.Time) *DeviceCreate {
 	if t != nil {
-		dc.SetUpdatedAt(*t)
+		dc.SetUpdateTime(*t)
 	}
 	return dc
 }
@@ -148,21 +150,9 @@ func (dc *DeviceCreate) SetNillableDeviceType(et *enums.DeviceType) *DeviceCreat
 	return dc
 }
 
-// SetCreatorID sets the "creator" edge to the Admin entity by ID.
-func (dc *DeviceCreate) SetCreatorID(id int) *DeviceCreate {
-	dc.mutation.SetCreatorID(id)
-	return dc
-}
-
 // SetCreator sets the "creator" edge to the Admin entity.
 func (dc *DeviceCreate) SetCreator(a *Admin) *DeviceCreate {
 	return dc.SetCreatorID(a.ID)
-}
-
-// SetUpdaterID sets the "updater" edge to the Admin entity by ID.
-func (dc *DeviceCreate) SetUpdaterID(id int) *DeviceCreate {
-	dc.mutation.SetUpdaterID(id)
-	return dc
 }
 
 // SetUpdater sets the "updater" edge to the Admin entity.
@@ -170,34 +160,64 @@ func (dc *DeviceCreate) SetUpdater(a *Admin) *DeviceCreate {
 	return dc.SetUpdaterID(a.ID)
 }
 
-// AddIpcEventDeviceIDs adds the "ipc_event_device" edge to the IPCEvent entity by IDs.
-func (dc *DeviceCreate) AddIpcEventDeviceIDs(ids ...int) *DeviceCreate {
-	dc.mutation.AddIpcEventDeviceIDs(ids...)
+// AddEventIDs adds the "event" edge to the Event entity by IDs.
+func (dc *DeviceCreate) AddEventIDs(ids ...int) *DeviceCreate {
+	dc.mutation.AddEventIDs(ids...)
 	return dc
 }
 
-// AddIpcEventDevice adds the "ipc_event_device" edges to the IPCEvent entity.
-func (dc *DeviceCreate) AddIpcEventDevice(i ...*IPCEvent) *DeviceCreate {
-	ids := make([]int, len(i))
-	for j := range i {
-		ids[j] = i[j].ID
+// AddEvent adds the "event" edges to the Event entity.
+func (dc *DeviceCreate) AddEvent(e ...*Event) *DeviceCreate {
+	ids := make([]int, len(e))
+	for i := range e {
+		ids[i] = e[i].ID
 	}
-	return dc.AddIpcEventDeviceIDs(ids...)
+	return dc.AddEventIDs(ids...)
 }
 
-// AddDeviceInstallationDeviceIDs adds the "device_installation_device" edge to the DeviceInstallation entity by IDs.
-func (dc *DeviceCreate) AddDeviceInstallationDeviceIDs(ids ...int) *DeviceCreate {
-	dc.mutation.AddDeviceInstallationDeviceIDs(ids...)
+// AddDeviceInstallationIDs adds the "device_installation" edge to the DeviceInstallation entity by IDs.
+func (dc *DeviceCreate) AddDeviceInstallationIDs(ids ...int) *DeviceCreate {
+	dc.mutation.AddDeviceInstallationIDs(ids...)
 	return dc
 }
 
-// AddDeviceInstallationDevice adds the "device_installation_device" edges to the DeviceInstallation entity.
-func (dc *DeviceCreate) AddDeviceInstallationDevice(d ...*DeviceInstallation) *DeviceCreate {
+// AddDeviceInstallation adds the "device_installation" edges to the DeviceInstallation entity.
+func (dc *DeviceCreate) AddDeviceInstallation(d ...*DeviceInstallation) *DeviceCreate {
 	ids := make([]int, len(d))
 	for i := range d {
 		ids[i] = d[i].ID
 	}
-	return dc.AddDeviceInstallationDeviceIDs(ids...)
+	return dc.AddDeviceInstallationIDs(ids...)
+}
+
+// AddEventLogIDs adds the "event_log" edge to the EventLog entity by IDs.
+func (dc *DeviceCreate) AddEventLogIDs(ids ...int) *DeviceCreate {
+	dc.mutation.AddEventLogIDs(ids...)
+	return dc
+}
+
+// AddEventLog adds the "event_log" edges to the EventLog entity.
+func (dc *DeviceCreate) AddEventLog(e ...*EventLog) *DeviceCreate {
+	ids := make([]int, len(e))
+	for i := range e {
+		ids[i] = e[i].ID
+	}
+	return dc.AddEventLogIDs(ids...)
+}
+
+// AddFixingIDs adds the "fixing" edge to the Fixing entity by IDs.
+func (dc *DeviceCreate) AddFixingIDs(ids ...int) *DeviceCreate {
+	dc.mutation.AddFixingIDs(ids...)
+	return dc
+}
+
+// AddFixing adds the "fixing" edges to the Fixing entity.
+func (dc *DeviceCreate) AddFixing(f ...*Fixing) *DeviceCreate {
+	ids := make([]int, len(f))
+	for i := range f {
+		ids[i] = f[i].ID
+	}
+	return dc.AddFixingIDs(ids...)
 }
 
 // Mutation returns the DeviceMutation object of the builder.
@@ -237,19 +257,19 @@ func (dc *DeviceCreate) ExecX(ctx context.Context) {
 
 // defaults sets the default values of the builder before save.
 func (dc *DeviceCreate) defaults() error {
-	if _, ok := dc.mutation.CreatedAt(); !ok {
-		if device.DefaultCreatedAt == nil {
-			return fmt.Errorf("dao: uninitialized device.DefaultCreatedAt (forgotten import dao/runtime?)")
+	if _, ok := dc.mutation.CreateTime(); !ok {
+		if device.DefaultCreateTime == nil {
+			return fmt.Errorf("dao: uninitialized device.DefaultCreateTime (forgotten import dao/runtime?)")
 		}
-		v := device.DefaultCreatedAt()
-		dc.mutation.SetCreatedAt(v)
+		v := device.DefaultCreateTime()
+		dc.mutation.SetCreateTime(v)
 	}
-	if _, ok := dc.mutation.UpdatedAt(); !ok {
-		if device.DefaultUpdatedAt == nil {
-			return fmt.Errorf("dao: uninitialized device.DefaultUpdatedAt (forgotten import dao/runtime?)")
+	if _, ok := dc.mutation.UpdateTime(); !ok {
+		if device.DefaultUpdateTime == nil {
+			return fmt.Errorf("dao: uninitialized device.DefaultUpdateTime (forgotten import dao/runtime?)")
 		}
-		v := device.DefaultUpdatedAt()
-		dc.mutation.SetUpdatedAt(v)
+		v := device.DefaultUpdateTime()
+		dc.mutation.SetUpdateTime(v)
 	}
 	if _, ok := dc.mutation.Brand(); !ok {
 		v := device.DefaultBrand
@@ -272,27 +292,27 @@ func (dc *DeviceCreate) defaults() error {
 
 // check runs all checks and user-defined validators on the builder.
 func (dc *DeviceCreate) check() error {
-	if _, ok := dc.mutation.CreatedAt(); !ok {
-		return &ValidationError{Name: "created_at", err: errors.New(`dao: missing required field "Device.created_at"`)}
+	if _, ok := dc.mutation.CreateTime(); !ok {
+		return &ValidationError{Name: "create_time", err: errors.New(`dao: missing required field "Device.create_time"`)}
 	}
-	if _, ok := dc.mutation.CreatedBy(); !ok {
-		return &ValidationError{Name: "created_by", err: errors.New(`dao: missing required field "Device.created_by"`)}
+	if _, ok := dc.mutation.CreatorID(); !ok {
+		return &ValidationError{Name: "creator_id", err: errors.New(`dao: missing required field "Device.creator_id"`)}
 	}
-	if v, ok := dc.mutation.CreatedBy(); ok {
-		if err := device.CreatedByValidator(v); err != nil {
-			return &ValidationError{Name: "created_by", err: fmt.Errorf(`dao: validator failed for field "Device.created_by": %w`, err)}
+	if v, ok := dc.mutation.CreatorID(); ok {
+		if err := device.CreatorIDValidator(v); err != nil {
+			return &ValidationError{Name: "creator_id", err: fmt.Errorf(`dao: validator failed for field "Device.creator_id": %w`, err)}
 		}
 	}
-	if _, ok := dc.mutation.UpdatedBy(); !ok {
-		return &ValidationError{Name: "updated_by", err: errors.New(`dao: missing required field "Device.updated_by"`)}
+	if _, ok := dc.mutation.UpdaterID(); !ok {
+		return &ValidationError{Name: "updater_id", err: errors.New(`dao: missing required field "Device.updater_id"`)}
 	}
-	if v, ok := dc.mutation.UpdatedBy(); ok {
-		if err := device.UpdatedByValidator(v); err != nil {
-			return &ValidationError{Name: "updated_by", err: fmt.Errorf(`dao: validator failed for field "Device.updated_by": %w`, err)}
+	if v, ok := dc.mutation.UpdaterID(); ok {
+		if err := device.UpdaterIDValidator(v); err != nil {
+			return &ValidationError{Name: "updater_id", err: fmt.Errorf(`dao: validator failed for field "Device.updater_id": %w`, err)}
 		}
 	}
-	if _, ok := dc.mutation.UpdatedAt(); !ok {
-		return &ValidationError{Name: "updated_at", err: errors.New(`dao: missing required field "Device.updated_at"`)}
+	if _, ok := dc.mutation.UpdateTime(); !ok {
+		return &ValidationError{Name: "update_time", err: errors.New(`dao: missing required field "Device.update_time"`)}
 	}
 	if v, ok := dc.mutation.Brand(); ok {
 		if err := device.BrandValidator(int(v)); err != nil {
@@ -354,17 +374,17 @@ func (dc *DeviceCreate) createSpec() (*Device, *sqlgraph.CreateSpec) {
 		_node = &Device{config: dc.config}
 		_spec = sqlgraph.NewCreateSpec(device.Table, sqlgraph.NewFieldSpec(device.FieldID, field.TypeInt))
 	)
-	if value, ok := dc.mutation.CreatedAt(); ok {
-		_spec.SetField(device.FieldCreatedAt, field.TypeTime, value)
-		_node.CreatedAt = value
+	if value, ok := dc.mutation.CreateTime(); ok {
+		_spec.SetField(device.FieldCreateTime, field.TypeTime, value)
+		_node.CreateTime = value
 	}
-	if value, ok := dc.mutation.DeletedAt(); ok {
-		_spec.SetField(device.FieldDeletedAt, field.TypeTime, value)
-		_node.DeletedAt = &value
+	if value, ok := dc.mutation.DeleteTime(); ok {
+		_spec.SetField(device.FieldDeleteTime, field.TypeTime, value)
+		_node.DeleteTime = &value
 	}
-	if value, ok := dc.mutation.UpdatedAt(); ok {
-		_spec.SetField(device.FieldUpdatedAt, field.TypeTime, value)
-		_node.UpdatedAt = value
+	if value, ok := dc.mutation.UpdateTime(); ok {
+		_spec.SetField(device.FieldUpdateTime, field.TypeTime, value)
+		_node.UpdateTime = value
 	}
 	if value, ok := dc.mutation.Brand(); ok {
 		_spec.SetField(device.FieldBrand, field.TypeInt, value)
@@ -400,7 +420,7 @@ func (dc *DeviceCreate) createSpec() (*Device, *sqlgraph.CreateSpec) {
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
-		_node.CreatedBy = nodes[0]
+		_node.CreatorID = nodes[0]
 		_spec.Edges = append(_spec.Edges, edge)
 	}
 	if nodes := dc.mutation.UpdaterIDs(); len(nodes) > 0 {
@@ -417,18 +437,18 @@ func (dc *DeviceCreate) createSpec() (*Device, *sqlgraph.CreateSpec) {
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
-		_node.UpdatedBy = nodes[0]
+		_node.UpdaterID = nodes[0]
 		_spec.Edges = append(_spec.Edges, edge)
 	}
-	if nodes := dc.mutation.IpcEventDeviceIDs(); len(nodes) > 0 {
+	if nodes := dc.mutation.EventIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
-			Table:   device.IpcEventDeviceTable,
-			Columns: []string{device.IpcEventDeviceColumn},
+			Table:   device.EventTable,
+			Columns: []string{device.EventColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(ipcevent.FieldID, field.TypeInt),
+				IDSpec: sqlgraph.NewFieldSpec(event.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {
@@ -436,15 +456,47 @@ func (dc *DeviceCreate) createSpec() (*Device, *sqlgraph.CreateSpec) {
 		}
 		_spec.Edges = append(_spec.Edges, edge)
 	}
-	if nodes := dc.mutation.DeviceInstallationDeviceIDs(); len(nodes) > 0 {
+	if nodes := dc.mutation.DeviceInstallationIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
-			Table:   device.DeviceInstallationDeviceTable,
-			Columns: []string{device.DeviceInstallationDeviceColumn},
+			Table:   device.DeviceInstallationTable,
+			Columns: []string{device.DeviceInstallationColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(deviceinstallation.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := dc.mutation.EventLogIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   device.EventLogTable,
+			Columns: []string{device.EventLogColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(eventlog.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := dc.mutation.FixingIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   device.FixingTable,
+			Columns: []string{device.FixingColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(fixing.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {

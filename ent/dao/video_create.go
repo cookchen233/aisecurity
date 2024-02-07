@@ -4,7 +4,7 @@ package dao
 
 import (
 	"aisecurity/ent/dao/admin"
-	"aisecurity/ent/dao/ipcevent"
+	"aisecurity/ent/dao/event"
 	"aisecurity/ent/dao/video"
 	"context"
 	"errors"
@@ -22,56 +22,56 @@ type VideoCreate struct {
 	hooks    []Hook
 }
 
-// SetCreatedAt sets the "created_at" field.
-func (vc *VideoCreate) SetCreatedAt(t time.Time) *VideoCreate {
-	vc.mutation.SetCreatedAt(t)
+// SetCreateTime sets the "create_time" field.
+func (vc *VideoCreate) SetCreateTime(t time.Time) *VideoCreate {
+	vc.mutation.SetCreateTime(t)
 	return vc
 }
 
-// SetNillableCreatedAt sets the "created_at" field if the given value is not nil.
-func (vc *VideoCreate) SetNillableCreatedAt(t *time.Time) *VideoCreate {
+// SetNillableCreateTime sets the "create_time" field if the given value is not nil.
+func (vc *VideoCreate) SetNillableCreateTime(t *time.Time) *VideoCreate {
 	if t != nil {
-		vc.SetCreatedAt(*t)
+		vc.SetCreateTime(*t)
 	}
 	return vc
 }
 
-// SetCreatedBy sets the "created_by" field.
-func (vc *VideoCreate) SetCreatedBy(i int) *VideoCreate {
-	vc.mutation.SetCreatedBy(i)
+// SetCreatorID sets the "creator_id" field.
+func (vc *VideoCreate) SetCreatorID(i int) *VideoCreate {
+	vc.mutation.SetCreatorID(i)
 	return vc
 }
 
-// SetDeletedAt sets the "deleted_at" field.
-func (vc *VideoCreate) SetDeletedAt(t time.Time) *VideoCreate {
-	vc.mutation.SetDeletedAt(t)
+// SetDeleteTime sets the "delete_time" field.
+func (vc *VideoCreate) SetDeleteTime(t time.Time) *VideoCreate {
+	vc.mutation.SetDeleteTime(t)
 	return vc
 }
 
-// SetNillableDeletedAt sets the "deleted_at" field if the given value is not nil.
-func (vc *VideoCreate) SetNillableDeletedAt(t *time.Time) *VideoCreate {
+// SetNillableDeleteTime sets the "delete_time" field if the given value is not nil.
+func (vc *VideoCreate) SetNillableDeleteTime(t *time.Time) *VideoCreate {
 	if t != nil {
-		vc.SetDeletedAt(*t)
+		vc.SetDeleteTime(*t)
 	}
 	return vc
 }
 
-// SetUpdatedBy sets the "updated_by" field.
-func (vc *VideoCreate) SetUpdatedBy(i int) *VideoCreate {
-	vc.mutation.SetUpdatedBy(i)
+// SetUpdaterID sets the "updater_id" field.
+func (vc *VideoCreate) SetUpdaterID(i int) *VideoCreate {
+	vc.mutation.SetUpdaterID(i)
 	return vc
 }
 
-// SetUpdatedAt sets the "updated_at" field.
-func (vc *VideoCreate) SetUpdatedAt(t time.Time) *VideoCreate {
-	vc.mutation.SetUpdatedAt(t)
+// SetUpdateTime sets the "update_time" field.
+func (vc *VideoCreate) SetUpdateTime(t time.Time) *VideoCreate {
+	vc.mutation.SetUpdateTime(t)
 	return vc
 }
 
-// SetNillableUpdatedAt sets the "updated_at" field if the given value is not nil.
-func (vc *VideoCreate) SetNillableUpdatedAt(t *time.Time) *VideoCreate {
+// SetNillableUpdateTime sets the "update_time" field if the given value is not nil.
+func (vc *VideoCreate) SetNillableUpdateTime(t *time.Time) *VideoCreate {
 	if t != nil {
-		vc.SetUpdatedAt(*t)
+		vc.SetUpdateTime(*t)
 	}
 	return vc
 }
@@ -146,35 +146,9 @@ func (vc *VideoCreate) SetNillableUploadedAt(t *time.Time) *VideoCreate {
 	return vc
 }
 
-// SetUploadedAt2 sets the "uploaded_at2" field.
-func (vc *VideoCreate) SetUploadedAt2(t time.Time) *VideoCreate {
-	vc.mutation.SetUploadedAt2(t)
-	return vc
-}
-
-// SetNillableUploadedAt2 sets the "uploaded_at2" field if the given value is not nil.
-func (vc *VideoCreate) SetNillableUploadedAt2(t *time.Time) *VideoCreate {
-	if t != nil {
-		vc.SetUploadedAt2(*t)
-	}
-	return vc
-}
-
-// SetCreatorID sets the "creator" edge to the Admin entity by ID.
-func (vc *VideoCreate) SetCreatorID(id int) *VideoCreate {
-	vc.mutation.SetCreatorID(id)
-	return vc
-}
-
 // SetCreator sets the "creator" edge to the Admin entity.
 func (vc *VideoCreate) SetCreator(a *Admin) *VideoCreate {
 	return vc.SetCreatorID(a.ID)
-}
-
-// SetUpdaterID sets the "updater" edge to the Admin entity by ID.
-func (vc *VideoCreate) SetUpdaterID(id int) *VideoCreate {
-	vc.mutation.SetUpdaterID(id)
-	return vc
 }
 
 // SetUpdater sets the "updater" edge to the Admin entity.
@@ -182,19 +156,19 @@ func (vc *VideoCreate) SetUpdater(a *Admin) *VideoCreate {
 	return vc.SetUpdaterID(a.ID)
 }
 
-// AddIpcEventVideoIDs adds the "ipc_event_video" edge to the IPCEvent entity by IDs.
-func (vc *VideoCreate) AddIpcEventVideoIDs(ids ...int) *VideoCreate {
-	vc.mutation.AddIpcEventVideoIDs(ids...)
+// AddEventIDs adds the "event" edge to the Event entity by IDs.
+func (vc *VideoCreate) AddEventIDs(ids ...int) *VideoCreate {
+	vc.mutation.AddEventIDs(ids...)
 	return vc
 }
 
-// AddIpcEventVideo adds the "ipc_event_video" edges to the IPCEvent entity.
-func (vc *VideoCreate) AddIpcEventVideo(i ...*IPCEvent) *VideoCreate {
-	ids := make([]int, len(i))
-	for j := range i {
-		ids[j] = i[j].ID
+// AddEvent adds the "event" edges to the Event entity.
+func (vc *VideoCreate) AddEvent(e ...*Event) *VideoCreate {
+	ids := make([]int, len(e))
+	for i := range e {
+		ids[i] = e[i].ID
 	}
-	return vc.AddIpcEventVideoIDs(ids...)
+	return vc.AddEventIDs(ids...)
 }
 
 // Mutation returns the VideoMutation object of the builder.
@@ -234,19 +208,19 @@ func (vc *VideoCreate) ExecX(ctx context.Context) {
 
 // defaults sets the default values of the builder before save.
 func (vc *VideoCreate) defaults() error {
-	if _, ok := vc.mutation.CreatedAt(); !ok {
-		if video.DefaultCreatedAt == nil {
-			return fmt.Errorf("dao: uninitialized video.DefaultCreatedAt (forgotten import dao/runtime?)")
+	if _, ok := vc.mutation.CreateTime(); !ok {
+		if video.DefaultCreateTime == nil {
+			return fmt.Errorf("dao: uninitialized video.DefaultCreateTime (forgotten import dao/runtime?)")
 		}
-		v := video.DefaultCreatedAt()
-		vc.mutation.SetCreatedAt(v)
+		v := video.DefaultCreateTime()
+		vc.mutation.SetCreateTime(v)
 	}
-	if _, ok := vc.mutation.UpdatedAt(); !ok {
-		if video.DefaultUpdatedAt == nil {
-			return fmt.Errorf("dao: uninitialized video.DefaultUpdatedAt (forgotten import dao/runtime?)")
+	if _, ok := vc.mutation.UpdateTime(); !ok {
+		if video.DefaultUpdateTime == nil {
+			return fmt.Errorf("dao: uninitialized video.DefaultUpdateTime (forgotten import dao/runtime?)")
 		}
-		v := video.DefaultUpdatedAt()
-		vc.mutation.SetUpdatedAt(v)
+		v := video.DefaultUpdateTime()
+		vc.mutation.SetUpdateTime(v)
 	}
 	if _, ok := vc.mutation.Size(); !ok {
 		v := video.DefaultSize
@@ -257,27 +231,27 @@ func (vc *VideoCreate) defaults() error {
 
 // check runs all checks and user-defined validators on the builder.
 func (vc *VideoCreate) check() error {
-	if _, ok := vc.mutation.CreatedAt(); !ok {
-		return &ValidationError{Name: "created_at", err: errors.New(`dao: missing required field "Video.created_at"`)}
+	if _, ok := vc.mutation.CreateTime(); !ok {
+		return &ValidationError{Name: "create_time", err: errors.New(`dao: missing required field "Video.create_time"`)}
 	}
-	if _, ok := vc.mutation.CreatedBy(); !ok {
-		return &ValidationError{Name: "created_by", err: errors.New(`dao: missing required field "Video.created_by"`)}
+	if _, ok := vc.mutation.CreatorID(); !ok {
+		return &ValidationError{Name: "creator_id", err: errors.New(`dao: missing required field "Video.creator_id"`)}
 	}
-	if v, ok := vc.mutation.CreatedBy(); ok {
-		if err := video.CreatedByValidator(v); err != nil {
-			return &ValidationError{Name: "created_by", err: fmt.Errorf(`dao: validator failed for field "Video.created_by": %w`, err)}
+	if v, ok := vc.mutation.CreatorID(); ok {
+		if err := video.CreatorIDValidator(v); err != nil {
+			return &ValidationError{Name: "creator_id", err: fmt.Errorf(`dao: validator failed for field "Video.creator_id": %w`, err)}
 		}
 	}
-	if _, ok := vc.mutation.UpdatedBy(); !ok {
-		return &ValidationError{Name: "updated_by", err: errors.New(`dao: missing required field "Video.updated_by"`)}
+	if _, ok := vc.mutation.UpdaterID(); !ok {
+		return &ValidationError{Name: "updater_id", err: errors.New(`dao: missing required field "Video.updater_id"`)}
 	}
-	if v, ok := vc.mutation.UpdatedBy(); ok {
-		if err := video.UpdatedByValidator(v); err != nil {
-			return &ValidationError{Name: "updated_by", err: fmt.Errorf(`dao: validator failed for field "Video.updated_by": %w`, err)}
+	if v, ok := vc.mutation.UpdaterID(); ok {
+		if err := video.UpdaterIDValidator(v); err != nil {
+			return &ValidationError{Name: "updater_id", err: fmt.Errorf(`dao: validator failed for field "Video.updater_id": %w`, err)}
 		}
 	}
-	if _, ok := vc.mutation.UpdatedAt(); !ok {
-		return &ValidationError{Name: "updated_at", err: errors.New(`dao: missing required field "Video.updated_at"`)}
+	if _, ok := vc.mutation.UpdateTime(); !ok {
+		return &ValidationError{Name: "update_time", err: errors.New(`dao: missing required field "Video.update_time"`)}
 	}
 	if _, ok := vc.mutation.Size(); !ok {
 		return &ValidationError{Name: "size", err: errors.New(`dao: missing required field "Video.size"`)}
@@ -314,17 +288,17 @@ func (vc *VideoCreate) createSpec() (*Video, *sqlgraph.CreateSpec) {
 		_node = &Video{config: vc.config}
 		_spec = sqlgraph.NewCreateSpec(video.Table, sqlgraph.NewFieldSpec(video.FieldID, field.TypeInt))
 	)
-	if value, ok := vc.mutation.CreatedAt(); ok {
-		_spec.SetField(video.FieldCreatedAt, field.TypeTime, value)
-		_node.CreatedAt = value
+	if value, ok := vc.mutation.CreateTime(); ok {
+		_spec.SetField(video.FieldCreateTime, field.TypeTime, value)
+		_node.CreateTime = value
 	}
-	if value, ok := vc.mutation.DeletedAt(); ok {
-		_spec.SetField(video.FieldDeletedAt, field.TypeTime, value)
-		_node.DeletedAt = &value
+	if value, ok := vc.mutation.DeleteTime(); ok {
+		_spec.SetField(video.FieldDeleteTime, field.TypeTime, value)
+		_node.DeleteTime = &value
 	}
-	if value, ok := vc.mutation.UpdatedAt(); ok {
-		_spec.SetField(video.FieldUpdatedAt, field.TypeTime, value)
-		_node.UpdatedAt = value
+	if value, ok := vc.mutation.UpdateTime(); ok {
+		_spec.SetField(video.FieldUpdateTime, field.TypeTime, value)
+		_node.UpdateTime = value
 	}
 	if value, ok := vc.mutation.Name(); ok {
 		_spec.SetField(video.FieldName, field.TypeString, value)
@@ -346,10 +320,6 @@ func (vc *VideoCreate) createSpec() (*Video, *sqlgraph.CreateSpec) {
 		_spec.SetField(video.FieldUploadedAt, field.TypeTime, value)
 		_node.UploadedAt = &value
 	}
-	if value, ok := vc.mutation.UploadedAt2(); ok {
-		_spec.SetField(video.FieldUploadedAt2, field.TypeTime, value)
-		_node.UploadedAt2 = &value
-	}
 	if nodes := vc.mutation.CreatorIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
@@ -364,7 +334,7 @@ func (vc *VideoCreate) createSpec() (*Video, *sqlgraph.CreateSpec) {
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
-		_node.CreatedBy = nodes[0]
+		_node.CreatorID = nodes[0]
 		_spec.Edges = append(_spec.Edges, edge)
 	}
 	if nodes := vc.mutation.UpdaterIDs(); len(nodes) > 0 {
@@ -381,18 +351,18 @@ func (vc *VideoCreate) createSpec() (*Video, *sqlgraph.CreateSpec) {
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
-		_node.UpdatedBy = nodes[0]
+		_node.UpdaterID = nodes[0]
 		_spec.Edges = append(_spec.Edges, edge)
 	}
-	if nodes := vc.mutation.IpcEventVideoIDs(); len(nodes) > 0 {
+	if nodes := vc.mutation.EventIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
-			Table:   video.IpcEventVideoTable,
-			Columns: []string{video.IpcEventVideoColumn},
+			Table:   video.EventTable,
+			Columns: []string{video.EventColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(ipcevent.FieldID, field.TypeInt),
+				IDSpec: sqlgraph.NewFieldSpec(event.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {

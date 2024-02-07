@@ -15,18 +15,18 @@ import (
 	"time"
 )
 
-type Video struct {
+type VideoService struct {
 	Service
 	entClient *dao.VideoClient
 }
 
-func NewVideo(ctx context.Context) *Video {
-	s := &Video{entClient: db.EntClient.Video}
+func NewVideoService(ctx context.Context) *VideoService {
+	s := &VideoService{entClient: db.EntClient.Video}
 	s.Ctx = ctx
 	return s
 }
 
-func (s *Video) Create(ent structs.IEntity) (structs.IEntity, error) {
+func (s *VideoService) Create(ent structs.IEntity) (structs.IEntity, error) {
 	e := ent.(*entities.Video)
 	c := s.entClient.
 		Create().
@@ -39,13 +39,13 @@ func (s *Video) Create(ent structs.IEntity) (structs.IEntity, error) {
 	}
 	saved, err := c.Save(s.Ctx)
 	if err != nil {
-		return nil, utils.ErrorWrap(err, "failed creating Video")
+		return nil, utils.ErrorWrap(err, "failed creating VideoService")
 	}
 	// ConvertTo now returns a non-pointer type that implements IEntity
 	return structs.ConvertTo[*dao.Video, entities.Video](saved), nil
 }
 
-func (s *Video) Update(ent structs.IEntity) (structs.IEntity, error) {
+func (s *VideoService) Update(ent structs.IEntity) (structs.IEntity, error) {
 	e := ent.(*entities.Video)
 	u := s.entClient.UpdateOneID(e.ID).
 		SetName(e.Name).
@@ -57,12 +57,12 @@ func (s *Video) Update(ent structs.IEntity) (structs.IEntity, error) {
 	}
 	save, err := u.Save(s.Ctx)
 	if err != nil {
-		return nil, utils.ErrorWrap(err, "failed updating Video")
+		return nil, utils.ErrorWrap(err, "failed updating VideoService")
 	}
 	return structs.ConvertTo[*dao.Video, entities.Video](save), nil
 }
 
-func (s *Video) GetDetails(fit structs.IFilter) (structs.IEntity, error) {
+func (s *VideoService) GetDetails(fit structs.IFilter) (structs.IEntity, error) {
 	fit.SetPage(1)
 	fit.SetLimit(1)
 	list, err := s.GetList(fit)
@@ -75,11 +75,12 @@ func (s *Video) GetDetails(fit structs.IFilter) (structs.IEntity, error) {
 	return list[0], nil
 }
 
-func (s *Video) GetList(fit structs.IFilter) ([]structs.IEntity, error) {
+func (s *VideoService) GetList(fit structs.IFilter) ([]structs.IEntity, error) {
 	// list
 	list, err := s.query(fit).
 		Limit(fit.GetLimit()).
 		Offset(fit.GetOffset()).
+		Order(dao.Desc(video.FieldID)).
 		All(s.Ctx)
 	if err != nil {
 		return nil, utils.ErrorWithStack(err)
@@ -98,7 +99,7 @@ func (s *Video) GetList(fit structs.IFilter) ([]structs.IEntity, error) {
 	return ents, nil
 }
 
-func (s *Video) query(fit structs.IFilter) *dao.VideoQuery {
+func (s *VideoService) query(fit structs.IFilter) *dao.VideoQuery {
 	f := fit.(*filters.Video)
 	q := s.entClient.Query()
 	if f.ID != 0 {
@@ -113,7 +114,7 @@ func (s *Video) query(fit structs.IFilter) *dao.VideoQuery {
 	return q.Clone()
 }
 
-func (s *Video) GetTotal(fit structs.IFilter) (int, error) {
+func (s *VideoService) GetTotal(fit structs.IFilter) (int, error) {
 	total, err := s.query(fit).Count(s.Ctx)
 	if err != nil {
 		return 0, utils.ErrorWithStack(err)
@@ -121,7 +122,7 @@ func (s *Video) GetTotal(fit structs.IFilter) (int, error) {
 	return total, nil
 }
 
-func (s *Video) GetByName(name string) (structs.IEntity, error) {
+func (s *VideoService) GetByName(name string) (structs.IEntity, error) {
 	first, err := s.entClient.Query().Where(video.NameEQ(name)).First(s.Ctx)
 	if err != nil {
 		return nil, utils.ErrorWithStack(err)
@@ -129,7 +130,7 @@ func (s *Video) GetByName(name string) (structs.IEntity, error) {
 	return structs.ConvertTo[*dao.Video, entities.Video](first), nil
 }
 
-func (s *Video) CreateOrUpdateByName(ent structs.IEntity) (structs.IEntity, error) {
+func (s *VideoService) CreateOrUpdateByName(ent structs.IEntity) (structs.IEntity, error) {
 	e := ent.(*entities.Video)
 	exVideo, err := s.GetByName(e.Name)
 	var now = time.Now()

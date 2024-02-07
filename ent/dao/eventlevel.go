@@ -21,23 +21,25 @@ type EventLevel struct {
 	// ID of the ent.
 	ID int `json:"id,omitempty"`
 	// 创建时间
-	CreatedAt time.Time `json:"created_at"`
+	CreateTime time.Time `json:"create_time"`
 	// 创建者
-	CreatedBy int `json:"created_by"`
+	CreatorID int `json:"creator_id"`
 	// 删除时间
-	DeletedAt *time.Time `json:"deleted_at"`
+	DeleteTime *time.Time `json:"delete_time"`
 	// 最后更新者
-	UpdatedBy int `json:"updated_by"`
+	UpdaterID int `json:"updater_id"`
 	// 最后更新时间
-	UpdatedAt time.Time `json:"updated_at"`
+	UpdateTime time.Time `json:"update_time"`
 	// 名称
 	Name string `json:"name" validate:"required"`
 	// 包含事件类型
 	EventTypes []enums.EventType `json:"event_types" validate:"required"`
 	// 描述
 	Description string `json:"description"`
-	// 是否上报
-	IsReport bool `json:"is_report"`
+	// 图标
+	Icon string `json:"icon"`
+	// 通知方式
+	NotifyTypes []enums.NotifyType `json:"notify_types"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the EventLevelQuery when eager-loading is set.
 	Edges        EventLevelEdges `json:"edges"`
@@ -86,15 +88,13 @@ func (*EventLevel) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
 	for i := range columns {
 		switch columns[i] {
-		case eventlevel.FieldEventTypes:
+		case eventlevel.FieldEventTypes, eventlevel.FieldNotifyTypes:
 			values[i] = new([]byte)
-		case eventlevel.FieldIsReport:
-			values[i] = new(sql.NullBool)
-		case eventlevel.FieldID, eventlevel.FieldCreatedBy, eventlevel.FieldUpdatedBy:
+		case eventlevel.FieldID, eventlevel.FieldCreatorID, eventlevel.FieldUpdaterID:
 			values[i] = new(sql.NullInt64)
-		case eventlevel.FieldName, eventlevel.FieldDescription:
+		case eventlevel.FieldName, eventlevel.FieldDescription, eventlevel.FieldIcon:
 			values[i] = new(sql.NullString)
-		case eventlevel.FieldCreatedAt, eventlevel.FieldDeletedAt, eventlevel.FieldUpdatedAt:
+		case eventlevel.FieldCreateTime, eventlevel.FieldDeleteTime, eventlevel.FieldUpdateTime:
 			values[i] = new(sql.NullTime)
 		default:
 			values[i] = new(sql.UnknownType)
@@ -117,36 +117,36 @@ func (el *EventLevel) assignValues(columns []string, values []any) error {
 				return fmt.Errorf("unexpected type %T for field id", value)
 			}
 			el.ID = int(value.Int64)
-		case eventlevel.FieldCreatedAt:
+		case eventlevel.FieldCreateTime:
 			if value, ok := values[i].(*sql.NullTime); !ok {
-				return fmt.Errorf("unexpected type %T for field created_at", values[i])
+				return fmt.Errorf("unexpected type %T for field create_time", values[i])
 			} else if value.Valid {
-				el.CreatedAt = value.Time
+				el.CreateTime = value.Time
 			}
-		case eventlevel.FieldCreatedBy:
+		case eventlevel.FieldCreatorID:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
-				return fmt.Errorf("unexpected type %T for field created_by", values[i])
+				return fmt.Errorf("unexpected type %T for field creator_id", values[i])
 			} else if value.Valid {
-				el.CreatedBy = int(value.Int64)
+				el.CreatorID = int(value.Int64)
 			}
-		case eventlevel.FieldDeletedAt:
+		case eventlevel.FieldDeleteTime:
 			if value, ok := values[i].(*sql.NullTime); !ok {
-				return fmt.Errorf("unexpected type %T for field deleted_at", values[i])
+				return fmt.Errorf("unexpected type %T for field delete_time", values[i])
 			} else if value.Valid {
-				el.DeletedAt = new(time.Time)
-				*el.DeletedAt = value.Time
+				el.DeleteTime = new(time.Time)
+				*el.DeleteTime = value.Time
 			}
-		case eventlevel.FieldUpdatedBy:
+		case eventlevel.FieldUpdaterID:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
-				return fmt.Errorf("unexpected type %T for field updated_by", values[i])
+				return fmt.Errorf("unexpected type %T for field updater_id", values[i])
 			} else if value.Valid {
-				el.UpdatedBy = int(value.Int64)
+				el.UpdaterID = int(value.Int64)
 			}
-		case eventlevel.FieldUpdatedAt:
+		case eventlevel.FieldUpdateTime:
 			if value, ok := values[i].(*sql.NullTime); !ok {
-				return fmt.Errorf("unexpected type %T for field updated_at", values[i])
+				return fmt.Errorf("unexpected type %T for field update_time", values[i])
 			} else if value.Valid {
-				el.UpdatedAt = value.Time
+				el.UpdateTime = value.Time
 			}
 		case eventlevel.FieldName:
 			if value, ok := values[i].(*sql.NullString); !ok {
@@ -168,11 +168,19 @@ func (el *EventLevel) assignValues(columns []string, values []any) error {
 			} else if value.Valid {
 				el.Description = value.String
 			}
-		case eventlevel.FieldIsReport:
-			if value, ok := values[i].(*sql.NullBool); !ok {
-				return fmt.Errorf("unexpected type %T for field is_report", values[i])
+		case eventlevel.FieldIcon:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field icon", values[i])
 			} else if value.Valid {
-				el.IsReport = value.Bool
+				el.Icon = value.String
+			}
+		case eventlevel.FieldNotifyTypes:
+			if value, ok := values[i].(*[]byte); !ok {
+				return fmt.Errorf("unexpected type %T for field notify_types", values[i])
+			} else if value != nil && len(*value) > 0 {
+				if err := json.Unmarshal(*value, &el.NotifyTypes); err != nil {
+					return fmt.Errorf("unmarshal field notify_types: %w", err)
+				}
 			}
 		default:
 			el.selectValues.Set(columns[i], values[i])
@@ -220,22 +228,22 @@ func (el *EventLevel) String() string {
 	var builder strings.Builder
 	builder.WriteString("EventLevel(")
 	builder.WriteString(fmt.Sprintf("id=%v, ", el.ID))
-	builder.WriteString("created_at=")
-	builder.WriteString(el.CreatedAt.Format(time.ANSIC))
+	builder.WriteString("create_time=")
+	builder.WriteString(el.CreateTime.Format(time.ANSIC))
 	builder.WriteString(", ")
-	builder.WriteString("created_by=")
-	builder.WriteString(fmt.Sprintf("%v", el.CreatedBy))
+	builder.WriteString("creator_id=")
+	builder.WriteString(fmt.Sprintf("%v", el.CreatorID))
 	builder.WriteString(", ")
-	if v := el.DeletedAt; v != nil {
-		builder.WriteString("deleted_at=")
+	if v := el.DeleteTime; v != nil {
+		builder.WriteString("delete_time=")
 		builder.WriteString(v.Format(time.ANSIC))
 	}
 	builder.WriteString(", ")
-	builder.WriteString("updated_by=")
-	builder.WriteString(fmt.Sprintf("%v", el.UpdatedBy))
+	builder.WriteString("updater_id=")
+	builder.WriteString(fmt.Sprintf("%v", el.UpdaterID))
 	builder.WriteString(", ")
-	builder.WriteString("updated_at=")
-	builder.WriteString(el.UpdatedAt.Format(time.ANSIC))
+	builder.WriteString("update_time=")
+	builder.WriteString(el.UpdateTime.Format(time.ANSIC))
 	builder.WriteString(", ")
 	builder.WriteString("name=")
 	builder.WriteString(el.Name)
@@ -246,8 +254,11 @@ func (el *EventLevel) String() string {
 	builder.WriteString("description=")
 	builder.WriteString(el.Description)
 	builder.WriteString(", ")
-	builder.WriteString("is_report=")
-	builder.WriteString(fmt.Sprintf("%v", el.IsReport))
+	builder.WriteString("icon=")
+	builder.WriteString(el.Icon)
+	builder.WriteString(", ")
+	builder.WriteString("notify_types=")
+	builder.WriteString(fmt.Sprintf("%v", el.NotifyTypes))
 	builder.WriteByte(')')
 	return builder.String()
 }

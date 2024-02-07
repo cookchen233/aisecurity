@@ -6,6 +6,7 @@ import (
 	"aisecurity/ent/dao/admin"
 	"aisecurity/ent/dao/department"
 	"aisecurity/ent/dao/employee"
+	"aisecurity/ent/dao/permission"
 	"aisecurity/ent/dao/predicate"
 	"context"
 	"database/sql/driver"
@@ -20,15 +21,16 @@ import (
 // DepartmentQuery is the builder for querying Department entities.
 type DepartmentQuery struct {
 	config
-	ctx           *QueryContext
-	order         []department.OrderOption
-	inters        []Interceptor
-	predicates    []predicate.Department
-	withCreator   *AdminQuery
-	withUpdater   *AdminQuery
-	withParent    *DepartmentQuery
-	withEmployees *EmployeeQuery
-	withChildren  *DepartmentQuery
+	ctx             *QueryContext
+	order           []department.OrderOption
+	inters          []Interceptor
+	predicates      []predicate.Department
+	withCreator     *AdminQuery
+	withUpdater     *AdminQuery
+	withParent      *DepartmentQuery
+	withPermissions *PermissionQuery
+	withEmployees   *EmployeeQuery
+	withChildren    *DepartmentQuery
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
 	path func(context.Context) (*sql.Selector, error)
@@ -124,6 +126,28 @@ func (dq *DepartmentQuery) QueryParent() *DepartmentQuery {
 			sqlgraph.From(department.Table, department.FieldID, selector),
 			sqlgraph.To(department.Table, department.FieldID),
 			sqlgraph.Edge(sqlgraph.M2O, true, department.ParentTable, department.ParentColumn),
+		)
+		fromU = sqlgraph.SetNeighbors(dq.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
+}
+
+// QueryPermissions chains the current query on the "permissions" edge.
+func (dq *DepartmentQuery) QueryPermissions() *PermissionQuery {
+	query := (&PermissionClient{config: dq.config}).Query()
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := dq.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := dq.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(department.Table, department.FieldID, selector),
+			sqlgraph.To(permission.Table, permission.FieldID),
+			sqlgraph.Edge(sqlgraph.M2M, true, department.PermissionsTable, department.PermissionsPrimaryKey...),
 		)
 		fromU = sqlgraph.SetNeighbors(dq.driver.Dialect(), step)
 		return fromU, nil
@@ -362,16 +386,17 @@ func (dq *DepartmentQuery) Clone() *DepartmentQuery {
 		return nil
 	}
 	return &DepartmentQuery{
-		config:        dq.config,
-		ctx:           dq.ctx.Clone(),
-		order:         append([]department.OrderOption{}, dq.order...),
-		inters:        append([]Interceptor{}, dq.inters...),
-		predicates:    append([]predicate.Department{}, dq.predicates...),
-		withCreator:   dq.withCreator.Clone(),
-		withUpdater:   dq.withUpdater.Clone(),
-		withParent:    dq.withParent.Clone(),
-		withEmployees: dq.withEmployees.Clone(),
-		withChildren:  dq.withChildren.Clone(),
+		config:          dq.config,
+		ctx:             dq.ctx.Clone(),
+		order:           append([]department.OrderOption{}, dq.order...),
+		inters:          append([]Interceptor{}, dq.inters...),
+		predicates:      append([]predicate.Department{}, dq.predicates...),
+		withCreator:     dq.withCreator.Clone(),
+		withUpdater:     dq.withUpdater.Clone(),
+		withParent:      dq.withParent.Clone(),
+		withPermissions: dq.withPermissions.Clone(),
+		withEmployees:   dq.withEmployees.Clone(),
+		withChildren:    dq.withChildren.Clone(),
 		// clone intermediate query.
 		sql:  dq.sql.Clone(),
 		path: dq.path,
@@ -411,6 +436,17 @@ func (dq *DepartmentQuery) WithParent(opts ...func(*DepartmentQuery)) *Departmen
 	return dq
 }
 
+// WithPermissions tells the query-builder to eager-load the nodes that are connected to
+// the "permissions" edge. The optional arguments are used to configure the query builder of the edge.
+func (dq *DepartmentQuery) WithPermissions(opts ...func(*PermissionQuery)) *DepartmentQuery {
+	query := (&PermissionClient{config: dq.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	dq.withPermissions = query
+	return dq
+}
+
 // WithEmployees tells the query-builder to eager-load the nodes that are connected to
 // the "employees" edge. The optional arguments are used to configure the query builder of the edge.
 func (dq *DepartmentQuery) WithEmployees(opts ...func(*EmployeeQuery)) *DepartmentQuery {
@@ -439,12 +475,12 @@ func (dq *DepartmentQuery) WithChildren(opts ...func(*DepartmentQuery)) *Departm
 // Example:
 //
 //	var v []struct {
-//		CreatedAt time.Time `json:"created_at"`
+//		CreateTime time.Time `json:"create_time"`
 //		Count int `json:"count,omitempty"`
 //	}
 //
 //	client.Department.Query().
-//		GroupBy(department.FieldCreatedAt).
+//		GroupBy(department.FieldCreateTime).
 //		Aggregate(dao.Count()).
 //		Scan(ctx, &v)
 func (dq *DepartmentQuery) GroupBy(field string, fields ...string) *DepartmentGroupBy {
@@ -462,11 +498,11 @@ func (dq *DepartmentQuery) GroupBy(field string, fields ...string) *DepartmentGr
 // Example:
 //
 //	var v []struct {
-//		CreatedAt time.Time `json:"created_at"`
+//		CreateTime time.Time `json:"create_time"`
 //	}
 //
 //	client.Department.Query().
-//		Select(department.FieldCreatedAt).
+//		Select(department.FieldCreateTime).
 //		Scan(ctx, &v)
 func (dq *DepartmentQuery) Select(fields ...string) *DepartmentSelect {
 	dq.ctx.Fields = append(dq.ctx.Fields, fields...)
@@ -511,10 +547,11 @@ func (dq *DepartmentQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*D
 	var (
 		nodes       = []*Department{}
 		_spec       = dq.querySpec()
-		loadedTypes = [5]bool{
+		loadedTypes = [6]bool{
 			dq.withCreator != nil,
 			dq.withUpdater != nil,
 			dq.withParent != nil,
+			dq.withPermissions != nil,
 			dq.withEmployees != nil,
 			dq.withChildren != nil,
 		}
@@ -555,6 +592,13 @@ func (dq *DepartmentQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*D
 			return nil, err
 		}
 	}
+	if query := dq.withPermissions; query != nil {
+		if err := dq.loadPermissions(ctx, query, nodes,
+			func(n *Department) { n.Edges.Permissions = []*Permission{} },
+			func(n *Department, e *Permission) { n.Edges.Permissions = append(n.Edges.Permissions, e) }); err != nil {
+			return nil, err
+		}
+	}
 	if query := dq.withEmployees; query != nil {
 		if err := dq.loadEmployees(ctx, query, nodes,
 			func(n *Department) { n.Edges.Employees = []*Employee{} },
@@ -576,7 +620,7 @@ func (dq *DepartmentQuery) loadCreator(ctx context.Context, query *AdminQuery, n
 	ids := make([]int, 0, len(nodes))
 	nodeids := make(map[int][]*Department)
 	for i := range nodes {
-		fk := nodes[i].CreatedBy
+		fk := nodes[i].CreatorID
 		if _, ok := nodeids[fk]; !ok {
 			ids = append(ids, fk)
 		}
@@ -593,7 +637,7 @@ func (dq *DepartmentQuery) loadCreator(ctx context.Context, query *AdminQuery, n
 	for _, n := range neighbors {
 		nodes, ok := nodeids[n.ID]
 		if !ok {
-			return fmt.Errorf(`unexpected foreign-key "created_by" returned %v`, n.ID)
+			return fmt.Errorf(`unexpected foreign-key "creator_id" returned %v`, n.ID)
 		}
 		for i := range nodes {
 			assign(nodes[i], n)
@@ -605,7 +649,7 @@ func (dq *DepartmentQuery) loadUpdater(ctx context.Context, query *AdminQuery, n
 	ids := make([]int, 0, len(nodes))
 	nodeids := make(map[int][]*Department)
 	for i := range nodes {
-		fk := nodes[i].UpdatedBy
+		fk := nodes[i].UpdaterID
 		if _, ok := nodeids[fk]; !ok {
 			ids = append(ids, fk)
 		}
@@ -622,7 +666,7 @@ func (dq *DepartmentQuery) loadUpdater(ctx context.Context, query *AdminQuery, n
 	for _, n := range neighbors {
 		nodes, ok := nodeids[n.ID]
 		if !ok {
-			return fmt.Errorf(`unexpected foreign-key "updated_by" returned %v`, n.ID)
+			return fmt.Errorf(`unexpected foreign-key "updater_id" returned %v`, n.ID)
 		}
 		for i := range nodes {
 			assign(nodes[i], n)
@@ -655,6 +699,67 @@ func (dq *DepartmentQuery) loadParent(ctx context.Context, query *DepartmentQuer
 		}
 		for i := range nodes {
 			assign(nodes[i], n)
+		}
+	}
+	return nil
+}
+func (dq *DepartmentQuery) loadPermissions(ctx context.Context, query *PermissionQuery, nodes []*Department, init func(*Department), assign func(*Department, *Permission)) error {
+	edgeIDs := make([]driver.Value, len(nodes))
+	byID := make(map[int]*Department)
+	nids := make(map[int]map[*Department]struct{})
+	for i, node := range nodes {
+		edgeIDs[i] = node.ID
+		byID[node.ID] = node
+		if init != nil {
+			init(node)
+		}
+	}
+	query.Where(func(s *sql.Selector) {
+		joinT := sql.Table(department.PermissionsTable)
+		s.Join(joinT).On(s.C(permission.FieldID), joinT.C(department.PermissionsPrimaryKey[0]))
+		s.Where(sql.InValues(joinT.C(department.PermissionsPrimaryKey[1]), edgeIDs...))
+		columns := s.SelectedColumns()
+		s.Select(joinT.C(department.PermissionsPrimaryKey[1]))
+		s.AppendSelect(columns...)
+		s.SetDistinct(false)
+	})
+	if err := query.prepareQuery(ctx); err != nil {
+		return err
+	}
+	qr := QuerierFunc(func(ctx context.Context, q Query) (Value, error) {
+		return query.sqlAll(ctx, func(_ context.Context, spec *sqlgraph.QuerySpec) {
+			assign := spec.Assign
+			values := spec.ScanValues
+			spec.ScanValues = func(columns []string) ([]any, error) {
+				values, err := values(columns[1:])
+				if err != nil {
+					return nil, err
+				}
+				return append([]any{new(sql.NullInt64)}, values...), nil
+			}
+			spec.Assign = func(columns []string, values []any) error {
+				outValue := int(values[0].(*sql.NullInt64).Int64)
+				inValue := int(values[1].(*sql.NullInt64).Int64)
+				if nids[inValue] == nil {
+					nids[inValue] = map[*Department]struct{}{byID[outValue]: {}}
+					return assign(columns[1:], values[1:])
+				}
+				nids[inValue][byID[outValue]] = struct{}{}
+				return nil
+			}
+		})
+	})
+	neighbors, err := withInterceptors[[]*Permission](ctx, query, qr, query.inters)
+	if err != nil {
+		return err
+	}
+	for _, n := range neighbors {
+		nodes, ok := nids[n.ID]
+		if !ok {
+			return fmt.Errorf(`unexpected "permissions" node returned %v`, n.ID)
+		}
+		for kn := range nodes {
+			assign(kn, n)
 		}
 	}
 	return nil
@@ -746,10 +851,10 @@ func (dq *DepartmentQuery) querySpec() *sqlgraph.QuerySpec {
 			}
 		}
 		if dq.withCreator != nil {
-			_spec.Node.AddColumnOnce(department.FieldCreatedBy)
+			_spec.Node.AddColumnOnce(department.FieldCreatorID)
 		}
 		if dq.withUpdater != nil {
-			_spec.Node.AddColumnOnce(department.FieldUpdatedBy)
+			_spec.Node.AddColumnOnce(department.FieldUpdaterID)
 		}
 		if dq.withParent != nil {
 			_spec.Node.AddColumnOnce(department.FieldParentID)

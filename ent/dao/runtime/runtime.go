@@ -4,18 +4,24 @@ package runtime
 
 import (
 	"aisecurity/ent/dao/admin"
-	"aisecurity/ent/dao/adminrole"
 	"aisecurity/ent/dao/area"
 	"aisecurity/ent/dao/department"
 	"aisecurity/ent/dao/device"
 	"aisecurity/ent/dao/deviceinstallation"
 	"aisecurity/ent/dao/employee"
+	"aisecurity/ent/dao/event"
 	"aisecurity/ent/dao/eventlevel"
-	"aisecurity/ent/dao/ipcevent"
+	"aisecurity/ent/dao/eventlog"
+	"aisecurity/ent/dao/fixing"
 	"aisecurity/ent/dao/occupation"
+	"aisecurity/ent/dao/permission"
 	"aisecurity/ent/dao/risk"
 	"aisecurity/ent/dao/riskcategory"
 	"aisecurity/ent/dao/risklocation"
+	"aisecurity/ent/dao/sweep"
+	"aisecurity/ent/dao/sweepresult"
+	"aisecurity/ent/dao/sweepresultdetails"
+	"aisecurity/ent/dao/sweepschedule"
 	"aisecurity/ent/dao/video"
 	"aisecurity/ent/schema"
 	"aisecurity/enums"
@@ -35,24 +41,24 @@ func init() {
 	_ = adminMixinFields0
 	adminFields := schema.Admin{}.Fields()
 	_ = adminFields
-	// adminDescCreatedAt is the schema descriptor for created_at field.
-	adminDescCreatedAt := adminMixinFields0[0].Descriptor()
-	// admin.DefaultCreatedAt holds the default value on creation for the created_at field.
-	admin.DefaultCreatedAt = adminDescCreatedAt.Default.(func() time.Time)
-	// adminDescCreatedBy is the schema descriptor for created_by field.
-	adminDescCreatedBy := adminMixinFields0[1].Descriptor()
-	// admin.CreatedByValidator is a validator for the "created_by" field. It is called by the builders before save.
-	admin.CreatedByValidator = adminDescCreatedBy.Validators[0].(func(int) error)
-	// adminDescUpdatedBy is the schema descriptor for updated_by field.
-	adminDescUpdatedBy := adminMixinFields0[3].Descriptor()
-	// admin.UpdatedByValidator is a validator for the "updated_by" field. It is called by the builders before save.
-	admin.UpdatedByValidator = adminDescUpdatedBy.Validators[0].(func(int) error)
-	// adminDescUpdatedAt is the schema descriptor for updated_at field.
-	adminDescUpdatedAt := adminMixinFields0[4].Descriptor()
-	// admin.DefaultUpdatedAt holds the default value on creation for the updated_at field.
-	admin.DefaultUpdatedAt = adminDescUpdatedAt.Default.(func() time.Time)
-	// admin.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
-	admin.UpdateDefaultUpdatedAt = adminDescUpdatedAt.UpdateDefault.(func() time.Time)
+	// adminDescCreateTime is the schema descriptor for create_time field.
+	adminDescCreateTime := adminMixinFields0[0].Descriptor()
+	// admin.DefaultCreateTime holds the default value on creation for the create_time field.
+	admin.DefaultCreateTime = adminDescCreateTime.Default.(func() time.Time)
+	// adminDescCreatorID is the schema descriptor for creator_id field.
+	adminDescCreatorID := adminMixinFields0[1].Descriptor()
+	// admin.CreatorIDValidator is a validator for the "creator_id" field. It is called by the builders before save.
+	admin.CreatorIDValidator = adminDescCreatorID.Validators[0].(func(int) error)
+	// adminDescUpdaterID is the schema descriptor for updater_id field.
+	adminDescUpdaterID := adminMixinFields0[3].Descriptor()
+	// admin.UpdaterIDValidator is a validator for the "updater_id" field. It is called by the builders before save.
+	admin.UpdaterIDValidator = adminDescUpdaterID.Validators[0].(func(int) error)
+	// adminDescUpdateTime is the schema descriptor for update_time field.
+	adminDescUpdateTime := adminMixinFields0[4].Descriptor()
+	// admin.DefaultUpdateTime holds the default value on creation for the update_time field.
+	admin.DefaultUpdateTime = adminDescUpdateTime.Default.(func() time.Time)
+	// admin.UpdateDefaultUpdateTime holds the default value on update for the update_time field.
+	admin.UpdateDefaultUpdateTime = adminDescUpdateTime.UpdateDefault.(func() time.Time)
 	// adminDescUsername is the schema descriptor for username field.
 	adminDescUsername := adminFields[0].Descriptor()
 	// admin.UsernameValidator is a validator for the "username" field. It is called by the builders before save.
@@ -111,48 +117,16 @@ func init() {
 	adminDescRealName := adminFields[3].Descriptor()
 	// admin.RealNameValidator is a validator for the "real_name" field. It is called by the builders before save.
 	admin.RealNameValidator = adminDescRealName.Validators[0].(func(string) error)
-	// adminDescAvatar is the schema descriptor for avatar field.
-	adminDescAvatar := adminFields[4].Descriptor()
-	// admin.AvatarValidator is a validator for the "avatar" field. It is called by the builders before save.
-	admin.AvatarValidator = adminDescAvatar.Validators[0].(func(string) error)
-	adminroleFields := schema.AdminRole{}.Fields()
-	_ = adminroleFields
-	// adminroleDescCreatedAt is the schema descriptor for created_at field.
-	adminroleDescCreatedAt := adminroleFields[0].Descriptor()
-	// adminrole.DefaultCreatedAt holds the default value on creation for the created_at field.
-	adminrole.DefaultCreatedAt = adminroleDescCreatedAt.Default.(func() time.Time)
-	// adminroleDescCreatedBy is the schema descriptor for created_by field.
-	adminroleDescCreatedBy := adminroleFields[1].Descriptor()
-	// adminrole.CreatedByValidator is a validator for the "created_by" field. It is called by the builders before save.
-	adminrole.CreatedByValidator = adminroleDescCreatedBy.Validators[0].(func(int) error)
-	// adminroleDescName is the schema descriptor for name field.
-	adminroleDescName := adminroleFields[2].Descriptor()
-	// adminrole.NameValidator is a validator for the "name" field. It is called by the builders before save.
-	adminrole.NameValidator = func() func(string) error {
-		validators := adminroleDescName.Validators
-		fns := [...]func(string) error{
-			validators[0].(func(string) error),
-			validators[1].(func(string) error),
-		}
-		return func(name string) error {
-			for _, fn := range fns {
-				if err := fn(name); err != nil {
-					return err
-				}
-			}
-			return nil
-		}
-	}()
-	// adminroleDescUpdatedBy is the schema descriptor for updated_by field.
-	adminroleDescUpdatedBy := adminroleFields[4].Descriptor()
-	// adminrole.UpdatedByValidator is a validator for the "updated_by" field. It is called by the builders before save.
-	adminrole.UpdatedByValidator = adminroleDescUpdatedBy.Validators[0].(func(int) error)
-	// adminroleDescUpdatedAt is the schema descriptor for updated_at field.
-	adminroleDescUpdatedAt := adminroleFields[5].Descriptor()
-	// adminrole.DefaultUpdatedAt holds the default value on creation for the updated_at field.
-	adminrole.DefaultUpdatedAt = adminroleDescUpdatedAt.Default.(func() time.Time)
-	// adminrole.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
-	adminrole.UpdateDefaultUpdatedAt = adminroleDescUpdatedAt.UpdateDefault.(func() time.Time)
+	// adminDescMobile is the schema descriptor for mobile field.
+	adminDescMobile := adminFields[4].Descriptor()
+	// admin.MobileValidator is a validator for the "mobile" field. It is called by the builders before save.
+	admin.MobileValidator = adminDescMobile.Validators[0].(func(string) error)
+	// adminDescAdminStatus is the schema descriptor for admin_status field.
+	adminDescAdminStatus := adminFields[6].Descriptor()
+	// admin.DefaultAdminStatus holds the default value on creation for the admin_status field.
+	admin.DefaultAdminStatus = enums.AdminStatus(adminDescAdminStatus.Default.(int))
+	// admin.AdminStatusValidator is a validator for the "admin_status" field. It is called by the builders before save.
+	admin.AdminStatusValidator = adminDescAdminStatus.Validators[0].(func(int) error)
 	areaMixin := schema.Area{}.Mixin()
 	areaMixinHooks0 := areaMixin[0].Hooks()
 	area.Hooks[0] = areaMixinHooks0[0]
@@ -160,24 +134,24 @@ func init() {
 	_ = areaMixinFields0
 	areaFields := schema.Area{}.Fields()
 	_ = areaFields
-	// areaDescCreatedAt is the schema descriptor for created_at field.
-	areaDescCreatedAt := areaMixinFields0[0].Descriptor()
-	// area.DefaultCreatedAt holds the default value on creation for the created_at field.
-	area.DefaultCreatedAt = areaDescCreatedAt.Default.(func() time.Time)
-	// areaDescCreatedBy is the schema descriptor for created_by field.
-	areaDescCreatedBy := areaMixinFields0[1].Descriptor()
-	// area.CreatedByValidator is a validator for the "created_by" field. It is called by the builders before save.
-	area.CreatedByValidator = areaDescCreatedBy.Validators[0].(func(int) error)
-	// areaDescUpdatedBy is the schema descriptor for updated_by field.
-	areaDescUpdatedBy := areaMixinFields0[3].Descriptor()
-	// area.UpdatedByValidator is a validator for the "updated_by" field. It is called by the builders before save.
-	area.UpdatedByValidator = areaDescUpdatedBy.Validators[0].(func(int) error)
-	// areaDescUpdatedAt is the schema descriptor for updated_at field.
-	areaDescUpdatedAt := areaMixinFields0[4].Descriptor()
-	// area.DefaultUpdatedAt holds the default value on creation for the updated_at field.
-	area.DefaultUpdatedAt = areaDescUpdatedAt.Default.(func() time.Time)
-	// area.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
-	area.UpdateDefaultUpdatedAt = areaDescUpdatedAt.UpdateDefault.(func() time.Time)
+	// areaDescCreateTime is the schema descriptor for create_time field.
+	areaDescCreateTime := areaMixinFields0[0].Descriptor()
+	// area.DefaultCreateTime holds the default value on creation for the create_time field.
+	area.DefaultCreateTime = areaDescCreateTime.Default.(func() time.Time)
+	// areaDescCreatorID is the schema descriptor for creator_id field.
+	areaDescCreatorID := areaMixinFields0[1].Descriptor()
+	// area.CreatorIDValidator is a validator for the "creator_id" field. It is called by the builders before save.
+	area.CreatorIDValidator = areaDescCreatorID.Validators[0].(func(int) error)
+	// areaDescUpdaterID is the schema descriptor for updater_id field.
+	areaDescUpdaterID := areaMixinFields0[3].Descriptor()
+	// area.UpdaterIDValidator is a validator for the "updater_id" field. It is called by the builders before save.
+	area.UpdaterIDValidator = areaDescUpdaterID.Validators[0].(func(int) error)
+	// areaDescUpdateTime is the schema descriptor for update_time field.
+	areaDescUpdateTime := areaMixinFields0[4].Descriptor()
+	// area.DefaultUpdateTime holds the default value on creation for the update_time field.
+	area.DefaultUpdateTime = areaDescUpdateTime.Default.(func() time.Time)
+	// area.UpdateDefaultUpdateTime holds the default value on update for the update_time field.
+	area.UpdateDefaultUpdateTime = areaDescUpdateTime.UpdateDefault.(func() time.Time)
 	// areaDescName is the schema descriptor for name field.
 	areaDescName := areaFields[0].Descriptor()
 	// area.DefaultName holds the default value on creation for the name field.
@@ -191,24 +165,24 @@ func init() {
 	_ = departmentMixinFields0
 	departmentFields := schema.Department{}.Fields()
 	_ = departmentFields
-	// departmentDescCreatedAt is the schema descriptor for created_at field.
-	departmentDescCreatedAt := departmentMixinFields0[0].Descriptor()
-	// department.DefaultCreatedAt holds the default value on creation for the created_at field.
-	department.DefaultCreatedAt = departmentDescCreatedAt.Default.(func() time.Time)
-	// departmentDescCreatedBy is the schema descriptor for created_by field.
-	departmentDescCreatedBy := departmentMixinFields0[1].Descriptor()
-	// department.CreatedByValidator is a validator for the "created_by" field. It is called by the builders before save.
-	department.CreatedByValidator = departmentDescCreatedBy.Validators[0].(func(int) error)
-	// departmentDescUpdatedBy is the schema descriptor for updated_by field.
-	departmentDescUpdatedBy := departmentMixinFields0[3].Descriptor()
-	// department.UpdatedByValidator is a validator for the "updated_by" field. It is called by the builders before save.
-	department.UpdatedByValidator = departmentDescUpdatedBy.Validators[0].(func(int) error)
-	// departmentDescUpdatedAt is the schema descriptor for updated_at field.
-	departmentDescUpdatedAt := departmentMixinFields0[4].Descriptor()
-	// department.DefaultUpdatedAt holds the default value on creation for the updated_at field.
-	department.DefaultUpdatedAt = departmentDescUpdatedAt.Default.(func() time.Time)
-	// department.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
-	department.UpdateDefaultUpdatedAt = departmentDescUpdatedAt.UpdateDefault.(func() time.Time)
+	// departmentDescCreateTime is the schema descriptor for create_time field.
+	departmentDescCreateTime := departmentMixinFields0[0].Descriptor()
+	// department.DefaultCreateTime holds the default value on creation for the create_time field.
+	department.DefaultCreateTime = departmentDescCreateTime.Default.(func() time.Time)
+	// departmentDescCreatorID is the schema descriptor for creator_id field.
+	departmentDescCreatorID := departmentMixinFields0[1].Descriptor()
+	// department.CreatorIDValidator is a validator for the "creator_id" field. It is called by the builders before save.
+	department.CreatorIDValidator = departmentDescCreatorID.Validators[0].(func(int) error)
+	// departmentDescUpdaterID is the schema descriptor for updater_id field.
+	departmentDescUpdaterID := departmentMixinFields0[3].Descriptor()
+	// department.UpdaterIDValidator is a validator for the "updater_id" field. It is called by the builders before save.
+	department.UpdaterIDValidator = departmentDescUpdaterID.Validators[0].(func(int) error)
+	// departmentDescUpdateTime is the schema descriptor for update_time field.
+	departmentDescUpdateTime := departmentMixinFields0[4].Descriptor()
+	// department.DefaultUpdateTime holds the default value on creation for the update_time field.
+	department.DefaultUpdateTime = departmentDescUpdateTime.Default.(func() time.Time)
+	// department.UpdateDefaultUpdateTime holds the default value on update for the update_time field.
+	department.UpdateDefaultUpdateTime = departmentDescUpdateTime.UpdateDefault.(func() time.Time)
 	// departmentDescName is the schema descriptor for name field.
 	departmentDescName := departmentFields[0].Descriptor()
 	// department.NameValidator is a validator for the "name" field. It is called by the builders before save.
@@ -238,24 +212,24 @@ func init() {
 	_ = deviceMixinFields0
 	deviceFields := schema.Device{}.Fields()
 	_ = deviceFields
-	// deviceDescCreatedAt is the schema descriptor for created_at field.
-	deviceDescCreatedAt := deviceMixinFields0[0].Descriptor()
-	// device.DefaultCreatedAt holds the default value on creation for the created_at field.
-	device.DefaultCreatedAt = deviceDescCreatedAt.Default.(func() time.Time)
-	// deviceDescCreatedBy is the schema descriptor for created_by field.
-	deviceDescCreatedBy := deviceMixinFields0[1].Descriptor()
-	// device.CreatedByValidator is a validator for the "created_by" field. It is called by the builders before save.
-	device.CreatedByValidator = deviceDescCreatedBy.Validators[0].(func(int) error)
-	// deviceDescUpdatedBy is the schema descriptor for updated_by field.
-	deviceDescUpdatedBy := deviceMixinFields0[3].Descriptor()
-	// device.UpdatedByValidator is a validator for the "updated_by" field. It is called by the builders before save.
-	device.UpdatedByValidator = deviceDescUpdatedBy.Validators[0].(func(int) error)
-	// deviceDescUpdatedAt is the schema descriptor for updated_at field.
-	deviceDescUpdatedAt := deviceMixinFields0[4].Descriptor()
-	// device.DefaultUpdatedAt holds the default value on creation for the updated_at field.
-	device.DefaultUpdatedAt = deviceDescUpdatedAt.Default.(func() time.Time)
-	// device.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
-	device.UpdateDefaultUpdatedAt = deviceDescUpdatedAt.UpdateDefault.(func() time.Time)
+	// deviceDescCreateTime is the schema descriptor for create_time field.
+	deviceDescCreateTime := deviceMixinFields0[0].Descriptor()
+	// device.DefaultCreateTime holds the default value on creation for the create_time field.
+	device.DefaultCreateTime = deviceDescCreateTime.Default.(func() time.Time)
+	// deviceDescCreatorID is the schema descriptor for creator_id field.
+	deviceDescCreatorID := deviceMixinFields0[1].Descriptor()
+	// device.CreatorIDValidator is a validator for the "creator_id" field. It is called by the builders before save.
+	device.CreatorIDValidator = deviceDescCreatorID.Validators[0].(func(int) error)
+	// deviceDescUpdaterID is the schema descriptor for updater_id field.
+	deviceDescUpdaterID := deviceMixinFields0[3].Descriptor()
+	// device.UpdaterIDValidator is a validator for the "updater_id" field. It is called by the builders before save.
+	device.UpdaterIDValidator = deviceDescUpdaterID.Validators[0].(func(int) error)
+	// deviceDescUpdateTime is the schema descriptor for update_time field.
+	deviceDescUpdateTime := deviceMixinFields0[4].Descriptor()
+	// device.DefaultUpdateTime holds the default value on creation for the update_time field.
+	device.DefaultUpdateTime = deviceDescUpdateTime.Default.(func() time.Time)
+	// device.UpdateDefaultUpdateTime holds the default value on update for the update_time field.
+	device.UpdateDefaultUpdateTime = deviceDescUpdateTime.UpdateDefault.(func() time.Time)
 	// deviceDescBrand is the schema descriptor for brand field.
 	deviceDescBrand := deviceFields[0].Descriptor()
 	// device.DefaultBrand holds the default value on creation for the brand field.
@@ -291,24 +265,24 @@ func init() {
 	_ = deviceinstallationMixinFields0
 	deviceinstallationFields := schema.DeviceInstallation{}.Fields()
 	_ = deviceinstallationFields
-	// deviceinstallationDescCreatedAt is the schema descriptor for created_at field.
-	deviceinstallationDescCreatedAt := deviceinstallationMixinFields0[0].Descriptor()
-	// deviceinstallation.DefaultCreatedAt holds the default value on creation for the created_at field.
-	deviceinstallation.DefaultCreatedAt = deviceinstallationDescCreatedAt.Default.(func() time.Time)
-	// deviceinstallationDescCreatedBy is the schema descriptor for created_by field.
-	deviceinstallationDescCreatedBy := deviceinstallationMixinFields0[1].Descriptor()
-	// deviceinstallation.CreatedByValidator is a validator for the "created_by" field. It is called by the builders before save.
-	deviceinstallation.CreatedByValidator = deviceinstallationDescCreatedBy.Validators[0].(func(int) error)
-	// deviceinstallationDescUpdatedBy is the schema descriptor for updated_by field.
-	deviceinstallationDescUpdatedBy := deviceinstallationMixinFields0[3].Descriptor()
-	// deviceinstallation.UpdatedByValidator is a validator for the "updated_by" field. It is called by the builders before save.
-	deviceinstallation.UpdatedByValidator = deviceinstallationDescUpdatedBy.Validators[0].(func(int) error)
-	// deviceinstallationDescUpdatedAt is the schema descriptor for updated_at field.
-	deviceinstallationDescUpdatedAt := deviceinstallationMixinFields0[4].Descriptor()
-	// deviceinstallation.DefaultUpdatedAt holds the default value on creation for the updated_at field.
-	deviceinstallation.DefaultUpdatedAt = deviceinstallationDescUpdatedAt.Default.(func() time.Time)
-	// deviceinstallation.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
-	deviceinstallation.UpdateDefaultUpdatedAt = deviceinstallationDescUpdatedAt.UpdateDefault.(func() time.Time)
+	// deviceinstallationDescCreateTime is the schema descriptor for create_time field.
+	deviceinstallationDescCreateTime := deviceinstallationMixinFields0[0].Descriptor()
+	// deviceinstallation.DefaultCreateTime holds the default value on creation for the create_time field.
+	deviceinstallation.DefaultCreateTime = deviceinstallationDescCreateTime.Default.(func() time.Time)
+	// deviceinstallationDescCreatorID is the schema descriptor for creator_id field.
+	deviceinstallationDescCreatorID := deviceinstallationMixinFields0[1].Descriptor()
+	// deviceinstallation.CreatorIDValidator is a validator for the "creator_id" field. It is called by the builders before save.
+	deviceinstallation.CreatorIDValidator = deviceinstallationDescCreatorID.Validators[0].(func(int) error)
+	// deviceinstallationDescUpdaterID is the schema descriptor for updater_id field.
+	deviceinstallationDescUpdaterID := deviceinstallationMixinFields0[3].Descriptor()
+	// deviceinstallation.UpdaterIDValidator is a validator for the "updater_id" field. It is called by the builders before save.
+	deviceinstallation.UpdaterIDValidator = deviceinstallationDescUpdaterID.Validators[0].(func(int) error)
+	// deviceinstallationDescUpdateTime is the schema descriptor for update_time field.
+	deviceinstallationDescUpdateTime := deviceinstallationMixinFields0[4].Descriptor()
+	// deviceinstallation.DefaultUpdateTime holds the default value on creation for the update_time field.
+	deviceinstallation.DefaultUpdateTime = deviceinstallationDescUpdateTime.Default.(func() time.Time)
+	// deviceinstallation.UpdateDefaultUpdateTime holds the default value on update for the update_time field.
+	deviceinstallation.UpdateDefaultUpdateTime = deviceinstallationDescUpdateTime.UpdateDefault.(func() time.Time)
 	// deviceinstallationDescDeviceID is the schema descriptor for device_id field.
 	deviceinstallationDescDeviceID := deviceinstallationFields[0].Descriptor()
 	// deviceinstallation.DeviceIDValidator is a validator for the "device_id" field. It is called by the builders before save.
@@ -328,24 +302,24 @@ func init() {
 	_ = employeeMixinFields0
 	employeeFields := schema.Employee{}.Fields()
 	_ = employeeFields
-	// employeeDescCreatedAt is the schema descriptor for created_at field.
-	employeeDescCreatedAt := employeeMixinFields0[0].Descriptor()
-	// employee.DefaultCreatedAt holds the default value on creation for the created_at field.
-	employee.DefaultCreatedAt = employeeDescCreatedAt.Default.(func() time.Time)
-	// employeeDescCreatedBy is the schema descriptor for created_by field.
-	employeeDescCreatedBy := employeeMixinFields0[1].Descriptor()
-	// employee.CreatedByValidator is a validator for the "created_by" field. It is called by the builders before save.
-	employee.CreatedByValidator = employeeDescCreatedBy.Validators[0].(func(int) error)
-	// employeeDescUpdatedBy is the schema descriptor for updated_by field.
-	employeeDescUpdatedBy := employeeMixinFields0[3].Descriptor()
-	// employee.UpdatedByValidator is a validator for the "updated_by" field. It is called by the builders before save.
-	employee.UpdatedByValidator = employeeDescUpdatedBy.Validators[0].(func(int) error)
-	// employeeDescUpdatedAt is the schema descriptor for updated_at field.
-	employeeDescUpdatedAt := employeeMixinFields0[4].Descriptor()
-	// employee.DefaultUpdatedAt holds the default value on creation for the updated_at field.
-	employee.DefaultUpdatedAt = employeeDescUpdatedAt.Default.(func() time.Time)
-	// employee.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
-	employee.UpdateDefaultUpdatedAt = employeeDescUpdatedAt.UpdateDefault.(func() time.Time)
+	// employeeDescCreateTime is the schema descriptor for create_time field.
+	employeeDescCreateTime := employeeMixinFields0[0].Descriptor()
+	// employee.DefaultCreateTime holds the default value on creation for the create_time field.
+	employee.DefaultCreateTime = employeeDescCreateTime.Default.(func() time.Time)
+	// employeeDescCreatorID is the schema descriptor for creator_id field.
+	employeeDescCreatorID := employeeMixinFields0[1].Descriptor()
+	// employee.CreatorIDValidator is a validator for the "creator_id" field. It is called by the builders before save.
+	employee.CreatorIDValidator = employeeDescCreatorID.Validators[0].(func(int) error)
+	// employeeDescUpdaterID is the schema descriptor for updater_id field.
+	employeeDescUpdaterID := employeeMixinFields0[3].Descriptor()
+	// employee.UpdaterIDValidator is a validator for the "updater_id" field. It is called by the builders before save.
+	employee.UpdaterIDValidator = employeeDescUpdaterID.Validators[0].(func(int) error)
+	// employeeDescUpdateTime is the schema descriptor for update_time field.
+	employeeDescUpdateTime := employeeMixinFields0[4].Descriptor()
+	// employee.DefaultUpdateTime holds the default value on creation for the update_time field.
+	employee.DefaultUpdateTime = employeeDescUpdateTime.Default.(func() time.Time)
+	// employee.UpdateDefaultUpdateTime holds the default value on update for the update_time field.
+	employee.UpdateDefaultUpdateTime = employeeDescUpdateTime.UpdateDefault.(func() time.Time)
 	// employeeDescAdminID is the schema descriptor for admin_id field.
 	employeeDescAdminID := employeeFields[0].Descriptor()
 	// employee.AdminIDValidator is a validator for the "admin_id" field. It is called by the builders before save.
@@ -354,6 +328,71 @@ func init() {
 	employeeDescDepartmentID := employeeFields[1].Descriptor()
 	// employee.DepartmentIDValidator is a validator for the "department_id" field. It is called by the builders before save.
 	employee.DepartmentIDValidator = employeeDescDepartmentID.Validators[0].(func(int) error)
+	// employeeDescOccupationID is the schema descriptor for occupation_id field.
+	employeeDescOccupationID := employeeFields[2].Descriptor()
+	// employee.OccupationIDValidator is a validator for the "occupation_id" field. It is called by the builders before save.
+	employee.OccupationIDValidator = employeeDescOccupationID.Validators[0].(func(int) error)
+	eventMixin := schema.Event{}.Mixin()
+	eventMixinHooks0 := eventMixin[0].Hooks()
+	event.Hooks[0] = eventMixinHooks0[0]
+	eventMixinFields0 := eventMixin[0].Fields()
+	_ = eventMixinFields0
+	eventFields := schema.Event{}.Fields()
+	_ = eventFields
+	// eventDescCreateTime is the schema descriptor for create_time field.
+	eventDescCreateTime := eventMixinFields0[0].Descriptor()
+	// event.DefaultCreateTime holds the default value on creation for the create_time field.
+	event.DefaultCreateTime = eventDescCreateTime.Default.(func() time.Time)
+	// eventDescCreatorID is the schema descriptor for creator_id field.
+	eventDescCreatorID := eventMixinFields0[1].Descriptor()
+	// event.CreatorIDValidator is a validator for the "creator_id" field. It is called by the builders before save.
+	event.CreatorIDValidator = eventDescCreatorID.Validators[0].(func(int) error)
+	// eventDescUpdaterID is the schema descriptor for updater_id field.
+	eventDescUpdaterID := eventMixinFields0[3].Descriptor()
+	// event.UpdaterIDValidator is a validator for the "updater_id" field. It is called by the builders before save.
+	event.UpdaterIDValidator = eventDescUpdaterID.Validators[0].(func(int) error)
+	// eventDescUpdateTime is the schema descriptor for update_time field.
+	eventDescUpdateTime := eventMixinFields0[4].Descriptor()
+	// event.DefaultUpdateTime holds the default value on creation for the update_time field.
+	event.DefaultUpdateTime = eventDescUpdateTime.Default.(func() time.Time)
+	// event.UpdateDefaultUpdateTime holds the default value on update for the update_time field.
+	event.UpdateDefaultUpdateTime = eventDescUpdateTime.UpdateDefault.(func() time.Time)
+	// eventDescDeviceID is the schema descriptor for device_id field.
+	eventDescDeviceID := eventFields[0].Descriptor()
+	// event.DeviceIDValidator is a validator for the "device_id" field. It is called by the builders before save.
+	event.DeviceIDValidator = eventDescDeviceID.Validators[0].(func(int) error)
+	// eventDescVideoID is the schema descriptor for video_id field.
+	eventDescVideoID := eventFields[1].Descriptor()
+	// event.VideoIDValidator is a validator for the "video_id" field. It is called by the builders before save.
+	event.VideoIDValidator = eventDescVideoID.Validators[0].(func(int) error)
+	// eventDescEventTime is the schema descriptor for event_time field.
+	eventDescEventTime := eventFields[2].Descriptor()
+	// event.DefaultEventTime holds the default value on creation for the event_time field.
+	event.DefaultEventTime = eventDescEventTime.Default.(func() time.Time)
+	// eventDescEventType is the schema descriptor for event_type field.
+	eventDescEventType := eventFields[3].Descriptor()
+	// event.DefaultEventType holds the default value on creation for the event_type field.
+	event.DefaultEventType = enums.EventType(eventDescEventType.Default.(int))
+	// event.EventTypeValidator is a validator for the "event_type" field. It is called by the builders before save.
+	event.EventTypeValidator = eventDescEventType.Validators[0].(func(int) error)
+	// eventDescEventStatus is the schema descriptor for event_status field.
+	eventDescEventStatus := eventFields[4].Descriptor()
+	// event.DefaultEventStatus holds the default value on creation for the event_status field.
+	event.DefaultEventStatus = enums.EventStatus(eventDescEventStatus.Default.(int))
+	// event.EventStatusValidator is a validator for the "event_status" field. It is called by the builders before save.
+	event.EventStatusValidator = eventDescEventStatus.Validators[0].(func(int) error)
+	// eventDescImages is the schema descriptor for images field.
+	eventDescImages := eventFields[5].Descriptor()
+	// event.DefaultImages holds the default value on creation for the images field.
+	event.DefaultImages = eventDescImages.Default.([]*types.UploadedImage)
+	// eventDescLabeledImages is the schema descriptor for labeled_images field.
+	eventDescLabeledImages := eventFields[6].Descriptor()
+	// event.DefaultLabeledImages holds the default value on creation for the labeled_images field.
+	event.DefaultLabeledImages = eventDescLabeledImages.Default.([]*types.UploadedImage)
+	// eventDescDataID is the schema descriptor for data_id field.
+	eventDescDataID := eventFields[7].Descriptor()
+	// event.DataIDValidator is a validator for the "data_id" field. It is called by the builders before save.
+	event.DataIDValidator = eventDescDataID.Validators[0].(func(string) error)
 	eventlevelMixin := schema.EventLevel{}.Mixin()
 	eventlevelMixinHooks0 := eventlevelMixin[0].Hooks()
 	eventlevel.Hooks[0] = eventlevelMixinHooks0[0]
@@ -361,93 +400,116 @@ func init() {
 	_ = eventlevelMixinFields0
 	eventlevelFields := schema.EventLevel{}.Fields()
 	_ = eventlevelFields
-	// eventlevelDescCreatedAt is the schema descriptor for created_at field.
-	eventlevelDescCreatedAt := eventlevelMixinFields0[0].Descriptor()
-	// eventlevel.DefaultCreatedAt holds the default value on creation for the created_at field.
-	eventlevel.DefaultCreatedAt = eventlevelDescCreatedAt.Default.(func() time.Time)
-	// eventlevelDescCreatedBy is the schema descriptor for created_by field.
-	eventlevelDescCreatedBy := eventlevelMixinFields0[1].Descriptor()
-	// eventlevel.CreatedByValidator is a validator for the "created_by" field. It is called by the builders before save.
-	eventlevel.CreatedByValidator = eventlevelDescCreatedBy.Validators[0].(func(int) error)
-	// eventlevelDescUpdatedBy is the schema descriptor for updated_by field.
-	eventlevelDescUpdatedBy := eventlevelMixinFields0[3].Descriptor()
-	// eventlevel.UpdatedByValidator is a validator for the "updated_by" field. It is called by the builders before save.
-	eventlevel.UpdatedByValidator = eventlevelDescUpdatedBy.Validators[0].(func(int) error)
-	// eventlevelDescUpdatedAt is the schema descriptor for updated_at field.
-	eventlevelDescUpdatedAt := eventlevelMixinFields0[4].Descriptor()
-	// eventlevel.DefaultUpdatedAt holds the default value on creation for the updated_at field.
-	eventlevel.DefaultUpdatedAt = eventlevelDescUpdatedAt.Default.(func() time.Time)
-	// eventlevel.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
-	eventlevel.UpdateDefaultUpdatedAt = eventlevelDescUpdatedAt.UpdateDefault.(func() time.Time)
+	// eventlevelDescCreateTime is the schema descriptor for create_time field.
+	eventlevelDescCreateTime := eventlevelMixinFields0[0].Descriptor()
+	// eventlevel.DefaultCreateTime holds the default value on creation for the create_time field.
+	eventlevel.DefaultCreateTime = eventlevelDescCreateTime.Default.(func() time.Time)
+	// eventlevelDescCreatorID is the schema descriptor for creator_id field.
+	eventlevelDescCreatorID := eventlevelMixinFields0[1].Descriptor()
+	// eventlevel.CreatorIDValidator is a validator for the "creator_id" field. It is called by the builders before save.
+	eventlevel.CreatorIDValidator = eventlevelDescCreatorID.Validators[0].(func(int) error)
+	// eventlevelDescUpdaterID is the schema descriptor for updater_id field.
+	eventlevelDescUpdaterID := eventlevelMixinFields0[3].Descriptor()
+	// eventlevel.UpdaterIDValidator is a validator for the "updater_id" field. It is called by the builders before save.
+	eventlevel.UpdaterIDValidator = eventlevelDescUpdaterID.Validators[0].(func(int) error)
+	// eventlevelDescUpdateTime is the schema descriptor for update_time field.
+	eventlevelDescUpdateTime := eventlevelMixinFields0[4].Descriptor()
+	// eventlevel.DefaultUpdateTime holds the default value on creation for the update_time field.
+	eventlevel.DefaultUpdateTime = eventlevelDescUpdateTime.Default.(func() time.Time)
+	// eventlevel.UpdateDefaultUpdateTime holds the default value on update for the update_time field.
+	eventlevel.UpdateDefaultUpdateTime = eventlevelDescUpdateTime.UpdateDefault.(func() time.Time)
 	// eventlevelDescName is the schema descriptor for name field.
 	eventlevelDescName := eventlevelFields[0].Descriptor()
 	// eventlevel.NameValidator is a validator for the "name" field. It is called by the builders before save.
 	eventlevel.NameValidator = eventlevelDescName.Validators[0].(func(string) error)
-	// eventlevelDescIsReport is the schema descriptor for is_report field.
-	eventlevelDescIsReport := eventlevelFields[3].Descriptor()
-	// eventlevel.DefaultIsReport holds the default value on creation for the is_report field.
-	eventlevel.DefaultIsReport = eventlevelDescIsReport.Default.(bool)
-	ipceventMixin := schema.IPCEvent{}.Mixin()
-	ipceventMixinHooks0 := ipceventMixin[0].Hooks()
-	ipcevent.Hooks[0] = ipceventMixinHooks0[0]
-	ipceventMixinFields0 := ipceventMixin[0].Fields()
-	_ = ipceventMixinFields0
-	ipceventFields := schema.IPCEvent{}.Fields()
-	_ = ipceventFields
-	// ipceventDescCreatedAt is the schema descriptor for created_at field.
-	ipceventDescCreatedAt := ipceventMixinFields0[0].Descriptor()
-	// ipcevent.DefaultCreatedAt holds the default value on creation for the created_at field.
-	ipcevent.DefaultCreatedAt = ipceventDescCreatedAt.Default.(func() time.Time)
-	// ipceventDescCreatedBy is the schema descriptor for created_by field.
-	ipceventDescCreatedBy := ipceventMixinFields0[1].Descriptor()
-	// ipcevent.CreatedByValidator is a validator for the "created_by" field. It is called by the builders before save.
-	ipcevent.CreatedByValidator = ipceventDescCreatedBy.Validators[0].(func(int) error)
-	// ipceventDescUpdatedBy is the schema descriptor for updated_by field.
-	ipceventDescUpdatedBy := ipceventMixinFields0[3].Descriptor()
-	// ipcevent.UpdatedByValidator is a validator for the "updated_by" field. It is called by the builders before save.
-	ipcevent.UpdatedByValidator = ipceventDescUpdatedBy.Validators[0].(func(int) error)
-	// ipceventDescUpdatedAt is the schema descriptor for updated_at field.
-	ipceventDescUpdatedAt := ipceventMixinFields0[4].Descriptor()
-	// ipcevent.DefaultUpdatedAt holds the default value on creation for the updated_at field.
-	ipcevent.DefaultUpdatedAt = ipceventDescUpdatedAt.Default.(func() time.Time)
-	// ipcevent.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
-	ipcevent.UpdateDefaultUpdatedAt = ipceventDescUpdatedAt.UpdateDefault.(func() time.Time)
-	// ipceventDescDeviceID is the schema descriptor for device_id field.
-	ipceventDescDeviceID := ipceventFields[0].Descriptor()
-	// ipcevent.DeviceIDValidator is a validator for the "device_id" field. It is called by the builders before save.
-	ipcevent.DeviceIDValidator = ipceventDescDeviceID.Validators[0].(func(int) error)
-	// ipceventDescVideoID is the schema descriptor for video_id field.
-	ipceventDescVideoID := ipceventFields[1].Descriptor()
-	// ipcevent.VideoIDValidator is a validator for the "video_id" field. It is called by the builders before save.
-	ipcevent.VideoIDValidator = ipceventDescVideoID.Validators[0].(func(int) error)
-	// ipceventDescEventTime is the schema descriptor for event_time field.
-	ipceventDescEventTime := ipceventFields[2].Descriptor()
-	// ipcevent.DefaultEventTime holds the default value on creation for the event_time field.
-	ipcevent.DefaultEventTime = ipceventDescEventTime.Default.(func() time.Time)
-	// ipceventDescEventType is the schema descriptor for event_type field.
-	ipceventDescEventType := ipceventFields[3].Descriptor()
-	// ipcevent.DefaultEventType holds the default value on creation for the event_type field.
-	ipcevent.DefaultEventType = enums.EventType(ipceventDescEventType.Default.(int))
-	// ipcevent.EventTypeValidator is a validator for the "event_type" field. It is called by the builders before save.
-	ipcevent.EventTypeValidator = ipceventDescEventType.Validators[0].(func(int) error)
-	// ipceventDescEventStatus is the schema descriptor for event_status field.
-	ipceventDescEventStatus := ipceventFields[4].Descriptor()
-	// ipcevent.DefaultEventStatus holds the default value on creation for the event_status field.
-	ipcevent.DefaultEventStatus = enums.EventStatus(ipceventDescEventStatus.Default.(int))
-	// ipcevent.EventStatusValidator is a validator for the "event_status" field. It is called by the builders before save.
-	ipcevent.EventStatusValidator = ipceventDescEventStatus.Validators[0].(func(int) error)
-	// ipceventDescImages is the schema descriptor for images field.
-	ipceventDescImages := ipceventFields[5].Descriptor()
-	// ipcevent.DefaultImages holds the default value on creation for the images field.
-	ipcevent.DefaultImages = ipceventDescImages.Default.([]*types.UploadedImage)
-	// ipceventDescLabeledImages is the schema descriptor for labeled_images field.
-	ipceventDescLabeledImages := ipceventFields[6].Descriptor()
-	// ipcevent.DefaultLabeledImages holds the default value on creation for the labeled_images field.
-	ipcevent.DefaultLabeledImages = ipceventDescLabeledImages.Default.([]*types.UploadedImage)
-	// ipceventDescEventID is the schema descriptor for event_id field.
-	ipceventDescEventID := ipceventFields[7].Descriptor()
-	// ipcevent.EventIDValidator is a validator for the "event_id" field. It is called by the builders before save.
-	ipcevent.EventIDValidator = ipceventDescEventID.Validators[0].(func(string) error)
+	// eventlevelDescIcon is the schema descriptor for icon field.
+	eventlevelDescIcon := eventlevelFields[3].Descriptor()
+	// eventlevel.IconValidator is a validator for the "icon" field. It is called by the builders before save.
+	eventlevel.IconValidator = eventlevelDescIcon.Validators[0].(func(string) error)
+	eventlogMixin := schema.EventLog{}.Mixin()
+	eventlogMixinHooks0 := eventlogMixin[0].Hooks()
+	eventlog.Hooks[0] = eventlogMixinHooks0[0]
+	eventlogMixinFields0 := eventlogMixin[0].Fields()
+	_ = eventlogMixinFields0
+	eventlogFields := schema.EventLog{}.Fields()
+	_ = eventlogFields
+	// eventlogDescCreateTime is the schema descriptor for create_time field.
+	eventlogDescCreateTime := eventlogMixinFields0[0].Descriptor()
+	// eventlog.DefaultCreateTime holds the default value on creation for the create_time field.
+	eventlog.DefaultCreateTime = eventlogDescCreateTime.Default.(func() time.Time)
+	// eventlogDescCreatorID is the schema descriptor for creator_id field.
+	eventlogDescCreatorID := eventlogMixinFields0[1].Descriptor()
+	// eventlog.CreatorIDValidator is a validator for the "creator_id" field. It is called by the builders before save.
+	eventlog.CreatorIDValidator = eventlogDescCreatorID.Validators[0].(func(int) error)
+	// eventlogDescUpdaterID is the schema descriptor for updater_id field.
+	eventlogDescUpdaterID := eventlogMixinFields0[3].Descriptor()
+	// eventlog.UpdaterIDValidator is a validator for the "updater_id" field. It is called by the builders before save.
+	eventlog.UpdaterIDValidator = eventlogDescUpdaterID.Validators[0].(func(int) error)
+	// eventlogDescUpdateTime is the schema descriptor for update_time field.
+	eventlogDescUpdateTime := eventlogMixinFields0[4].Descriptor()
+	// eventlog.DefaultUpdateTime holds the default value on creation for the update_time field.
+	eventlog.DefaultUpdateTime = eventlogDescUpdateTime.Default.(func() time.Time)
+	// eventlog.UpdateDefaultUpdateTime holds the default value on update for the update_time field.
+	eventlog.UpdateDefaultUpdateTime = eventlogDescUpdateTime.UpdateDefault.(func() time.Time)
+	// eventlogDescDeviceID is the schema descriptor for device_id field.
+	eventlogDescDeviceID := eventlogFields[0].Descriptor()
+	// eventlog.DeviceIDValidator is a validator for the "device_id" field. It is called by the builders before save.
+	eventlog.DeviceIDValidator = eventlogDescDeviceID.Validators[0].(func(int) error)
+	// eventlogDescEventID is the schema descriptor for event_id field.
+	eventlogDescEventID := eventlogFields[1].Descriptor()
+	// eventlog.EventIDValidator is a validator for the "event_id" field. It is called by the builders before save.
+	eventlog.EventIDValidator = eventlogDescEventID.Validators[0].(func(int) error)
+	// eventlogDescActorID is the schema descriptor for actor_id field.
+	eventlogDescActorID := eventlogFields[2].Descriptor()
+	// eventlog.ActorIDValidator is a validator for the "actor_id" field. It is called by the builders before save.
+	eventlog.ActorIDValidator = eventlogDescActorID.Validators[0].(func(int) error)
+	// eventlogDescActor2ID is the schema descriptor for actor2_id field.
+	eventlogDescActor2ID := eventlogFields[3].Descriptor()
+	// eventlog.Actor2IDValidator is a validator for the "actor2_id" field. It is called by the builders before save.
+	eventlog.Actor2IDValidator = eventlogDescActor2ID.Validators[0].(func(int) error)
+	// eventlogDescLogType is the schema descriptor for log_type field.
+	eventlogDescLogType := eventlogFields[4].Descriptor()
+	// eventlog.DefaultLogType holds the default value on creation for the log_type field.
+	eventlog.DefaultLogType = enums.EventLogType(eventlogDescLogType.Default.(int))
+	// eventlog.LogTypeValidator is a validator for the "log_type" field. It is called by the builders before save.
+	eventlog.LogTypeValidator = eventlogDescLogType.Validators[0].(func(int) error)
+	fixingMixin := schema.Fixing{}.Mixin()
+	fixingMixinHooks0 := fixingMixin[0].Hooks()
+	fixing.Hooks[0] = fixingMixinHooks0[0]
+	fixingMixinFields0 := fixingMixin[0].Fields()
+	_ = fixingMixinFields0
+	fixingFields := schema.Fixing{}.Fields()
+	_ = fixingFields
+	// fixingDescCreateTime is the schema descriptor for create_time field.
+	fixingDescCreateTime := fixingMixinFields0[0].Descriptor()
+	// fixing.DefaultCreateTime holds the default value on creation for the create_time field.
+	fixing.DefaultCreateTime = fixingDescCreateTime.Default.(func() time.Time)
+	// fixingDescCreatorID is the schema descriptor for creator_id field.
+	fixingDescCreatorID := fixingMixinFields0[1].Descriptor()
+	// fixing.CreatorIDValidator is a validator for the "creator_id" field. It is called by the builders before save.
+	fixing.CreatorIDValidator = fixingDescCreatorID.Validators[0].(func(int) error)
+	// fixingDescUpdaterID is the schema descriptor for updater_id field.
+	fixingDescUpdaterID := fixingMixinFields0[3].Descriptor()
+	// fixing.UpdaterIDValidator is a validator for the "updater_id" field. It is called by the builders before save.
+	fixing.UpdaterIDValidator = fixingDescUpdaterID.Validators[0].(func(int) error)
+	// fixingDescUpdateTime is the schema descriptor for update_time field.
+	fixingDescUpdateTime := fixingMixinFields0[4].Descriptor()
+	// fixing.DefaultUpdateTime holds the default value on creation for the update_time field.
+	fixing.DefaultUpdateTime = fixingDescUpdateTime.Default.(func() time.Time)
+	// fixing.UpdateDefaultUpdateTime holds the default value on update for the update_time field.
+	fixing.UpdateDefaultUpdateTime = fixingDescUpdateTime.UpdateDefault.(func() time.Time)
+	// fixingDescFixerID is the schema descriptor for fixer_id field.
+	fixingDescFixerID := fixingFields[0].Descriptor()
+	// fixing.FixerIDValidator is a validator for the "fixer_id" field. It is called by the builders before save.
+	fixing.FixerIDValidator = fixingDescFixerID.Validators[0].(func(int) error)
+	// fixingDescEventID is the schema descriptor for event_id field.
+	fixingDescEventID := fixingFields[1].Descriptor()
+	// fixing.EventIDValidator is a validator for the "event_id" field. It is called by the builders before save.
+	fixing.EventIDValidator = fixingDescEventID.Validators[0].(func(int) error)
+	// fixingDescDeviceID is the schema descriptor for device_id field.
+	fixingDescDeviceID := fixingFields[2].Descriptor()
+	// fixing.DeviceIDValidator is a validator for the "device_id" field. It is called by the builders before save.
+	fixing.DeviceIDValidator = fixingDescDeviceID.Validators[0].(func(int) error)
 	occupationMixin := schema.Occupation{}.Mixin()
 	occupationMixinHooks0 := occupationMixin[0].Hooks()
 	occupation.Hooks[0] = occupationMixinHooks0[0]
@@ -455,29 +517,72 @@ func init() {
 	_ = occupationMixinFields0
 	occupationFields := schema.Occupation{}.Fields()
 	_ = occupationFields
-	// occupationDescCreatedAt is the schema descriptor for created_at field.
-	occupationDescCreatedAt := occupationMixinFields0[0].Descriptor()
-	// occupation.DefaultCreatedAt holds the default value on creation for the created_at field.
-	occupation.DefaultCreatedAt = occupationDescCreatedAt.Default.(func() time.Time)
-	// occupationDescCreatedBy is the schema descriptor for created_by field.
-	occupationDescCreatedBy := occupationMixinFields0[1].Descriptor()
-	// occupation.CreatedByValidator is a validator for the "created_by" field. It is called by the builders before save.
-	occupation.CreatedByValidator = occupationDescCreatedBy.Validators[0].(func(int) error)
-	// occupationDescUpdatedBy is the schema descriptor for updated_by field.
-	occupationDescUpdatedBy := occupationMixinFields0[3].Descriptor()
-	// occupation.UpdatedByValidator is a validator for the "updated_by" field. It is called by the builders before save.
-	occupation.UpdatedByValidator = occupationDescUpdatedBy.Validators[0].(func(int) error)
-	// occupationDescUpdatedAt is the schema descriptor for updated_at field.
-	occupationDescUpdatedAt := occupationMixinFields0[4].Descriptor()
-	// occupation.DefaultUpdatedAt holds the default value on creation for the updated_at field.
-	occupation.DefaultUpdatedAt = occupationDescUpdatedAt.Default.(func() time.Time)
-	// occupation.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
-	occupation.UpdateDefaultUpdatedAt = occupationDescUpdatedAt.UpdateDefault.(func() time.Time)
+	// occupationDescCreateTime is the schema descriptor for create_time field.
+	occupationDescCreateTime := occupationMixinFields0[0].Descriptor()
+	// occupation.DefaultCreateTime holds the default value on creation for the create_time field.
+	occupation.DefaultCreateTime = occupationDescCreateTime.Default.(func() time.Time)
+	// occupationDescCreatorID is the schema descriptor for creator_id field.
+	occupationDescCreatorID := occupationMixinFields0[1].Descriptor()
+	// occupation.CreatorIDValidator is a validator for the "creator_id" field. It is called by the builders before save.
+	occupation.CreatorIDValidator = occupationDescCreatorID.Validators[0].(func(int) error)
+	// occupationDescUpdaterID is the schema descriptor for updater_id field.
+	occupationDescUpdaterID := occupationMixinFields0[3].Descriptor()
+	// occupation.UpdaterIDValidator is a validator for the "updater_id" field. It is called by the builders before save.
+	occupation.UpdaterIDValidator = occupationDescUpdaterID.Validators[0].(func(int) error)
+	// occupationDescUpdateTime is the schema descriptor for update_time field.
+	occupationDescUpdateTime := occupationMixinFields0[4].Descriptor()
+	// occupation.DefaultUpdateTime holds the default value on creation for the update_time field.
+	occupation.DefaultUpdateTime = occupationDescUpdateTime.Default.(func() time.Time)
+	// occupation.UpdateDefaultUpdateTime holds the default value on update for the update_time field.
+	occupation.UpdateDefaultUpdateTime = occupationDescUpdateTime.UpdateDefault.(func() time.Time)
 	// occupationDescName is the schema descriptor for name field.
 	occupationDescName := occupationFields[0].Descriptor()
 	// occupation.NameValidator is a validator for the "name" field. It is called by the builders before save.
 	occupation.NameValidator = func() func(string) error {
 		validators := occupationDescName.Validators
+		fns := [...]func(string) error{
+			validators[0].(func(string) error),
+			validators[1].(func(string) error),
+		}
+		return func(name string) error {
+			for _, fn := range fns {
+				if err := fn(name); err != nil {
+					return err
+				}
+			}
+			return nil
+		}
+	}()
+	permissionMixin := schema.Permission{}.Mixin()
+	permissionMixinHooks0 := permissionMixin[0].Hooks()
+	permission.Hooks[0] = permissionMixinHooks0[0]
+	permissionMixinFields0 := permissionMixin[0].Fields()
+	_ = permissionMixinFields0
+	permissionFields := schema.Permission{}.Fields()
+	_ = permissionFields
+	// permissionDescCreateTime is the schema descriptor for create_time field.
+	permissionDescCreateTime := permissionMixinFields0[0].Descriptor()
+	// permission.DefaultCreateTime holds the default value on creation for the create_time field.
+	permission.DefaultCreateTime = permissionDescCreateTime.Default.(func() time.Time)
+	// permissionDescCreatorID is the schema descriptor for creator_id field.
+	permissionDescCreatorID := permissionMixinFields0[1].Descriptor()
+	// permission.CreatorIDValidator is a validator for the "creator_id" field. It is called by the builders before save.
+	permission.CreatorIDValidator = permissionDescCreatorID.Validators[0].(func(int) error)
+	// permissionDescUpdaterID is the schema descriptor for updater_id field.
+	permissionDescUpdaterID := permissionMixinFields0[3].Descriptor()
+	// permission.UpdaterIDValidator is a validator for the "updater_id" field. It is called by the builders before save.
+	permission.UpdaterIDValidator = permissionDescUpdaterID.Validators[0].(func(int) error)
+	// permissionDescUpdateTime is the schema descriptor for update_time field.
+	permissionDescUpdateTime := permissionMixinFields0[4].Descriptor()
+	// permission.DefaultUpdateTime holds the default value on creation for the update_time field.
+	permission.DefaultUpdateTime = permissionDescUpdateTime.Default.(func() time.Time)
+	// permission.UpdateDefaultUpdateTime holds the default value on update for the update_time field.
+	permission.UpdateDefaultUpdateTime = permissionDescUpdateTime.UpdateDefault.(func() time.Time)
+	// permissionDescName is the schema descriptor for name field.
+	permissionDescName := permissionFields[0].Descriptor()
+	// permission.NameValidator is a validator for the "name" field. It is called by the builders before save.
+	permission.NameValidator = func() func(string) error {
+		validators := permissionDescName.Validators
 		fns := [...]func(string) error{
 			validators[0].(func(string) error),
 			validators[1].(func(string) error),
@@ -498,24 +603,24 @@ func init() {
 	_ = riskMixinFields0
 	riskFields := schema.Risk{}.Fields()
 	_ = riskFields
-	// riskDescCreatedAt is the schema descriptor for created_at field.
-	riskDescCreatedAt := riskMixinFields0[0].Descriptor()
-	// risk.DefaultCreatedAt holds the default value on creation for the created_at field.
-	risk.DefaultCreatedAt = riskDescCreatedAt.Default.(func() time.Time)
-	// riskDescCreatedBy is the schema descriptor for created_by field.
-	riskDescCreatedBy := riskMixinFields0[1].Descriptor()
-	// risk.CreatedByValidator is a validator for the "created_by" field. It is called by the builders before save.
-	risk.CreatedByValidator = riskDescCreatedBy.Validators[0].(func(int) error)
-	// riskDescUpdatedBy is the schema descriptor for updated_by field.
-	riskDescUpdatedBy := riskMixinFields0[3].Descriptor()
-	// risk.UpdatedByValidator is a validator for the "updated_by" field. It is called by the builders before save.
-	risk.UpdatedByValidator = riskDescUpdatedBy.Validators[0].(func(int) error)
-	// riskDescUpdatedAt is the schema descriptor for updated_at field.
-	riskDescUpdatedAt := riskMixinFields0[4].Descriptor()
-	// risk.DefaultUpdatedAt holds the default value on creation for the updated_at field.
-	risk.DefaultUpdatedAt = riskDescUpdatedAt.Default.(func() time.Time)
-	// risk.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
-	risk.UpdateDefaultUpdatedAt = riskDescUpdatedAt.UpdateDefault.(func() time.Time)
+	// riskDescCreateTime is the schema descriptor for create_time field.
+	riskDescCreateTime := riskMixinFields0[0].Descriptor()
+	// risk.DefaultCreateTime holds the default value on creation for the create_time field.
+	risk.DefaultCreateTime = riskDescCreateTime.Default.(func() time.Time)
+	// riskDescCreatorID is the schema descriptor for creator_id field.
+	riskDescCreatorID := riskMixinFields0[1].Descriptor()
+	// risk.CreatorIDValidator is a validator for the "creator_id" field. It is called by the builders before save.
+	risk.CreatorIDValidator = riskDescCreatorID.Validators[0].(func(int) error)
+	// riskDescUpdaterID is the schema descriptor for updater_id field.
+	riskDescUpdaterID := riskMixinFields0[3].Descriptor()
+	// risk.UpdaterIDValidator is a validator for the "updater_id" field. It is called by the builders before save.
+	risk.UpdaterIDValidator = riskDescUpdaterID.Validators[0].(func(int) error)
+	// riskDescUpdateTime is the schema descriptor for update_time field.
+	riskDescUpdateTime := riskMixinFields0[4].Descriptor()
+	// risk.DefaultUpdateTime holds the default value on creation for the update_time field.
+	risk.DefaultUpdateTime = riskDescUpdateTime.Default.(func() time.Time)
+	// risk.UpdateDefaultUpdateTime holds the default value on update for the update_time field.
+	risk.UpdateDefaultUpdateTime = riskDescUpdateTime.UpdateDefault.(func() time.Time)
 	// riskDescTitle is the schema descriptor for title field.
 	riskDescTitle := riskFields[0].Descriptor()
 	// risk.TitleValidator is a validator for the "title" field. It is called by the builders before save.
@@ -546,16 +651,12 @@ func init() {
 	riskDescRiskLocationID := riskFields[4].Descriptor()
 	// risk.RiskLocationIDValidator is a validator for the "risk_location_id" field. It is called by the builders before save.
 	risk.RiskLocationIDValidator = riskDescRiskLocationID.Validators[0].(func(int) error)
-	// riskDescReporterID is the schema descriptor for reporter_id field.
-	riskDescReporterID := riskFields[5].Descriptor()
-	// risk.ReporterIDValidator is a validator for the "reporter_id" field. It is called by the builders before save.
-	risk.ReporterIDValidator = riskDescReporterID.Validators[0].(func(int) error)
 	// riskDescMaintainerID is the schema descriptor for maintainer_id field.
-	riskDescMaintainerID := riskFields[6].Descriptor()
+	riskDescMaintainerID := riskFields[5].Descriptor()
 	// risk.MaintainerIDValidator is a validator for the "maintainer_id" field. It is called by the builders before save.
 	risk.MaintainerIDValidator = riskDescMaintainerID.Validators[0].(func(int) error)
 	// riskDescMaintainStatus is the schema descriptor for maintain_status field.
-	riskDescMaintainStatus := riskFields[8].Descriptor()
+	riskDescMaintainStatus := riskFields[7].Descriptor()
 	// risk.DefaultMaintainStatus holds the default value on creation for the maintain_status field.
 	risk.DefaultMaintainStatus = maintain_status.MaintainStatus(riskDescMaintainStatus.Default.(int))
 	// risk.MaintainStatusValidator is a validator for the "maintain_status" field. It is called by the builders before save.
@@ -567,24 +668,24 @@ func init() {
 	_ = riskcategoryMixinFields0
 	riskcategoryFields := schema.RiskCategory{}.Fields()
 	_ = riskcategoryFields
-	// riskcategoryDescCreatedAt is the schema descriptor for created_at field.
-	riskcategoryDescCreatedAt := riskcategoryMixinFields0[0].Descriptor()
-	// riskcategory.DefaultCreatedAt holds the default value on creation for the created_at field.
-	riskcategory.DefaultCreatedAt = riskcategoryDescCreatedAt.Default.(func() time.Time)
-	// riskcategoryDescCreatedBy is the schema descriptor for created_by field.
-	riskcategoryDescCreatedBy := riskcategoryMixinFields0[1].Descriptor()
-	// riskcategory.CreatedByValidator is a validator for the "created_by" field. It is called by the builders before save.
-	riskcategory.CreatedByValidator = riskcategoryDescCreatedBy.Validators[0].(func(int) error)
-	// riskcategoryDescUpdatedBy is the schema descriptor for updated_by field.
-	riskcategoryDescUpdatedBy := riskcategoryMixinFields0[3].Descriptor()
-	// riskcategory.UpdatedByValidator is a validator for the "updated_by" field. It is called by the builders before save.
-	riskcategory.UpdatedByValidator = riskcategoryDescUpdatedBy.Validators[0].(func(int) error)
-	// riskcategoryDescUpdatedAt is the schema descriptor for updated_at field.
-	riskcategoryDescUpdatedAt := riskcategoryMixinFields0[4].Descriptor()
-	// riskcategory.DefaultUpdatedAt holds the default value on creation for the updated_at field.
-	riskcategory.DefaultUpdatedAt = riskcategoryDescUpdatedAt.Default.(func() time.Time)
-	// riskcategory.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
-	riskcategory.UpdateDefaultUpdatedAt = riskcategoryDescUpdatedAt.UpdateDefault.(func() time.Time)
+	// riskcategoryDescCreateTime is the schema descriptor for create_time field.
+	riskcategoryDescCreateTime := riskcategoryMixinFields0[0].Descriptor()
+	// riskcategory.DefaultCreateTime holds the default value on creation for the create_time field.
+	riskcategory.DefaultCreateTime = riskcategoryDescCreateTime.Default.(func() time.Time)
+	// riskcategoryDescCreatorID is the schema descriptor for creator_id field.
+	riskcategoryDescCreatorID := riskcategoryMixinFields0[1].Descriptor()
+	// riskcategory.CreatorIDValidator is a validator for the "creator_id" field. It is called by the builders before save.
+	riskcategory.CreatorIDValidator = riskcategoryDescCreatorID.Validators[0].(func(int) error)
+	// riskcategoryDescUpdaterID is the schema descriptor for updater_id field.
+	riskcategoryDescUpdaterID := riskcategoryMixinFields0[3].Descriptor()
+	// riskcategory.UpdaterIDValidator is a validator for the "updater_id" field. It is called by the builders before save.
+	riskcategory.UpdaterIDValidator = riskcategoryDescUpdaterID.Validators[0].(func(int) error)
+	// riskcategoryDescUpdateTime is the schema descriptor for update_time field.
+	riskcategoryDescUpdateTime := riskcategoryMixinFields0[4].Descriptor()
+	// riskcategory.DefaultUpdateTime holds the default value on creation for the update_time field.
+	riskcategory.DefaultUpdateTime = riskcategoryDescUpdateTime.Default.(func() time.Time)
+	// riskcategory.UpdateDefaultUpdateTime holds the default value on update for the update_time field.
+	riskcategory.UpdateDefaultUpdateTime = riskcategoryDescUpdateTime.UpdateDefault.(func() time.Time)
 	// riskcategoryDescName is the schema descriptor for name field.
 	riskcategoryDescName := riskcategoryFields[0].Descriptor()
 	// riskcategory.NameValidator is a validator for the "name" field. It is called by the builders before save.
@@ -610,24 +711,24 @@ func init() {
 	_ = risklocationMixinFields0
 	risklocationFields := schema.RiskLocation{}.Fields()
 	_ = risklocationFields
-	// risklocationDescCreatedAt is the schema descriptor for created_at field.
-	risklocationDescCreatedAt := risklocationMixinFields0[0].Descriptor()
-	// risklocation.DefaultCreatedAt holds the default value on creation for the created_at field.
-	risklocation.DefaultCreatedAt = risklocationDescCreatedAt.Default.(func() time.Time)
-	// risklocationDescCreatedBy is the schema descriptor for created_by field.
-	risklocationDescCreatedBy := risklocationMixinFields0[1].Descriptor()
-	// risklocation.CreatedByValidator is a validator for the "created_by" field. It is called by the builders before save.
-	risklocation.CreatedByValidator = risklocationDescCreatedBy.Validators[0].(func(int) error)
-	// risklocationDescUpdatedBy is the schema descriptor for updated_by field.
-	risklocationDescUpdatedBy := risklocationMixinFields0[3].Descriptor()
-	// risklocation.UpdatedByValidator is a validator for the "updated_by" field. It is called by the builders before save.
-	risklocation.UpdatedByValidator = risklocationDescUpdatedBy.Validators[0].(func(int) error)
-	// risklocationDescUpdatedAt is the schema descriptor for updated_at field.
-	risklocationDescUpdatedAt := risklocationMixinFields0[4].Descriptor()
-	// risklocation.DefaultUpdatedAt holds the default value on creation for the updated_at field.
-	risklocation.DefaultUpdatedAt = risklocationDescUpdatedAt.Default.(func() time.Time)
-	// risklocation.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
-	risklocation.UpdateDefaultUpdatedAt = risklocationDescUpdatedAt.UpdateDefault.(func() time.Time)
+	// risklocationDescCreateTime is the schema descriptor for create_time field.
+	risklocationDescCreateTime := risklocationMixinFields0[0].Descriptor()
+	// risklocation.DefaultCreateTime holds the default value on creation for the create_time field.
+	risklocation.DefaultCreateTime = risklocationDescCreateTime.Default.(func() time.Time)
+	// risklocationDescCreatorID is the schema descriptor for creator_id field.
+	risklocationDescCreatorID := risklocationMixinFields0[1].Descriptor()
+	// risklocation.CreatorIDValidator is a validator for the "creator_id" field. It is called by the builders before save.
+	risklocation.CreatorIDValidator = risklocationDescCreatorID.Validators[0].(func(int) error)
+	// risklocationDescUpdaterID is the schema descriptor for updater_id field.
+	risklocationDescUpdaterID := risklocationMixinFields0[3].Descriptor()
+	// risklocation.UpdaterIDValidator is a validator for the "updater_id" field. It is called by the builders before save.
+	risklocation.UpdaterIDValidator = risklocationDescUpdaterID.Validators[0].(func(int) error)
+	// risklocationDescUpdateTime is the schema descriptor for update_time field.
+	risklocationDescUpdateTime := risklocationMixinFields0[4].Descriptor()
+	// risklocation.DefaultUpdateTime holds the default value on creation for the update_time field.
+	risklocation.DefaultUpdateTime = risklocationDescUpdateTime.Default.(func() time.Time)
+	// risklocation.UpdateDefaultUpdateTime holds the default value on update for the update_time field.
+	risklocation.UpdateDefaultUpdateTime = risklocationDescUpdateTime.UpdateDefault.(func() time.Time)
 	// risklocationDescName is the schema descriptor for name field.
 	risklocationDescName := risklocationFields[0].Descriptor()
 	// risklocation.NameValidator is a validator for the "name" field. It is called by the builders before save.
@@ -646,6 +747,202 @@ func init() {
 			return nil
 		}
 	}()
+	sweepMixin := schema.Sweep{}.Mixin()
+	sweepMixinHooks0 := sweepMixin[0].Hooks()
+	sweep.Hooks[0] = sweepMixinHooks0[0]
+	sweepMixinFields0 := sweepMixin[0].Fields()
+	_ = sweepMixinFields0
+	sweepFields := schema.Sweep{}.Fields()
+	_ = sweepFields
+	// sweepDescCreateTime is the schema descriptor for create_time field.
+	sweepDescCreateTime := sweepMixinFields0[0].Descriptor()
+	// sweep.DefaultCreateTime holds the default value on creation for the create_time field.
+	sweep.DefaultCreateTime = sweepDescCreateTime.Default.(func() time.Time)
+	// sweepDescCreatorID is the schema descriptor for creator_id field.
+	sweepDescCreatorID := sweepMixinFields0[1].Descriptor()
+	// sweep.CreatorIDValidator is a validator for the "creator_id" field. It is called by the builders before save.
+	sweep.CreatorIDValidator = sweepDescCreatorID.Validators[0].(func(int) error)
+	// sweepDescUpdaterID is the schema descriptor for updater_id field.
+	sweepDescUpdaterID := sweepMixinFields0[3].Descriptor()
+	// sweep.UpdaterIDValidator is a validator for the "updater_id" field. It is called by the builders before save.
+	sweep.UpdaterIDValidator = sweepDescUpdaterID.Validators[0].(func(int) error)
+	// sweepDescUpdateTime is the schema descriptor for update_time field.
+	sweepDescUpdateTime := sweepMixinFields0[4].Descriptor()
+	// sweep.DefaultUpdateTime holds the default value on creation for the update_time field.
+	sweep.DefaultUpdateTime = sweepDescUpdateTime.Default.(func() time.Time)
+	// sweep.UpdateDefaultUpdateTime holds the default value on update for the update_time field.
+	sweep.UpdateDefaultUpdateTime = sweepDescUpdateTime.UpdateDefault.(func() time.Time)
+	// sweepDescName is the schema descriptor for name field.
+	sweepDescName := sweepFields[0].Descriptor()
+	// sweep.NameValidator is a validator for the "name" field. It is called by the builders before save.
+	sweep.NameValidator = func() func(string) error {
+		validators := sweepDescName.Validators
+		fns := [...]func(string) error{
+			validators[0].(func(string) error),
+			validators[1].(func(string) error),
+		}
+		return func(name string) error {
+			for _, fn := range fns {
+				if err := fn(name); err != nil {
+					return err
+				}
+			}
+			return nil
+		}
+	}()
+	// sweepDescRiskCategoryID is the schema descriptor for risk_category_id field.
+	sweepDescRiskCategoryID := sweepFields[1].Descriptor()
+	// sweep.RiskCategoryIDValidator is a validator for the "risk_category_id" field. It is called by the builders before save.
+	sweep.RiskCategoryIDValidator = sweepDescRiskCategoryID.Validators[0].(func(int) error)
+	// sweepDescRiskLocationID is the schema descriptor for risk_location_id field.
+	sweepDescRiskLocationID := sweepFields[2].Descriptor()
+	// sweep.RiskLocationIDValidator is a validator for the "risk_location_id" field. It is called by the builders before save.
+	sweep.RiskLocationIDValidator = sweepDescRiskLocationID.Validators[0].(func(int) error)
+	sweepresultMixin := schema.SweepResult{}.Mixin()
+	sweepresultMixinHooks0 := sweepresultMixin[0].Hooks()
+	sweepresult.Hooks[0] = sweepresultMixinHooks0[0]
+	sweepresultMixinFields0 := sweepresultMixin[0].Fields()
+	_ = sweepresultMixinFields0
+	sweepresultFields := schema.SweepResult{}.Fields()
+	_ = sweepresultFields
+	// sweepresultDescCreateTime is the schema descriptor for create_time field.
+	sweepresultDescCreateTime := sweepresultMixinFields0[0].Descriptor()
+	// sweepresult.DefaultCreateTime holds the default value on creation for the create_time field.
+	sweepresult.DefaultCreateTime = sweepresultDescCreateTime.Default.(func() time.Time)
+	// sweepresultDescCreatorID is the schema descriptor for creator_id field.
+	sweepresultDescCreatorID := sweepresultMixinFields0[1].Descriptor()
+	// sweepresult.CreatorIDValidator is a validator for the "creator_id" field. It is called by the builders before save.
+	sweepresult.CreatorIDValidator = sweepresultDescCreatorID.Validators[0].(func(int) error)
+	// sweepresultDescUpdaterID is the schema descriptor for updater_id field.
+	sweepresultDescUpdaterID := sweepresultMixinFields0[3].Descriptor()
+	// sweepresult.UpdaterIDValidator is a validator for the "updater_id" field. It is called by the builders before save.
+	sweepresult.UpdaterIDValidator = sweepresultDescUpdaterID.Validators[0].(func(int) error)
+	// sweepresultDescUpdateTime is the schema descriptor for update_time field.
+	sweepresultDescUpdateTime := sweepresultMixinFields0[4].Descriptor()
+	// sweepresult.DefaultUpdateTime holds the default value on creation for the update_time field.
+	sweepresult.DefaultUpdateTime = sweepresultDescUpdateTime.Default.(func() time.Time)
+	// sweepresult.UpdateDefaultUpdateTime holds the default value on update for the update_time field.
+	sweepresult.UpdateDefaultUpdateTime = sweepresultDescUpdateTime.UpdateDefault.(func() time.Time)
+	// sweepresultDescSweepID is the schema descriptor for sweep_id field.
+	sweepresultDescSweepID := sweepresultFields[0].Descriptor()
+	// sweepresult.SweepIDValidator is a validator for the "sweep_id" field. It is called by the builders before save.
+	sweepresult.SweepIDValidator = sweepresultDescSweepID.Validators[0].(func(int) error)
+	// sweepresultDescSweepScheduleID is the schema descriptor for sweep_schedule_id field.
+	sweepresultDescSweepScheduleID := sweepresultFields[1].Descriptor()
+	// sweepresult.SweepScheduleIDValidator is a validator for the "sweep_schedule_id" field. It is called by the builders before save.
+	sweepresult.SweepScheduleIDValidator = sweepresultDescSweepScheduleID.Validators[0].(func(int) error)
+	sweepresultdetailsMixin := schema.SweepResultDetails{}.Mixin()
+	sweepresultdetailsMixinHooks0 := sweepresultdetailsMixin[0].Hooks()
+	sweepresultdetails.Hooks[0] = sweepresultdetailsMixinHooks0[0]
+	sweepresultdetailsMixinFields0 := sweepresultdetailsMixin[0].Fields()
+	_ = sweepresultdetailsMixinFields0
+	sweepresultdetailsFields := schema.SweepResultDetails{}.Fields()
+	_ = sweepresultdetailsFields
+	// sweepresultdetailsDescCreateTime is the schema descriptor for create_time field.
+	sweepresultdetailsDescCreateTime := sweepresultdetailsMixinFields0[0].Descriptor()
+	// sweepresultdetails.DefaultCreateTime holds the default value on creation for the create_time field.
+	sweepresultdetails.DefaultCreateTime = sweepresultdetailsDescCreateTime.Default.(func() time.Time)
+	// sweepresultdetailsDescCreatorID is the schema descriptor for creator_id field.
+	sweepresultdetailsDescCreatorID := sweepresultdetailsMixinFields0[1].Descriptor()
+	// sweepresultdetails.CreatorIDValidator is a validator for the "creator_id" field. It is called by the builders before save.
+	sweepresultdetails.CreatorIDValidator = sweepresultdetailsDescCreatorID.Validators[0].(func(int) error)
+	// sweepresultdetailsDescUpdaterID is the schema descriptor for updater_id field.
+	sweepresultdetailsDescUpdaterID := sweepresultdetailsMixinFields0[3].Descriptor()
+	// sweepresultdetails.UpdaterIDValidator is a validator for the "updater_id" field. It is called by the builders before save.
+	sweepresultdetails.UpdaterIDValidator = sweepresultdetailsDescUpdaterID.Validators[0].(func(int) error)
+	// sweepresultdetailsDescUpdateTime is the schema descriptor for update_time field.
+	sweepresultdetailsDescUpdateTime := sweepresultdetailsMixinFields0[4].Descriptor()
+	// sweepresultdetails.DefaultUpdateTime holds the default value on creation for the update_time field.
+	sweepresultdetails.DefaultUpdateTime = sweepresultdetailsDescUpdateTime.Default.(func() time.Time)
+	// sweepresultdetails.UpdateDefaultUpdateTime holds the default value on update for the update_time field.
+	sweepresultdetails.UpdateDefaultUpdateTime = sweepresultdetailsDescUpdateTime.UpdateDefault.(func() time.Time)
+	// sweepresultdetailsDescSweepID is the schema descriptor for sweep_id field.
+	sweepresultdetailsDescSweepID := sweepresultdetailsFields[0].Descriptor()
+	// sweepresultdetails.SweepIDValidator is a validator for the "sweep_id" field. It is called by the builders before save.
+	sweepresultdetails.SweepIDValidator = sweepresultdetailsDescSweepID.Validators[0].(func(int) error)
+	// sweepresultdetailsDescSweepScheduleID is the schema descriptor for sweep_schedule_id field.
+	sweepresultdetailsDescSweepScheduleID := sweepresultdetailsFields[1].Descriptor()
+	// sweepresultdetails.SweepScheduleIDValidator is a validator for the "sweep_schedule_id" field. It is called by the builders before save.
+	sweepresultdetails.SweepScheduleIDValidator = sweepresultdetailsDescSweepScheduleID.Validators[0].(func(int) error)
+	// sweepresultdetailsDescSweepResultID is the schema descriptor for sweep_result_id field.
+	sweepresultdetailsDescSweepResultID := sweepresultdetailsFields[2].Descriptor()
+	// sweepresultdetails.SweepResultIDValidator is a validator for the "sweep_result_id" field. It is called by the builders before save.
+	sweepresultdetails.SweepResultIDValidator = sweepresultdetailsDescSweepResultID.Validators[0].(func(int) error)
+	// sweepresultdetailsDescTitle is the schema descriptor for title field.
+	sweepresultdetailsDescTitle := sweepresultdetailsFields[3].Descriptor()
+	// sweepresultdetails.TitleValidator is a validator for the "title" field. It is called by the builders before save.
+	sweepresultdetails.TitleValidator = func() func(string) error {
+		validators := sweepresultdetailsDescTitle.Validators
+		fns := [...]func(string) error{
+			validators[0].(func(string) error),
+			validators[1].(func(string) error),
+		}
+		return func(title string) error {
+			for _, fn := range fns {
+				if err := fn(title); err != nil {
+					return err
+				}
+			}
+			return nil
+		}
+	}()
+	// sweepresultdetailsDescResult is the schema descriptor for result field.
+	sweepresultdetailsDescResult := sweepresultdetailsFields[4].Descriptor()
+	// sweepresultdetails.ResultValidator is a validator for the "result" field. It is called by the builders before save.
+	sweepresultdetails.ResultValidator = sweepresultdetailsDescResult.Validators[0].(func(int) error)
+	sweepscheduleMixin := schema.SweepSchedule{}.Mixin()
+	sweepscheduleMixinHooks0 := sweepscheduleMixin[0].Hooks()
+	sweepschedule.Hooks[0] = sweepscheduleMixinHooks0[0]
+	sweepscheduleMixinFields0 := sweepscheduleMixin[0].Fields()
+	_ = sweepscheduleMixinFields0
+	sweepscheduleFields := schema.SweepSchedule{}.Fields()
+	_ = sweepscheduleFields
+	// sweepscheduleDescCreateTime is the schema descriptor for create_time field.
+	sweepscheduleDescCreateTime := sweepscheduleMixinFields0[0].Descriptor()
+	// sweepschedule.DefaultCreateTime holds the default value on creation for the create_time field.
+	sweepschedule.DefaultCreateTime = sweepscheduleDescCreateTime.Default.(func() time.Time)
+	// sweepscheduleDescCreatorID is the schema descriptor for creator_id field.
+	sweepscheduleDescCreatorID := sweepscheduleMixinFields0[1].Descriptor()
+	// sweepschedule.CreatorIDValidator is a validator for the "creator_id" field. It is called by the builders before save.
+	sweepschedule.CreatorIDValidator = sweepscheduleDescCreatorID.Validators[0].(func(int) error)
+	// sweepscheduleDescUpdaterID is the schema descriptor for updater_id field.
+	sweepscheduleDescUpdaterID := sweepscheduleMixinFields0[3].Descriptor()
+	// sweepschedule.UpdaterIDValidator is a validator for the "updater_id" field. It is called by the builders before save.
+	sweepschedule.UpdaterIDValidator = sweepscheduleDescUpdaterID.Validators[0].(func(int) error)
+	// sweepscheduleDescUpdateTime is the schema descriptor for update_time field.
+	sweepscheduleDescUpdateTime := sweepscheduleMixinFields0[4].Descriptor()
+	// sweepschedule.DefaultUpdateTime holds the default value on creation for the update_time field.
+	sweepschedule.DefaultUpdateTime = sweepscheduleDescUpdateTime.Default.(func() time.Time)
+	// sweepschedule.UpdateDefaultUpdateTime holds the default value on update for the update_time field.
+	sweepschedule.UpdateDefaultUpdateTime = sweepscheduleDescUpdateTime.UpdateDefault.(func() time.Time)
+	// sweepscheduleDescName is the schema descriptor for name field.
+	sweepscheduleDescName := sweepscheduleFields[0].Descriptor()
+	// sweepschedule.NameValidator is a validator for the "name" field. It is called by the builders before save.
+	sweepschedule.NameValidator = func() func(string) error {
+		validators := sweepscheduleDescName.Validators
+		fns := [...]func(string) error{
+			validators[0].(func(string) error),
+			validators[1].(func(string) error),
+		}
+		return func(name string) error {
+			for _, fn := range fns {
+				if err := fn(name); err != nil {
+					return err
+				}
+			}
+			return nil
+		}
+	}()
+	// sweepscheduleDescSweepID is the schema descriptor for sweep_id field.
+	sweepscheduleDescSweepID := sweepscheduleFields[1].Descriptor()
+	// sweepschedule.SweepIDValidator is a validator for the "sweep_id" field. It is called by the builders before save.
+	sweepschedule.SweepIDValidator = sweepscheduleDescSweepID.Validators[0].(func(int) error)
+	// sweepscheduleDescScheduleStatus is the schema descriptor for schedule_status field.
+	sweepscheduleDescScheduleStatus := sweepscheduleFields[2].Descriptor()
+	// sweepschedule.DefaultScheduleStatus holds the default value on creation for the schedule_status field.
+	sweepschedule.DefaultScheduleStatus = enums.AdminStatus(sweepscheduleDescScheduleStatus.Default.(int))
+	// sweepschedule.ScheduleStatusValidator is a validator for the "schedule_status" field. It is called by the builders before save.
+	sweepschedule.ScheduleStatusValidator = sweepscheduleDescScheduleStatus.Validators[0].(func(int) error)
 	videoMixin := schema.Video{}.Mixin()
 	videoMixinHooks0 := videoMixin[0].Hooks()
 	video.Hooks[0] = videoMixinHooks0[0]
@@ -653,24 +950,24 @@ func init() {
 	_ = videoMixinFields0
 	videoFields := schema.Video{}.Fields()
 	_ = videoFields
-	// videoDescCreatedAt is the schema descriptor for created_at field.
-	videoDescCreatedAt := videoMixinFields0[0].Descriptor()
-	// video.DefaultCreatedAt holds the default value on creation for the created_at field.
-	video.DefaultCreatedAt = videoDescCreatedAt.Default.(func() time.Time)
-	// videoDescCreatedBy is the schema descriptor for created_by field.
-	videoDescCreatedBy := videoMixinFields0[1].Descriptor()
-	// video.CreatedByValidator is a validator for the "created_by" field. It is called by the builders before save.
-	video.CreatedByValidator = videoDescCreatedBy.Validators[0].(func(int) error)
-	// videoDescUpdatedBy is the schema descriptor for updated_by field.
-	videoDescUpdatedBy := videoMixinFields0[3].Descriptor()
-	// video.UpdatedByValidator is a validator for the "updated_by" field. It is called by the builders before save.
-	video.UpdatedByValidator = videoDescUpdatedBy.Validators[0].(func(int) error)
-	// videoDescUpdatedAt is the schema descriptor for updated_at field.
-	videoDescUpdatedAt := videoMixinFields0[4].Descriptor()
-	// video.DefaultUpdatedAt holds the default value on creation for the updated_at field.
-	video.DefaultUpdatedAt = videoDescUpdatedAt.Default.(func() time.Time)
-	// video.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
-	video.UpdateDefaultUpdatedAt = videoDescUpdatedAt.UpdateDefault.(func() time.Time)
+	// videoDescCreateTime is the schema descriptor for create_time field.
+	videoDescCreateTime := videoMixinFields0[0].Descriptor()
+	// video.DefaultCreateTime holds the default value on creation for the create_time field.
+	video.DefaultCreateTime = videoDescCreateTime.Default.(func() time.Time)
+	// videoDescCreatorID is the schema descriptor for creator_id field.
+	videoDescCreatorID := videoMixinFields0[1].Descriptor()
+	// video.CreatorIDValidator is a validator for the "creator_id" field. It is called by the builders before save.
+	video.CreatorIDValidator = videoDescCreatorID.Validators[0].(func(int) error)
+	// videoDescUpdaterID is the schema descriptor for updater_id field.
+	videoDescUpdaterID := videoMixinFields0[3].Descriptor()
+	// video.UpdaterIDValidator is a validator for the "updater_id" field. It is called by the builders before save.
+	video.UpdaterIDValidator = videoDescUpdaterID.Validators[0].(func(int) error)
+	// videoDescUpdateTime is the schema descriptor for update_time field.
+	videoDescUpdateTime := videoMixinFields0[4].Descriptor()
+	// video.DefaultUpdateTime holds the default value on creation for the update_time field.
+	video.DefaultUpdateTime = videoDescUpdateTime.Default.(func() time.Time)
+	// video.UpdateDefaultUpdateTime holds the default value on update for the update_time field.
+	video.UpdateDefaultUpdateTime = videoDescUpdateTime.UpdateDefault.(func() time.Time)
 	// videoDescSize is the schema descriptor for size field.
 	videoDescSize := videoFields[2].Descriptor()
 	// video.DefaultSize holds the default value on creation for the size field.

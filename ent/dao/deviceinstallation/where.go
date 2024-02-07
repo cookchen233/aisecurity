@@ -55,29 +55,29 @@ func IDLTE(id int) predicate.DeviceInstallation {
 	return predicate.DeviceInstallation(sql.FieldLTE(FieldID, id))
 }
 
-// CreatedAt applies equality check predicate on the "created_at" field. It's identical to CreatedAtEQ.
-func CreatedAt(v time.Time) predicate.DeviceInstallation {
-	return predicate.DeviceInstallation(sql.FieldEQ(FieldCreatedAt, v))
+// CreateTime applies equality check predicate on the "create_time" field. It's identical to CreateTimeEQ.
+func CreateTime(v time.Time) predicate.DeviceInstallation {
+	return predicate.DeviceInstallation(sql.FieldEQ(FieldCreateTime, v))
 }
 
-// CreatedBy applies equality check predicate on the "created_by" field. It's identical to CreatedByEQ.
-func CreatedBy(v int) predicate.DeviceInstallation {
-	return predicate.DeviceInstallation(sql.FieldEQ(FieldCreatedBy, v))
+// CreatorID applies equality check predicate on the "creator_id" field. It's identical to CreatorIDEQ.
+func CreatorID(v int) predicate.DeviceInstallation {
+	return predicate.DeviceInstallation(sql.FieldEQ(FieldCreatorID, v))
 }
 
-// DeletedAt applies equality check predicate on the "deleted_at" field. It's identical to DeletedAtEQ.
-func DeletedAt(v time.Time) predicate.DeviceInstallation {
-	return predicate.DeviceInstallation(sql.FieldEQ(FieldDeletedAt, v))
+// DeleteTime applies equality check predicate on the "delete_time" field. It's identical to DeleteTimeEQ.
+func DeleteTime(v time.Time) predicate.DeviceInstallation {
+	return predicate.DeviceInstallation(sql.FieldEQ(FieldDeleteTime, v))
 }
 
-// UpdatedBy applies equality check predicate on the "updated_by" field. It's identical to UpdatedByEQ.
-func UpdatedBy(v int) predicate.DeviceInstallation {
-	return predicate.DeviceInstallation(sql.FieldEQ(FieldUpdatedBy, v))
+// UpdaterID applies equality check predicate on the "updater_id" field. It's identical to UpdaterIDEQ.
+func UpdaterID(v int) predicate.DeviceInstallation {
+	return predicate.DeviceInstallation(sql.FieldEQ(FieldUpdaterID, v))
 }
 
-// UpdatedAt applies equality check predicate on the "updated_at" field. It's identical to UpdatedAtEQ.
-func UpdatedAt(v time.Time) predicate.DeviceInstallation {
-	return predicate.DeviceInstallation(sql.FieldEQ(FieldUpdatedAt, v))
+// UpdateTime applies equality check predicate on the "update_time" field. It's identical to UpdateTimeEQ.
+func UpdateTime(v time.Time) predicate.DeviceInstallation {
+	return predicate.DeviceInstallation(sql.FieldEQ(FieldUpdateTime, v))
 }
 
 // DeviceID applies equality check predicate on the "device_id" field. It's identical to DeviceIDEQ.
@@ -125,174 +125,174 @@ func InstallTime(v time.Time) predicate.DeviceInstallation {
 	return predicate.DeviceInstallation(sql.FieldEQ(FieldInstallTime, v))
 }
 
-// CreatedAtEQ applies the EQ predicate on the "created_at" field.
-func CreatedAtEQ(v time.Time) predicate.DeviceInstallation {
-	return predicate.DeviceInstallation(sql.FieldEQ(FieldCreatedAt, v))
+// CreateTimeEQ applies the EQ predicate on the "create_time" field.
+func CreateTimeEQ(v time.Time) predicate.DeviceInstallation {
+	return predicate.DeviceInstallation(sql.FieldEQ(FieldCreateTime, v))
 }
 
-// CreatedAtNEQ applies the NEQ predicate on the "created_at" field.
-func CreatedAtNEQ(v time.Time) predicate.DeviceInstallation {
-	return predicate.DeviceInstallation(sql.FieldNEQ(FieldCreatedAt, v))
+// CreateTimeNEQ applies the NEQ predicate on the "create_time" field.
+func CreateTimeNEQ(v time.Time) predicate.DeviceInstallation {
+	return predicate.DeviceInstallation(sql.FieldNEQ(FieldCreateTime, v))
 }
 
-// CreatedAtIn applies the In predicate on the "created_at" field.
-func CreatedAtIn(vs ...time.Time) predicate.DeviceInstallation {
-	return predicate.DeviceInstallation(sql.FieldIn(FieldCreatedAt, vs...))
+// CreateTimeIn applies the In predicate on the "create_time" field.
+func CreateTimeIn(vs ...time.Time) predicate.DeviceInstallation {
+	return predicate.DeviceInstallation(sql.FieldIn(FieldCreateTime, vs...))
 }
 
-// CreatedAtNotIn applies the NotIn predicate on the "created_at" field.
-func CreatedAtNotIn(vs ...time.Time) predicate.DeviceInstallation {
-	return predicate.DeviceInstallation(sql.FieldNotIn(FieldCreatedAt, vs...))
+// CreateTimeNotIn applies the NotIn predicate on the "create_time" field.
+func CreateTimeNotIn(vs ...time.Time) predicate.DeviceInstallation {
+	return predicate.DeviceInstallation(sql.FieldNotIn(FieldCreateTime, vs...))
 }
 
-// CreatedAtGT applies the GT predicate on the "created_at" field.
-func CreatedAtGT(v time.Time) predicate.DeviceInstallation {
-	return predicate.DeviceInstallation(sql.FieldGT(FieldCreatedAt, v))
+// CreateTimeGT applies the GT predicate on the "create_time" field.
+func CreateTimeGT(v time.Time) predicate.DeviceInstallation {
+	return predicate.DeviceInstallation(sql.FieldGT(FieldCreateTime, v))
 }
 
-// CreatedAtGTE applies the GTE predicate on the "created_at" field.
-func CreatedAtGTE(v time.Time) predicate.DeviceInstallation {
-	return predicate.DeviceInstallation(sql.FieldGTE(FieldCreatedAt, v))
+// CreateTimeGTE applies the GTE predicate on the "create_time" field.
+func CreateTimeGTE(v time.Time) predicate.DeviceInstallation {
+	return predicate.DeviceInstallation(sql.FieldGTE(FieldCreateTime, v))
 }
 
-// CreatedAtLT applies the LT predicate on the "created_at" field.
-func CreatedAtLT(v time.Time) predicate.DeviceInstallation {
-	return predicate.DeviceInstallation(sql.FieldLT(FieldCreatedAt, v))
+// CreateTimeLT applies the LT predicate on the "create_time" field.
+func CreateTimeLT(v time.Time) predicate.DeviceInstallation {
+	return predicate.DeviceInstallation(sql.FieldLT(FieldCreateTime, v))
 }
 
-// CreatedAtLTE applies the LTE predicate on the "created_at" field.
-func CreatedAtLTE(v time.Time) predicate.DeviceInstallation {
-	return predicate.DeviceInstallation(sql.FieldLTE(FieldCreatedAt, v))
+// CreateTimeLTE applies the LTE predicate on the "create_time" field.
+func CreateTimeLTE(v time.Time) predicate.DeviceInstallation {
+	return predicate.DeviceInstallation(sql.FieldLTE(FieldCreateTime, v))
 }
 
-// CreatedByEQ applies the EQ predicate on the "created_by" field.
-func CreatedByEQ(v int) predicate.DeviceInstallation {
-	return predicate.DeviceInstallation(sql.FieldEQ(FieldCreatedBy, v))
+// CreatorIDEQ applies the EQ predicate on the "creator_id" field.
+func CreatorIDEQ(v int) predicate.DeviceInstallation {
+	return predicate.DeviceInstallation(sql.FieldEQ(FieldCreatorID, v))
 }
 
-// CreatedByNEQ applies the NEQ predicate on the "created_by" field.
-func CreatedByNEQ(v int) predicate.DeviceInstallation {
-	return predicate.DeviceInstallation(sql.FieldNEQ(FieldCreatedBy, v))
+// CreatorIDNEQ applies the NEQ predicate on the "creator_id" field.
+func CreatorIDNEQ(v int) predicate.DeviceInstallation {
+	return predicate.DeviceInstallation(sql.FieldNEQ(FieldCreatorID, v))
 }
 
-// CreatedByIn applies the In predicate on the "created_by" field.
-func CreatedByIn(vs ...int) predicate.DeviceInstallation {
-	return predicate.DeviceInstallation(sql.FieldIn(FieldCreatedBy, vs...))
+// CreatorIDIn applies the In predicate on the "creator_id" field.
+func CreatorIDIn(vs ...int) predicate.DeviceInstallation {
+	return predicate.DeviceInstallation(sql.FieldIn(FieldCreatorID, vs...))
 }
 
-// CreatedByNotIn applies the NotIn predicate on the "created_by" field.
-func CreatedByNotIn(vs ...int) predicate.DeviceInstallation {
-	return predicate.DeviceInstallation(sql.FieldNotIn(FieldCreatedBy, vs...))
+// CreatorIDNotIn applies the NotIn predicate on the "creator_id" field.
+func CreatorIDNotIn(vs ...int) predicate.DeviceInstallation {
+	return predicate.DeviceInstallation(sql.FieldNotIn(FieldCreatorID, vs...))
 }
 
-// DeletedAtEQ applies the EQ predicate on the "deleted_at" field.
-func DeletedAtEQ(v time.Time) predicate.DeviceInstallation {
-	return predicate.DeviceInstallation(sql.FieldEQ(FieldDeletedAt, v))
+// DeleteTimeEQ applies the EQ predicate on the "delete_time" field.
+func DeleteTimeEQ(v time.Time) predicate.DeviceInstallation {
+	return predicate.DeviceInstallation(sql.FieldEQ(FieldDeleteTime, v))
 }
 
-// DeletedAtNEQ applies the NEQ predicate on the "deleted_at" field.
-func DeletedAtNEQ(v time.Time) predicate.DeviceInstallation {
-	return predicate.DeviceInstallation(sql.FieldNEQ(FieldDeletedAt, v))
+// DeleteTimeNEQ applies the NEQ predicate on the "delete_time" field.
+func DeleteTimeNEQ(v time.Time) predicate.DeviceInstallation {
+	return predicate.DeviceInstallation(sql.FieldNEQ(FieldDeleteTime, v))
 }
 
-// DeletedAtIn applies the In predicate on the "deleted_at" field.
-func DeletedAtIn(vs ...time.Time) predicate.DeviceInstallation {
-	return predicate.DeviceInstallation(sql.FieldIn(FieldDeletedAt, vs...))
+// DeleteTimeIn applies the In predicate on the "delete_time" field.
+func DeleteTimeIn(vs ...time.Time) predicate.DeviceInstallation {
+	return predicate.DeviceInstallation(sql.FieldIn(FieldDeleteTime, vs...))
 }
 
-// DeletedAtNotIn applies the NotIn predicate on the "deleted_at" field.
-func DeletedAtNotIn(vs ...time.Time) predicate.DeviceInstallation {
-	return predicate.DeviceInstallation(sql.FieldNotIn(FieldDeletedAt, vs...))
+// DeleteTimeNotIn applies the NotIn predicate on the "delete_time" field.
+func DeleteTimeNotIn(vs ...time.Time) predicate.DeviceInstallation {
+	return predicate.DeviceInstallation(sql.FieldNotIn(FieldDeleteTime, vs...))
 }
 
-// DeletedAtGT applies the GT predicate on the "deleted_at" field.
-func DeletedAtGT(v time.Time) predicate.DeviceInstallation {
-	return predicate.DeviceInstallation(sql.FieldGT(FieldDeletedAt, v))
+// DeleteTimeGT applies the GT predicate on the "delete_time" field.
+func DeleteTimeGT(v time.Time) predicate.DeviceInstallation {
+	return predicate.DeviceInstallation(sql.FieldGT(FieldDeleteTime, v))
 }
 
-// DeletedAtGTE applies the GTE predicate on the "deleted_at" field.
-func DeletedAtGTE(v time.Time) predicate.DeviceInstallation {
-	return predicate.DeviceInstallation(sql.FieldGTE(FieldDeletedAt, v))
+// DeleteTimeGTE applies the GTE predicate on the "delete_time" field.
+func DeleteTimeGTE(v time.Time) predicate.DeviceInstallation {
+	return predicate.DeviceInstallation(sql.FieldGTE(FieldDeleteTime, v))
 }
 
-// DeletedAtLT applies the LT predicate on the "deleted_at" field.
-func DeletedAtLT(v time.Time) predicate.DeviceInstallation {
-	return predicate.DeviceInstallation(sql.FieldLT(FieldDeletedAt, v))
+// DeleteTimeLT applies the LT predicate on the "delete_time" field.
+func DeleteTimeLT(v time.Time) predicate.DeviceInstallation {
+	return predicate.DeviceInstallation(sql.FieldLT(FieldDeleteTime, v))
 }
 
-// DeletedAtLTE applies the LTE predicate on the "deleted_at" field.
-func DeletedAtLTE(v time.Time) predicate.DeviceInstallation {
-	return predicate.DeviceInstallation(sql.FieldLTE(FieldDeletedAt, v))
+// DeleteTimeLTE applies the LTE predicate on the "delete_time" field.
+func DeleteTimeLTE(v time.Time) predicate.DeviceInstallation {
+	return predicate.DeviceInstallation(sql.FieldLTE(FieldDeleteTime, v))
 }
 
-// DeletedAtIsNil applies the IsNil predicate on the "deleted_at" field.
-func DeletedAtIsNil() predicate.DeviceInstallation {
-	return predicate.DeviceInstallation(sql.FieldIsNull(FieldDeletedAt))
+// DeleteTimeIsNil applies the IsNil predicate on the "delete_time" field.
+func DeleteTimeIsNil() predicate.DeviceInstallation {
+	return predicate.DeviceInstallation(sql.FieldIsNull(FieldDeleteTime))
 }
 
-// DeletedAtNotNil applies the NotNil predicate on the "deleted_at" field.
-func DeletedAtNotNil() predicate.DeviceInstallation {
-	return predicate.DeviceInstallation(sql.FieldNotNull(FieldDeletedAt))
+// DeleteTimeNotNil applies the NotNil predicate on the "delete_time" field.
+func DeleteTimeNotNil() predicate.DeviceInstallation {
+	return predicate.DeviceInstallation(sql.FieldNotNull(FieldDeleteTime))
 }
 
-// UpdatedByEQ applies the EQ predicate on the "updated_by" field.
-func UpdatedByEQ(v int) predicate.DeviceInstallation {
-	return predicate.DeviceInstallation(sql.FieldEQ(FieldUpdatedBy, v))
+// UpdaterIDEQ applies the EQ predicate on the "updater_id" field.
+func UpdaterIDEQ(v int) predicate.DeviceInstallation {
+	return predicate.DeviceInstallation(sql.FieldEQ(FieldUpdaterID, v))
 }
 
-// UpdatedByNEQ applies the NEQ predicate on the "updated_by" field.
-func UpdatedByNEQ(v int) predicate.DeviceInstallation {
-	return predicate.DeviceInstallation(sql.FieldNEQ(FieldUpdatedBy, v))
+// UpdaterIDNEQ applies the NEQ predicate on the "updater_id" field.
+func UpdaterIDNEQ(v int) predicate.DeviceInstallation {
+	return predicate.DeviceInstallation(sql.FieldNEQ(FieldUpdaterID, v))
 }
 
-// UpdatedByIn applies the In predicate on the "updated_by" field.
-func UpdatedByIn(vs ...int) predicate.DeviceInstallation {
-	return predicate.DeviceInstallation(sql.FieldIn(FieldUpdatedBy, vs...))
+// UpdaterIDIn applies the In predicate on the "updater_id" field.
+func UpdaterIDIn(vs ...int) predicate.DeviceInstallation {
+	return predicate.DeviceInstallation(sql.FieldIn(FieldUpdaterID, vs...))
 }
 
-// UpdatedByNotIn applies the NotIn predicate on the "updated_by" field.
-func UpdatedByNotIn(vs ...int) predicate.DeviceInstallation {
-	return predicate.DeviceInstallation(sql.FieldNotIn(FieldUpdatedBy, vs...))
+// UpdaterIDNotIn applies the NotIn predicate on the "updater_id" field.
+func UpdaterIDNotIn(vs ...int) predicate.DeviceInstallation {
+	return predicate.DeviceInstallation(sql.FieldNotIn(FieldUpdaterID, vs...))
 }
 
-// UpdatedAtEQ applies the EQ predicate on the "updated_at" field.
-func UpdatedAtEQ(v time.Time) predicate.DeviceInstallation {
-	return predicate.DeviceInstallation(sql.FieldEQ(FieldUpdatedAt, v))
+// UpdateTimeEQ applies the EQ predicate on the "update_time" field.
+func UpdateTimeEQ(v time.Time) predicate.DeviceInstallation {
+	return predicate.DeviceInstallation(sql.FieldEQ(FieldUpdateTime, v))
 }
 
-// UpdatedAtNEQ applies the NEQ predicate on the "updated_at" field.
-func UpdatedAtNEQ(v time.Time) predicate.DeviceInstallation {
-	return predicate.DeviceInstallation(sql.FieldNEQ(FieldUpdatedAt, v))
+// UpdateTimeNEQ applies the NEQ predicate on the "update_time" field.
+func UpdateTimeNEQ(v time.Time) predicate.DeviceInstallation {
+	return predicate.DeviceInstallation(sql.FieldNEQ(FieldUpdateTime, v))
 }
 
-// UpdatedAtIn applies the In predicate on the "updated_at" field.
-func UpdatedAtIn(vs ...time.Time) predicate.DeviceInstallation {
-	return predicate.DeviceInstallation(sql.FieldIn(FieldUpdatedAt, vs...))
+// UpdateTimeIn applies the In predicate on the "update_time" field.
+func UpdateTimeIn(vs ...time.Time) predicate.DeviceInstallation {
+	return predicate.DeviceInstallation(sql.FieldIn(FieldUpdateTime, vs...))
 }
 
-// UpdatedAtNotIn applies the NotIn predicate on the "updated_at" field.
-func UpdatedAtNotIn(vs ...time.Time) predicate.DeviceInstallation {
-	return predicate.DeviceInstallation(sql.FieldNotIn(FieldUpdatedAt, vs...))
+// UpdateTimeNotIn applies the NotIn predicate on the "update_time" field.
+func UpdateTimeNotIn(vs ...time.Time) predicate.DeviceInstallation {
+	return predicate.DeviceInstallation(sql.FieldNotIn(FieldUpdateTime, vs...))
 }
 
-// UpdatedAtGT applies the GT predicate on the "updated_at" field.
-func UpdatedAtGT(v time.Time) predicate.DeviceInstallation {
-	return predicate.DeviceInstallation(sql.FieldGT(FieldUpdatedAt, v))
+// UpdateTimeGT applies the GT predicate on the "update_time" field.
+func UpdateTimeGT(v time.Time) predicate.DeviceInstallation {
+	return predicate.DeviceInstallation(sql.FieldGT(FieldUpdateTime, v))
 }
 
-// UpdatedAtGTE applies the GTE predicate on the "updated_at" field.
-func UpdatedAtGTE(v time.Time) predicate.DeviceInstallation {
-	return predicate.DeviceInstallation(sql.FieldGTE(FieldUpdatedAt, v))
+// UpdateTimeGTE applies the GTE predicate on the "update_time" field.
+func UpdateTimeGTE(v time.Time) predicate.DeviceInstallation {
+	return predicate.DeviceInstallation(sql.FieldGTE(FieldUpdateTime, v))
 }
 
-// UpdatedAtLT applies the LT predicate on the "updated_at" field.
-func UpdatedAtLT(v time.Time) predicate.DeviceInstallation {
-	return predicate.DeviceInstallation(sql.FieldLT(FieldUpdatedAt, v))
+// UpdateTimeLT applies the LT predicate on the "update_time" field.
+func UpdateTimeLT(v time.Time) predicate.DeviceInstallation {
+	return predicate.DeviceInstallation(sql.FieldLT(FieldUpdateTime, v))
 }
 
-// UpdatedAtLTE applies the LTE predicate on the "updated_at" field.
-func UpdatedAtLTE(v time.Time) predicate.DeviceInstallation {
-	return predicate.DeviceInstallation(sql.FieldLTE(FieldUpdatedAt, v))
+// UpdateTimeLTE applies the LTE predicate on the "update_time" field.
+func UpdateTimeLTE(v time.Time) predicate.DeviceInstallation {
+	return predicate.DeviceInstallation(sql.FieldLTE(FieldUpdateTime, v))
 }
 
 // DeviceIDEQ applies the EQ predicate on the "device_id" field.

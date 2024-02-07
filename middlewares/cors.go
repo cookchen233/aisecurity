@@ -9,6 +9,9 @@ func CORSMiddleware() gin.HandlerFunc {
 		"http://192.168.2.104:8025":            true,
 		"http://127.0.0.1:8025":                true,
 		"http://loc-vite-ts.aisecurity.com.cn": true,
+		"http://localhost:8025":                true,
+		"https://loc-vite.aisecurity.com.cn":   true,
+		"http://8.137.115.105:8025":            true,
 	}
 	return func(c *gin.Context) {
 		if origin := c.GetHeader("Origin"); allowList[origin] {

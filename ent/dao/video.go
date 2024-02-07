@@ -19,15 +19,15 @@ type Video struct {
 	// ID of the ent.
 	ID int `json:"id,omitempty"`
 	// 创建时间
-	CreatedAt time.Time `json:"created_at"`
+	CreateTime time.Time `json:"create_time"`
 	// 创建者
-	CreatedBy int `json:"created_by"`
+	CreatorID int `json:"creator_id"`
 	// 删除时间
-	DeletedAt *time.Time `json:"deleted_at"`
+	DeleteTime *time.Time `json:"delete_time"`
 	// 最后更新者
-	UpdatedBy int `json:"updated_by"`
+	UpdaterID int `json:"updater_id"`
 	// 最后更新时间
-	UpdatedAt time.Time `json:"updated_at"`
+	UpdateTime time.Time `json:"update_time"`
 	// 名称
 	Name string `json:"name"`
 	// 文件地址
@@ -38,8 +38,6 @@ type Video struct {
 	Duration string `json:"duration"`
 	// 上传时间
 	UploadedAt *time.Time `json:"uploaded_at"`
-	// 上传时间
-	UploadedAt2 *time.Time `json:"uploaded_at2"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the VideoQuery when eager-loading is set.
 	Edges        VideoEdges `json:"edges"`
@@ -52,8 +50,8 @@ type VideoEdges struct {
 	Creator *Admin `json:"creator,omitempty"`
 	// Updater holds the value of the updater edge.
 	Updater *Admin `json:"updater,omitempty"`
-	// IpcEventVideo holds the value of the ipc_event_video edge.
-	IpcEventVideo []*IPCEvent `json:"ipc_event_video,omitempty"`
+	// Event holds the value of the event edge.
+	Event []*Event `json:"event,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
 	loadedTypes [3]bool
@@ -85,13 +83,13 @@ func (e VideoEdges) UpdaterOrErr() (*Admin, error) {
 	return nil, &NotLoadedError{edge: "updater"}
 }
 
-// IpcEventVideoOrErr returns the IpcEventVideo value or an error if the edge
+// EventOrErr returns the Event value or an error if the edge
 // was not loaded in eager-loading.
-func (e VideoEdges) IpcEventVideoOrErr() ([]*IPCEvent, error) {
+func (e VideoEdges) EventOrErr() ([]*Event, error) {
 	if e.loadedTypes[2] {
-		return e.IpcEventVideo, nil
+		return e.Event, nil
 	}
-	return nil, &NotLoadedError{edge: "ipc_event_video"}
+	return nil, &NotLoadedError{edge: "event"}
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
@@ -99,11 +97,11 @@ func (*Video) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
 	for i := range columns {
 		switch columns[i] {
-		case video.FieldID, video.FieldCreatedBy, video.FieldUpdatedBy, video.FieldSize:
+		case video.FieldID, video.FieldCreatorID, video.FieldUpdaterID, video.FieldSize:
 			values[i] = new(sql.NullInt64)
 		case video.FieldName, video.FieldURL, video.FieldDuration:
 			values[i] = new(sql.NullString)
-		case video.FieldCreatedAt, video.FieldDeletedAt, video.FieldUpdatedAt, video.FieldUploadedAt, video.FieldUploadedAt2:
+		case video.FieldCreateTime, video.FieldDeleteTime, video.FieldUpdateTime, video.FieldUploadedAt:
 			values[i] = new(sql.NullTime)
 		default:
 			values[i] = new(sql.UnknownType)
@@ -126,36 +124,36 @@ func (v *Video) assignValues(columns []string, values []any) error {
 				return fmt.Errorf("unexpected type %T for field id", value)
 			}
 			v.ID = int(value.Int64)
-		case video.FieldCreatedAt:
+		case video.FieldCreateTime:
 			if value, ok := values[i].(*sql.NullTime); !ok {
-				return fmt.Errorf("unexpected type %T for field created_at", values[i])
+				return fmt.Errorf("unexpected type %T for field create_time", values[i])
 			} else if value.Valid {
-				v.CreatedAt = value.Time
+				v.CreateTime = value.Time
 			}
-		case video.FieldCreatedBy:
+		case video.FieldCreatorID:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
-				return fmt.Errorf("unexpected type %T for field created_by", values[i])
+				return fmt.Errorf("unexpected type %T for field creator_id", values[i])
 			} else if value.Valid {
-				v.CreatedBy = int(value.Int64)
+				v.CreatorID = int(value.Int64)
 			}
-		case video.FieldDeletedAt:
+		case video.FieldDeleteTime:
 			if value, ok := values[i].(*sql.NullTime); !ok {
-				return fmt.Errorf("unexpected type %T for field deleted_at", values[i])
+				return fmt.Errorf("unexpected type %T for field delete_time", values[i])
 			} else if value.Valid {
-				v.DeletedAt = new(time.Time)
-				*v.DeletedAt = value.Time
+				v.DeleteTime = new(time.Time)
+				*v.DeleteTime = value.Time
 			}
-		case video.FieldUpdatedBy:
+		case video.FieldUpdaterID:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
-				return fmt.Errorf("unexpected type %T for field updated_by", values[i])
+				return fmt.Errorf("unexpected type %T for field updater_id", values[i])
 			} else if value.Valid {
-				v.UpdatedBy = int(value.Int64)
+				v.UpdaterID = int(value.Int64)
 			}
-		case video.FieldUpdatedAt:
+		case video.FieldUpdateTime:
 			if value, ok := values[i].(*sql.NullTime); !ok {
-				return fmt.Errorf("unexpected type %T for field updated_at", values[i])
+				return fmt.Errorf("unexpected type %T for field update_time", values[i])
 			} else if value.Valid {
-				v.UpdatedAt = value.Time
+				v.UpdateTime = value.Time
 			}
 		case video.FieldName:
 			if value, ok := values[i].(*sql.NullString); !ok {
@@ -188,13 +186,6 @@ func (v *Video) assignValues(columns []string, values []any) error {
 				v.UploadedAt = new(time.Time)
 				*v.UploadedAt = value.Time
 			}
-		case video.FieldUploadedAt2:
-			if value, ok := values[i].(*sql.NullTime); !ok {
-				return fmt.Errorf("unexpected type %T for field uploaded_at2", values[i])
-			} else if value.Valid {
-				v.UploadedAt2 = new(time.Time)
-				*v.UploadedAt2 = value.Time
-			}
 		default:
 			v.selectValues.Set(columns[i], values[i])
 		}
@@ -218,9 +209,9 @@ func (v *Video) QueryUpdater() *AdminQuery {
 	return NewVideoClient(v.config).QueryUpdater(v)
 }
 
-// QueryIpcEventVideo queries the "ipc_event_video" edge of the Video entity.
-func (v *Video) QueryIpcEventVideo() *IPCEventQuery {
-	return NewVideoClient(v.config).QueryIpcEventVideo(v)
+// QueryEvent queries the "event" edge of the Video entity.
+func (v *Video) QueryEvent() *EventQuery {
+	return NewVideoClient(v.config).QueryEvent(v)
 }
 
 // Update returns a builder for updating this Video.
@@ -246,22 +237,22 @@ func (v *Video) String() string {
 	var builder strings.Builder
 	builder.WriteString("Video(")
 	builder.WriteString(fmt.Sprintf("id=%v, ", v.ID))
-	builder.WriteString("created_at=")
-	builder.WriteString(v.CreatedAt.Format(time.ANSIC))
+	builder.WriteString("create_time=")
+	builder.WriteString(v.CreateTime.Format(time.ANSIC))
 	builder.WriteString(", ")
-	builder.WriteString("created_by=")
-	builder.WriteString(fmt.Sprintf("%v", v.CreatedBy))
+	builder.WriteString("creator_id=")
+	builder.WriteString(fmt.Sprintf("%v", v.CreatorID))
 	builder.WriteString(", ")
-	if v := v.DeletedAt; v != nil {
-		builder.WriteString("deleted_at=")
+	if v := v.DeleteTime; v != nil {
+		builder.WriteString("delete_time=")
 		builder.WriteString(v.Format(time.ANSIC))
 	}
 	builder.WriteString(", ")
-	builder.WriteString("updated_by=")
-	builder.WriteString(fmt.Sprintf("%v", v.UpdatedBy))
+	builder.WriteString("updater_id=")
+	builder.WriteString(fmt.Sprintf("%v", v.UpdaterID))
 	builder.WriteString(", ")
-	builder.WriteString("updated_at=")
-	builder.WriteString(v.UpdatedAt.Format(time.ANSIC))
+	builder.WriteString("update_time=")
+	builder.WriteString(v.UpdateTime.Format(time.ANSIC))
 	builder.WriteString(", ")
 	builder.WriteString("name=")
 	builder.WriteString(v.Name)
@@ -277,11 +268,6 @@ func (v *Video) String() string {
 	builder.WriteString(", ")
 	if v := v.UploadedAt; v != nil {
 		builder.WriteString("uploaded_at=")
-		builder.WriteString(v.Format(time.ANSIC))
-	}
-	builder.WriteString(", ")
-	if v := v.UploadedAt2; v != nil {
-		builder.WriteString("uploaded_at2=")
 		builder.WriteString(v.Format(time.ANSIC))
 	}
 	builder.WriteByte(')')

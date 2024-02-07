@@ -9,9 +9,6 @@ import (
 // Admin is the predicate function for admin builders.
 type Admin func(*sql.Selector)
 
-// AdminRole is the predicate function for adminrole builders.
-type AdminRole func(*sql.Selector)
-
 // Area is the predicate function for area builders.
 type Area func(*sql.Selector)
 
@@ -27,14 +24,23 @@ type DeviceInstallation func(*sql.Selector)
 // Employee is the predicate function for employee builders.
 type Employee func(*sql.Selector)
 
+// Event is the predicate function for event builders.
+type Event func(*sql.Selector)
+
 // EventLevel is the predicate function for eventlevel builders.
 type EventLevel func(*sql.Selector)
 
-// IPCEvent is the predicate function for ipcevent builders.
-type IPCEvent func(*sql.Selector)
+// EventLog is the predicate function for eventlog builders.
+type EventLog func(*sql.Selector)
+
+// Fixing is the predicate function for fixing builders.
+type Fixing func(*sql.Selector)
 
 // Occupation is the predicate function for occupation builders.
 type Occupation func(*sql.Selector)
+
+// Permission is the predicate function for permission builders.
+type Permission func(*sql.Selector)
 
 // Risk is the predicate function for risk builders.
 type Risk func(*sql.Selector)
@@ -44,6 +50,18 @@ type RiskCategory func(*sql.Selector)
 
 // RiskLocation is the predicate function for risklocation builders.
 type RiskLocation func(*sql.Selector)
+
+// Sweep is the predicate function for sweep builders.
+type Sweep func(*sql.Selector)
+
+// SweepResult is the predicate function for sweepresult builders.
+type SweepResult func(*sql.Selector)
+
+// SweepResultDetails is the predicate function for sweepresultdetails builders.
+type SweepResultDetails func(*sql.Selector)
+
+// SweepSchedule is the predicate function for sweepschedule builders.
+type SweepSchedule func(*sql.Selector)
 
 // Video is the predicate function for video builders.
 type Video func(*sql.Selector)

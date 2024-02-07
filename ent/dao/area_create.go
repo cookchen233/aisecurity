@@ -22,56 +22,56 @@ type AreaCreate struct {
 	hooks    []Hook
 }
 
-// SetCreatedAt sets the "created_at" field.
-func (ac *AreaCreate) SetCreatedAt(t time.Time) *AreaCreate {
-	ac.mutation.SetCreatedAt(t)
+// SetCreateTime sets the "create_time" field.
+func (ac *AreaCreate) SetCreateTime(t time.Time) *AreaCreate {
+	ac.mutation.SetCreateTime(t)
 	return ac
 }
 
-// SetNillableCreatedAt sets the "created_at" field if the given value is not nil.
-func (ac *AreaCreate) SetNillableCreatedAt(t *time.Time) *AreaCreate {
+// SetNillableCreateTime sets the "create_time" field if the given value is not nil.
+func (ac *AreaCreate) SetNillableCreateTime(t *time.Time) *AreaCreate {
 	if t != nil {
-		ac.SetCreatedAt(*t)
+		ac.SetCreateTime(*t)
 	}
 	return ac
 }
 
-// SetCreatedBy sets the "created_by" field.
-func (ac *AreaCreate) SetCreatedBy(i int) *AreaCreate {
-	ac.mutation.SetCreatedBy(i)
+// SetCreatorID sets the "creator_id" field.
+func (ac *AreaCreate) SetCreatorID(i int) *AreaCreate {
+	ac.mutation.SetCreatorID(i)
 	return ac
 }
 
-// SetDeletedAt sets the "deleted_at" field.
-func (ac *AreaCreate) SetDeletedAt(t time.Time) *AreaCreate {
-	ac.mutation.SetDeletedAt(t)
+// SetDeleteTime sets the "delete_time" field.
+func (ac *AreaCreate) SetDeleteTime(t time.Time) *AreaCreate {
+	ac.mutation.SetDeleteTime(t)
 	return ac
 }
 
-// SetNillableDeletedAt sets the "deleted_at" field if the given value is not nil.
-func (ac *AreaCreate) SetNillableDeletedAt(t *time.Time) *AreaCreate {
+// SetNillableDeleteTime sets the "delete_time" field if the given value is not nil.
+func (ac *AreaCreate) SetNillableDeleteTime(t *time.Time) *AreaCreate {
 	if t != nil {
-		ac.SetDeletedAt(*t)
+		ac.SetDeleteTime(*t)
 	}
 	return ac
 }
 
-// SetUpdatedBy sets the "updated_by" field.
-func (ac *AreaCreate) SetUpdatedBy(i int) *AreaCreate {
-	ac.mutation.SetUpdatedBy(i)
+// SetUpdaterID sets the "updater_id" field.
+func (ac *AreaCreate) SetUpdaterID(i int) *AreaCreate {
+	ac.mutation.SetUpdaterID(i)
 	return ac
 }
 
-// SetUpdatedAt sets the "updated_at" field.
-func (ac *AreaCreate) SetUpdatedAt(t time.Time) *AreaCreate {
-	ac.mutation.SetUpdatedAt(t)
+// SetUpdateTime sets the "update_time" field.
+func (ac *AreaCreate) SetUpdateTime(t time.Time) *AreaCreate {
+	ac.mutation.SetUpdateTime(t)
 	return ac
 }
 
-// SetNillableUpdatedAt sets the "updated_at" field if the given value is not nil.
-func (ac *AreaCreate) SetNillableUpdatedAt(t *time.Time) *AreaCreate {
+// SetNillableUpdateTime sets the "update_time" field if the given value is not nil.
+func (ac *AreaCreate) SetNillableUpdateTime(t *time.Time) *AreaCreate {
 	if t != nil {
-		ac.SetUpdatedAt(*t)
+		ac.SetUpdateTime(*t)
 	}
 	return ac
 }
@@ -104,21 +104,9 @@ func (ac *AreaCreate) SetNillableDescription(s *string) *AreaCreate {
 	return ac
 }
 
-// SetCreatorID sets the "creator" edge to the Admin entity by ID.
-func (ac *AreaCreate) SetCreatorID(id int) *AreaCreate {
-	ac.mutation.SetCreatorID(id)
-	return ac
-}
-
 // SetCreator sets the "creator" edge to the Admin entity.
 func (ac *AreaCreate) SetCreator(a *Admin) *AreaCreate {
 	return ac.SetCreatorID(a.ID)
-}
-
-// SetUpdaterID sets the "updater" edge to the Admin entity by ID.
-func (ac *AreaCreate) SetUpdaterID(id int) *AreaCreate {
-	ac.mutation.SetUpdaterID(id)
-	return ac
 }
 
 // SetUpdater sets the "updater" edge to the Admin entity.
@@ -126,19 +114,19 @@ func (ac *AreaCreate) SetUpdater(a *Admin) *AreaCreate {
 	return ac.SetUpdaterID(a.ID)
 }
 
-// AddDeviceInstallationAreaIDs adds the "device_installation_area" edge to the DeviceInstallation entity by IDs.
-func (ac *AreaCreate) AddDeviceInstallationAreaIDs(ids ...int) *AreaCreate {
-	ac.mutation.AddDeviceInstallationAreaIDs(ids...)
+// AddDeviceInstallationIDs adds the "device_installation" edge to the DeviceInstallation entity by IDs.
+func (ac *AreaCreate) AddDeviceInstallationIDs(ids ...int) *AreaCreate {
+	ac.mutation.AddDeviceInstallationIDs(ids...)
 	return ac
 }
 
-// AddDeviceInstallationArea adds the "device_installation_area" edges to the DeviceInstallation entity.
-func (ac *AreaCreate) AddDeviceInstallationArea(d ...*DeviceInstallation) *AreaCreate {
+// AddDeviceInstallation adds the "device_installation" edges to the DeviceInstallation entity.
+func (ac *AreaCreate) AddDeviceInstallation(d ...*DeviceInstallation) *AreaCreate {
 	ids := make([]int, len(d))
 	for i := range d {
 		ids[i] = d[i].ID
 	}
-	return ac.AddDeviceInstallationAreaIDs(ids...)
+	return ac.AddDeviceInstallationIDs(ids...)
 }
 
 // Mutation returns the AreaMutation object of the builder.
@@ -178,19 +166,19 @@ func (ac *AreaCreate) ExecX(ctx context.Context) {
 
 // defaults sets the default values of the builder before save.
 func (ac *AreaCreate) defaults() error {
-	if _, ok := ac.mutation.CreatedAt(); !ok {
-		if area.DefaultCreatedAt == nil {
-			return fmt.Errorf("dao: uninitialized area.DefaultCreatedAt (forgotten import dao/runtime?)")
+	if _, ok := ac.mutation.CreateTime(); !ok {
+		if area.DefaultCreateTime == nil {
+			return fmt.Errorf("dao: uninitialized area.DefaultCreateTime (forgotten import dao/runtime?)")
 		}
-		v := area.DefaultCreatedAt()
-		ac.mutation.SetCreatedAt(v)
+		v := area.DefaultCreateTime()
+		ac.mutation.SetCreateTime(v)
 	}
-	if _, ok := ac.mutation.UpdatedAt(); !ok {
-		if area.DefaultUpdatedAt == nil {
-			return fmt.Errorf("dao: uninitialized area.DefaultUpdatedAt (forgotten import dao/runtime?)")
+	if _, ok := ac.mutation.UpdateTime(); !ok {
+		if area.DefaultUpdateTime == nil {
+			return fmt.Errorf("dao: uninitialized area.DefaultUpdateTime (forgotten import dao/runtime?)")
 		}
-		v := area.DefaultUpdatedAt()
-		ac.mutation.SetUpdatedAt(v)
+		v := area.DefaultUpdateTime()
+		ac.mutation.SetUpdateTime(v)
 	}
 	if _, ok := ac.mutation.Name(); !ok {
 		v := area.DefaultName
@@ -201,27 +189,27 @@ func (ac *AreaCreate) defaults() error {
 
 // check runs all checks and user-defined validators on the builder.
 func (ac *AreaCreate) check() error {
-	if _, ok := ac.mutation.CreatedAt(); !ok {
-		return &ValidationError{Name: "created_at", err: errors.New(`dao: missing required field "Area.created_at"`)}
+	if _, ok := ac.mutation.CreateTime(); !ok {
+		return &ValidationError{Name: "create_time", err: errors.New(`dao: missing required field "Area.create_time"`)}
 	}
-	if _, ok := ac.mutation.CreatedBy(); !ok {
-		return &ValidationError{Name: "created_by", err: errors.New(`dao: missing required field "Area.created_by"`)}
+	if _, ok := ac.mutation.CreatorID(); !ok {
+		return &ValidationError{Name: "creator_id", err: errors.New(`dao: missing required field "Area.creator_id"`)}
 	}
-	if v, ok := ac.mutation.CreatedBy(); ok {
-		if err := area.CreatedByValidator(v); err != nil {
-			return &ValidationError{Name: "created_by", err: fmt.Errorf(`dao: validator failed for field "Area.created_by": %w`, err)}
+	if v, ok := ac.mutation.CreatorID(); ok {
+		if err := area.CreatorIDValidator(v); err != nil {
+			return &ValidationError{Name: "creator_id", err: fmt.Errorf(`dao: validator failed for field "Area.creator_id": %w`, err)}
 		}
 	}
-	if _, ok := ac.mutation.UpdatedBy(); !ok {
-		return &ValidationError{Name: "updated_by", err: errors.New(`dao: missing required field "Area.updated_by"`)}
+	if _, ok := ac.mutation.UpdaterID(); !ok {
+		return &ValidationError{Name: "updater_id", err: errors.New(`dao: missing required field "Area.updater_id"`)}
 	}
-	if v, ok := ac.mutation.UpdatedBy(); ok {
-		if err := area.UpdatedByValidator(v); err != nil {
-			return &ValidationError{Name: "updated_by", err: fmt.Errorf(`dao: validator failed for field "Area.updated_by": %w`, err)}
+	if v, ok := ac.mutation.UpdaterID(); ok {
+		if err := area.UpdaterIDValidator(v); err != nil {
+			return &ValidationError{Name: "updater_id", err: fmt.Errorf(`dao: validator failed for field "Area.updater_id": %w`, err)}
 		}
 	}
-	if _, ok := ac.mutation.UpdatedAt(); !ok {
-		return &ValidationError{Name: "updated_at", err: errors.New(`dao: missing required field "Area.updated_at"`)}
+	if _, ok := ac.mutation.UpdateTime(); !ok {
+		return &ValidationError{Name: "update_time", err: errors.New(`dao: missing required field "Area.update_time"`)}
 	}
 	if v, ok := ac.mutation.Name(); ok {
 		if err := area.NameValidator(v); err != nil {
@@ -260,17 +248,17 @@ func (ac *AreaCreate) createSpec() (*Area, *sqlgraph.CreateSpec) {
 		_node = &Area{config: ac.config}
 		_spec = sqlgraph.NewCreateSpec(area.Table, sqlgraph.NewFieldSpec(area.FieldID, field.TypeInt))
 	)
-	if value, ok := ac.mutation.CreatedAt(); ok {
-		_spec.SetField(area.FieldCreatedAt, field.TypeTime, value)
-		_node.CreatedAt = value
+	if value, ok := ac.mutation.CreateTime(); ok {
+		_spec.SetField(area.FieldCreateTime, field.TypeTime, value)
+		_node.CreateTime = value
 	}
-	if value, ok := ac.mutation.DeletedAt(); ok {
-		_spec.SetField(area.FieldDeletedAt, field.TypeTime, value)
-		_node.DeletedAt = &value
+	if value, ok := ac.mutation.DeleteTime(); ok {
+		_spec.SetField(area.FieldDeleteTime, field.TypeTime, value)
+		_node.DeleteTime = &value
 	}
-	if value, ok := ac.mutation.UpdatedAt(); ok {
-		_spec.SetField(area.FieldUpdatedAt, field.TypeTime, value)
-		_node.UpdatedAt = value
+	if value, ok := ac.mutation.UpdateTime(); ok {
+		_spec.SetField(area.FieldUpdateTime, field.TypeTime, value)
+		_node.UpdateTime = value
 	}
 	if value, ok := ac.mutation.Name(); ok {
 		_spec.SetField(area.FieldName, field.TypeString, value)
@@ -294,7 +282,7 @@ func (ac *AreaCreate) createSpec() (*Area, *sqlgraph.CreateSpec) {
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
-		_node.CreatedBy = nodes[0]
+		_node.CreatorID = nodes[0]
 		_spec.Edges = append(_spec.Edges, edge)
 	}
 	if nodes := ac.mutation.UpdaterIDs(); len(nodes) > 0 {
@@ -311,15 +299,15 @@ func (ac *AreaCreate) createSpec() (*Area, *sqlgraph.CreateSpec) {
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
-		_node.UpdatedBy = nodes[0]
+		_node.UpdaterID = nodes[0]
 		_spec.Edges = append(_spec.Edges, edge)
 	}
-	if nodes := ac.mutation.DeviceInstallationAreaIDs(); len(nodes) > 0 {
+	if nodes := ac.mutation.DeviceInstallationIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
-			Table:   area.DeviceInstallationAreaTable,
-			Columns: []string{area.DeviceInstallationAreaColumn},
+			Table:   area.DeviceInstallationTable,
+			Columns: []string{area.DeviceInstallationColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(deviceinstallation.FieldID, field.TypeInt),

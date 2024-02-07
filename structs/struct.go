@@ -77,9 +77,10 @@ type IFilter interface {
 
 type StandardFilter struct {
 	// for generic filter
-	Page  int `form:"page"`
-	Limit int `form:"limit"`
-	ID    int `form:"id"`
+	Page     int    `form:"page"`
+	Limit    int    `form:"limit"`
+	ID       int    `form:"id"`
+	Keywords string `form:"keywords"`
 
 	// for specific filter, some filters may not need.
 	Name  string `form:"name"`

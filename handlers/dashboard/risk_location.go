@@ -24,7 +24,7 @@ func (h *RiskLocationHandler) GetFilter(c *gin.Context) structs.IFilter {
 	return h.Filter
 }
 func (h *RiskLocationHandler) GetEntity(c *gin.Context) structs.IEntity { return h.Entity }
-func (h *RiskLocationHandler) SetRequestContext(c *gin.Context, h2 handlers.IHandler) {
+func (h *RiskLocationHandler) SetRequestContext(c *gin.Context, childHandler handlers.IHandler) {
 	h.Service = services.NewRiskLocationService()
 	h.Service.Ctx = c
 	h.Filter = &filters.RiskLocation{}

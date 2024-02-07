@@ -7,6 +7,7 @@ import (
 	"aisecurity/ent/dao/predicate"
 	"aisecurity/ent/dao/risk"
 	"aisecurity/ent/dao/riskcategory"
+	"aisecurity/ent/dao/sweep"
 	"context"
 	"database/sql/driver"
 	"fmt"
@@ -27,6 +28,7 @@ type RiskCategoryQuery struct {
 	withCreator *AdminQuery
 	withUpdater *AdminQuery
 	withRisk    *RiskQuery
+	withSweep   *SweepQuery
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
 	path func(context.Context) (*sql.Selector, error)
@@ -122,6 +124,28 @@ func (rcq *RiskCategoryQuery) QueryRisk() *RiskQuery {
 			sqlgraph.From(riskcategory.Table, riskcategory.FieldID, selector),
 			sqlgraph.To(risk.Table, risk.FieldID),
 			sqlgraph.Edge(sqlgraph.O2M, false, riskcategory.RiskTable, riskcategory.RiskColumn),
+		)
+		fromU = sqlgraph.SetNeighbors(rcq.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
+}
+
+// QuerySweep chains the current query on the "sweep" edge.
+func (rcq *RiskCategoryQuery) QuerySweep() *SweepQuery {
+	query := (&SweepClient{config: rcq.config}).Query()
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := rcq.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := rcq.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(riskcategory.Table, riskcategory.FieldID, selector),
+			sqlgraph.To(sweep.Table, sweep.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, riskcategory.SweepTable, riskcategory.SweepColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(rcq.driver.Dialect(), step)
 		return fromU, nil
@@ -324,6 +348,7 @@ func (rcq *RiskCategoryQuery) Clone() *RiskCategoryQuery {
 		withCreator: rcq.withCreator.Clone(),
 		withUpdater: rcq.withUpdater.Clone(),
 		withRisk:    rcq.withRisk.Clone(),
+		withSweep:   rcq.withSweep.Clone(),
 		// clone intermediate query.
 		sql:  rcq.sql.Clone(),
 		path: rcq.path,
@@ -363,18 +388,29 @@ func (rcq *RiskCategoryQuery) WithRisk(opts ...func(*RiskQuery)) *RiskCategoryQu
 	return rcq
 }
 
+// WithSweep tells the query-builder to eager-load the nodes that are connected to
+// the "sweep" edge. The optional arguments are used to configure the query builder of the edge.
+func (rcq *RiskCategoryQuery) WithSweep(opts ...func(*SweepQuery)) *RiskCategoryQuery {
+	query := (&SweepClient{config: rcq.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	rcq.withSweep = query
+	return rcq
+}
+
 // GroupBy is used to group vertices by one or more fields/columns.
 // It is often used with aggregate functions, like: count, max, mean, min, sum.
 //
 // Example:
 //
 //	var v []struct {
-//		CreatedAt time.Time `json:"created_at"`
+//		CreateTime time.Time `json:"create_time"`
 //		Count int `json:"count,omitempty"`
 //	}
 //
 //	client.RiskCategory.Query().
-//		GroupBy(riskcategory.FieldCreatedAt).
+//		GroupBy(riskcategory.FieldCreateTime).
 //		Aggregate(dao.Count()).
 //		Scan(ctx, &v)
 func (rcq *RiskCategoryQuery) GroupBy(field string, fields ...string) *RiskCategoryGroupBy {
@@ -392,11 +428,11 @@ func (rcq *RiskCategoryQuery) GroupBy(field string, fields ...string) *RiskCateg
 // Example:
 //
 //	var v []struct {
-//		CreatedAt time.Time `json:"created_at"`
+//		CreateTime time.Time `json:"create_time"`
 //	}
 //
 //	client.RiskCategory.Query().
-//		Select(riskcategory.FieldCreatedAt).
+//		Select(riskcategory.FieldCreateTime).
 //		Scan(ctx, &v)
 func (rcq *RiskCategoryQuery) Select(fields ...string) *RiskCategorySelect {
 	rcq.ctx.Fields = append(rcq.ctx.Fields, fields...)
@@ -441,10 +477,11 @@ func (rcq *RiskCategoryQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([
 	var (
 		nodes       = []*RiskCategory{}
 		_spec       = rcq.querySpec()
-		loadedTypes = [3]bool{
+		loadedTypes = [4]bool{
 			rcq.withCreator != nil,
 			rcq.withUpdater != nil,
 			rcq.withRisk != nil,
+			rcq.withSweep != nil,
 		}
 	)
 	_spec.ScanValues = func(columns []string) ([]any, error) {
@@ -484,6 +521,13 @@ func (rcq *RiskCategoryQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([
 			return nil, err
 		}
 	}
+	if query := rcq.withSweep; query != nil {
+		if err := rcq.loadSweep(ctx, query, nodes,
+			func(n *RiskCategory) { n.Edges.Sweep = []*Sweep{} },
+			func(n *RiskCategory, e *Sweep) { n.Edges.Sweep = append(n.Edges.Sweep, e) }); err != nil {
+			return nil, err
+		}
+	}
 	return nodes, nil
 }
 
@@ -491,7 +535,7 @@ func (rcq *RiskCategoryQuery) loadCreator(ctx context.Context, query *AdminQuery
 	ids := make([]int, 0, len(nodes))
 	nodeids := make(map[int][]*RiskCategory)
 	for i := range nodes {
-		fk := nodes[i].CreatedBy
+		fk := nodes[i].CreatorID
 		if _, ok := nodeids[fk]; !ok {
 			ids = append(ids, fk)
 		}
@@ -508,7 +552,7 @@ func (rcq *RiskCategoryQuery) loadCreator(ctx context.Context, query *AdminQuery
 	for _, n := range neighbors {
 		nodes, ok := nodeids[n.ID]
 		if !ok {
-			return fmt.Errorf(`unexpected foreign-key "created_by" returned %v`, n.ID)
+			return fmt.Errorf(`unexpected foreign-key "creator_id" returned %v`, n.ID)
 		}
 		for i := range nodes {
 			assign(nodes[i], n)
@@ -520,7 +564,7 @@ func (rcq *RiskCategoryQuery) loadUpdater(ctx context.Context, query *AdminQuery
 	ids := make([]int, 0, len(nodes))
 	nodeids := make(map[int][]*RiskCategory)
 	for i := range nodes {
-		fk := nodes[i].UpdatedBy
+		fk := nodes[i].UpdaterID
 		if _, ok := nodeids[fk]; !ok {
 			ids = append(ids, fk)
 		}
@@ -537,7 +581,7 @@ func (rcq *RiskCategoryQuery) loadUpdater(ctx context.Context, query *AdminQuery
 	for _, n := range neighbors {
 		nodes, ok := nodeids[n.ID]
 		if !ok {
-			return fmt.Errorf(`unexpected foreign-key "updated_by" returned %v`, n.ID)
+			return fmt.Errorf(`unexpected foreign-key "updater_id" returned %v`, n.ID)
 		}
 		for i := range nodes {
 			assign(nodes[i], n)
@@ -560,6 +604,36 @@ func (rcq *RiskCategoryQuery) loadRisk(ctx context.Context, query *RiskQuery, no
 	}
 	query.Where(predicate.Risk(func(s *sql.Selector) {
 		s.Where(sql.InValues(s.C(riskcategory.RiskColumn), fks...))
+	}))
+	neighbors, err := query.All(ctx)
+	if err != nil {
+		return err
+	}
+	for _, n := range neighbors {
+		fk := n.RiskCategoryID
+		node, ok := nodeids[fk]
+		if !ok {
+			return fmt.Errorf(`unexpected referenced foreign-key "risk_category_id" returned %v for node %v`, fk, n.ID)
+		}
+		assign(node, n)
+	}
+	return nil
+}
+func (rcq *RiskCategoryQuery) loadSweep(ctx context.Context, query *SweepQuery, nodes []*RiskCategory, init func(*RiskCategory), assign func(*RiskCategory, *Sweep)) error {
+	fks := make([]driver.Value, 0, len(nodes))
+	nodeids := make(map[int]*RiskCategory)
+	for i := range nodes {
+		fks = append(fks, nodes[i].ID)
+		nodeids[nodes[i].ID] = nodes[i]
+		if init != nil {
+			init(nodes[i])
+		}
+	}
+	if len(query.ctx.Fields) > 0 {
+		query.ctx.AppendFieldOnce(sweep.FieldRiskCategoryID)
+	}
+	query.Where(predicate.Sweep(func(s *sql.Selector) {
+		s.Where(sql.InValues(s.C(riskcategory.SweepColumn), fks...))
 	}))
 	neighbors, err := query.All(ctx)
 	if err != nil {
@@ -602,10 +676,10 @@ func (rcq *RiskCategoryQuery) querySpec() *sqlgraph.QuerySpec {
 			}
 		}
 		if rcq.withCreator != nil {
-			_spec.Node.AddColumnOnce(riskcategory.FieldCreatedBy)
+			_spec.Node.AddColumnOnce(riskcategory.FieldCreatorID)
 		}
 		if rcq.withUpdater != nil {
-			_spec.Node.AddColumnOnce(riskcategory.FieldUpdatedBy)
+			_spec.Node.AddColumnOnce(riskcategory.FieldUpdaterID)
 		}
 	}
 	if ps := rcq.predicates; len(ps) > 0 {

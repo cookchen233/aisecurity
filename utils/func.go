@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"github.com/pkg/errors"
 	"go.uber.org/zap"
+	"golang.org/x/crypto/bcrypt"
 	"math/rand"
 	"mime/multipart"
 	"os"
@@ -161,7 +162,7 @@ func Base64ToImage(basePath string, ImageData string) (string, error) {
 	dirName := filepath.Join(basePath, dirFormat)
 	if _, err := os.Stat(dirName); os.IsNotExist(err) {
 		// Create the directory if it does not exist
-		err := os.Mkdir(dirName, 0755) // 0755 permissions
+		err := os.MkdirAll(dirName, 0755) // 0755 permissions
 		if err != nil {
 			return "", ErrorWrap(err, "failed creating directory")
 		}
@@ -177,4 +178,21 @@ func Base64ToImage(basePath string, ImageData string) (string, error) {
 		return "", ErrorWrap(err, "failed writing to file")
 	}
 	return filename, nil
+}
+
+func Contains(slice []interface{}, element interface{}) bool {
+	for _, v := range slice {
+		if v == element {
+			return true
+		}
+	}
+	return false
+}
+
+func HashPassword(password string) (string, error) {
+	p, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
+	if err != nil {
+		return "", ErrorWrap(err, "failed hashing password")
+	}
+	return string(p), nil
 }

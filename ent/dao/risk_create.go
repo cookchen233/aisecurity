@@ -4,7 +4,6 @@ package dao
 
 import (
 	"aisecurity/ent/dao/admin"
-	"aisecurity/ent/dao/employee"
 	"aisecurity/ent/dao/risk"
 	"aisecurity/ent/dao/riskcategory"
 	"aisecurity/ent/dao/risklocation"
@@ -26,56 +25,56 @@ type RiskCreate struct {
 	hooks    []Hook
 }
 
-// SetCreatedAt sets the "created_at" field.
-func (rc *RiskCreate) SetCreatedAt(t time.Time) *RiskCreate {
-	rc.mutation.SetCreatedAt(t)
+// SetCreateTime sets the "create_time" field.
+func (rc *RiskCreate) SetCreateTime(t time.Time) *RiskCreate {
+	rc.mutation.SetCreateTime(t)
 	return rc
 }
 
-// SetNillableCreatedAt sets the "created_at" field if the given value is not nil.
-func (rc *RiskCreate) SetNillableCreatedAt(t *time.Time) *RiskCreate {
+// SetNillableCreateTime sets the "create_time" field if the given value is not nil.
+func (rc *RiskCreate) SetNillableCreateTime(t *time.Time) *RiskCreate {
 	if t != nil {
-		rc.SetCreatedAt(*t)
+		rc.SetCreateTime(*t)
 	}
 	return rc
 }
 
-// SetCreatedBy sets the "created_by" field.
-func (rc *RiskCreate) SetCreatedBy(i int) *RiskCreate {
-	rc.mutation.SetCreatedBy(i)
+// SetCreatorID sets the "creator_id" field.
+func (rc *RiskCreate) SetCreatorID(i int) *RiskCreate {
+	rc.mutation.SetCreatorID(i)
 	return rc
 }
 
-// SetDeletedAt sets the "deleted_at" field.
-func (rc *RiskCreate) SetDeletedAt(t time.Time) *RiskCreate {
-	rc.mutation.SetDeletedAt(t)
+// SetDeleteTime sets the "delete_time" field.
+func (rc *RiskCreate) SetDeleteTime(t time.Time) *RiskCreate {
+	rc.mutation.SetDeleteTime(t)
 	return rc
 }
 
-// SetNillableDeletedAt sets the "deleted_at" field if the given value is not nil.
-func (rc *RiskCreate) SetNillableDeletedAt(t *time.Time) *RiskCreate {
+// SetNillableDeleteTime sets the "delete_time" field if the given value is not nil.
+func (rc *RiskCreate) SetNillableDeleteTime(t *time.Time) *RiskCreate {
 	if t != nil {
-		rc.SetDeletedAt(*t)
+		rc.SetDeleteTime(*t)
 	}
 	return rc
 }
 
-// SetUpdatedBy sets the "updated_by" field.
-func (rc *RiskCreate) SetUpdatedBy(i int) *RiskCreate {
-	rc.mutation.SetUpdatedBy(i)
+// SetUpdaterID sets the "updater_id" field.
+func (rc *RiskCreate) SetUpdaterID(i int) *RiskCreate {
+	rc.mutation.SetUpdaterID(i)
 	return rc
 }
 
-// SetUpdatedAt sets the "updated_at" field.
-func (rc *RiskCreate) SetUpdatedAt(t time.Time) *RiskCreate {
-	rc.mutation.SetUpdatedAt(t)
+// SetUpdateTime sets the "update_time" field.
+func (rc *RiskCreate) SetUpdateTime(t time.Time) *RiskCreate {
+	rc.mutation.SetUpdateTime(t)
 	return rc
 }
 
-// SetNillableUpdatedAt sets the "updated_at" field if the given value is not nil.
-func (rc *RiskCreate) SetNillableUpdatedAt(t *time.Time) *RiskCreate {
+// SetNillableUpdateTime sets the "update_time" field if the given value is not nil.
+func (rc *RiskCreate) SetNillableUpdateTime(t *time.Time) *RiskCreate {
 	if t != nil {
-		rc.SetUpdatedAt(*t)
+		rc.SetUpdateTime(*t)
 	}
 	return rc
 }
@@ -115,12 +114,6 @@ func (rc *RiskCreate) SetRiskCategoryID(i int) *RiskCreate {
 // SetRiskLocationID sets the "risk_location_id" field.
 func (rc *RiskCreate) SetRiskLocationID(i int) *RiskCreate {
 	rc.mutation.SetRiskLocationID(i)
-	return rc
-}
-
-// SetReporterID sets the "reporter_id" field.
-func (rc *RiskCreate) SetReporterID(i int) *RiskCreate {
-	rc.mutation.SetReporterID(i)
 	return rc
 }
 
@@ -164,21 +157,9 @@ func (rc *RiskCreate) SetDueTime(t time.Time) *RiskCreate {
 	return rc
 }
 
-// SetCreatorID sets the "creator" edge to the Admin entity by ID.
-func (rc *RiskCreate) SetCreatorID(id int) *RiskCreate {
-	rc.mutation.SetCreatorID(id)
-	return rc
-}
-
 // SetCreator sets the "creator" edge to the Admin entity.
 func (rc *RiskCreate) SetCreator(a *Admin) *RiskCreate {
 	return rc.SetCreatorID(a.ID)
-}
-
-// SetUpdaterID sets the "updater" edge to the Admin entity by ID.
-func (rc *RiskCreate) SetUpdaterID(id int) *RiskCreate {
-	rc.mutation.SetUpdaterID(id)
-	return rc
 }
 
 // SetUpdater sets the "updater" edge to the Admin entity.
@@ -196,14 +177,9 @@ func (rc *RiskCreate) SetRiskLocation(r *RiskLocation) *RiskCreate {
 	return rc.SetRiskLocationID(r.ID)
 }
 
-// SetReporter sets the "reporter" edge to the Employee entity.
-func (rc *RiskCreate) SetReporter(e *Employee) *RiskCreate {
-	return rc.SetReporterID(e.ID)
-}
-
-// SetMaintainer sets the "maintainer" edge to the Employee entity.
-func (rc *RiskCreate) SetMaintainer(e *Employee) *RiskCreate {
-	return rc.SetMaintainerID(e.ID)
+// SetMaintainer sets the "maintainer" edge to the Admin entity.
+func (rc *RiskCreate) SetMaintainer(a *Admin) *RiskCreate {
+	return rc.SetMaintainerID(a.ID)
 }
 
 // Mutation returns the RiskMutation object of the builder.
@@ -243,19 +219,19 @@ func (rc *RiskCreate) ExecX(ctx context.Context) {
 
 // defaults sets the default values of the builder before save.
 func (rc *RiskCreate) defaults() error {
-	if _, ok := rc.mutation.CreatedAt(); !ok {
-		if risk.DefaultCreatedAt == nil {
-			return fmt.Errorf("dao: uninitialized risk.DefaultCreatedAt (forgotten import dao/runtime?)")
+	if _, ok := rc.mutation.CreateTime(); !ok {
+		if risk.DefaultCreateTime == nil {
+			return fmt.Errorf("dao: uninitialized risk.DefaultCreateTime (forgotten import dao/runtime?)")
 		}
-		v := risk.DefaultCreatedAt()
-		rc.mutation.SetCreatedAt(v)
+		v := risk.DefaultCreateTime()
+		rc.mutation.SetCreateTime(v)
 	}
-	if _, ok := rc.mutation.UpdatedAt(); !ok {
-		if risk.DefaultUpdatedAt == nil {
-			return fmt.Errorf("dao: uninitialized risk.DefaultUpdatedAt (forgotten import dao/runtime?)")
+	if _, ok := rc.mutation.UpdateTime(); !ok {
+		if risk.DefaultUpdateTime == nil {
+			return fmt.Errorf("dao: uninitialized risk.DefaultUpdateTime (forgotten import dao/runtime?)")
 		}
-		v := risk.DefaultUpdatedAt()
-		rc.mutation.SetUpdatedAt(v)
+		v := risk.DefaultUpdateTime()
+		rc.mutation.SetUpdateTime(v)
 	}
 	if _, ok := rc.mutation.Images(); !ok {
 		v := risk.DefaultImages
@@ -270,27 +246,27 @@ func (rc *RiskCreate) defaults() error {
 
 // check runs all checks and user-defined validators on the builder.
 func (rc *RiskCreate) check() error {
-	if _, ok := rc.mutation.CreatedAt(); !ok {
-		return &ValidationError{Name: "created_at", err: errors.New(`dao: missing required field "Risk.created_at"`)}
+	if _, ok := rc.mutation.CreateTime(); !ok {
+		return &ValidationError{Name: "create_time", err: errors.New(`dao: missing required field "Risk.create_time"`)}
 	}
-	if _, ok := rc.mutation.CreatedBy(); !ok {
-		return &ValidationError{Name: "created_by", err: errors.New(`dao: missing required field "Risk.created_by"`)}
+	if _, ok := rc.mutation.CreatorID(); !ok {
+		return &ValidationError{Name: "creator_id", err: errors.New(`dao: missing required field "Risk.creator_id"`)}
 	}
-	if v, ok := rc.mutation.CreatedBy(); ok {
-		if err := risk.CreatedByValidator(v); err != nil {
-			return &ValidationError{Name: "created_by", err: fmt.Errorf(`dao: validator failed for field "Risk.created_by": %w`, err)}
+	if v, ok := rc.mutation.CreatorID(); ok {
+		if err := risk.CreatorIDValidator(v); err != nil {
+			return &ValidationError{Name: "creator_id", err: fmt.Errorf(`dao: validator failed for field "Risk.creator_id": %w`, err)}
 		}
 	}
-	if _, ok := rc.mutation.UpdatedBy(); !ok {
-		return &ValidationError{Name: "updated_by", err: errors.New(`dao: missing required field "Risk.updated_by"`)}
+	if _, ok := rc.mutation.UpdaterID(); !ok {
+		return &ValidationError{Name: "updater_id", err: errors.New(`dao: missing required field "Risk.updater_id"`)}
 	}
-	if v, ok := rc.mutation.UpdatedBy(); ok {
-		if err := risk.UpdatedByValidator(v); err != nil {
-			return &ValidationError{Name: "updated_by", err: fmt.Errorf(`dao: validator failed for field "Risk.updated_by": %w`, err)}
+	if v, ok := rc.mutation.UpdaterID(); ok {
+		if err := risk.UpdaterIDValidator(v); err != nil {
+			return &ValidationError{Name: "updater_id", err: fmt.Errorf(`dao: validator failed for field "Risk.updater_id": %w`, err)}
 		}
 	}
-	if _, ok := rc.mutation.UpdatedAt(); !ok {
-		return &ValidationError{Name: "updated_at", err: errors.New(`dao: missing required field "Risk.updated_at"`)}
+	if _, ok := rc.mutation.UpdateTime(); !ok {
+		return &ValidationError{Name: "update_time", err: errors.New(`dao: missing required field "Risk.update_time"`)}
 	}
 	if _, ok := rc.mutation.Title(); !ok {
 		return &ValidationError{Name: "title", err: errors.New(`dao: missing required field "Risk.title"`)}
@@ -314,14 +290,6 @@ func (rc *RiskCreate) check() error {
 	if v, ok := rc.mutation.RiskLocationID(); ok {
 		if err := risk.RiskLocationIDValidator(v); err != nil {
 			return &ValidationError{Name: "risk_location_id", err: fmt.Errorf(`dao: validator failed for field "Risk.risk_location_id": %w`, err)}
-		}
-	}
-	if _, ok := rc.mutation.ReporterID(); !ok {
-		return &ValidationError{Name: "reporter_id", err: errors.New(`dao: missing required field "Risk.reporter_id"`)}
-	}
-	if v, ok := rc.mutation.ReporterID(); ok {
-		if err := risk.ReporterIDValidator(v); err != nil {
-			return &ValidationError{Name: "reporter_id", err: fmt.Errorf(`dao: validator failed for field "Risk.reporter_id": %w`, err)}
 		}
 	}
 	if _, ok := rc.mutation.MaintainerID(); !ok {
@@ -355,9 +323,6 @@ func (rc *RiskCreate) check() error {
 	if _, ok := rc.mutation.RiskLocationID(); !ok {
 		return &ValidationError{Name: "risk_location", err: errors.New(`dao: missing required edge "Risk.risk_location"`)}
 	}
-	if _, ok := rc.mutation.ReporterID(); !ok {
-		return &ValidationError{Name: "reporter", err: errors.New(`dao: missing required edge "Risk.reporter"`)}
-	}
 	if _, ok := rc.mutation.MaintainerID(); !ok {
 		return &ValidationError{Name: "maintainer", err: errors.New(`dao: missing required edge "Risk.maintainer"`)}
 	}
@@ -387,17 +352,17 @@ func (rc *RiskCreate) createSpec() (*Risk, *sqlgraph.CreateSpec) {
 		_node = &Risk{config: rc.config}
 		_spec = sqlgraph.NewCreateSpec(risk.Table, sqlgraph.NewFieldSpec(risk.FieldID, field.TypeInt))
 	)
-	if value, ok := rc.mutation.CreatedAt(); ok {
-		_spec.SetField(risk.FieldCreatedAt, field.TypeTime, value)
-		_node.CreatedAt = value
+	if value, ok := rc.mutation.CreateTime(); ok {
+		_spec.SetField(risk.FieldCreateTime, field.TypeTime, value)
+		_node.CreateTime = value
 	}
-	if value, ok := rc.mutation.DeletedAt(); ok {
-		_spec.SetField(risk.FieldDeletedAt, field.TypeTime, value)
-		_node.DeletedAt = &value
+	if value, ok := rc.mutation.DeleteTime(); ok {
+		_spec.SetField(risk.FieldDeleteTime, field.TypeTime, value)
+		_node.DeleteTime = &value
 	}
-	if value, ok := rc.mutation.UpdatedAt(); ok {
-		_spec.SetField(risk.FieldUpdatedAt, field.TypeTime, value)
-		_node.UpdatedAt = value
+	if value, ok := rc.mutation.UpdateTime(); ok {
+		_spec.SetField(risk.FieldUpdateTime, field.TypeTime, value)
+		_node.UpdateTime = value
 	}
 	if value, ok := rc.mutation.Title(); ok {
 		_spec.SetField(risk.FieldTitle, field.TypeString, value)
@@ -437,7 +402,7 @@ func (rc *RiskCreate) createSpec() (*Risk, *sqlgraph.CreateSpec) {
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
-		_node.CreatedBy = nodes[0]
+		_node.CreatorID = nodes[0]
 		_spec.Edges = append(_spec.Edges, edge)
 	}
 	if nodes := rc.mutation.UpdaterIDs(); len(nodes) > 0 {
@@ -454,7 +419,7 @@ func (rc *RiskCreate) createSpec() (*Risk, *sqlgraph.CreateSpec) {
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
-		_node.UpdatedBy = nodes[0]
+		_node.UpdaterID = nodes[0]
 		_spec.Edges = append(_spec.Edges, edge)
 	}
 	if nodes := rc.mutation.RiskCategoryIDs(); len(nodes) > 0 {
@@ -491,23 +456,6 @@ func (rc *RiskCreate) createSpec() (*Risk, *sqlgraph.CreateSpec) {
 		_node.RiskLocationID = nodes[0]
 		_spec.Edges = append(_spec.Edges, edge)
 	}
-	if nodes := rc.mutation.ReporterIDs(); len(nodes) > 0 {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2O,
-			Inverse: true,
-			Table:   risk.ReporterTable,
-			Columns: []string{risk.ReporterColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(employee.FieldID, field.TypeInt),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_node.ReporterID = nodes[0]
-		_spec.Edges = append(_spec.Edges, edge)
-	}
 	if nodes := rc.mutation.MaintainerIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
@@ -516,7 +464,7 @@ func (rc *RiskCreate) createSpec() (*Risk, *sqlgraph.CreateSpec) {
 			Columns: []string{risk.MaintainerColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(employee.FieldID, field.TypeInt),
+				IDSpec: sqlgraph.NewFieldSpec(admin.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {

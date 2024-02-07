@@ -15,16 +15,16 @@ const (
 	Label = "occupation"
 	// FieldID holds the string denoting the id field in the database.
 	FieldID = "id"
-	// FieldCreatedAt holds the string denoting the created_at field in the database.
-	FieldCreatedAt = "created_at"
-	// FieldCreatedBy holds the string denoting the created_by field in the database.
-	FieldCreatedBy = "created_by"
-	// FieldDeletedAt holds the string denoting the deleted_at field in the database.
-	FieldDeletedAt = "deleted_at"
-	// FieldUpdatedBy holds the string denoting the updated_by field in the database.
-	FieldUpdatedBy = "updated_by"
-	// FieldUpdatedAt holds the string denoting the updated_at field in the database.
-	FieldUpdatedAt = "updated_at"
+	// FieldCreateTime holds the string denoting the create_time field in the database.
+	FieldCreateTime = "create_time"
+	// FieldCreatorID holds the string denoting the creator_id field in the database.
+	FieldCreatorID = "creator_id"
+	// FieldDeleteTime holds the string denoting the delete_time field in the database.
+	FieldDeleteTime = "delete_time"
+	// FieldUpdaterID holds the string denoting the updater_id field in the database.
+	FieldUpdaterID = "updater_id"
+	// FieldUpdateTime holds the string denoting the update_time field in the database.
+	FieldUpdateTime = "update_time"
 	// FieldName holds the string denoting the name field in the database.
 	FieldName = "name"
 	// FieldDescription holds the string denoting the description field in the database.
@@ -33,8 +33,8 @@ const (
 	EdgeCreator = "creator"
 	// EdgeUpdater holds the string denoting the updater edge name in mutations.
 	EdgeUpdater = "updater"
-	// EdgeEmployees holds the string denoting the employees edge name in mutations.
-	EdgeEmployees = "employees"
+	// EdgeEmployee holds the string denoting the employee edge name in mutations.
+	EdgeEmployee = "employee"
 	// Table holds the table name of the occupation in the database.
 	Table = "occupations"
 	// CreatorTable is the table that holds the creator relation/edge.
@@ -43,38 +43,34 @@ const (
 	// It exists in this package in order to avoid circular dependency with the "admin" package.
 	CreatorInverseTable = "admins"
 	// CreatorColumn is the table column denoting the creator relation/edge.
-	CreatorColumn = "created_by"
+	CreatorColumn = "creator_id"
 	// UpdaterTable is the table that holds the updater relation/edge.
 	UpdaterTable = "occupations"
 	// UpdaterInverseTable is the table name for the Admin entity.
 	// It exists in this package in order to avoid circular dependency with the "admin" package.
 	UpdaterInverseTable = "admins"
 	// UpdaterColumn is the table column denoting the updater relation/edge.
-	UpdaterColumn = "updated_by"
-	// EmployeesTable is the table that holds the employees relation/edge. The primary key declared below.
-	EmployeesTable = "occupation_employees"
-	// EmployeesInverseTable is the table name for the Employee entity.
+	UpdaterColumn = "updater_id"
+	// EmployeeTable is the table that holds the employee relation/edge.
+	EmployeeTable = "employees"
+	// EmployeeInverseTable is the table name for the Employee entity.
 	// It exists in this package in order to avoid circular dependency with the "employee" package.
-	EmployeesInverseTable = "employees"
+	EmployeeInverseTable = "employees"
+	// EmployeeColumn is the table column denoting the employee relation/edge.
+	EmployeeColumn = "occupation_id"
 )
 
 // Columns holds all SQL columns for occupation fields.
 var Columns = []string{
 	FieldID,
-	FieldCreatedAt,
-	FieldCreatedBy,
-	FieldDeletedAt,
-	FieldUpdatedBy,
-	FieldUpdatedAt,
+	FieldCreateTime,
+	FieldCreatorID,
+	FieldDeleteTime,
+	FieldUpdaterID,
+	FieldUpdateTime,
 	FieldName,
 	FieldDescription,
 }
-
-var (
-	// EmployeesPrimaryKey and EmployeesColumn2 are the table columns denoting the
-	// primary key for the employees relation (M2M).
-	EmployeesPrimaryKey = []string{"occupation_id", "employee_id"}
-)
 
 // ValidColumn reports if the column name is valid (part of the table columns).
 func ValidColumn(column string) bool {
@@ -93,16 +89,16 @@ func ValidColumn(column string) bool {
 //	import _ "aisecurity/ent/dao/runtime"
 var (
 	Hooks [1]ent.Hook
-	// DefaultCreatedAt holds the default value on creation for the "created_at" field.
-	DefaultCreatedAt func() time.Time
-	// CreatedByValidator is a validator for the "created_by" field. It is called by the builders before save.
-	CreatedByValidator func(int) error
-	// UpdatedByValidator is a validator for the "updated_by" field. It is called by the builders before save.
-	UpdatedByValidator func(int) error
-	// DefaultUpdatedAt holds the default value on creation for the "updated_at" field.
-	DefaultUpdatedAt func() time.Time
-	// UpdateDefaultUpdatedAt holds the default value on update for the "updated_at" field.
-	UpdateDefaultUpdatedAt func() time.Time
+	// DefaultCreateTime holds the default value on creation for the "create_time" field.
+	DefaultCreateTime func() time.Time
+	// CreatorIDValidator is a validator for the "creator_id" field. It is called by the builders before save.
+	CreatorIDValidator func(int) error
+	// UpdaterIDValidator is a validator for the "updater_id" field. It is called by the builders before save.
+	UpdaterIDValidator func(int) error
+	// DefaultUpdateTime holds the default value on creation for the "update_time" field.
+	DefaultUpdateTime func() time.Time
+	// UpdateDefaultUpdateTime holds the default value on update for the "update_time" field.
+	UpdateDefaultUpdateTime func() time.Time
 	// NameValidator is a validator for the "name" field. It is called by the builders before save.
 	NameValidator func(string) error
 )
@@ -115,29 +111,29 @@ func ByID(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldID, opts...).ToFunc()
 }
 
-// ByCreatedAt orders the results by the created_at field.
-func ByCreatedAt(opts ...sql.OrderTermOption) OrderOption {
-	return sql.OrderByField(FieldCreatedAt, opts...).ToFunc()
+// ByCreateTime orders the results by the create_time field.
+func ByCreateTime(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldCreateTime, opts...).ToFunc()
 }
 
-// ByCreatedBy orders the results by the created_by field.
-func ByCreatedBy(opts ...sql.OrderTermOption) OrderOption {
-	return sql.OrderByField(FieldCreatedBy, opts...).ToFunc()
+// ByCreatorID orders the results by the creator_id field.
+func ByCreatorID(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldCreatorID, opts...).ToFunc()
 }
 
-// ByDeletedAt orders the results by the deleted_at field.
-func ByDeletedAt(opts ...sql.OrderTermOption) OrderOption {
-	return sql.OrderByField(FieldDeletedAt, opts...).ToFunc()
+// ByDeleteTime orders the results by the delete_time field.
+func ByDeleteTime(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldDeleteTime, opts...).ToFunc()
 }
 
-// ByUpdatedBy orders the results by the updated_by field.
-func ByUpdatedBy(opts ...sql.OrderTermOption) OrderOption {
-	return sql.OrderByField(FieldUpdatedBy, opts...).ToFunc()
+// ByUpdaterID orders the results by the updater_id field.
+func ByUpdaterID(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldUpdaterID, opts...).ToFunc()
 }
 
-// ByUpdatedAt orders the results by the updated_at field.
-func ByUpdatedAt(opts ...sql.OrderTermOption) OrderOption {
-	return sql.OrderByField(FieldUpdatedAt, opts...).ToFunc()
+// ByUpdateTime orders the results by the update_time field.
+func ByUpdateTime(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldUpdateTime, opts...).ToFunc()
 }
 
 // ByName orders the results by the name field.
@@ -164,17 +160,17 @@ func ByUpdaterField(field string, opts ...sql.OrderTermOption) OrderOption {
 	}
 }
 
-// ByEmployeesCount orders the results by employees count.
-func ByEmployeesCount(opts ...sql.OrderTermOption) OrderOption {
+// ByEmployeeCount orders the results by employee count.
+func ByEmployeeCount(opts ...sql.OrderTermOption) OrderOption {
 	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborsCount(s, newEmployeesStep(), opts...)
+		sqlgraph.OrderByNeighborsCount(s, newEmployeeStep(), opts...)
 	}
 }
 
-// ByEmployees orders the results by employees terms.
-func ByEmployees(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+// ByEmployee orders the results by employee terms.
+func ByEmployee(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
 	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborTerms(s, newEmployeesStep(), append([]sql.OrderTerm{term}, terms...)...)
+		sqlgraph.OrderByNeighborTerms(s, newEmployeeStep(), append([]sql.OrderTerm{term}, terms...)...)
 	}
 }
 func newCreatorStep() *sqlgraph.Step {
@@ -191,10 +187,10 @@ func newUpdaterStep() *sqlgraph.Step {
 		sqlgraph.Edge(sqlgraph.M2O, true, UpdaterTable, UpdaterColumn),
 	)
 }
-func newEmployeesStep() *sqlgraph.Step {
+func newEmployeeStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
-		sqlgraph.To(EmployeesInverseTable, FieldID),
-		sqlgraph.Edge(sqlgraph.M2M, false, EmployeesTable, EmployeesPrimaryKey...),
+		sqlgraph.To(EmployeeInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.O2M, false, EmployeeTable, EmployeeColumn),
 	)
 }

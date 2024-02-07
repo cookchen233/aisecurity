@@ -30,43 +30,43 @@ func (au *AreaUpdate) Where(ps ...predicate.Area) *AreaUpdate {
 	return au
 }
 
-// SetDeletedAt sets the "deleted_at" field.
-func (au *AreaUpdate) SetDeletedAt(t time.Time) *AreaUpdate {
-	au.mutation.SetDeletedAt(t)
+// SetDeleteTime sets the "delete_time" field.
+func (au *AreaUpdate) SetDeleteTime(t time.Time) *AreaUpdate {
+	au.mutation.SetDeleteTime(t)
 	return au
 }
 
-// SetNillableDeletedAt sets the "deleted_at" field if the given value is not nil.
-func (au *AreaUpdate) SetNillableDeletedAt(t *time.Time) *AreaUpdate {
+// SetNillableDeleteTime sets the "delete_time" field if the given value is not nil.
+func (au *AreaUpdate) SetNillableDeleteTime(t *time.Time) *AreaUpdate {
 	if t != nil {
-		au.SetDeletedAt(*t)
+		au.SetDeleteTime(*t)
 	}
 	return au
 }
 
-// ClearDeletedAt clears the value of the "deleted_at" field.
-func (au *AreaUpdate) ClearDeletedAt() *AreaUpdate {
-	au.mutation.ClearDeletedAt()
+// ClearDeleteTime clears the value of the "delete_time" field.
+func (au *AreaUpdate) ClearDeleteTime() *AreaUpdate {
+	au.mutation.ClearDeleteTime()
 	return au
 }
 
-// SetUpdatedBy sets the "updated_by" field.
-func (au *AreaUpdate) SetUpdatedBy(i int) *AreaUpdate {
-	au.mutation.SetUpdatedBy(i)
+// SetUpdaterID sets the "updater_id" field.
+func (au *AreaUpdate) SetUpdaterID(i int) *AreaUpdate {
+	au.mutation.SetUpdaterID(i)
 	return au
 }
 
-// SetNillableUpdatedBy sets the "updated_by" field if the given value is not nil.
-func (au *AreaUpdate) SetNillableUpdatedBy(i *int) *AreaUpdate {
+// SetNillableUpdaterID sets the "updater_id" field if the given value is not nil.
+func (au *AreaUpdate) SetNillableUpdaterID(i *int) *AreaUpdate {
 	if i != nil {
-		au.SetUpdatedBy(*i)
+		au.SetUpdaterID(*i)
 	}
 	return au
 }
 
-// SetUpdatedAt sets the "updated_at" field.
-func (au *AreaUpdate) SetUpdatedAt(t time.Time) *AreaUpdate {
-	au.mutation.SetUpdatedAt(t)
+// SetUpdateTime sets the "update_time" field.
+func (au *AreaUpdate) SetUpdateTime(t time.Time) *AreaUpdate {
+	au.mutation.SetUpdateTime(t)
 	return au
 }
 
@@ -110,30 +110,24 @@ func (au *AreaUpdate) ClearDescription() *AreaUpdate {
 	return au
 }
 
-// SetUpdaterID sets the "updater" edge to the Admin entity by ID.
-func (au *AreaUpdate) SetUpdaterID(id int) *AreaUpdate {
-	au.mutation.SetUpdaterID(id)
-	return au
-}
-
 // SetUpdater sets the "updater" edge to the Admin entity.
 func (au *AreaUpdate) SetUpdater(a *Admin) *AreaUpdate {
 	return au.SetUpdaterID(a.ID)
 }
 
-// AddDeviceInstallationAreaIDs adds the "device_installation_area" edge to the DeviceInstallation entity by IDs.
-func (au *AreaUpdate) AddDeviceInstallationAreaIDs(ids ...int) *AreaUpdate {
-	au.mutation.AddDeviceInstallationAreaIDs(ids...)
+// AddDeviceInstallationIDs adds the "device_installation" edge to the DeviceInstallation entity by IDs.
+func (au *AreaUpdate) AddDeviceInstallationIDs(ids ...int) *AreaUpdate {
+	au.mutation.AddDeviceInstallationIDs(ids...)
 	return au
 }
 
-// AddDeviceInstallationArea adds the "device_installation_area" edges to the DeviceInstallation entity.
-func (au *AreaUpdate) AddDeviceInstallationArea(d ...*DeviceInstallation) *AreaUpdate {
+// AddDeviceInstallation adds the "device_installation" edges to the DeviceInstallation entity.
+func (au *AreaUpdate) AddDeviceInstallation(d ...*DeviceInstallation) *AreaUpdate {
 	ids := make([]int, len(d))
 	for i := range d {
 		ids[i] = d[i].ID
 	}
-	return au.AddDeviceInstallationAreaIDs(ids...)
+	return au.AddDeviceInstallationIDs(ids...)
 }
 
 // Mutation returns the AreaMutation object of the builder.
@@ -147,25 +141,25 @@ func (au *AreaUpdate) ClearUpdater() *AreaUpdate {
 	return au
 }
 
-// ClearDeviceInstallationArea clears all "device_installation_area" edges to the DeviceInstallation entity.
-func (au *AreaUpdate) ClearDeviceInstallationArea() *AreaUpdate {
-	au.mutation.ClearDeviceInstallationArea()
+// ClearDeviceInstallation clears all "device_installation" edges to the DeviceInstallation entity.
+func (au *AreaUpdate) ClearDeviceInstallation() *AreaUpdate {
+	au.mutation.ClearDeviceInstallation()
 	return au
 }
 
-// RemoveDeviceInstallationAreaIDs removes the "device_installation_area" edge to DeviceInstallation entities by IDs.
-func (au *AreaUpdate) RemoveDeviceInstallationAreaIDs(ids ...int) *AreaUpdate {
-	au.mutation.RemoveDeviceInstallationAreaIDs(ids...)
+// RemoveDeviceInstallationIDs removes the "device_installation" edge to DeviceInstallation entities by IDs.
+func (au *AreaUpdate) RemoveDeviceInstallationIDs(ids ...int) *AreaUpdate {
+	au.mutation.RemoveDeviceInstallationIDs(ids...)
 	return au
 }
 
-// RemoveDeviceInstallationArea removes "device_installation_area" edges to DeviceInstallation entities.
-func (au *AreaUpdate) RemoveDeviceInstallationArea(d ...*DeviceInstallation) *AreaUpdate {
+// RemoveDeviceInstallation removes "device_installation" edges to DeviceInstallation entities.
+func (au *AreaUpdate) RemoveDeviceInstallation(d ...*DeviceInstallation) *AreaUpdate {
 	ids := make([]int, len(d))
 	for i := range d {
 		ids[i] = d[i].ID
 	}
-	return au.RemoveDeviceInstallationAreaIDs(ids...)
+	return au.RemoveDeviceInstallationIDs(ids...)
 }
 
 // Save executes the query and returns the number of nodes affected by the update operation.
@@ -200,21 +194,21 @@ func (au *AreaUpdate) ExecX(ctx context.Context) {
 
 // defaults sets the default values of the builder before save.
 func (au *AreaUpdate) defaults() error {
-	if _, ok := au.mutation.UpdatedAt(); !ok {
-		if area.UpdateDefaultUpdatedAt == nil {
-			return fmt.Errorf("dao: uninitialized area.UpdateDefaultUpdatedAt (forgotten import dao/runtime?)")
+	if _, ok := au.mutation.UpdateTime(); !ok {
+		if area.UpdateDefaultUpdateTime == nil {
+			return fmt.Errorf("dao: uninitialized area.UpdateDefaultUpdateTime (forgotten import dao/runtime?)")
 		}
-		v := area.UpdateDefaultUpdatedAt()
-		au.mutation.SetUpdatedAt(v)
+		v := area.UpdateDefaultUpdateTime()
+		au.mutation.SetUpdateTime(v)
 	}
 	return nil
 }
 
 // check runs all checks and user-defined validators on the builder.
 func (au *AreaUpdate) check() error {
-	if v, ok := au.mutation.UpdatedBy(); ok {
-		if err := area.UpdatedByValidator(v); err != nil {
-			return &ValidationError{Name: "updated_by", err: fmt.Errorf(`dao: validator failed for field "Area.updated_by": %w`, err)}
+	if v, ok := au.mutation.UpdaterID(); ok {
+		if err := area.UpdaterIDValidator(v); err != nil {
+			return &ValidationError{Name: "updater_id", err: fmt.Errorf(`dao: validator failed for field "Area.updater_id": %w`, err)}
 		}
 	}
 	if v, ok := au.mutation.Name(); ok {
@@ -243,14 +237,14 @@ func (au *AreaUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			}
 		}
 	}
-	if value, ok := au.mutation.DeletedAt(); ok {
-		_spec.SetField(area.FieldDeletedAt, field.TypeTime, value)
+	if value, ok := au.mutation.DeleteTime(); ok {
+		_spec.SetField(area.FieldDeleteTime, field.TypeTime, value)
 	}
-	if au.mutation.DeletedAtCleared() {
-		_spec.ClearField(area.FieldDeletedAt, field.TypeTime)
+	if au.mutation.DeleteTimeCleared() {
+		_spec.ClearField(area.FieldDeleteTime, field.TypeTime)
 	}
-	if value, ok := au.mutation.UpdatedAt(); ok {
-		_spec.SetField(area.FieldUpdatedAt, field.TypeTime, value)
+	if value, ok := au.mutation.UpdateTime(); ok {
+		_spec.SetField(area.FieldUpdateTime, field.TypeTime, value)
 	}
 	if value, ok := au.mutation.Name(); ok {
 		_spec.SetField(area.FieldName, field.TypeString, value)
@@ -293,12 +287,12 @@ func (au *AreaUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if au.mutation.DeviceInstallationAreaCleared() {
+	if au.mutation.DeviceInstallationCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
-			Table:   area.DeviceInstallationAreaTable,
-			Columns: []string{area.DeviceInstallationAreaColumn},
+			Table:   area.DeviceInstallationTable,
+			Columns: []string{area.DeviceInstallationColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(deviceinstallation.FieldID, field.TypeInt),
@@ -306,12 +300,12 @@ func (au *AreaUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := au.mutation.RemovedDeviceInstallationAreaIDs(); len(nodes) > 0 && !au.mutation.DeviceInstallationAreaCleared() {
+	if nodes := au.mutation.RemovedDeviceInstallationIDs(); len(nodes) > 0 && !au.mutation.DeviceInstallationCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
-			Table:   area.DeviceInstallationAreaTable,
-			Columns: []string{area.DeviceInstallationAreaColumn},
+			Table:   area.DeviceInstallationTable,
+			Columns: []string{area.DeviceInstallationColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(deviceinstallation.FieldID, field.TypeInt),
@@ -322,12 +316,12 @@ func (au *AreaUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := au.mutation.DeviceInstallationAreaIDs(); len(nodes) > 0 {
+	if nodes := au.mutation.DeviceInstallationIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
-			Table:   area.DeviceInstallationAreaTable,
-			Columns: []string{area.DeviceInstallationAreaColumn},
+			Table:   area.DeviceInstallationTable,
+			Columns: []string{area.DeviceInstallationColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(deviceinstallation.FieldID, field.TypeInt),
@@ -358,43 +352,43 @@ type AreaUpdateOne struct {
 	mutation *AreaMutation
 }
 
-// SetDeletedAt sets the "deleted_at" field.
-func (auo *AreaUpdateOne) SetDeletedAt(t time.Time) *AreaUpdateOne {
-	auo.mutation.SetDeletedAt(t)
+// SetDeleteTime sets the "delete_time" field.
+func (auo *AreaUpdateOne) SetDeleteTime(t time.Time) *AreaUpdateOne {
+	auo.mutation.SetDeleteTime(t)
 	return auo
 }
 
-// SetNillableDeletedAt sets the "deleted_at" field if the given value is not nil.
-func (auo *AreaUpdateOne) SetNillableDeletedAt(t *time.Time) *AreaUpdateOne {
+// SetNillableDeleteTime sets the "delete_time" field if the given value is not nil.
+func (auo *AreaUpdateOne) SetNillableDeleteTime(t *time.Time) *AreaUpdateOne {
 	if t != nil {
-		auo.SetDeletedAt(*t)
+		auo.SetDeleteTime(*t)
 	}
 	return auo
 }
 
-// ClearDeletedAt clears the value of the "deleted_at" field.
-func (auo *AreaUpdateOne) ClearDeletedAt() *AreaUpdateOne {
-	auo.mutation.ClearDeletedAt()
+// ClearDeleteTime clears the value of the "delete_time" field.
+func (auo *AreaUpdateOne) ClearDeleteTime() *AreaUpdateOne {
+	auo.mutation.ClearDeleteTime()
 	return auo
 }
 
-// SetUpdatedBy sets the "updated_by" field.
-func (auo *AreaUpdateOne) SetUpdatedBy(i int) *AreaUpdateOne {
-	auo.mutation.SetUpdatedBy(i)
+// SetUpdaterID sets the "updater_id" field.
+func (auo *AreaUpdateOne) SetUpdaterID(i int) *AreaUpdateOne {
+	auo.mutation.SetUpdaterID(i)
 	return auo
 }
 
-// SetNillableUpdatedBy sets the "updated_by" field if the given value is not nil.
-func (auo *AreaUpdateOne) SetNillableUpdatedBy(i *int) *AreaUpdateOne {
+// SetNillableUpdaterID sets the "updater_id" field if the given value is not nil.
+func (auo *AreaUpdateOne) SetNillableUpdaterID(i *int) *AreaUpdateOne {
 	if i != nil {
-		auo.SetUpdatedBy(*i)
+		auo.SetUpdaterID(*i)
 	}
 	return auo
 }
 
-// SetUpdatedAt sets the "updated_at" field.
-func (auo *AreaUpdateOne) SetUpdatedAt(t time.Time) *AreaUpdateOne {
-	auo.mutation.SetUpdatedAt(t)
+// SetUpdateTime sets the "update_time" field.
+func (auo *AreaUpdateOne) SetUpdateTime(t time.Time) *AreaUpdateOne {
+	auo.mutation.SetUpdateTime(t)
 	return auo
 }
 
@@ -438,30 +432,24 @@ func (auo *AreaUpdateOne) ClearDescription() *AreaUpdateOne {
 	return auo
 }
 
-// SetUpdaterID sets the "updater" edge to the Admin entity by ID.
-func (auo *AreaUpdateOne) SetUpdaterID(id int) *AreaUpdateOne {
-	auo.mutation.SetUpdaterID(id)
-	return auo
-}
-
 // SetUpdater sets the "updater" edge to the Admin entity.
 func (auo *AreaUpdateOne) SetUpdater(a *Admin) *AreaUpdateOne {
 	return auo.SetUpdaterID(a.ID)
 }
 
-// AddDeviceInstallationAreaIDs adds the "device_installation_area" edge to the DeviceInstallation entity by IDs.
-func (auo *AreaUpdateOne) AddDeviceInstallationAreaIDs(ids ...int) *AreaUpdateOne {
-	auo.mutation.AddDeviceInstallationAreaIDs(ids...)
+// AddDeviceInstallationIDs adds the "device_installation" edge to the DeviceInstallation entity by IDs.
+func (auo *AreaUpdateOne) AddDeviceInstallationIDs(ids ...int) *AreaUpdateOne {
+	auo.mutation.AddDeviceInstallationIDs(ids...)
 	return auo
 }
 
-// AddDeviceInstallationArea adds the "device_installation_area" edges to the DeviceInstallation entity.
-func (auo *AreaUpdateOne) AddDeviceInstallationArea(d ...*DeviceInstallation) *AreaUpdateOne {
+// AddDeviceInstallation adds the "device_installation" edges to the DeviceInstallation entity.
+func (auo *AreaUpdateOne) AddDeviceInstallation(d ...*DeviceInstallation) *AreaUpdateOne {
 	ids := make([]int, len(d))
 	for i := range d {
 		ids[i] = d[i].ID
 	}
-	return auo.AddDeviceInstallationAreaIDs(ids...)
+	return auo.AddDeviceInstallationIDs(ids...)
 }
 
 // Mutation returns the AreaMutation object of the builder.
@@ -475,25 +463,25 @@ func (auo *AreaUpdateOne) ClearUpdater() *AreaUpdateOne {
 	return auo
 }
 
-// ClearDeviceInstallationArea clears all "device_installation_area" edges to the DeviceInstallation entity.
-func (auo *AreaUpdateOne) ClearDeviceInstallationArea() *AreaUpdateOne {
-	auo.mutation.ClearDeviceInstallationArea()
+// ClearDeviceInstallation clears all "device_installation" edges to the DeviceInstallation entity.
+func (auo *AreaUpdateOne) ClearDeviceInstallation() *AreaUpdateOne {
+	auo.mutation.ClearDeviceInstallation()
 	return auo
 }
 
-// RemoveDeviceInstallationAreaIDs removes the "device_installation_area" edge to DeviceInstallation entities by IDs.
-func (auo *AreaUpdateOne) RemoveDeviceInstallationAreaIDs(ids ...int) *AreaUpdateOne {
-	auo.mutation.RemoveDeviceInstallationAreaIDs(ids...)
+// RemoveDeviceInstallationIDs removes the "device_installation" edge to DeviceInstallation entities by IDs.
+func (auo *AreaUpdateOne) RemoveDeviceInstallationIDs(ids ...int) *AreaUpdateOne {
+	auo.mutation.RemoveDeviceInstallationIDs(ids...)
 	return auo
 }
 
-// RemoveDeviceInstallationArea removes "device_installation_area" edges to DeviceInstallation entities.
-func (auo *AreaUpdateOne) RemoveDeviceInstallationArea(d ...*DeviceInstallation) *AreaUpdateOne {
+// RemoveDeviceInstallation removes "device_installation" edges to DeviceInstallation entities.
+func (auo *AreaUpdateOne) RemoveDeviceInstallation(d ...*DeviceInstallation) *AreaUpdateOne {
 	ids := make([]int, len(d))
 	for i := range d {
 		ids[i] = d[i].ID
 	}
-	return auo.RemoveDeviceInstallationAreaIDs(ids...)
+	return auo.RemoveDeviceInstallationIDs(ids...)
 }
 
 // Where appends a list predicates to the AreaUpdate builder.
@@ -541,21 +529,21 @@ func (auo *AreaUpdateOne) ExecX(ctx context.Context) {
 
 // defaults sets the default values of the builder before save.
 func (auo *AreaUpdateOne) defaults() error {
-	if _, ok := auo.mutation.UpdatedAt(); !ok {
-		if area.UpdateDefaultUpdatedAt == nil {
-			return fmt.Errorf("dao: uninitialized area.UpdateDefaultUpdatedAt (forgotten import dao/runtime?)")
+	if _, ok := auo.mutation.UpdateTime(); !ok {
+		if area.UpdateDefaultUpdateTime == nil {
+			return fmt.Errorf("dao: uninitialized area.UpdateDefaultUpdateTime (forgotten import dao/runtime?)")
 		}
-		v := area.UpdateDefaultUpdatedAt()
-		auo.mutation.SetUpdatedAt(v)
+		v := area.UpdateDefaultUpdateTime()
+		auo.mutation.SetUpdateTime(v)
 	}
 	return nil
 }
 
 // check runs all checks and user-defined validators on the builder.
 func (auo *AreaUpdateOne) check() error {
-	if v, ok := auo.mutation.UpdatedBy(); ok {
-		if err := area.UpdatedByValidator(v); err != nil {
-			return &ValidationError{Name: "updated_by", err: fmt.Errorf(`dao: validator failed for field "Area.updated_by": %w`, err)}
+	if v, ok := auo.mutation.UpdaterID(); ok {
+		if err := area.UpdaterIDValidator(v); err != nil {
+			return &ValidationError{Name: "updater_id", err: fmt.Errorf(`dao: validator failed for field "Area.updater_id": %w`, err)}
 		}
 	}
 	if v, ok := auo.mutation.Name(); ok {
@@ -601,14 +589,14 @@ func (auo *AreaUpdateOne) sqlSave(ctx context.Context) (_node *Area, err error) 
 			}
 		}
 	}
-	if value, ok := auo.mutation.DeletedAt(); ok {
-		_spec.SetField(area.FieldDeletedAt, field.TypeTime, value)
+	if value, ok := auo.mutation.DeleteTime(); ok {
+		_spec.SetField(area.FieldDeleteTime, field.TypeTime, value)
 	}
-	if auo.mutation.DeletedAtCleared() {
-		_spec.ClearField(area.FieldDeletedAt, field.TypeTime)
+	if auo.mutation.DeleteTimeCleared() {
+		_spec.ClearField(area.FieldDeleteTime, field.TypeTime)
 	}
-	if value, ok := auo.mutation.UpdatedAt(); ok {
-		_spec.SetField(area.FieldUpdatedAt, field.TypeTime, value)
+	if value, ok := auo.mutation.UpdateTime(); ok {
+		_spec.SetField(area.FieldUpdateTime, field.TypeTime, value)
 	}
 	if value, ok := auo.mutation.Name(); ok {
 		_spec.SetField(area.FieldName, field.TypeString, value)
@@ -651,12 +639,12 @@ func (auo *AreaUpdateOne) sqlSave(ctx context.Context) (_node *Area, err error) 
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if auo.mutation.DeviceInstallationAreaCleared() {
+	if auo.mutation.DeviceInstallationCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
-			Table:   area.DeviceInstallationAreaTable,
-			Columns: []string{area.DeviceInstallationAreaColumn},
+			Table:   area.DeviceInstallationTable,
+			Columns: []string{area.DeviceInstallationColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(deviceinstallation.FieldID, field.TypeInt),
@@ -664,12 +652,12 @@ func (auo *AreaUpdateOne) sqlSave(ctx context.Context) (_node *Area, err error) 
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := auo.mutation.RemovedDeviceInstallationAreaIDs(); len(nodes) > 0 && !auo.mutation.DeviceInstallationAreaCleared() {
+	if nodes := auo.mutation.RemovedDeviceInstallationIDs(); len(nodes) > 0 && !auo.mutation.DeviceInstallationCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
-			Table:   area.DeviceInstallationAreaTable,
-			Columns: []string{area.DeviceInstallationAreaColumn},
+			Table:   area.DeviceInstallationTable,
+			Columns: []string{area.DeviceInstallationColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(deviceinstallation.FieldID, field.TypeInt),
@@ -680,12 +668,12 @@ func (auo *AreaUpdateOne) sqlSave(ctx context.Context) (_node *Area, err error) 
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := auo.mutation.DeviceInstallationAreaIDs(); len(nodes) > 0 {
+	if nodes := auo.mutation.DeviceInstallationIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
-			Table:   area.DeviceInstallationAreaTable,
-			Columns: []string{area.DeviceInstallationAreaColumn},
+			Table:   area.DeviceInstallationTable,
+			Columns: []string{area.DeviceInstallationColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(deviceinstallation.FieldID, field.TypeInt),

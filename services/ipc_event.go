@@ -2,8 +2,10 @@ package services
 
 import (
 	"aisecurity/ent/dao"
-	"aisecurity/ent/dao/employee"
-	"aisecurity/ent/dao/ipcevent"
+	"aisecurity/ent/dao/device"
+	"aisecurity/ent/dao/event"
+	"aisecurity/ent/dao/eventlevel"
+	"aisecurity/ent/dao/fixing"
 	"aisecurity/ent/dao/video"
 	"aisecurity/enums"
 	"aisecurity/expects"
@@ -13,31 +15,37 @@ import (
 	"aisecurity/structs/types"
 	"aisecurity/utils"
 	"aisecurity/utils/db"
+	"context"
 	stdsql "database/sql"
 	"encoding/json"
+	"entgo.io/ent/dialect/sql"
 	"go.uber.org/zap"
 )
 
-type IPCEventService struct {
+type EventService struct {
 	Service
-	entClient *dao.IPCEventClient
+	entClient         *dao.EventClient
+	eventLevelService *EventLevelService
 }
 
-func NewIPCEventService() *IPCEventService {
-	return &IPCEventService{
-		entClient: db.EntClient.IPCEvent,
+func NewEventService(ctx context.Context) *EventService {
+	s := &EventService{
+		entClient:         db.EntClient.Event,
+		eventLevelService: NewEventLevelService(ctx),
 	}
+	s.Ctx = ctx
+	return s
 }
 
-func (s *IPCEventService) Create(ent structs.IEntity) (structs.IEntity, error) {
-	e := ent.(*entities.IPCEvent)
+func (s *EventService) Create(ent structs.IEntity) (structs.IEntity, error) {
+	e := ent.(*entities.Event)
 	c := s.entClient.Create().
 		SetDeviceID(e.DeviceID).
-		SetEventID(e.EventID).
+		SetDataID(e.DataID).
 		SetEventTime(e.EventTime).
 		SetEventType(e.EventType).
 		SetDescription(e.Description).
-		SetRawData(e.RawData).AddFixerIDs(1)
+		SetRawData(e.RawData)
 	if e.Images != nil {
 		c.SetImages(e.Images)
 	}
@@ -49,12 +57,25 @@ func (s *IPCEventService) Create(ent structs.IEntity) (structs.IEntity, error) {
 	}
 	saved, err := c.Save(s.Ctx)
 	if err != nil {
-		return nil, utils.ErrorWrap(err, "failed creating IPCEvent")
+		return nil, utils.ErrorWrap(err, "failed creating Event")
 	}
-	return structs.ConvertTo[*dao.IPCEvent, entities.IPCEvent](saved), nil
+
+	return structs.ConvertTo[*dao.Event, entities.Event](saved), nil
 }
 
-func (s *IPCEventService) GetDetails(fit structs.IFilter) (structs.IEntity, error) {
+func (s *EventService) Update(ent structs.IEntity) (structs.IEntity, error) {
+	e := ent.(*entities.Event)
+	u := s.entClient.UpdateOneID(e.ID).
+		SetEventStatus(e.EventStatus)
+	saved, err := u.Save(s.Ctx)
+	if err != nil {
+		return nil, utils.ErrorWrap(err, "failed updating Event")
+	}
+
+	return structs.ConvertTo[*dao.Event, entities.Event](saved), nil
+}
+
+func (s *EventService) GetDetails(fit structs.IFilter) (structs.IEntity, error) {
 	fit.SetPage(1)
 	fit.SetLimit(1)
 	list, err := s.GetList(fit)
@@ -67,30 +88,60 @@ func (s *IPCEventService) GetDetails(fit structs.IFilter) (structs.IEntity, erro
 	return list[0], nil
 }
 
-func (s *IPCEventService) query(fit structs.IFilter) *dao.IPCEventQuery {
-	f := fit.(*filters.IPCEvent)
+func (s *EventService) query(fit structs.IFilter) *dao.EventQuery {
+	f := fit.(*filters.Event)
 	q := s.entClient.Query()
 	if f.ID != 0 {
-		q = q.Where(ipcevent.IDEQ(f.ID))
+		q = q.Where(event.IDEQ(f.ID))
 	}
 	if f.Keywords != "" {
-		q = q.Where(ipcevent.DescriptionContainsFold(f.Keywords))
+		q = q.Where(event.DescriptionContainsFold(f.Keywords))
 	}
 	eventTypes := utils.FilterZerosFromArray(f.EventTypes)
 	if len(eventTypes) > 0 {
-		q = q.Where(ipcevent.EventTypeIn(eventTypes...))
+		q = q.Where(event.EventTypeIn(eventTypes...))
+	}
+	eventLevelIDs := utils.FilterZerosFromArray(f.EventLevelIDs)
+	if len(eventLevelIDs) > 0 {
+		eventTypes, err := db.EntClient.EventLevel.Query().Where(eventlevel.IDIn(eventLevelIDs...)).Select(eventlevel.FieldEventTypes).Ints(s.Ctx)
+		if err != nil {
+			utils.Logger.Error("failed getting event levels", zap.Error(err))
+		}
+		var es []enums.EventType
+		for _, v := range eventTypes {
+			es = append(es, enums.EventType(v))
+		}
+		q = q.Where(event.EventTypeIn(es...))
 	}
 	fixerIDs := utils.FilterZerosFromArray(f.FixerIDs)
 	if len(fixerIDs) > 0 {
-		q = q.Where(ipcevent.HasFixersWith(employee.IDIn(fixerIDs...)))
+		q = q.Where(event.HasFixingWith(fixing.FixerIDIn(fixerIDs...)))
+	}
+	if !f.EventTimeRange.Start.IsZero() {
+		q = q.Where(event.EventTimeGTE(f.EventTimeRange.Start))
+	}
+	if !f.EventTimeRange.End.IsZero() {
+		q = q.Where(event.EventTimeLTE(f.EventTimeRange.End))
+	}
+
+	if !f.FixTimeRange.Start.IsZero() {
+		q = q.Where(event.HasFixingWith(fixing.FixTimeGTE(f.FixTimeRange.Start)))
+	}
+	if !f.FixTimeRange.End.IsZero() {
+		q = q.Where(event.HasFixingWith(fixing.FixTimeLTE(f.FixTimeRange.End)))
+	}
+
+	deviceIDs := utils.FilterZerosFromArray(f.DeviceIDs)
+	if len(deviceIDs) > 0 {
+		q = q.Where(event.DeviceIDIn(deviceIDs...))
 	}
 	if f.EventStatus != 0 {
-		q = q.Where(ipcevent.EventStatusIn(f.EventStatus))
+		q = q.Where(event.EventStatusIn(f.EventStatus))
 	}
 	return q.Clone()
 }
 
-func (s *IPCEventService) GetTotal(fit structs.IFilter) (int, error) {
+func (s *EventService) GetTotal(fit structs.IFilter) (int, error) {
 	total, err := s.query(fit).Count(s.Ctx)
 	if err != nil {
 		return 0, utils.ErrorWithStack(err)
@@ -98,59 +149,91 @@ func (s *IPCEventService) GetTotal(fit structs.IFilter) (int, error) {
 	return total, nil
 }
 
-func (s *IPCEventService) GetIEEventStatusCounts(fit structs.IFilter) ([]*types.IEEventStatusCounts, error) {
+func (s *EventService) GetStatusCounts(fit structs.IFilter) ([]*types.StatusCount, error) {
 	// status counts
-	var counts []*types.IEEventStatusCounts
-	err := s.query(fit).GroupBy(ipcevent.FieldEventStatus).
-		Aggregate(dao.Count()).
-		Scan(s.Ctx, &counts)
-	if err != nil {
-		return counts, utils.ErrorWithStack(err)
+	var queryCounts []struct {
+		EventStatus enums.EventStatus `json:"event_status"`
+		Count       int
 	}
-	for _, status := range enums.EventStatus(0).GetAll() {
-		if status == enums.ESUnknown {
-			continue
-		}
-		var ex bool
-		for _, count := range counts {
-			if count.EventStatus == status {
-				count.Label = status.Label()
-				ex = true
+	err := s.query(fit).GroupBy(event.FieldEventStatus).
+		Aggregate(dao.Count()).
+		Scan(s.Ctx, &queryCounts)
+	if err != nil {
+		return nil, utils.ErrorWithStack(err)
+	}
+	var statusCounts []*types.StatusCount
+	for _, s := range enums.EventStatus(0).GetAll() {
+		var c int
+		for _, q := range queryCounts {
+			if q.EventStatus == s {
+				c = q.Count
 				break
 			}
+			if s == enums.ESUnknown {
+				c += q.Count
+			}
 		}
-		if !ex {
-			counts = append(counts, &types.IEEventStatusCounts{
-				EventStatus: status,
-				Count:       0,
-				Label:       status.Label(),
-			})
-		}
+		statusCounts = append(statusCounts, &types.StatusCount{
+			Value: int(s),
+			Label: s.Label(),
+			Count: c,
+		})
 	}
-	return counts, nil
+	return statusCounts, nil
 }
 
-func (s *IPCEventService) GetList(fit structs.IFilter) ([]structs.IEntity, error) {
+func (s *EventService) GetList(fit structs.IFilter) ([]structs.IEntity, error) {
 	// list
 	list, err := s.query(fit).
-		WithFixers(func(q *dao.EmployeeQuery) {
-			q.WithDepartment().WithAdmin()
+		WithCreator(func(q *dao.AdminQuery) {
+			q.WithEmployee(func(q2 *dao.EmployeeQuery) {
+				q2.WithDepartment().WithOccupation()
+			})
 		}).
+		WithFixing(func(q *dao.FixingQuery) {
+			q.WithFixer(func(q2 *dao.AdminQuery) {
+				q2.WithEmployee(func(q3 *dao.EmployeeQuery) {
+					q3.WithDepartment().WithOccupation()
+				})
+			}).
+				WithCreator(func(q2 *dao.AdminQuery) {
+					q2.WithEmployee(func(q3 *dao.EmployeeQuery) {
+						q3.WithDepartment().WithOccupation()
+					})
+				})
+		}).
+		WithDevice(func(q *dao.DeviceQuery) {
+			q.WithDeviceInstallation(func(query *dao.DeviceInstallationQuery) {
+				query.WithArea()
+			}).Order(device.ByID(sql.OrderDesc()))
+		}).
+		WithVideo().
 		Limit(fit.GetLimit()).
 		Offset(fit.GetOffset()).
+		Order(dao.Desc(event.FieldID)).
 		All(s.Ctx)
 	if err != nil {
 		return nil, utils.ErrorWithStack(err)
 	}
 	ents := make([]structs.IEntity, len(list))
-	for i, _ := range list {
-		ents[i] = structs.ConvertTo[*dao.IPCEvent, entities.IPCEvent](list[i])
+	for i, v := range list {
+		v.EventTypeLabel = v.EventType.Label()
+		v.EventStatusLabel = v.EventStatus.Label()
+		if len(v.Edges.Device.Edges.DeviceInstallation) > 0 {
+			d := v.Edges.Device.Edges.DeviceInstallation[0]
+			v.Location = d.Location
+			v.LocationWithAliasName = d.Location
+			if d.AreaName != "" {
+				v.LocationWithAliasName = d.Location + " (" + d.AliasName + ")"
+			}
+		}
+		ents[i] = structs.ConvertTo[*dao.Event, entities.Event](v)
 	}
 	return ents, nil
 }
 
-func (s *IPCEventService) GetListByImageName(name string) ([]structs.IEntity, error) {
-	result, err := s.entClient.QueryContext(s.Ctx, "SELECT id, images FROM ipc_events WHERE images->0->>'name' = $1", name)
+func (s *EventService) GetListByImageName(name string) ([]structs.IEntity, error) {
+	result, err := s.entClient.QueryContext(s.Ctx, "SELECT id, images FROM events WHERE images->0->>'name' = $1", name)
 	if err != nil {
 		return nil, utils.ErrorWithStack(err)
 	}
@@ -177,8 +260,8 @@ func (s *IPCEventService) GetListByImageName(name string) ([]structs.IEntity, er
 				return nil, utils.ErrorWithStack(err)
 			}
 		}
-		rows = append(rows, &entities.IPCEvent{
-			IPCEvent: dao.IPCEvent{
+		rows = append(rows, &entities.Event{
+			Event: dao.Event{
 				ID:     id,
 				Images: images,
 			},
@@ -188,13 +271,13 @@ func (s *IPCEventService) GetListByImageName(name string) ([]structs.IEntity, er
 	return rows, nil
 }
 
-func (s *IPCEventService) GetByVideoName(name string) (structs.IEntity, error) {
+func (s *EventService) GetByVideoName(name string) (structs.IEntity, error) {
 	first, err := s.entClient.Query().
-		Where(ipcevent.HasVideoWith(video.NameEQ(name))).
+		Where(event.HasVideoWith(video.NameEQ(name))).
 		WithVideo().
 		First(s.Ctx)
 	if err != nil {
 		return nil, utils.ErrorWithStack(err)
 	}
-	return structs.ConvertTo[*dao.IPCEvent, entities.IPCEvent](first), nil
+	return structs.ConvertTo[*dao.Event, entities.Event](first), nil
 }

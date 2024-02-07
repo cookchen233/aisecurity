@@ -24,7 +24,7 @@ func (h *RiskCategoryHandler) GetFilter(c *gin.Context) structs.IFilter {
 	return h.Filter
 }
 func (h *RiskCategoryHandler) GetEntity(c *gin.Context) structs.IEntity { return h.Entity }
-func (h *RiskCategoryHandler) SetRequestContext(c *gin.Context, h2 handlers.IHandler) {
+func (h *RiskCategoryHandler) SetRequestContext(c *gin.Context, childHandler handlers.IHandler) {
 	h.Service = services.NewRiskCategoryService()
 	h.Service.Ctx = c
 	h.Filter = &filters.RiskCategory{}

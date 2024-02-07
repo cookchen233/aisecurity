@@ -6,6 +6,7 @@ import (
 	"aisecurity/ent/dao/admin"
 	"aisecurity/ent/dao/risk"
 	"aisecurity/ent/dao/risklocation"
+	"aisecurity/ent/dao/sweep"
 	"context"
 	"errors"
 	"fmt"
@@ -22,56 +23,56 @@ type RiskLocationCreate struct {
 	hooks    []Hook
 }
 
-// SetCreatedAt sets the "created_at" field.
-func (rlc *RiskLocationCreate) SetCreatedAt(t time.Time) *RiskLocationCreate {
-	rlc.mutation.SetCreatedAt(t)
+// SetCreateTime sets the "create_time" field.
+func (rlc *RiskLocationCreate) SetCreateTime(t time.Time) *RiskLocationCreate {
+	rlc.mutation.SetCreateTime(t)
 	return rlc
 }
 
-// SetNillableCreatedAt sets the "created_at" field if the given value is not nil.
-func (rlc *RiskLocationCreate) SetNillableCreatedAt(t *time.Time) *RiskLocationCreate {
+// SetNillableCreateTime sets the "create_time" field if the given value is not nil.
+func (rlc *RiskLocationCreate) SetNillableCreateTime(t *time.Time) *RiskLocationCreate {
 	if t != nil {
-		rlc.SetCreatedAt(*t)
+		rlc.SetCreateTime(*t)
 	}
 	return rlc
 }
 
-// SetCreatedBy sets the "created_by" field.
-func (rlc *RiskLocationCreate) SetCreatedBy(i int) *RiskLocationCreate {
-	rlc.mutation.SetCreatedBy(i)
+// SetCreatorID sets the "creator_id" field.
+func (rlc *RiskLocationCreate) SetCreatorID(i int) *RiskLocationCreate {
+	rlc.mutation.SetCreatorID(i)
 	return rlc
 }
 
-// SetDeletedAt sets the "deleted_at" field.
-func (rlc *RiskLocationCreate) SetDeletedAt(t time.Time) *RiskLocationCreate {
-	rlc.mutation.SetDeletedAt(t)
+// SetDeleteTime sets the "delete_time" field.
+func (rlc *RiskLocationCreate) SetDeleteTime(t time.Time) *RiskLocationCreate {
+	rlc.mutation.SetDeleteTime(t)
 	return rlc
 }
 
-// SetNillableDeletedAt sets the "deleted_at" field if the given value is not nil.
-func (rlc *RiskLocationCreate) SetNillableDeletedAt(t *time.Time) *RiskLocationCreate {
+// SetNillableDeleteTime sets the "delete_time" field if the given value is not nil.
+func (rlc *RiskLocationCreate) SetNillableDeleteTime(t *time.Time) *RiskLocationCreate {
 	if t != nil {
-		rlc.SetDeletedAt(*t)
+		rlc.SetDeleteTime(*t)
 	}
 	return rlc
 }
 
-// SetUpdatedBy sets the "updated_by" field.
-func (rlc *RiskLocationCreate) SetUpdatedBy(i int) *RiskLocationCreate {
-	rlc.mutation.SetUpdatedBy(i)
+// SetUpdaterID sets the "updater_id" field.
+func (rlc *RiskLocationCreate) SetUpdaterID(i int) *RiskLocationCreate {
+	rlc.mutation.SetUpdaterID(i)
 	return rlc
 }
 
-// SetUpdatedAt sets the "updated_at" field.
-func (rlc *RiskLocationCreate) SetUpdatedAt(t time.Time) *RiskLocationCreate {
-	rlc.mutation.SetUpdatedAt(t)
+// SetUpdateTime sets the "update_time" field.
+func (rlc *RiskLocationCreate) SetUpdateTime(t time.Time) *RiskLocationCreate {
+	rlc.mutation.SetUpdateTime(t)
 	return rlc
 }
 
-// SetNillableUpdatedAt sets the "updated_at" field if the given value is not nil.
-func (rlc *RiskLocationCreate) SetNillableUpdatedAt(t *time.Time) *RiskLocationCreate {
+// SetNillableUpdateTime sets the "update_time" field if the given value is not nil.
+func (rlc *RiskLocationCreate) SetNillableUpdateTime(t *time.Time) *RiskLocationCreate {
 	if t != nil {
-		rlc.SetUpdatedAt(*t)
+		rlc.SetUpdateTime(*t)
 	}
 	return rlc
 }
@@ -82,21 +83,9 @@ func (rlc *RiskLocationCreate) SetName(s string) *RiskLocationCreate {
 	return rlc
 }
 
-// SetCreatorID sets the "creator" edge to the Admin entity by ID.
-func (rlc *RiskLocationCreate) SetCreatorID(id int) *RiskLocationCreate {
-	rlc.mutation.SetCreatorID(id)
-	return rlc
-}
-
 // SetCreator sets the "creator" edge to the Admin entity.
 func (rlc *RiskLocationCreate) SetCreator(a *Admin) *RiskLocationCreate {
 	return rlc.SetCreatorID(a.ID)
-}
-
-// SetUpdaterID sets the "updater" edge to the Admin entity by ID.
-func (rlc *RiskLocationCreate) SetUpdaterID(id int) *RiskLocationCreate {
-	rlc.mutation.SetUpdaterID(id)
-	return rlc
 }
 
 // SetUpdater sets the "updater" edge to the Admin entity.
@@ -117,6 +106,21 @@ func (rlc *RiskLocationCreate) AddRisk(r ...*Risk) *RiskLocationCreate {
 		ids[i] = r[i].ID
 	}
 	return rlc.AddRiskIDs(ids...)
+}
+
+// AddSweepIDs adds the "sweep" edge to the Sweep entity by IDs.
+func (rlc *RiskLocationCreate) AddSweepIDs(ids ...int) *RiskLocationCreate {
+	rlc.mutation.AddSweepIDs(ids...)
+	return rlc
+}
+
+// AddSweep adds the "sweep" edges to the Sweep entity.
+func (rlc *RiskLocationCreate) AddSweep(s ...*Sweep) *RiskLocationCreate {
+	ids := make([]int, len(s))
+	for i := range s {
+		ids[i] = s[i].ID
+	}
+	return rlc.AddSweepIDs(ids...)
 }
 
 // Mutation returns the RiskLocationMutation object of the builder.
@@ -156,46 +160,46 @@ func (rlc *RiskLocationCreate) ExecX(ctx context.Context) {
 
 // defaults sets the default values of the builder before save.
 func (rlc *RiskLocationCreate) defaults() error {
-	if _, ok := rlc.mutation.CreatedAt(); !ok {
-		if risklocation.DefaultCreatedAt == nil {
-			return fmt.Errorf("dao: uninitialized risklocation.DefaultCreatedAt (forgotten import dao/runtime?)")
+	if _, ok := rlc.mutation.CreateTime(); !ok {
+		if risklocation.DefaultCreateTime == nil {
+			return fmt.Errorf("dao: uninitialized risklocation.DefaultCreateTime (forgotten import dao/runtime?)")
 		}
-		v := risklocation.DefaultCreatedAt()
-		rlc.mutation.SetCreatedAt(v)
+		v := risklocation.DefaultCreateTime()
+		rlc.mutation.SetCreateTime(v)
 	}
-	if _, ok := rlc.mutation.UpdatedAt(); !ok {
-		if risklocation.DefaultUpdatedAt == nil {
-			return fmt.Errorf("dao: uninitialized risklocation.DefaultUpdatedAt (forgotten import dao/runtime?)")
+	if _, ok := rlc.mutation.UpdateTime(); !ok {
+		if risklocation.DefaultUpdateTime == nil {
+			return fmt.Errorf("dao: uninitialized risklocation.DefaultUpdateTime (forgotten import dao/runtime?)")
 		}
-		v := risklocation.DefaultUpdatedAt()
-		rlc.mutation.SetUpdatedAt(v)
+		v := risklocation.DefaultUpdateTime()
+		rlc.mutation.SetUpdateTime(v)
 	}
 	return nil
 }
 
 // check runs all checks and user-defined validators on the builder.
 func (rlc *RiskLocationCreate) check() error {
-	if _, ok := rlc.mutation.CreatedAt(); !ok {
-		return &ValidationError{Name: "created_at", err: errors.New(`dao: missing required field "RiskLocation.created_at"`)}
+	if _, ok := rlc.mutation.CreateTime(); !ok {
+		return &ValidationError{Name: "create_time", err: errors.New(`dao: missing required field "RiskLocation.create_time"`)}
 	}
-	if _, ok := rlc.mutation.CreatedBy(); !ok {
-		return &ValidationError{Name: "created_by", err: errors.New(`dao: missing required field "RiskLocation.created_by"`)}
+	if _, ok := rlc.mutation.CreatorID(); !ok {
+		return &ValidationError{Name: "creator_id", err: errors.New(`dao: missing required field "RiskLocation.creator_id"`)}
 	}
-	if v, ok := rlc.mutation.CreatedBy(); ok {
-		if err := risklocation.CreatedByValidator(v); err != nil {
-			return &ValidationError{Name: "created_by", err: fmt.Errorf(`dao: validator failed for field "RiskLocation.created_by": %w`, err)}
+	if v, ok := rlc.mutation.CreatorID(); ok {
+		if err := risklocation.CreatorIDValidator(v); err != nil {
+			return &ValidationError{Name: "creator_id", err: fmt.Errorf(`dao: validator failed for field "RiskLocation.creator_id": %w`, err)}
 		}
 	}
-	if _, ok := rlc.mutation.UpdatedBy(); !ok {
-		return &ValidationError{Name: "updated_by", err: errors.New(`dao: missing required field "RiskLocation.updated_by"`)}
+	if _, ok := rlc.mutation.UpdaterID(); !ok {
+		return &ValidationError{Name: "updater_id", err: errors.New(`dao: missing required field "RiskLocation.updater_id"`)}
 	}
-	if v, ok := rlc.mutation.UpdatedBy(); ok {
-		if err := risklocation.UpdatedByValidator(v); err != nil {
-			return &ValidationError{Name: "updated_by", err: fmt.Errorf(`dao: validator failed for field "RiskLocation.updated_by": %w`, err)}
+	if v, ok := rlc.mutation.UpdaterID(); ok {
+		if err := risklocation.UpdaterIDValidator(v); err != nil {
+			return &ValidationError{Name: "updater_id", err: fmt.Errorf(`dao: validator failed for field "RiskLocation.updater_id": %w`, err)}
 		}
 	}
-	if _, ok := rlc.mutation.UpdatedAt(); !ok {
-		return &ValidationError{Name: "updated_at", err: errors.New(`dao: missing required field "RiskLocation.updated_at"`)}
+	if _, ok := rlc.mutation.UpdateTime(); !ok {
+		return &ValidationError{Name: "update_time", err: errors.New(`dao: missing required field "RiskLocation.update_time"`)}
 	}
 	if _, ok := rlc.mutation.Name(); !ok {
 		return &ValidationError{Name: "name", err: errors.New(`dao: missing required field "RiskLocation.name"`)}
@@ -237,17 +241,17 @@ func (rlc *RiskLocationCreate) createSpec() (*RiskLocation, *sqlgraph.CreateSpec
 		_node = &RiskLocation{config: rlc.config}
 		_spec = sqlgraph.NewCreateSpec(risklocation.Table, sqlgraph.NewFieldSpec(risklocation.FieldID, field.TypeInt))
 	)
-	if value, ok := rlc.mutation.CreatedAt(); ok {
-		_spec.SetField(risklocation.FieldCreatedAt, field.TypeTime, value)
-		_node.CreatedAt = value
+	if value, ok := rlc.mutation.CreateTime(); ok {
+		_spec.SetField(risklocation.FieldCreateTime, field.TypeTime, value)
+		_node.CreateTime = value
 	}
-	if value, ok := rlc.mutation.DeletedAt(); ok {
-		_spec.SetField(risklocation.FieldDeletedAt, field.TypeTime, value)
-		_node.DeletedAt = &value
+	if value, ok := rlc.mutation.DeleteTime(); ok {
+		_spec.SetField(risklocation.FieldDeleteTime, field.TypeTime, value)
+		_node.DeleteTime = &value
 	}
-	if value, ok := rlc.mutation.UpdatedAt(); ok {
-		_spec.SetField(risklocation.FieldUpdatedAt, field.TypeTime, value)
-		_node.UpdatedAt = value
+	if value, ok := rlc.mutation.UpdateTime(); ok {
+		_spec.SetField(risklocation.FieldUpdateTime, field.TypeTime, value)
+		_node.UpdateTime = value
 	}
 	if value, ok := rlc.mutation.Name(); ok {
 		_spec.SetField(risklocation.FieldName, field.TypeString, value)
@@ -267,7 +271,7 @@ func (rlc *RiskLocationCreate) createSpec() (*RiskLocation, *sqlgraph.CreateSpec
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
-		_node.CreatedBy = nodes[0]
+		_node.CreatorID = nodes[0]
 		_spec.Edges = append(_spec.Edges, edge)
 	}
 	if nodes := rlc.mutation.UpdaterIDs(); len(nodes) > 0 {
@@ -284,7 +288,7 @@ func (rlc *RiskLocationCreate) createSpec() (*RiskLocation, *sqlgraph.CreateSpec
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
-		_node.UpdatedBy = nodes[0]
+		_node.UpdaterID = nodes[0]
 		_spec.Edges = append(_spec.Edges, edge)
 	}
 	if nodes := rlc.mutation.RiskIDs(); len(nodes) > 0 {
@@ -296,6 +300,22 @@ func (rlc *RiskLocationCreate) createSpec() (*RiskLocation, *sqlgraph.CreateSpec
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(risk.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := rlc.mutation.SweepIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   risklocation.SweepTable,
+			Columns: []string{risklocation.SweepColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(sweep.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {

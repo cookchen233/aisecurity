@@ -24,7 +24,7 @@ import (
 
 type TwoHandler struct {
 	handlers.IPCHandler
-	Service *services.IPCEventService
+	Service *services.EventService
 }
 
 func NewTwoHandler() *TwoHandler { return &TwoHandler{} }
@@ -37,11 +37,10 @@ func (h *TwoHandler) GetFilter(c *gin.Context) structs.IFilter {
 func (h *TwoHandler) GetEntity(c *gin.Context) structs.IEntity {
 	return h.Entity
 }
-func (h *TwoHandler) SetRequestContext(c *gin.Context, h2 handlers.IHandler) {
-	h.Service = services.NewIPCEventService()
-	h.Service.Ctx = c
-	h.Filter = &filters.IPCEvent{}
-	h.Entity = &entities.IPCEvent{}
+func (h *TwoHandler) SetRequestContext(c *gin.Context, childHandler handlers.IHandler) {
+	h.Service = services.NewEventService(c)
+	h.Filter = &filters.Event{}
+	h.Entity = &entities.Event{}
 	h.IPCHandler.SetRequestContext(c, h)
 }
 
@@ -52,9 +51,9 @@ func (h *TwoHandler) ReportEvent(c *gin.Context) {
 	re := regexp.MustCompile(pattern)
 	bodyString = re.ReplaceAllString(bodyString, `"$1": "$3...$4"`)
 
-	var p posts.TwoIPCEvent
+	var p posts.TwoEvent
 	if err := c.ShouldBindJSON(&p); err != nil {
-		http.Error(c, err, 900)
+		http.Error(c, err, 1000)
 		return
 	}
 
@@ -86,18 +85,18 @@ func (h *TwoHandler) ReportEvent(c *gin.Context) {
 				},
 			})
 			if err != nil {
-				http.Error(c, utils.ErrorWithStack(err), 1000)
+				http.Error(c, utils.ErrorWithStack(err), 2000)
 				return
 			}
 		} else {
-			http.Error(c, utils.ErrorWithStack(err), 1000)
+			http.Error(c, utils.ErrorWithStack(err), 2000)
 			return
 		}
 	}
 	d := device.(*entities.Device)
 
 	// device installation
-	deviceInstallationService := services.NewDeviceInstallation(c)
+	deviceInstallationService := services.NewDeviceInstallationService(c)
 	_, err = deviceInstallationService.GetByDeviceID(d.ID)
 	if err != nil {
 		if dao.IsNotFound(err) {
@@ -118,10 +117,10 @@ func (h *TwoHandler) ReportEvent(c *gin.Context) {
 		}
 	}
 
-	ent := entities.IPCEvent{
-		IPCEvent: dao.IPCEvent{
+	ent := entities.Event{
+		Event: dao.Event{
 			DeviceID:    d.ID,
-			EventID:     p.AlarmID,
+			DataID:      p.AlarmID,
 			EventTime:   eventTime,
 			EventType:   eventType,
 			Description: description,
@@ -134,20 +133,20 @@ func (h *TwoHandler) ReportEvent(c *gin.Context) {
 	image, err := utils.Base64ToImage(basePath, p.ImageData)
 	if err != nil {
 		utils.Logger.Error("failed to convert base64 to image", zap.Error(err))
-		http.Error(c, err, 1000)
+		http.Error(c, err, 2000)
 		return
 	}
 	imageInfo, err := os.Stat(image)
 	if err != nil {
 		utils.Logger.Error("failed getting file info", zap.Error(err))
-		http.Error(c, err, 1000)
+		http.Error(c, err, 2000)
 		return
 	}
 	ent.Images = append(ent.Images, &types.UploadedImage{UploadedFile: types.UploadedFile{
-		Name:      p.LocalRawPath,
-		URL:       image,
-		Size:      imageInfo.Size(),
-		CreatedAt: time.Now(),
+		Name:       p.LocalRawPath,
+		URL:        image,
+		Size:       imageInfo.Size(),
+		CreateTime: time.Now(),
 	}})
 
 	// Save the labeled image
@@ -155,25 +154,25 @@ func (h *TwoHandler) ReportEvent(c *gin.Context) {
 		labeledImage, err := utils.Base64ToImage(basePath, p.ImageDataLabeled)
 		if err != nil {
 			utils.Logger.Error("failed to convert base64 to image", zap.Error(err))
-			http.Error(c, err, 1000)
+			http.Error(c, err, 2000)
 			return
 		}
 		labeledImageInfo, err := os.Stat(labeledImage)
 		if err != nil {
 			utils.Logger.Error("failed getting file info", zap.Error(err))
-			http.Error(c, err, 1000)
+			http.Error(c, err, 2000)
 			return
 		}
 		ent.LabeledImages = append(ent.LabeledImages, &types.UploadedImage{UploadedFile: types.UploadedFile{
-			Name:      p.LocalLabeledPath,
-			URL:       labeledImage,
-			Size:      labeledImageInfo.Size(),
-			CreatedAt: time.Now(),
+			Name:       p.LocalLabeledPath,
+			URL:        labeledImage,
+			Size:       labeledImageInfo.Size(),
+			CreateTime: time.Now(),
 		}})
 	}
 
 	// after the videos being uploaded, the event will be updated.
-	videoService := services.NewVideo(c)
+	videoService := services.NewVideoService(c)
 	video, err := videoService.CreateOrUpdateByName(&entities.Video{
 		Video: dao.Video{
 			Name: p.VideoFile,
@@ -188,9 +187,19 @@ func (h *TwoHandler) ReportEvent(c *gin.Context) {
 
 	saved, err := h.Service.Create(&ent)
 	if err != nil {
-		http.Error(c, err, 1000)
+		http.Error(c, err, 2000)
 		return
 	}
+
+	// event log
+	eventLogService := services.NewEventLogService(c)
+	_, err = eventLogService.Create(&entities.EventLog{
+		EventLog: dao.EventLog{
+			DeviceID: d.ID,
+			EventID:  saved.(*entities.Event).ID,
+			LogType:  enums.ELT1,
+		},
+	})
 	http.Success(c, saved)
 }
 
@@ -199,19 +208,23 @@ func (h *TwoHandler) UploadVideos(c *gin.Context) {
 	var maxSize int64 = 1024 * 1024 * 100
 	var allowedMimeTypes = types.NewAllowedMimeTypes([]string{})
 	form, _ := c.MultipartForm()
+	if form == nil {
+		http.Error(c, utils.ErrorWithStack(expects.NewClientError("空的表单数据")))
+		return
+	}
 	fileHeaders := form.File["Video"]
-	uploadedFiles, err, code := h.UploadFile(c, basePath, fileHeaders, maxSize, allowedMimeTypes)
+	uploadedFiles, err := h.UploadFile(c, basePath, fileHeaders, maxSize, allowedMimeTypes)
 	if err != nil {
-		http.Error(c, utils.ErrorWithStack(err), code)
+		http.Error(c, utils.ErrorWithStack(err))
 		return
 	}
 	if len(uploadedFiles) == 0 {
-		http.Error(c, utils.ErrorWithStack(expects.NewEmptyData()), 900)
+		http.Error(c, utils.ErrorWithStack(expects.NewEmptyData()), 1000)
 		return
 	}
 	var saveds []structs.IEntity
 	var failures []string
-	videoService := services.NewVideo(c)
+	videoService := services.NewVideoService(c)
 	for _, file := range uploadedFiles {
 		saved, err := videoService.CreateOrUpdateByName(&entities.Video{
 			Video: dao.Video{
@@ -231,5 +244,5 @@ func (h *TwoHandler) UploadVideos(c *gin.Context) {
 }
 
 func (h *TwoHandler) ExtraMessages(c *gin.Context) {
-	http.Error(c, utils.ErrorWithStack(expects.NewNotImplementedMethod()), 900)
+	http.Error(c, utils.ErrorWithStack(expects.NewNotImplementedMethod()), 1000)
 }

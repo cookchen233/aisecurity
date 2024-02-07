@@ -3,10 +3,10 @@ package types
 import "time"
 
 type UploadedFile struct {
-	Name      string    `json:"name"`
-	URL       string    `json:"url"`
-	Size      int64     `json:"size"`
-	CreatedAt time.Time `json:"created_at"`
+	Name       string    `json:"name"`
+	URL        string    `json:"url"`
+	Size       int64     `json:"size"`
+	CreateTime time.Time `json:"create_time"`
 }
 
 type UploadedImage struct {

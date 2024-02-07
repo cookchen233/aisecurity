@@ -4,18 +4,24 @@ package dao
 
 import (
 	"aisecurity/ent/dao/admin"
-	"aisecurity/ent/dao/adminrole"
 	"aisecurity/ent/dao/area"
 	"aisecurity/ent/dao/department"
 	"aisecurity/ent/dao/device"
 	"aisecurity/ent/dao/deviceinstallation"
 	"aisecurity/ent/dao/employee"
+	"aisecurity/ent/dao/event"
 	"aisecurity/ent/dao/eventlevel"
-	"aisecurity/ent/dao/ipcevent"
+	"aisecurity/ent/dao/eventlog"
+	"aisecurity/ent/dao/fixing"
 	"aisecurity/ent/dao/occupation"
+	"aisecurity/ent/dao/permission"
 	"aisecurity/ent/dao/risk"
 	"aisecurity/ent/dao/riskcategory"
 	"aisecurity/ent/dao/risklocation"
+	"aisecurity/ent/dao/sweep"
+	"aisecurity/ent/dao/sweepresult"
+	"aisecurity/ent/dao/sweepresultdetails"
+	"aisecurity/ent/dao/sweepschedule"
 	"aisecurity/ent/dao/video"
 	"context"
 	"errors"
@@ -87,18 +93,24 @@ func checkColumn(table, column string) error {
 	initCheck.Do(func() {
 		columnCheck = sql.NewColumnCheck(map[string]func(string) bool{
 			admin.Table:              admin.ValidColumn,
-			adminrole.Table:          adminrole.ValidColumn,
 			area.Table:               area.ValidColumn,
 			department.Table:         department.ValidColumn,
 			device.Table:             device.ValidColumn,
 			deviceinstallation.Table: deviceinstallation.ValidColumn,
 			employee.Table:           employee.ValidColumn,
+			event.Table:              event.ValidColumn,
 			eventlevel.Table:         eventlevel.ValidColumn,
-			ipcevent.Table:           ipcevent.ValidColumn,
+			eventlog.Table:           eventlog.ValidColumn,
+			fixing.Table:             fixing.ValidColumn,
 			occupation.Table:         occupation.ValidColumn,
+			permission.Table:         permission.ValidColumn,
 			risk.Table:               risk.ValidColumn,
 			riskcategory.Table:       riskcategory.ValidColumn,
 			risklocation.Table:       risklocation.ValidColumn,
+			sweep.Table:              sweep.ValidColumn,
+			sweepresult.Table:        sweepresult.ValidColumn,
+			sweepresultdetails.Table: sweepresultdetails.ValidColumn,
+			sweepschedule.Table:      sweepschedule.ValidColumn,
 			video.Table:              video.ValidColumn,
 		})
 	})

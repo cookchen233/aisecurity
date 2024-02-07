@@ -19,15 +19,15 @@ type Area struct {
 	// ID of the ent.
 	ID int `json:"id,omitempty"`
 	// 创建时间
-	CreatedAt time.Time `json:"created_at"`
+	CreateTime time.Time `json:"create_time"`
 	// 创建者
-	CreatedBy int `json:"created_by"`
+	CreatorID int `json:"creator_id"`
 	// 删除时间
-	DeletedAt *time.Time `json:"deleted_at"`
+	DeleteTime *time.Time `json:"delete_time"`
 	// 最后更新者
-	UpdatedBy int `json:"updated_by"`
+	UpdaterID int `json:"updater_id"`
 	// 最后更新时间
-	UpdatedAt time.Time `json:"updated_at"`
+	UpdateTime time.Time `json:"update_time"`
 	// 名称
 	Name string `json:"name"`
 	// 描述
@@ -44,8 +44,8 @@ type AreaEdges struct {
 	Creator *Admin `json:"creator,omitempty"`
 	// Updater holds the value of the updater edge.
 	Updater *Admin `json:"updater,omitempty"`
-	// DeviceInstallationArea holds the value of the device_installation_area edge.
-	DeviceInstallationArea []*DeviceInstallation `json:"device_installation_area,omitempty"`
+	// DeviceInstallation holds the value of the device_installation edge.
+	DeviceInstallation []*DeviceInstallation `json:"device_installation,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
 	loadedTypes [3]bool
@@ -77,13 +77,13 @@ func (e AreaEdges) UpdaterOrErr() (*Admin, error) {
 	return nil, &NotLoadedError{edge: "updater"}
 }
 
-// DeviceInstallationAreaOrErr returns the DeviceInstallationArea value or an error if the edge
+// DeviceInstallationOrErr returns the DeviceInstallation value or an error if the edge
 // was not loaded in eager-loading.
-func (e AreaEdges) DeviceInstallationAreaOrErr() ([]*DeviceInstallation, error) {
+func (e AreaEdges) DeviceInstallationOrErr() ([]*DeviceInstallation, error) {
 	if e.loadedTypes[2] {
-		return e.DeviceInstallationArea, nil
+		return e.DeviceInstallation, nil
 	}
-	return nil, &NotLoadedError{edge: "device_installation_area"}
+	return nil, &NotLoadedError{edge: "device_installation"}
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
@@ -91,11 +91,11 @@ func (*Area) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
 	for i := range columns {
 		switch columns[i] {
-		case area.FieldID, area.FieldCreatedBy, area.FieldUpdatedBy:
+		case area.FieldID, area.FieldCreatorID, area.FieldUpdaterID:
 			values[i] = new(sql.NullInt64)
 		case area.FieldName, area.FieldDescription:
 			values[i] = new(sql.NullString)
-		case area.FieldCreatedAt, area.FieldDeletedAt, area.FieldUpdatedAt:
+		case area.FieldCreateTime, area.FieldDeleteTime, area.FieldUpdateTime:
 			values[i] = new(sql.NullTime)
 		default:
 			values[i] = new(sql.UnknownType)
@@ -118,36 +118,36 @@ func (a *Area) assignValues(columns []string, values []any) error {
 				return fmt.Errorf("unexpected type %T for field id", value)
 			}
 			a.ID = int(value.Int64)
-		case area.FieldCreatedAt:
+		case area.FieldCreateTime:
 			if value, ok := values[i].(*sql.NullTime); !ok {
-				return fmt.Errorf("unexpected type %T for field created_at", values[i])
+				return fmt.Errorf("unexpected type %T for field create_time", values[i])
 			} else if value.Valid {
-				a.CreatedAt = value.Time
+				a.CreateTime = value.Time
 			}
-		case area.FieldCreatedBy:
+		case area.FieldCreatorID:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
-				return fmt.Errorf("unexpected type %T for field created_by", values[i])
+				return fmt.Errorf("unexpected type %T for field creator_id", values[i])
 			} else if value.Valid {
-				a.CreatedBy = int(value.Int64)
+				a.CreatorID = int(value.Int64)
 			}
-		case area.FieldDeletedAt:
+		case area.FieldDeleteTime:
 			if value, ok := values[i].(*sql.NullTime); !ok {
-				return fmt.Errorf("unexpected type %T for field deleted_at", values[i])
+				return fmt.Errorf("unexpected type %T for field delete_time", values[i])
 			} else if value.Valid {
-				a.DeletedAt = new(time.Time)
-				*a.DeletedAt = value.Time
+				a.DeleteTime = new(time.Time)
+				*a.DeleteTime = value.Time
 			}
-		case area.FieldUpdatedBy:
+		case area.FieldUpdaterID:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
-				return fmt.Errorf("unexpected type %T for field updated_by", values[i])
+				return fmt.Errorf("unexpected type %T for field updater_id", values[i])
 			} else if value.Valid {
-				a.UpdatedBy = int(value.Int64)
+				a.UpdaterID = int(value.Int64)
 			}
-		case area.FieldUpdatedAt:
+		case area.FieldUpdateTime:
 			if value, ok := values[i].(*sql.NullTime); !ok {
-				return fmt.Errorf("unexpected type %T for field updated_at", values[i])
+				return fmt.Errorf("unexpected type %T for field update_time", values[i])
 			} else if value.Valid {
-				a.UpdatedAt = value.Time
+				a.UpdateTime = value.Time
 			}
 		case area.FieldName:
 			if value, ok := values[i].(*sql.NullString); !ok {
@@ -184,9 +184,9 @@ func (a *Area) QueryUpdater() *AdminQuery {
 	return NewAreaClient(a.config).QueryUpdater(a)
 }
 
-// QueryDeviceInstallationArea queries the "device_installation_area" edge of the Area entity.
-func (a *Area) QueryDeviceInstallationArea() *DeviceInstallationQuery {
-	return NewAreaClient(a.config).QueryDeviceInstallationArea(a)
+// QueryDeviceInstallation queries the "device_installation" edge of the Area entity.
+func (a *Area) QueryDeviceInstallation() *DeviceInstallationQuery {
+	return NewAreaClient(a.config).QueryDeviceInstallation(a)
 }
 
 // Update returns a builder for updating this Area.
@@ -212,22 +212,22 @@ func (a *Area) String() string {
 	var builder strings.Builder
 	builder.WriteString("Area(")
 	builder.WriteString(fmt.Sprintf("id=%v, ", a.ID))
-	builder.WriteString("created_at=")
-	builder.WriteString(a.CreatedAt.Format(time.ANSIC))
+	builder.WriteString("create_time=")
+	builder.WriteString(a.CreateTime.Format(time.ANSIC))
 	builder.WriteString(", ")
-	builder.WriteString("created_by=")
-	builder.WriteString(fmt.Sprintf("%v", a.CreatedBy))
+	builder.WriteString("creator_id=")
+	builder.WriteString(fmt.Sprintf("%v", a.CreatorID))
 	builder.WriteString(", ")
-	if v := a.DeletedAt; v != nil {
-		builder.WriteString("deleted_at=")
+	if v := a.DeleteTime; v != nil {
+		builder.WriteString("delete_time=")
 		builder.WriteString(v.Format(time.ANSIC))
 	}
 	builder.WriteString(", ")
-	builder.WriteString("updated_by=")
-	builder.WriteString(fmt.Sprintf("%v", a.UpdatedBy))
+	builder.WriteString("updater_id=")
+	builder.WriteString(fmt.Sprintf("%v", a.UpdaterID))
 	builder.WriteString(", ")
-	builder.WriteString("updated_at=")
-	builder.WriteString(a.UpdatedAt.Format(time.ANSIC))
+	builder.WriteString("update_time=")
+	builder.WriteString(a.UpdateTime.Format(time.ANSIC))
 	builder.WriteString(", ")
 	builder.WriteString("name=")
 	builder.WriteString(a.Name)

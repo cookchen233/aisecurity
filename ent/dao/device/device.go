@@ -16,16 +16,16 @@ const (
 	Label = "device"
 	// FieldID holds the string denoting the id field in the database.
 	FieldID = "id"
-	// FieldCreatedAt holds the string denoting the created_at field in the database.
-	FieldCreatedAt = "created_at"
-	// FieldCreatedBy holds the string denoting the created_by field in the database.
-	FieldCreatedBy = "created_by"
-	// FieldDeletedAt holds the string denoting the deleted_at field in the database.
-	FieldDeletedAt = "deleted_at"
-	// FieldUpdatedBy holds the string denoting the updated_by field in the database.
-	FieldUpdatedBy = "updated_by"
-	// FieldUpdatedAt holds the string denoting the updated_at field in the database.
-	FieldUpdatedAt = "updated_at"
+	// FieldCreateTime holds the string denoting the create_time field in the database.
+	FieldCreateTime = "create_time"
+	// FieldCreatorID holds the string denoting the creator_id field in the database.
+	FieldCreatorID = "creator_id"
+	// FieldDeleteTime holds the string denoting the delete_time field in the database.
+	FieldDeleteTime = "delete_time"
+	// FieldUpdaterID holds the string denoting the updater_id field in the database.
+	FieldUpdaterID = "updater_id"
+	// FieldUpdateTime holds the string denoting the update_time field in the database.
+	FieldUpdateTime = "update_time"
 	// FieldBrand holds the string denoting the brand field in the database.
 	FieldBrand = "brand"
 	// FieldModel holds the string denoting the model field in the database.
@@ -40,10 +40,14 @@ const (
 	EdgeCreator = "creator"
 	// EdgeUpdater holds the string denoting the updater edge name in mutations.
 	EdgeUpdater = "updater"
-	// EdgeIpcEventDevice holds the string denoting the ipc_event_device edge name in mutations.
-	EdgeIpcEventDevice = "ipc_event_device"
-	// EdgeDeviceInstallationDevice holds the string denoting the device_installation_device edge name in mutations.
-	EdgeDeviceInstallationDevice = "device_installation_device"
+	// EdgeEvent holds the string denoting the event edge name in mutations.
+	EdgeEvent = "event"
+	// EdgeDeviceInstallation holds the string denoting the device_installation edge name in mutations.
+	EdgeDeviceInstallation = "device_installation"
+	// EdgeEventLog holds the string denoting the event_log edge name in mutations.
+	EdgeEventLog = "event_log"
+	// EdgeFixing holds the string denoting the fixing edge name in mutations.
+	EdgeFixing = "fixing"
 	// Table holds the table name of the device in the database.
 	Table = "devices"
 	// CreatorTable is the table that holds the creator relation/edge.
@@ -52,38 +56,52 @@ const (
 	// It exists in this package in order to avoid circular dependency with the "admin" package.
 	CreatorInverseTable = "admins"
 	// CreatorColumn is the table column denoting the creator relation/edge.
-	CreatorColumn = "created_by"
+	CreatorColumn = "creator_id"
 	// UpdaterTable is the table that holds the updater relation/edge.
 	UpdaterTable = "devices"
 	// UpdaterInverseTable is the table name for the Admin entity.
 	// It exists in this package in order to avoid circular dependency with the "admin" package.
 	UpdaterInverseTable = "admins"
 	// UpdaterColumn is the table column denoting the updater relation/edge.
-	UpdaterColumn = "updated_by"
-	// IpcEventDeviceTable is the table that holds the ipc_event_device relation/edge.
-	IpcEventDeviceTable = "ipc_events"
-	// IpcEventDeviceInverseTable is the table name for the IPCEvent entity.
-	// It exists in this package in order to avoid circular dependency with the "ipcevent" package.
-	IpcEventDeviceInverseTable = "ipc_events"
-	// IpcEventDeviceColumn is the table column denoting the ipc_event_device relation/edge.
-	IpcEventDeviceColumn = "device_id"
-	// DeviceInstallationDeviceTable is the table that holds the device_installation_device relation/edge.
-	DeviceInstallationDeviceTable = "device_installations"
-	// DeviceInstallationDeviceInverseTable is the table name for the DeviceInstallation entity.
+	UpdaterColumn = "updater_id"
+	// EventTable is the table that holds the event relation/edge.
+	EventTable = "events"
+	// EventInverseTable is the table name for the Event entity.
+	// It exists in this package in order to avoid circular dependency with the "event" package.
+	EventInverseTable = "events"
+	// EventColumn is the table column denoting the event relation/edge.
+	EventColumn = "device_id"
+	// DeviceInstallationTable is the table that holds the device_installation relation/edge.
+	DeviceInstallationTable = "device_installations"
+	// DeviceInstallationInverseTable is the table name for the DeviceInstallation entity.
 	// It exists in this package in order to avoid circular dependency with the "deviceinstallation" package.
-	DeviceInstallationDeviceInverseTable = "device_installations"
-	// DeviceInstallationDeviceColumn is the table column denoting the device_installation_device relation/edge.
-	DeviceInstallationDeviceColumn = "device_id"
+	DeviceInstallationInverseTable = "device_installations"
+	// DeviceInstallationColumn is the table column denoting the device_installation relation/edge.
+	DeviceInstallationColumn = "device_id"
+	// EventLogTable is the table that holds the event_log relation/edge.
+	EventLogTable = "event_logs"
+	// EventLogInverseTable is the table name for the EventLog entity.
+	// It exists in this package in order to avoid circular dependency with the "eventlog" package.
+	EventLogInverseTable = "event_logs"
+	// EventLogColumn is the table column denoting the event_log relation/edge.
+	EventLogColumn = "device_id"
+	// FixingTable is the table that holds the fixing relation/edge.
+	FixingTable = "fixings"
+	// FixingInverseTable is the table name for the Fixing entity.
+	// It exists in this package in order to avoid circular dependency with the "fixing" package.
+	FixingInverseTable = "fixings"
+	// FixingColumn is the table column denoting the fixing relation/edge.
+	FixingColumn = "device_id"
 )
 
 // Columns holds all SQL columns for device fields.
 var Columns = []string{
 	FieldID,
-	FieldCreatedAt,
-	FieldCreatedBy,
-	FieldDeletedAt,
-	FieldUpdatedBy,
-	FieldUpdatedAt,
+	FieldCreateTime,
+	FieldCreatorID,
+	FieldDeleteTime,
+	FieldUpdaterID,
+	FieldUpdateTime,
 	FieldBrand,
 	FieldModel,
 	FieldName,
@@ -108,16 +126,16 @@ func ValidColumn(column string) bool {
 //	import _ "aisecurity/ent/dao/runtime"
 var (
 	Hooks [1]ent.Hook
-	// DefaultCreatedAt holds the default value on creation for the "created_at" field.
-	DefaultCreatedAt func() time.Time
-	// CreatedByValidator is a validator for the "created_by" field. It is called by the builders before save.
-	CreatedByValidator func(int) error
-	// UpdatedByValidator is a validator for the "updated_by" field. It is called by the builders before save.
-	UpdatedByValidator func(int) error
-	// DefaultUpdatedAt holds the default value on creation for the "updated_at" field.
-	DefaultUpdatedAt func() time.Time
-	// UpdateDefaultUpdatedAt holds the default value on update for the "updated_at" field.
-	UpdateDefaultUpdatedAt func() time.Time
+	// DefaultCreateTime holds the default value on creation for the "create_time" field.
+	DefaultCreateTime func() time.Time
+	// CreatorIDValidator is a validator for the "creator_id" field. It is called by the builders before save.
+	CreatorIDValidator func(int) error
+	// UpdaterIDValidator is a validator for the "updater_id" field. It is called by the builders before save.
+	UpdaterIDValidator func(int) error
+	// DefaultUpdateTime holds the default value on creation for the "update_time" field.
+	DefaultUpdateTime func() time.Time
+	// UpdateDefaultUpdateTime holds the default value on update for the "update_time" field.
+	UpdateDefaultUpdateTime func() time.Time
 	// DefaultBrand holds the default value on creation for the "brand" field.
 	DefaultBrand enums.DeviceBrand
 	// BrandValidator is a validator for the "brand" field. It is called by the builders before save.
@@ -146,29 +164,29 @@ func ByID(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldID, opts...).ToFunc()
 }
 
-// ByCreatedAt orders the results by the created_at field.
-func ByCreatedAt(opts ...sql.OrderTermOption) OrderOption {
-	return sql.OrderByField(FieldCreatedAt, opts...).ToFunc()
+// ByCreateTime orders the results by the create_time field.
+func ByCreateTime(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldCreateTime, opts...).ToFunc()
 }
 
-// ByCreatedBy orders the results by the created_by field.
-func ByCreatedBy(opts ...sql.OrderTermOption) OrderOption {
-	return sql.OrderByField(FieldCreatedBy, opts...).ToFunc()
+// ByCreatorID orders the results by the creator_id field.
+func ByCreatorID(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldCreatorID, opts...).ToFunc()
 }
 
-// ByDeletedAt orders the results by the deleted_at field.
-func ByDeletedAt(opts ...sql.OrderTermOption) OrderOption {
-	return sql.OrderByField(FieldDeletedAt, opts...).ToFunc()
+// ByDeleteTime orders the results by the delete_time field.
+func ByDeleteTime(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldDeleteTime, opts...).ToFunc()
 }
 
-// ByUpdatedBy orders the results by the updated_by field.
-func ByUpdatedBy(opts ...sql.OrderTermOption) OrderOption {
-	return sql.OrderByField(FieldUpdatedBy, opts...).ToFunc()
+// ByUpdaterID orders the results by the updater_id field.
+func ByUpdaterID(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldUpdaterID, opts...).ToFunc()
 }
 
-// ByUpdatedAt orders the results by the updated_at field.
-func ByUpdatedAt(opts ...sql.OrderTermOption) OrderOption {
-	return sql.OrderByField(FieldUpdatedAt, opts...).ToFunc()
+// ByUpdateTime orders the results by the update_time field.
+func ByUpdateTime(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldUpdateTime, opts...).ToFunc()
 }
 
 // ByBrand orders the results by the brand field.
@@ -210,31 +228,59 @@ func ByUpdaterField(field string, opts ...sql.OrderTermOption) OrderOption {
 	}
 }
 
-// ByIpcEventDeviceCount orders the results by ipc_event_device count.
-func ByIpcEventDeviceCount(opts ...sql.OrderTermOption) OrderOption {
+// ByEventCount orders the results by event count.
+func ByEventCount(opts ...sql.OrderTermOption) OrderOption {
 	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborsCount(s, newIpcEventDeviceStep(), opts...)
+		sqlgraph.OrderByNeighborsCount(s, newEventStep(), opts...)
 	}
 }
 
-// ByIpcEventDevice orders the results by ipc_event_device terms.
-func ByIpcEventDevice(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+// ByEvent orders the results by event terms.
+func ByEvent(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
 	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborTerms(s, newIpcEventDeviceStep(), append([]sql.OrderTerm{term}, terms...)...)
+		sqlgraph.OrderByNeighborTerms(s, newEventStep(), append([]sql.OrderTerm{term}, terms...)...)
 	}
 }
 
-// ByDeviceInstallationDeviceCount orders the results by device_installation_device count.
-func ByDeviceInstallationDeviceCount(opts ...sql.OrderTermOption) OrderOption {
+// ByDeviceInstallationCount orders the results by device_installation count.
+func ByDeviceInstallationCount(opts ...sql.OrderTermOption) OrderOption {
 	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborsCount(s, newDeviceInstallationDeviceStep(), opts...)
+		sqlgraph.OrderByNeighborsCount(s, newDeviceInstallationStep(), opts...)
 	}
 }
 
-// ByDeviceInstallationDevice orders the results by device_installation_device terms.
-func ByDeviceInstallationDevice(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+// ByDeviceInstallation orders the results by device_installation terms.
+func ByDeviceInstallation(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
 	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborTerms(s, newDeviceInstallationDeviceStep(), append([]sql.OrderTerm{term}, terms...)...)
+		sqlgraph.OrderByNeighborTerms(s, newDeviceInstallationStep(), append([]sql.OrderTerm{term}, terms...)...)
+	}
+}
+
+// ByEventLogCount orders the results by event_log count.
+func ByEventLogCount(opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborsCount(s, newEventLogStep(), opts...)
+	}
+}
+
+// ByEventLog orders the results by event_log terms.
+func ByEventLog(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newEventLogStep(), append([]sql.OrderTerm{term}, terms...)...)
+	}
+}
+
+// ByFixingCount orders the results by fixing count.
+func ByFixingCount(opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborsCount(s, newFixingStep(), opts...)
+	}
+}
+
+// ByFixing orders the results by fixing terms.
+func ByFixing(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newFixingStep(), append([]sql.OrderTerm{term}, terms...)...)
 	}
 }
 func newCreatorStep() *sqlgraph.Step {
@@ -251,17 +297,31 @@ func newUpdaterStep() *sqlgraph.Step {
 		sqlgraph.Edge(sqlgraph.M2O, true, UpdaterTable, UpdaterColumn),
 	)
 }
-func newIpcEventDeviceStep() *sqlgraph.Step {
+func newEventStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
-		sqlgraph.To(IpcEventDeviceInverseTable, FieldID),
-		sqlgraph.Edge(sqlgraph.O2M, false, IpcEventDeviceTable, IpcEventDeviceColumn),
+		sqlgraph.To(EventInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.O2M, false, EventTable, EventColumn),
 	)
 }
-func newDeviceInstallationDeviceStep() *sqlgraph.Step {
+func newDeviceInstallationStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
-		sqlgraph.To(DeviceInstallationDeviceInverseTable, FieldID),
-		sqlgraph.Edge(sqlgraph.O2M, false, DeviceInstallationDeviceTable, DeviceInstallationDeviceColumn),
+		sqlgraph.To(DeviceInstallationInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.O2M, false, DeviceInstallationTable, DeviceInstallationColumn),
+	)
+}
+func newEventLogStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(EventLogInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.O2M, false, EventLogTable, EventLogColumn),
+	)
+}
+func newFixingStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(FixingInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.O2M, false, FixingTable, FixingColumn),
 	)
 }

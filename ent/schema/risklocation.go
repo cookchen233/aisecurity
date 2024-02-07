@@ -28,9 +28,10 @@ func (RiskLocation) Fields() []ent.Field {
 // Edges of the RiskLocation.
 func (RiskLocation) Edges() []ent.Edge {
 	return []ent.Edge{
-		edge.From("creator", Admin.Type).Ref("risk_location_creator").Field("created_by").Immutable().Unique().Required(),
-		edge.From("updater", Admin.Type).Ref("risk_location_updater").Field("updated_by").Required().Unique(),
+		edge.From("creator", Admin.Type).Ref("risk_location_creator").Field("creator_id").Immutable().Unique().Required(),
+		edge.From("updater", Admin.Type).Ref("risk_location_updater").Field("updater_id").Required().Unique(),
 
 		edge.To("risk", Risk.Type),
+		edge.To("sweep", Sweep.Type),
 	}
 }

@@ -75,6 +75,7 @@ func (s *Device) GetList(fit structs.IFilter) ([]structs.IEntity, error) {
 	list, err := s.query(fit).
 		Limit(fit.GetLimit()).
 		Offset(fit.GetOffset()).
+		Order(dao.Desc(device.FieldID)).
 		All(s.Ctx)
 	if err != nil {
 		return nil, utils.ErrorWithStack(err)

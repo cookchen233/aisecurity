@@ -6,6 +6,7 @@ import (
 	"aisecurity/ent/dao/admin"
 	"aisecurity/ent/dao/department"
 	"aisecurity/ent/dao/employee"
+	"aisecurity/ent/dao/occupation"
 	"fmt"
 	"strings"
 	"time"
@@ -20,19 +21,21 @@ type Employee struct {
 	// ID of the ent.
 	ID int `json:"id,omitempty"`
 	// 创建时间
-	CreatedAt time.Time `json:"created_at"`
+	CreateTime time.Time `json:"create_time"`
 	// 创建者
-	CreatedBy int `json:"created_by"`
+	CreatorID int `json:"creator_id"`
 	// 删除时间
-	DeletedAt *time.Time `json:"deleted_at"`
+	DeleteTime *time.Time `json:"delete_time"`
 	// 最后更新者
-	UpdatedBy int `json:"updated_by"`
+	UpdaterID int `json:"updater_id"`
 	// 最后更新时间
-	UpdatedAt time.Time `json:"updated_at"`
+	UpdateTime time.Time `json:"update_time"`
 	// 管理员id
 	AdminID int `json:"admin_id"`
 	// 部门id
 	DepartmentID int `json:"department_id"`
+	// 岗位ID
+	OccupationID int `json:"occupation_id"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the EmployeeQuery when eager-loading is set.
 	Edges        EmployeeEdges `json:"edges"`
@@ -47,19 +50,13 @@ type EmployeeEdges struct {
 	Updater *Admin `json:"updater,omitempty"`
 	// Admin holds the value of the admin edge.
 	Admin *Admin `json:"admin,omitempty"`
+	// Occupation holds the value of the occupation edge.
+	Occupation *Occupation `json:"occupation,omitempty"`
 	// Department holds the value of the department edge.
 	Department *Department `json:"department,omitempty"`
-	// Occupations holds the value of the occupations edge.
-	Occupations []*Occupation `json:"occupations,omitempty"`
-	// IpcEvents holds the value of the ipc_events edge.
-	IpcEvents []*IPCEvent `json:"ipc_events,omitempty"`
-	// RiskReporter holds the value of the risk_reporter edge.
-	RiskReporter []*Risk `json:"risk_reporter,omitempty"`
-	// RiskMaintainer holds the value of the risk_maintainer edge.
-	RiskMaintainer []*Risk `json:"risk_maintainer,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
-	loadedTypes [8]bool
+	loadedTypes [5]bool
 }
 
 // CreatorOrErr returns the Creator value or an error if the edge
@@ -101,10 +98,23 @@ func (e EmployeeEdges) AdminOrErr() (*Admin, error) {
 	return nil, &NotLoadedError{edge: "admin"}
 }
 
+// OccupationOrErr returns the Occupation value or an error if the edge
+// was not loaded in eager-loading, or loaded but was not found.
+func (e EmployeeEdges) OccupationOrErr() (*Occupation, error) {
+	if e.loadedTypes[3] {
+		if e.Occupation == nil {
+			// Edge was loaded but was not found.
+			return nil, &NotFoundError{label: occupation.Label}
+		}
+		return e.Occupation, nil
+	}
+	return nil, &NotLoadedError{edge: "occupation"}
+}
+
 // DepartmentOrErr returns the Department value or an error if the edge
 // was not loaded in eager-loading, or loaded but was not found.
 func (e EmployeeEdges) DepartmentOrErr() (*Department, error) {
-	if e.loadedTypes[3] {
+	if e.loadedTypes[4] {
 		if e.Department == nil {
 			// Edge was loaded but was not found.
 			return nil, &NotFoundError{label: department.Label}
@@ -114,50 +124,14 @@ func (e EmployeeEdges) DepartmentOrErr() (*Department, error) {
 	return nil, &NotLoadedError{edge: "department"}
 }
 
-// OccupationsOrErr returns the Occupations value or an error if the edge
-// was not loaded in eager-loading.
-func (e EmployeeEdges) OccupationsOrErr() ([]*Occupation, error) {
-	if e.loadedTypes[4] {
-		return e.Occupations, nil
-	}
-	return nil, &NotLoadedError{edge: "occupations"}
-}
-
-// IpcEventsOrErr returns the IpcEvents value or an error if the edge
-// was not loaded in eager-loading.
-func (e EmployeeEdges) IpcEventsOrErr() ([]*IPCEvent, error) {
-	if e.loadedTypes[5] {
-		return e.IpcEvents, nil
-	}
-	return nil, &NotLoadedError{edge: "ipc_events"}
-}
-
-// RiskReporterOrErr returns the RiskReporter value or an error if the edge
-// was not loaded in eager-loading.
-func (e EmployeeEdges) RiskReporterOrErr() ([]*Risk, error) {
-	if e.loadedTypes[6] {
-		return e.RiskReporter, nil
-	}
-	return nil, &NotLoadedError{edge: "risk_reporter"}
-}
-
-// RiskMaintainerOrErr returns the RiskMaintainer value or an error if the edge
-// was not loaded in eager-loading.
-func (e EmployeeEdges) RiskMaintainerOrErr() ([]*Risk, error) {
-	if e.loadedTypes[7] {
-		return e.RiskMaintainer, nil
-	}
-	return nil, &NotLoadedError{edge: "risk_maintainer"}
-}
-
 // scanValues returns the types for scanning values from sql.Rows.
 func (*Employee) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
 	for i := range columns {
 		switch columns[i] {
-		case employee.FieldID, employee.FieldCreatedBy, employee.FieldUpdatedBy, employee.FieldAdminID, employee.FieldDepartmentID:
+		case employee.FieldID, employee.FieldCreatorID, employee.FieldUpdaterID, employee.FieldAdminID, employee.FieldDepartmentID, employee.FieldOccupationID:
 			values[i] = new(sql.NullInt64)
-		case employee.FieldCreatedAt, employee.FieldDeletedAt, employee.FieldUpdatedAt:
+		case employee.FieldCreateTime, employee.FieldDeleteTime, employee.FieldUpdateTime:
 			values[i] = new(sql.NullTime)
 		default:
 			values[i] = new(sql.UnknownType)
@@ -180,36 +154,36 @@ func (e *Employee) assignValues(columns []string, values []any) error {
 				return fmt.Errorf("unexpected type %T for field id", value)
 			}
 			e.ID = int(value.Int64)
-		case employee.FieldCreatedAt:
+		case employee.FieldCreateTime:
 			if value, ok := values[i].(*sql.NullTime); !ok {
-				return fmt.Errorf("unexpected type %T for field created_at", values[i])
+				return fmt.Errorf("unexpected type %T for field create_time", values[i])
 			} else if value.Valid {
-				e.CreatedAt = value.Time
+				e.CreateTime = value.Time
 			}
-		case employee.FieldCreatedBy:
+		case employee.FieldCreatorID:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
-				return fmt.Errorf("unexpected type %T for field created_by", values[i])
+				return fmt.Errorf("unexpected type %T for field creator_id", values[i])
 			} else if value.Valid {
-				e.CreatedBy = int(value.Int64)
+				e.CreatorID = int(value.Int64)
 			}
-		case employee.FieldDeletedAt:
+		case employee.FieldDeleteTime:
 			if value, ok := values[i].(*sql.NullTime); !ok {
-				return fmt.Errorf("unexpected type %T for field deleted_at", values[i])
+				return fmt.Errorf("unexpected type %T for field delete_time", values[i])
 			} else if value.Valid {
-				e.DeletedAt = new(time.Time)
-				*e.DeletedAt = value.Time
+				e.DeleteTime = new(time.Time)
+				*e.DeleteTime = value.Time
 			}
-		case employee.FieldUpdatedBy:
+		case employee.FieldUpdaterID:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
-				return fmt.Errorf("unexpected type %T for field updated_by", values[i])
+				return fmt.Errorf("unexpected type %T for field updater_id", values[i])
 			} else if value.Valid {
-				e.UpdatedBy = int(value.Int64)
+				e.UpdaterID = int(value.Int64)
 			}
-		case employee.FieldUpdatedAt:
+		case employee.FieldUpdateTime:
 			if value, ok := values[i].(*sql.NullTime); !ok {
-				return fmt.Errorf("unexpected type %T for field updated_at", values[i])
+				return fmt.Errorf("unexpected type %T for field update_time", values[i])
 			} else if value.Valid {
-				e.UpdatedAt = value.Time
+				e.UpdateTime = value.Time
 			}
 		case employee.FieldAdminID:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
@@ -222,6 +196,12 @@ func (e *Employee) assignValues(columns []string, values []any) error {
 				return fmt.Errorf("unexpected type %T for field department_id", values[i])
 			} else if value.Valid {
 				e.DepartmentID = int(value.Int64)
+			}
+		case employee.FieldOccupationID:
+			if value, ok := values[i].(*sql.NullInt64); !ok {
+				return fmt.Errorf("unexpected type %T for field occupation_id", values[i])
+			} else if value.Valid {
+				e.OccupationID = int(value.Int64)
 			}
 		default:
 			e.selectValues.Set(columns[i], values[i])
@@ -251,29 +231,14 @@ func (e *Employee) QueryAdmin() *AdminQuery {
 	return NewEmployeeClient(e.config).QueryAdmin(e)
 }
 
+// QueryOccupation queries the "occupation" edge of the Employee entity.
+func (e *Employee) QueryOccupation() *OccupationQuery {
+	return NewEmployeeClient(e.config).QueryOccupation(e)
+}
+
 // QueryDepartment queries the "department" edge of the Employee entity.
 func (e *Employee) QueryDepartment() *DepartmentQuery {
 	return NewEmployeeClient(e.config).QueryDepartment(e)
-}
-
-// QueryOccupations queries the "occupations" edge of the Employee entity.
-func (e *Employee) QueryOccupations() *OccupationQuery {
-	return NewEmployeeClient(e.config).QueryOccupations(e)
-}
-
-// QueryIpcEvents queries the "ipc_events" edge of the Employee entity.
-func (e *Employee) QueryIpcEvents() *IPCEventQuery {
-	return NewEmployeeClient(e.config).QueryIpcEvents(e)
-}
-
-// QueryRiskReporter queries the "risk_reporter" edge of the Employee entity.
-func (e *Employee) QueryRiskReporter() *RiskQuery {
-	return NewEmployeeClient(e.config).QueryRiskReporter(e)
-}
-
-// QueryRiskMaintainer queries the "risk_maintainer" edge of the Employee entity.
-func (e *Employee) QueryRiskMaintainer() *RiskQuery {
-	return NewEmployeeClient(e.config).QueryRiskMaintainer(e)
 }
 
 // Update returns a builder for updating this Employee.
@@ -299,28 +264,31 @@ func (e *Employee) String() string {
 	var builder strings.Builder
 	builder.WriteString("Employee(")
 	builder.WriteString(fmt.Sprintf("id=%v, ", e.ID))
-	builder.WriteString("created_at=")
-	builder.WriteString(e.CreatedAt.Format(time.ANSIC))
+	builder.WriteString("create_time=")
+	builder.WriteString(e.CreateTime.Format(time.ANSIC))
 	builder.WriteString(", ")
-	builder.WriteString("created_by=")
-	builder.WriteString(fmt.Sprintf("%v", e.CreatedBy))
+	builder.WriteString("creator_id=")
+	builder.WriteString(fmt.Sprintf("%v", e.CreatorID))
 	builder.WriteString(", ")
-	if v := e.DeletedAt; v != nil {
-		builder.WriteString("deleted_at=")
+	if v := e.DeleteTime; v != nil {
+		builder.WriteString("delete_time=")
 		builder.WriteString(v.Format(time.ANSIC))
 	}
 	builder.WriteString(", ")
-	builder.WriteString("updated_by=")
-	builder.WriteString(fmt.Sprintf("%v", e.UpdatedBy))
+	builder.WriteString("updater_id=")
+	builder.WriteString(fmt.Sprintf("%v", e.UpdaterID))
 	builder.WriteString(", ")
-	builder.WriteString("updated_at=")
-	builder.WriteString(e.UpdatedAt.Format(time.ANSIC))
+	builder.WriteString("update_time=")
+	builder.WriteString(e.UpdateTime.Format(time.ANSIC))
 	builder.WriteString(", ")
 	builder.WriteString("admin_id=")
 	builder.WriteString(fmt.Sprintf("%v", e.AdminID))
 	builder.WriteString(", ")
 	builder.WriteString("department_id=")
 	builder.WriteString(fmt.Sprintf("%v", e.DepartmentID))
+	builder.WriteString(", ")
+	builder.WriteString("occupation_id=")
+	builder.WriteString(fmt.Sprintf("%v", e.OccupationID))
 	builder.WriteByte(')')
 	return builder.String()
 }

@@ -33,10 +33,12 @@ func (Device) Fields() []ent.Field {
 // Edges of the Device.
 func (Device) Edges() []ent.Edge {
 	return []ent.Edge{
-		edge.From("creator", Admin.Type).Ref("device_creator").Field("created_by").Immutable().Unique().Required(),
-		edge.From("updater", Admin.Type).Ref("device_updater").Field("updated_by").Required().Unique(),
+		edge.From("creator", Admin.Type).Ref("device_creator").Field("creator_id").Immutable().Unique().Required(),
+		edge.From("updater", Admin.Type).Ref("device_updater").Field("updater_id").Required().Unique(),
 
-		edge.To("ipc_event_device", IPCEvent.Type),
-		edge.To("device_installation_device", DeviceInstallation.Type),
+		edge.To("event", Event.Type),
+		edge.To("device_installation", DeviceInstallation.Type),
+		edge.To("event_log", EventLog.Type),
+		edge.To("fixing", Fixing.Type),
 	}
 }

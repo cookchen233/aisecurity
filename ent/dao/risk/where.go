@@ -56,29 +56,29 @@ func IDLTE(id int) predicate.Risk {
 	return predicate.Risk(sql.FieldLTE(FieldID, id))
 }
 
-// CreatedAt applies equality check predicate on the "created_at" field. It's identical to CreatedAtEQ.
-func CreatedAt(v time.Time) predicate.Risk {
-	return predicate.Risk(sql.FieldEQ(FieldCreatedAt, v))
+// CreateTime applies equality check predicate on the "create_time" field. It's identical to CreateTimeEQ.
+func CreateTime(v time.Time) predicate.Risk {
+	return predicate.Risk(sql.FieldEQ(FieldCreateTime, v))
 }
 
-// CreatedBy applies equality check predicate on the "created_by" field. It's identical to CreatedByEQ.
-func CreatedBy(v int) predicate.Risk {
-	return predicate.Risk(sql.FieldEQ(FieldCreatedBy, v))
+// CreatorID applies equality check predicate on the "creator_id" field. It's identical to CreatorIDEQ.
+func CreatorID(v int) predicate.Risk {
+	return predicate.Risk(sql.FieldEQ(FieldCreatorID, v))
 }
 
-// DeletedAt applies equality check predicate on the "deleted_at" field. It's identical to DeletedAtEQ.
-func DeletedAt(v time.Time) predicate.Risk {
-	return predicate.Risk(sql.FieldEQ(FieldDeletedAt, v))
+// DeleteTime applies equality check predicate on the "delete_time" field. It's identical to DeleteTimeEQ.
+func DeleteTime(v time.Time) predicate.Risk {
+	return predicate.Risk(sql.FieldEQ(FieldDeleteTime, v))
 }
 
-// UpdatedBy applies equality check predicate on the "updated_by" field. It's identical to UpdatedByEQ.
-func UpdatedBy(v int) predicate.Risk {
-	return predicate.Risk(sql.FieldEQ(FieldUpdatedBy, v))
+// UpdaterID applies equality check predicate on the "updater_id" field. It's identical to UpdaterIDEQ.
+func UpdaterID(v int) predicate.Risk {
+	return predicate.Risk(sql.FieldEQ(FieldUpdaterID, v))
 }
 
-// UpdatedAt applies equality check predicate on the "updated_at" field. It's identical to UpdatedAtEQ.
-func UpdatedAt(v time.Time) predicate.Risk {
-	return predicate.Risk(sql.FieldEQ(FieldUpdatedAt, v))
+// UpdateTime applies equality check predicate on the "update_time" field. It's identical to UpdateTimeEQ.
+func UpdateTime(v time.Time) predicate.Risk {
+	return predicate.Risk(sql.FieldEQ(FieldUpdateTime, v))
 }
 
 // Title applies equality check predicate on the "title" field. It's identical to TitleEQ.
@@ -99,11 +99,6 @@ func RiskCategoryID(v int) predicate.Risk {
 // RiskLocationID applies equality check predicate on the "risk_location_id" field. It's identical to RiskLocationIDEQ.
 func RiskLocationID(v int) predicate.Risk {
 	return predicate.Risk(sql.FieldEQ(FieldRiskLocationID, v))
-}
-
-// ReporterID applies equality check predicate on the "reporter_id" field. It's identical to ReporterIDEQ.
-func ReporterID(v int) predicate.Risk {
-	return predicate.Risk(sql.FieldEQ(FieldReporterID, v))
 }
 
 // MaintainerID applies equality check predicate on the "maintainer_id" field. It's identical to MaintainerIDEQ.
@@ -127,174 +122,174 @@ func DueTime(v time.Time) predicate.Risk {
 	return predicate.Risk(sql.FieldEQ(FieldDueTime, v))
 }
 
-// CreatedAtEQ applies the EQ predicate on the "created_at" field.
-func CreatedAtEQ(v time.Time) predicate.Risk {
-	return predicate.Risk(sql.FieldEQ(FieldCreatedAt, v))
+// CreateTimeEQ applies the EQ predicate on the "create_time" field.
+func CreateTimeEQ(v time.Time) predicate.Risk {
+	return predicate.Risk(sql.FieldEQ(FieldCreateTime, v))
 }
 
-// CreatedAtNEQ applies the NEQ predicate on the "created_at" field.
-func CreatedAtNEQ(v time.Time) predicate.Risk {
-	return predicate.Risk(sql.FieldNEQ(FieldCreatedAt, v))
+// CreateTimeNEQ applies the NEQ predicate on the "create_time" field.
+func CreateTimeNEQ(v time.Time) predicate.Risk {
+	return predicate.Risk(sql.FieldNEQ(FieldCreateTime, v))
 }
 
-// CreatedAtIn applies the In predicate on the "created_at" field.
-func CreatedAtIn(vs ...time.Time) predicate.Risk {
-	return predicate.Risk(sql.FieldIn(FieldCreatedAt, vs...))
+// CreateTimeIn applies the In predicate on the "create_time" field.
+func CreateTimeIn(vs ...time.Time) predicate.Risk {
+	return predicate.Risk(sql.FieldIn(FieldCreateTime, vs...))
 }
 
-// CreatedAtNotIn applies the NotIn predicate on the "created_at" field.
-func CreatedAtNotIn(vs ...time.Time) predicate.Risk {
-	return predicate.Risk(sql.FieldNotIn(FieldCreatedAt, vs...))
+// CreateTimeNotIn applies the NotIn predicate on the "create_time" field.
+func CreateTimeNotIn(vs ...time.Time) predicate.Risk {
+	return predicate.Risk(sql.FieldNotIn(FieldCreateTime, vs...))
 }
 
-// CreatedAtGT applies the GT predicate on the "created_at" field.
-func CreatedAtGT(v time.Time) predicate.Risk {
-	return predicate.Risk(sql.FieldGT(FieldCreatedAt, v))
+// CreateTimeGT applies the GT predicate on the "create_time" field.
+func CreateTimeGT(v time.Time) predicate.Risk {
+	return predicate.Risk(sql.FieldGT(FieldCreateTime, v))
 }
 
-// CreatedAtGTE applies the GTE predicate on the "created_at" field.
-func CreatedAtGTE(v time.Time) predicate.Risk {
-	return predicate.Risk(sql.FieldGTE(FieldCreatedAt, v))
+// CreateTimeGTE applies the GTE predicate on the "create_time" field.
+func CreateTimeGTE(v time.Time) predicate.Risk {
+	return predicate.Risk(sql.FieldGTE(FieldCreateTime, v))
 }
 
-// CreatedAtLT applies the LT predicate on the "created_at" field.
-func CreatedAtLT(v time.Time) predicate.Risk {
-	return predicate.Risk(sql.FieldLT(FieldCreatedAt, v))
+// CreateTimeLT applies the LT predicate on the "create_time" field.
+func CreateTimeLT(v time.Time) predicate.Risk {
+	return predicate.Risk(sql.FieldLT(FieldCreateTime, v))
 }
 
-// CreatedAtLTE applies the LTE predicate on the "created_at" field.
-func CreatedAtLTE(v time.Time) predicate.Risk {
-	return predicate.Risk(sql.FieldLTE(FieldCreatedAt, v))
+// CreateTimeLTE applies the LTE predicate on the "create_time" field.
+func CreateTimeLTE(v time.Time) predicate.Risk {
+	return predicate.Risk(sql.FieldLTE(FieldCreateTime, v))
 }
 
-// CreatedByEQ applies the EQ predicate on the "created_by" field.
-func CreatedByEQ(v int) predicate.Risk {
-	return predicate.Risk(sql.FieldEQ(FieldCreatedBy, v))
+// CreatorIDEQ applies the EQ predicate on the "creator_id" field.
+func CreatorIDEQ(v int) predicate.Risk {
+	return predicate.Risk(sql.FieldEQ(FieldCreatorID, v))
 }
 
-// CreatedByNEQ applies the NEQ predicate on the "created_by" field.
-func CreatedByNEQ(v int) predicate.Risk {
-	return predicate.Risk(sql.FieldNEQ(FieldCreatedBy, v))
+// CreatorIDNEQ applies the NEQ predicate on the "creator_id" field.
+func CreatorIDNEQ(v int) predicate.Risk {
+	return predicate.Risk(sql.FieldNEQ(FieldCreatorID, v))
 }
 
-// CreatedByIn applies the In predicate on the "created_by" field.
-func CreatedByIn(vs ...int) predicate.Risk {
-	return predicate.Risk(sql.FieldIn(FieldCreatedBy, vs...))
+// CreatorIDIn applies the In predicate on the "creator_id" field.
+func CreatorIDIn(vs ...int) predicate.Risk {
+	return predicate.Risk(sql.FieldIn(FieldCreatorID, vs...))
 }
 
-// CreatedByNotIn applies the NotIn predicate on the "created_by" field.
-func CreatedByNotIn(vs ...int) predicate.Risk {
-	return predicate.Risk(sql.FieldNotIn(FieldCreatedBy, vs...))
+// CreatorIDNotIn applies the NotIn predicate on the "creator_id" field.
+func CreatorIDNotIn(vs ...int) predicate.Risk {
+	return predicate.Risk(sql.FieldNotIn(FieldCreatorID, vs...))
 }
 
-// DeletedAtEQ applies the EQ predicate on the "deleted_at" field.
-func DeletedAtEQ(v time.Time) predicate.Risk {
-	return predicate.Risk(sql.FieldEQ(FieldDeletedAt, v))
+// DeleteTimeEQ applies the EQ predicate on the "delete_time" field.
+func DeleteTimeEQ(v time.Time) predicate.Risk {
+	return predicate.Risk(sql.FieldEQ(FieldDeleteTime, v))
 }
 
-// DeletedAtNEQ applies the NEQ predicate on the "deleted_at" field.
-func DeletedAtNEQ(v time.Time) predicate.Risk {
-	return predicate.Risk(sql.FieldNEQ(FieldDeletedAt, v))
+// DeleteTimeNEQ applies the NEQ predicate on the "delete_time" field.
+func DeleteTimeNEQ(v time.Time) predicate.Risk {
+	return predicate.Risk(sql.FieldNEQ(FieldDeleteTime, v))
 }
 
-// DeletedAtIn applies the In predicate on the "deleted_at" field.
-func DeletedAtIn(vs ...time.Time) predicate.Risk {
-	return predicate.Risk(sql.FieldIn(FieldDeletedAt, vs...))
+// DeleteTimeIn applies the In predicate on the "delete_time" field.
+func DeleteTimeIn(vs ...time.Time) predicate.Risk {
+	return predicate.Risk(sql.FieldIn(FieldDeleteTime, vs...))
 }
 
-// DeletedAtNotIn applies the NotIn predicate on the "deleted_at" field.
-func DeletedAtNotIn(vs ...time.Time) predicate.Risk {
-	return predicate.Risk(sql.FieldNotIn(FieldDeletedAt, vs...))
+// DeleteTimeNotIn applies the NotIn predicate on the "delete_time" field.
+func DeleteTimeNotIn(vs ...time.Time) predicate.Risk {
+	return predicate.Risk(sql.FieldNotIn(FieldDeleteTime, vs...))
 }
 
-// DeletedAtGT applies the GT predicate on the "deleted_at" field.
-func DeletedAtGT(v time.Time) predicate.Risk {
-	return predicate.Risk(sql.FieldGT(FieldDeletedAt, v))
+// DeleteTimeGT applies the GT predicate on the "delete_time" field.
+func DeleteTimeGT(v time.Time) predicate.Risk {
+	return predicate.Risk(sql.FieldGT(FieldDeleteTime, v))
 }
 
-// DeletedAtGTE applies the GTE predicate on the "deleted_at" field.
-func DeletedAtGTE(v time.Time) predicate.Risk {
-	return predicate.Risk(sql.FieldGTE(FieldDeletedAt, v))
+// DeleteTimeGTE applies the GTE predicate on the "delete_time" field.
+func DeleteTimeGTE(v time.Time) predicate.Risk {
+	return predicate.Risk(sql.FieldGTE(FieldDeleteTime, v))
 }
 
-// DeletedAtLT applies the LT predicate on the "deleted_at" field.
-func DeletedAtLT(v time.Time) predicate.Risk {
-	return predicate.Risk(sql.FieldLT(FieldDeletedAt, v))
+// DeleteTimeLT applies the LT predicate on the "delete_time" field.
+func DeleteTimeLT(v time.Time) predicate.Risk {
+	return predicate.Risk(sql.FieldLT(FieldDeleteTime, v))
 }
 
-// DeletedAtLTE applies the LTE predicate on the "deleted_at" field.
-func DeletedAtLTE(v time.Time) predicate.Risk {
-	return predicate.Risk(sql.FieldLTE(FieldDeletedAt, v))
+// DeleteTimeLTE applies the LTE predicate on the "delete_time" field.
+func DeleteTimeLTE(v time.Time) predicate.Risk {
+	return predicate.Risk(sql.FieldLTE(FieldDeleteTime, v))
 }
 
-// DeletedAtIsNil applies the IsNil predicate on the "deleted_at" field.
-func DeletedAtIsNil() predicate.Risk {
-	return predicate.Risk(sql.FieldIsNull(FieldDeletedAt))
+// DeleteTimeIsNil applies the IsNil predicate on the "delete_time" field.
+func DeleteTimeIsNil() predicate.Risk {
+	return predicate.Risk(sql.FieldIsNull(FieldDeleteTime))
 }
 
-// DeletedAtNotNil applies the NotNil predicate on the "deleted_at" field.
-func DeletedAtNotNil() predicate.Risk {
-	return predicate.Risk(sql.FieldNotNull(FieldDeletedAt))
+// DeleteTimeNotNil applies the NotNil predicate on the "delete_time" field.
+func DeleteTimeNotNil() predicate.Risk {
+	return predicate.Risk(sql.FieldNotNull(FieldDeleteTime))
 }
 
-// UpdatedByEQ applies the EQ predicate on the "updated_by" field.
-func UpdatedByEQ(v int) predicate.Risk {
-	return predicate.Risk(sql.FieldEQ(FieldUpdatedBy, v))
+// UpdaterIDEQ applies the EQ predicate on the "updater_id" field.
+func UpdaterIDEQ(v int) predicate.Risk {
+	return predicate.Risk(sql.FieldEQ(FieldUpdaterID, v))
 }
 
-// UpdatedByNEQ applies the NEQ predicate on the "updated_by" field.
-func UpdatedByNEQ(v int) predicate.Risk {
-	return predicate.Risk(sql.FieldNEQ(FieldUpdatedBy, v))
+// UpdaterIDNEQ applies the NEQ predicate on the "updater_id" field.
+func UpdaterIDNEQ(v int) predicate.Risk {
+	return predicate.Risk(sql.FieldNEQ(FieldUpdaterID, v))
 }
 
-// UpdatedByIn applies the In predicate on the "updated_by" field.
-func UpdatedByIn(vs ...int) predicate.Risk {
-	return predicate.Risk(sql.FieldIn(FieldUpdatedBy, vs...))
+// UpdaterIDIn applies the In predicate on the "updater_id" field.
+func UpdaterIDIn(vs ...int) predicate.Risk {
+	return predicate.Risk(sql.FieldIn(FieldUpdaterID, vs...))
 }
 
-// UpdatedByNotIn applies the NotIn predicate on the "updated_by" field.
-func UpdatedByNotIn(vs ...int) predicate.Risk {
-	return predicate.Risk(sql.FieldNotIn(FieldUpdatedBy, vs...))
+// UpdaterIDNotIn applies the NotIn predicate on the "updater_id" field.
+func UpdaterIDNotIn(vs ...int) predicate.Risk {
+	return predicate.Risk(sql.FieldNotIn(FieldUpdaterID, vs...))
 }
 
-// UpdatedAtEQ applies the EQ predicate on the "updated_at" field.
-func UpdatedAtEQ(v time.Time) predicate.Risk {
-	return predicate.Risk(sql.FieldEQ(FieldUpdatedAt, v))
+// UpdateTimeEQ applies the EQ predicate on the "update_time" field.
+func UpdateTimeEQ(v time.Time) predicate.Risk {
+	return predicate.Risk(sql.FieldEQ(FieldUpdateTime, v))
 }
 
-// UpdatedAtNEQ applies the NEQ predicate on the "updated_at" field.
-func UpdatedAtNEQ(v time.Time) predicate.Risk {
-	return predicate.Risk(sql.FieldNEQ(FieldUpdatedAt, v))
+// UpdateTimeNEQ applies the NEQ predicate on the "update_time" field.
+func UpdateTimeNEQ(v time.Time) predicate.Risk {
+	return predicate.Risk(sql.FieldNEQ(FieldUpdateTime, v))
 }
 
-// UpdatedAtIn applies the In predicate on the "updated_at" field.
-func UpdatedAtIn(vs ...time.Time) predicate.Risk {
-	return predicate.Risk(sql.FieldIn(FieldUpdatedAt, vs...))
+// UpdateTimeIn applies the In predicate on the "update_time" field.
+func UpdateTimeIn(vs ...time.Time) predicate.Risk {
+	return predicate.Risk(sql.FieldIn(FieldUpdateTime, vs...))
 }
 
-// UpdatedAtNotIn applies the NotIn predicate on the "updated_at" field.
-func UpdatedAtNotIn(vs ...time.Time) predicate.Risk {
-	return predicate.Risk(sql.FieldNotIn(FieldUpdatedAt, vs...))
+// UpdateTimeNotIn applies the NotIn predicate on the "update_time" field.
+func UpdateTimeNotIn(vs ...time.Time) predicate.Risk {
+	return predicate.Risk(sql.FieldNotIn(FieldUpdateTime, vs...))
 }
 
-// UpdatedAtGT applies the GT predicate on the "updated_at" field.
-func UpdatedAtGT(v time.Time) predicate.Risk {
-	return predicate.Risk(sql.FieldGT(FieldUpdatedAt, v))
+// UpdateTimeGT applies the GT predicate on the "update_time" field.
+func UpdateTimeGT(v time.Time) predicate.Risk {
+	return predicate.Risk(sql.FieldGT(FieldUpdateTime, v))
 }
 
-// UpdatedAtGTE applies the GTE predicate on the "updated_at" field.
-func UpdatedAtGTE(v time.Time) predicate.Risk {
-	return predicate.Risk(sql.FieldGTE(FieldUpdatedAt, v))
+// UpdateTimeGTE applies the GTE predicate on the "update_time" field.
+func UpdateTimeGTE(v time.Time) predicate.Risk {
+	return predicate.Risk(sql.FieldGTE(FieldUpdateTime, v))
 }
 
-// UpdatedAtLT applies the LT predicate on the "updated_at" field.
-func UpdatedAtLT(v time.Time) predicate.Risk {
-	return predicate.Risk(sql.FieldLT(FieldUpdatedAt, v))
+// UpdateTimeLT applies the LT predicate on the "update_time" field.
+func UpdateTimeLT(v time.Time) predicate.Risk {
+	return predicate.Risk(sql.FieldLT(FieldUpdateTime, v))
 }
 
-// UpdatedAtLTE applies the LTE predicate on the "updated_at" field.
-func UpdatedAtLTE(v time.Time) predicate.Risk {
-	return predicate.Risk(sql.FieldLTE(FieldUpdatedAt, v))
+// UpdateTimeLTE applies the LTE predicate on the "update_time" field.
+func UpdateTimeLTE(v time.Time) predicate.Risk {
+	return predicate.Risk(sql.FieldLTE(FieldUpdateTime, v))
 }
 
 // TitleEQ applies the EQ predicate on the "title" field.
@@ -485,26 +480,6 @@ func RiskLocationIDIn(vs ...int) predicate.Risk {
 // RiskLocationIDNotIn applies the NotIn predicate on the "risk_location_id" field.
 func RiskLocationIDNotIn(vs ...int) predicate.Risk {
 	return predicate.Risk(sql.FieldNotIn(FieldRiskLocationID, vs...))
-}
-
-// ReporterIDEQ applies the EQ predicate on the "reporter_id" field.
-func ReporterIDEQ(v int) predicate.Risk {
-	return predicate.Risk(sql.FieldEQ(FieldReporterID, v))
-}
-
-// ReporterIDNEQ applies the NEQ predicate on the "reporter_id" field.
-func ReporterIDNEQ(v int) predicate.Risk {
-	return predicate.Risk(sql.FieldNEQ(FieldReporterID, v))
-}
-
-// ReporterIDIn applies the In predicate on the "reporter_id" field.
-func ReporterIDIn(vs ...int) predicate.Risk {
-	return predicate.Risk(sql.FieldIn(FieldReporterID, vs...))
-}
-
-// ReporterIDNotIn applies the NotIn predicate on the "reporter_id" field.
-func ReporterIDNotIn(vs ...int) predicate.Risk {
-	return predicate.Risk(sql.FieldNotIn(FieldReporterID, vs...))
 }
 
 // MaintainerIDEQ applies the EQ predicate on the "maintainer_id" field.
@@ -788,29 +763,6 @@ func HasRiskLocationWith(preds ...predicate.RiskLocation) predicate.Risk {
 	})
 }
 
-// HasReporter applies the HasEdge predicate on the "reporter" edge.
-func HasReporter() predicate.Risk {
-	return predicate.Risk(func(s *sql.Selector) {
-		step := sqlgraph.NewStep(
-			sqlgraph.From(Table, FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, true, ReporterTable, ReporterColumn),
-		)
-		sqlgraph.HasNeighbors(s, step)
-	})
-}
-
-// HasReporterWith applies the HasEdge predicate on the "reporter" edge with a given conditions (other predicates).
-func HasReporterWith(preds ...predicate.Employee) predicate.Risk {
-	return predicate.Risk(func(s *sql.Selector) {
-		step := newReporterStep()
-		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
-			for _, p := range preds {
-				p(s)
-			}
-		})
-	})
-}
-
 // HasMaintainer applies the HasEdge predicate on the "maintainer" edge.
 func HasMaintainer() predicate.Risk {
 	return predicate.Risk(func(s *sql.Selector) {
@@ -823,7 +775,7 @@ func HasMaintainer() predicate.Risk {
 }
 
 // HasMaintainerWith applies the HasEdge predicate on the "maintainer" edge with a given conditions (other predicates).
-func HasMaintainerWith(preds ...predicate.Employee) predicate.Risk {
+func HasMaintainerWith(preds ...predicate.Admin) predicate.Risk {
 	return predicate.Risk(func(s *sql.Selector) {
 		step := newMaintainerStep()
 		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {

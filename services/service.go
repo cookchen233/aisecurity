@@ -1,10 +1,14 @@
 package services
 
 import (
+	"aisecurity/ent/dao"
 	"aisecurity/expects"
 	"aisecurity/structs"
+	"aisecurity/structs/types"
 	"aisecurity/utils"
 	"context"
+	"fmt"
+	"github.com/gin-gonic/gin"
 	"go.uber.org/zap"
 )
 
@@ -14,6 +18,7 @@ type IService interface {
 	Update(structs.IEntity) (structs.IEntity, error)
 	GetList(structs.IFilter) ([]structs.IEntity, error)
 	GetTotal(structs.IFilter) (int, error)
+	GetStatusCounts(structs.IFilter) ([]*types.StatusCount, error)
 	GetDetails(structs.IFilter) (structs.IEntity, error)
 	Delete(structs.IEntity) error
 }
@@ -49,4 +54,19 @@ func (s *Service) GetDetails(structs.IFilter) (structs.IEntity, error) {
 func (s *Service) Delete(structs.IEntity) error {
 	utils.Logger.Error("called empty service method", zap.String("method", utils.GetMethodName()))
 	return utils.ErrorWithStack(expects.NewNotImplementedMethod())
+}
+func (s *Service) GetStatusCounts(filter structs.IFilter) ([]*types.StatusCount, error) {
+	utils.Logger.Error("called empty service method", zap.String("method", utils.GetMethodName()))
+	return nil, utils.ErrorWithStack(expects.NewNotImplementedMethod())
+}
+
+func (s *Service) rollback(tx *dao.Tx, err error) error {
+	if rerr := tx.Rollback(); rerr != nil {
+		err = fmt.Errorf("%w: %v", err, rerr)
+	}
+	return err
+}
+
+func (s *Service) GetCurrentAdminID() int {
+	return s.Ctx.(*gin.Context).GetInt("admin_id")
 }

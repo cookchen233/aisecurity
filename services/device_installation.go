@@ -15,18 +15,18 @@ import (
 	"go.uber.org/zap"
 )
 
-type DeviceInstallation struct {
+type DeviceInstallationService struct {
 	Service
 	entClient *dao.DeviceInstallationClient
 }
 
-func NewDeviceInstallation(ctx context.Context) *DeviceInstallation {
-	s := &DeviceInstallation{entClient: db.EntClient.DeviceInstallation}
+func NewDeviceInstallationService(ctx context.Context) *DeviceInstallationService {
+	s := &DeviceInstallationService{entClient: db.EntClient.DeviceInstallation}
 	s.Ctx = ctx
 	return s
 }
 
-func (s *DeviceInstallation) Create(ent structs.IEntity) (structs.IEntity, error) {
+func (s *DeviceInstallationService) Create(ent structs.IEntity) (structs.IEntity, error) {
 	e := ent.(*entities.DeviceInstallation)
 	c := s.entClient.Create().
 		SetDeviceID(e.DeviceID).
@@ -42,13 +42,13 @@ func (s *DeviceInstallation) Create(ent structs.IEntity) (structs.IEntity, error
 	}
 	saved, err := c.Save(s.Ctx)
 	if err != nil {
-		return nil, utils.ErrorWrap(err, "failed creating DeviceInstallation")
+		return nil, utils.ErrorWrap(err, "failed creating DeviceInstallationService")
 	}
 	// ConvertTo now returns a non-pointer type that implements IEntity
 	return structs.ConvertTo[*dao.DeviceInstallation, entities.DeviceInstallation](saved), nil
 }
 
-func (s *DeviceInstallation) Update(ent structs.IEntity) (structs.IEntity, error) {
+func (s *DeviceInstallationService) Update(ent structs.IEntity) (structs.IEntity, error) {
 	e := ent.(*entities.DeviceInstallation)
 	u := s.entClient.UpdateOneID(e.ID).
 		SetDeviceID(e.DeviceID).
@@ -64,12 +64,12 @@ func (s *DeviceInstallation) Update(ent structs.IEntity) (structs.IEntity, error
 	}
 	save, err := u.Save(s.Ctx)
 	if err != nil {
-		return nil, utils.ErrorWrap(err, "failed updating DeviceInstallation")
+		return nil, utils.ErrorWrap(err, "failed updating DeviceInstallationService")
 	}
 	return structs.ConvertTo[*dao.DeviceInstallation, entities.DeviceInstallation](save), nil
 }
 
-func (s *DeviceInstallation) GetDetails(fit structs.IFilter) (structs.IEntity, error) {
+func (s *DeviceInstallationService) GetDetails(fit structs.IFilter) (structs.IEntity, error) {
 	fit.SetPage(1)
 	fit.SetLimit(1)
 	list, err := s.GetList(fit)
@@ -82,17 +82,20 @@ func (s *DeviceInstallation) GetDetails(fit structs.IFilter) (structs.IEntity, e
 	return list[0], nil
 }
 
-func (s *DeviceInstallation) GetList(fit structs.IFilter) ([]structs.IEntity, error) {
+func (s *DeviceInstallationService) GetList(fit structs.IFilter) ([]structs.IEntity, error) {
 	// list
 	list, err := s.query(fit).
+		WithArea().
 		Limit(fit.GetLimit()).
 		Offset(fit.GetOffset()).
+		Order(dao.Desc(deviceinstallation.FieldID)).
 		All(s.Ctx)
 	if err != nil {
 		return nil, utils.ErrorWithStack(err)
 	}
 	ents := make([]structs.IEntity, len(list))
 	for i, v := range list {
+		v.AreaName = v.Edges.Area.Name
 		v2 := new(entities.DeviceInstallation)
 		ents[i] = v
 		err := gconv.Struct(v, v2)
@@ -105,7 +108,7 @@ func (s *DeviceInstallation) GetList(fit structs.IFilter) ([]structs.IEntity, er
 	return ents, nil
 }
 
-func (s *DeviceInstallation) query(fit structs.IFilter) *dao.DeviceInstallationQuery {
+func (s *DeviceInstallationService) query(fit structs.IFilter) *dao.DeviceInstallationQuery {
 	f := fit.(*filters.DeviceInstallation)
 	q := s.entClient.Query()
 	if f.ID != 0 {
@@ -114,7 +117,7 @@ func (s *DeviceInstallation) query(fit structs.IFilter) *dao.DeviceInstallationQ
 	return q.Clone()
 }
 
-func (s *DeviceInstallation) GetTotal(fit structs.IFilter) (int, error) {
+func (s *DeviceInstallationService) GetTotal(fit structs.IFilter) (int, error) {
 	total, err := s.query(fit).Count(s.Ctx)
 	if err != nil {
 		return 0, utils.ErrorWithStack(err)
@@ -122,7 +125,7 @@ func (s *DeviceInstallation) GetTotal(fit structs.IFilter) (int, error) {
 	return total, nil
 }
 
-func (s *DeviceInstallation) GetByDeviceID(deviceID int) (structs.IEntity, error) {
+func (s *DeviceInstallationService) GetByDeviceID(deviceID int) (structs.IEntity, error) {
 	first, err := s.entClient.Query().
 		Where(deviceinstallation.DeviceID(deviceID)).
 		WithArea().

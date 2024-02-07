@@ -22,56 +22,56 @@ type OccupationCreate struct {
 	hooks    []Hook
 }
 
-// SetCreatedAt sets the "created_at" field.
-func (oc *OccupationCreate) SetCreatedAt(t time.Time) *OccupationCreate {
-	oc.mutation.SetCreatedAt(t)
+// SetCreateTime sets the "create_time" field.
+func (oc *OccupationCreate) SetCreateTime(t time.Time) *OccupationCreate {
+	oc.mutation.SetCreateTime(t)
 	return oc
 }
 
-// SetNillableCreatedAt sets the "created_at" field if the given value is not nil.
-func (oc *OccupationCreate) SetNillableCreatedAt(t *time.Time) *OccupationCreate {
+// SetNillableCreateTime sets the "create_time" field if the given value is not nil.
+func (oc *OccupationCreate) SetNillableCreateTime(t *time.Time) *OccupationCreate {
 	if t != nil {
-		oc.SetCreatedAt(*t)
+		oc.SetCreateTime(*t)
 	}
 	return oc
 }
 
-// SetCreatedBy sets the "created_by" field.
-func (oc *OccupationCreate) SetCreatedBy(i int) *OccupationCreate {
-	oc.mutation.SetCreatedBy(i)
+// SetCreatorID sets the "creator_id" field.
+func (oc *OccupationCreate) SetCreatorID(i int) *OccupationCreate {
+	oc.mutation.SetCreatorID(i)
 	return oc
 }
 
-// SetDeletedAt sets the "deleted_at" field.
-func (oc *OccupationCreate) SetDeletedAt(t time.Time) *OccupationCreate {
-	oc.mutation.SetDeletedAt(t)
+// SetDeleteTime sets the "delete_time" field.
+func (oc *OccupationCreate) SetDeleteTime(t time.Time) *OccupationCreate {
+	oc.mutation.SetDeleteTime(t)
 	return oc
 }
 
-// SetNillableDeletedAt sets the "deleted_at" field if the given value is not nil.
-func (oc *OccupationCreate) SetNillableDeletedAt(t *time.Time) *OccupationCreate {
+// SetNillableDeleteTime sets the "delete_time" field if the given value is not nil.
+func (oc *OccupationCreate) SetNillableDeleteTime(t *time.Time) *OccupationCreate {
 	if t != nil {
-		oc.SetDeletedAt(*t)
+		oc.SetDeleteTime(*t)
 	}
 	return oc
 }
 
-// SetUpdatedBy sets the "updated_by" field.
-func (oc *OccupationCreate) SetUpdatedBy(i int) *OccupationCreate {
-	oc.mutation.SetUpdatedBy(i)
+// SetUpdaterID sets the "updater_id" field.
+func (oc *OccupationCreate) SetUpdaterID(i int) *OccupationCreate {
+	oc.mutation.SetUpdaterID(i)
 	return oc
 }
 
-// SetUpdatedAt sets the "updated_at" field.
-func (oc *OccupationCreate) SetUpdatedAt(t time.Time) *OccupationCreate {
-	oc.mutation.SetUpdatedAt(t)
+// SetUpdateTime sets the "update_time" field.
+func (oc *OccupationCreate) SetUpdateTime(t time.Time) *OccupationCreate {
+	oc.mutation.SetUpdateTime(t)
 	return oc
 }
 
-// SetNillableUpdatedAt sets the "updated_at" field if the given value is not nil.
-func (oc *OccupationCreate) SetNillableUpdatedAt(t *time.Time) *OccupationCreate {
+// SetNillableUpdateTime sets the "update_time" field if the given value is not nil.
+func (oc *OccupationCreate) SetNillableUpdateTime(t *time.Time) *OccupationCreate {
 	if t != nil {
-		oc.SetUpdatedAt(*t)
+		oc.SetUpdateTime(*t)
 	}
 	return oc
 }
@@ -96,21 +96,9 @@ func (oc *OccupationCreate) SetNillableDescription(s *string) *OccupationCreate 
 	return oc
 }
 
-// SetCreatorID sets the "creator" edge to the Admin entity by ID.
-func (oc *OccupationCreate) SetCreatorID(id int) *OccupationCreate {
-	oc.mutation.SetCreatorID(id)
-	return oc
-}
-
 // SetCreator sets the "creator" edge to the Admin entity.
 func (oc *OccupationCreate) SetCreator(a *Admin) *OccupationCreate {
 	return oc.SetCreatorID(a.ID)
-}
-
-// SetUpdaterID sets the "updater" edge to the Admin entity by ID.
-func (oc *OccupationCreate) SetUpdaterID(id int) *OccupationCreate {
-	oc.mutation.SetUpdaterID(id)
-	return oc
 }
 
 // SetUpdater sets the "updater" edge to the Admin entity.
@@ -118,14 +106,14 @@ func (oc *OccupationCreate) SetUpdater(a *Admin) *OccupationCreate {
 	return oc.SetUpdaterID(a.ID)
 }
 
-// AddEmployeeIDs adds the "employees" edge to the Employee entity by IDs.
+// AddEmployeeIDs adds the "employee" edge to the Employee entity by IDs.
 func (oc *OccupationCreate) AddEmployeeIDs(ids ...int) *OccupationCreate {
 	oc.mutation.AddEmployeeIDs(ids...)
 	return oc
 }
 
-// AddEmployees adds the "employees" edges to the Employee entity.
-func (oc *OccupationCreate) AddEmployees(e ...*Employee) *OccupationCreate {
+// AddEmployee adds the "employee" edges to the Employee entity.
+func (oc *OccupationCreate) AddEmployee(e ...*Employee) *OccupationCreate {
 	ids := make([]int, len(e))
 	for i := range e {
 		ids[i] = e[i].ID
@@ -170,46 +158,46 @@ func (oc *OccupationCreate) ExecX(ctx context.Context) {
 
 // defaults sets the default values of the builder before save.
 func (oc *OccupationCreate) defaults() error {
-	if _, ok := oc.mutation.CreatedAt(); !ok {
-		if occupation.DefaultCreatedAt == nil {
-			return fmt.Errorf("dao: uninitialized occupation.DefaultCreatedAt (forgotten import dao/runtime?)")
+	if _, ok := oc.mutation.CreateTime(); !ok {
+		if occupation.DefaultCreateTime == nil {
+			return fmt.Errorf("dao: uninitialized occupation.DefaultCreateTime (forgotten import dao/runtime?)")
 		}
-		v := occupation.DefaultCreatedAt()
-		oc.mutation.SetCreatedAt(v)
+		v := occupation.DefaultCreateTime()
+		oc.mutation.SetCreateTime(v)
 	}
-	if _, ok := oc.mutation.UpdatedAt(); !ok {
-		if occupation.DefaultUpdatedAt == nil {
-			return fmt.Errorf("dao: uninitialized occupation.DefaultUpdatedAt (forgotten import dao/runtime?)")
+	if _, ok := oc.mutation.UpdateTime(); !ok {
+		if occupation.DefaultUpdateTime == nil {
+			return fmt.Errorf("dao: uninitialized occupation.DefaultUpdateTime (forgotten import dao/runtime?)")
 		}
-		v := occupation.DefaultUpdatedAt()
-		oc.mutation.SetUpdatedAt(v)
+		v := occupation.DefaultUpdateTime()
+		oc.mutation.SetUpdateTime(v)
 	}
 	return nil
 }
 
 // check runs all checks and user-defined validators on the builder.
 func (oc *OccupationCreate) check() error {
-	if _, ok := oc.mutation.CreatedAt(); !ok {
-		return &ValidationError{Name: "created_at", err: errors.New(`dao: missing required field "Occupation.created_at"`)}
+	if _, ok := oc.mutation.CreateTime(); !ok {
+		return &ValidationError{Name: "create_time", err: errors.New(`dao: missing required field "Occupation.create_time"`)}
 	}
-	if _, ok := oc.mutation.CreatedBy(); !ok {
-		return &ValidationError{Name: "created_by", err: errors.New(`dao: missing required field "Occupation.created_by"`)}
+	if _, ok := oc.mutation.CreatorID(); !ok {
+		return &ValidationError{Name: "creator_id", err: errors.New(`dao: missing required field "Occupation.creator_id"`)}
 	}
-	if v, ok := oc.mutation.CreatedBy(); ok {
-		if err := occupation.CreatedByValidator(v); err != nil {
-			return &ValidationError{Name: "created_by", err: fmt.Errorf(`dao: validator failed for field "Occupation.created_by": %w`, err)}
+	if v, ok := oc.mutation.CreatorID(); ok {
+		if err := occupation.CreatorIDValidator(v); err != nil {
+			return &ValidationError{Name: "creator_id", err: fmt.Errorf(`dao: validator failed for field "Occupation.creator_id": %w`, err)}
 		}
 	}
-	if _, ok := oc.mutation.UpdatedBy(); !ok {
-		return &ValidationError{Name: "updated_by", err: errors.New(`dao: missing required field "Occupation.updated_by"`)}
+	if _, ok := oc.mutation.UpdaterID(); !ok {
+		return &ValidationError{Name: "updater_id", err: errors.New(`dao: missing required field "Occupation.updater_id"`)}
 	}
-	if v, ok := oc.mutation.UpdatedBy(); ok {
-		if err := occupation.UpdatedByValidator(v); err != nil {
-			return &ValidationError{Name: "updated_by", err: fmt.Errorf(`dao: validator failed for field "Occupation.updated_by": %w`, err)}
+	if v, ok := oc.mutation.UpdaterID(); ok {
+		if err := occupation.UpdaterIDValidator(v); err != nil {
+			return &ValidationError{Name: "updater_id", err: fmt.Errorf(`dao: validator failed for field "Occupation.updater_id": %w`, err)}
 		}
 	}
-	if _, ok := oc.mutation.UpdatedAt(); !ok {
-		return &ValidationError{Name: "updated_at", err: errors.New(`dao: missing required field "Occupation.updated_at"`)}
+	if _, ok := oc.mutation.UpdateTime(); !ok {
+		return &ValidationError{Name: "update_time", err: errors.New(`dao: missing required field "Occupation.update_time"`)}
 	}
 	if _, ok := oc.mutation.Name(); !ok {
 		return &ValidationError{Name: "name", err: errors.New(`dao: missing required field "Occupation.name"`)}
@@ -251,17 +239,17 @@ func (oc *OccupationCreate) createSpec() (*Occupation, *sqlgraph.CreateSpec) {
 		_node = &Occupation{config: oc.config}
 		_spec = sqlgraph.NewCreateSpec(occupation.Table, sqlgraph.NewFieldSpec(occupation.FieldID, field.TypeInt))
 	)
-	if value, ok := oc.mutation.CreatedAt(); ok {
-		_spec.SetField(occupation.FieldCreatedAt, field.TypeTime, value)
-		_node.CreatedAt = value
+	if value, ok := oc.mutation.CreateTime(); ok {
+		_spec.SetField(occupation.FieldCreateTime, field.TypeTime, value)
+		_node.CreateTime = value
 	}
-	if value, ok := oc.mutation.DeletedAt(); ok {
-		_spec.SetField(occupation.FieldDeletedAt, field.TypeTime, value)
-		_node.DeletedAt = &value
+	if value, ok := oc.mutation.DeleteTime(); ok {
+		_spec.SetField(occupation.FieldDeleteTime, field.TypeTime, value)
+		_node.DeleteTime = &value
 	}
-	if value, ok := oc.mutation.UpdatedAt(); ok {
-		_spec.SetField(occupation.FieldUpdatedAt, field.TypeTime, value)
-		_node.UpdatedAt = value
+	if value, ok := oc.mutation.UpdateTime(); ok {
+		_spec.SetField(occupation.FieldUpdateTime, field.TypeTime, value)
+		_node.UpdateTime = value
 	}
 	if value, ok := oc.mutation.Name(); ok {
 		_spec.SetField(occupation.FieldName, field.TypeString, value)
@@ -285,7 +273,7 @@ func (oc *OccupationCreate) createSpec() (*Occupation, *sqlgraph.CreateSpec) {
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
-		_node.CreatedBy = nodes[0]
+		_node.CreatorID = nodes[0]
 		_spec.Edges = append(_spec.Edges, edge)
 	}
 	if nodes := oc.mutation.UpdaterIDs(); len(nodes) > 0 {
@@ -302,15 +290,15 @@ func (oc *OccupationCreate) createSpec() (*Occupation, *sqlgraph.CreateSpec) {
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
-		_node.UpdatedBy = nodes[0]
+		_node.UpdaterID = nodes[0]
 		_spec.Edges = append(_spec.Edges, edge)
 	}
-	if nodes := oc.mutation.EmployeesIDs(); len(nodes) > 0 {
+	if nodes := oc.mutation.EmployeeIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
+			Rel:     sqlgraph.O2M,
 			Inverse: false,
-			Table:   occupation.EmployeesTable,
-			Columns: occupation.EmployeesPrimaryKey,
+			Table:   occupation.EmployeeTable,
+			Columns: []string{occupation.EmployeeColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(employee.FieldID, field.TypeInt),

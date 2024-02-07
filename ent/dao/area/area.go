@@ -15,16 +15,16 @@ const (
 	Label = "area"
 	// FieldID holds the string denoting the id field in the database.
 	FieldID = "id"
-	// FieldCreatedAt holds the string denoting the created_at field in the database.
-	FieldCreatedAt = "created_at"
-	// FieldCreatedBy holds the string denoting the created_by field in the database.
-	FieldCreatedBy = "created_by"
-	// FieldDeletedAt holds the string denoting the deleted_at field in the database.
-	FieldDeletedAt = "deleted_at"
-	// FieldUpdatedBy holds the string denoting the updated_by field in the database.
-	FieldUpdatedBy = "updated_by"
-	// FieldUpdatedAt holds the string denoting the updated_at field in the database.
-	FieldUpdatedAt = "updated_at"
+	// FieldCreateTime holds the string denoting the create_time field in the database.
+	FieldCreateTime = "create_time"
+	// FieldCreatorID holds the string denoting the creator_id field in the database.
+	FieldCreatorID = "creator_id"
+	// FieldDeleteTime holds the string denoting the delete_time field in the database.
+	FieldDeleteTime = "delete_time"
+	// FieldUpdaterID holds the string denoting the updater_id field in the database.
+	FieldUpdaterID = "updater_id"
+	// FieldUpdateTime holds the string denoting the update_time field in the database.
+	FieldUpdateTime = "update_time"
 	// FieldName holds the string denoting the name field in the database.
 	FieldName = "name"
 	// FieldDescription holds the string denoting the description field in the database.
@@ -33,8 +33,8 @@ const (
 	EdgeCreator = "creator"
 	// EdgeUpdater holds the string denoting the updater edge name in mutations.
 	EdgeUpdater = "updater"
-	// EdgeDeviceInstallationArea holds the string denoting the device_installation_area edge name in mutations.
-	EdgeDeviceInstallationArea = "device_installation_area"
+	// EdgeDeviceInstallation holds the string denoting the device_installation edge name in mutations.
+	EdgeDeviceInstallation = "device_installation"
 	// Table holds the table name of the area in the database.
 	Table = "areas"
 	// CreatorTable is the table that holds the creator relation/edge.
@@ -43,31 +43,31 @@ const (
 	// It exists in this package in order to avoid circular dependency with the "admin" package.
 	CreatorInverseTable = "admins"
 	// CreatorColumn is the table column denoting the creator relation/edge.
-	CreatorColumn = "created_by"
+	CreatorColumn = "creator_id"
 	// UpdaterTable is the table that holds the updater relation/edge.
 	UpdaterTable = "areas"
 	// UpdaterInverseTable is the table name for the Admin entity.
 	// It exists in this package in order to avoid circular dependency with the "admin" package.
 	UpdaterInverseTable = "admins"
 	// UpdaterColumn is the table column denoting the updater relation/edge.
-	UpdaterColumn = "updated_by"
-	// DeviceInstallationAreaTable is the table that holds the device_installation_area relation/edge.
-	DeviceInstallationAreaTable = "device_installations"
-	// DeviceInstallationAreaInverseTable is the table name for the DeviceInstallation entity.
+	UpdaterColumn = "updater_id"
+	// DeviceInstallationTable is the table that holds the device_installation relation/edge.
+	DeviceInstallationTable = "device_installations"
+	// DeviceInstallationInverseTable is the table name for the DeviceInstallation entity.
 	// It exists in this package in order to avoid circular dependency with the "deviceinstallation" package.
-	DeviceInstallationAreaInverseTable = "device_installations"
-	// DeviceInstallationAreaColumn is the table column denoting the device_installation_area relation/edge.
-	DeviceInstallationAreaColumn = "area_id"
+	DeviceInstallationInverseTable = "device_installations"
+	// DeviceInstallationColumn is the table column denoting the device_installation relation/edge.
+	DeviceInstallationColumn = "area_id"
 )
 
 // Columns holds all SQL columns for area fields.
 var Columns = []string{
 	FieldID,
-	FieldCreatedAt,
-	FieldCreatedBy,
-	FieldDeletedAt,
-	FieldUpdatedBy,
-	FieldUpdatedAt,
+	FieldCreateTime,
+	FieldCreatorID,
+	FieldDeleteTime,
+	FieldUpdaterID,
+	FieldUpdateTime,
 	FieldName,
 	FieldDescription,
 }
@@ -89,16 +89,16 @@ func ValidColumn(column string) bool {
 //	import _ "aisecurity/ent/dao/runtime"
 var (
 	Hooks [1]ent.Hook
-	// DefaultCreatedAt holds the default value on creation for the "created_at" field.
-	DefaultCreatedAt func() time.Time
-	// CreatedByValidator is a validator for the "created_by" field. It is called by the builders before save.
-	CreatedByValidator func(int) error
-	// UpdatedByValidator is a validator for the "updated_by" field. It is called by the builders before save.
-	UpdatedByValidator func(int) error
-	// DefaultUpdatedAt holds the default value on creation for the "updated_at" field.
-	DefaultUpdatedAt func() time.Time
-	// UpdateDefaultUpdatedAt holds the default value on update for the "updated_at" field.
-	UpdateDefaultUpdatedAt func() time.Time
+	// DefaultCreateTime holds the default value on creation for the "create_time" field.
+	DefaultCreateTime func() time.Time
+	// CreatorIDValidator is a validator for the "creator_id" field. It is called by the builders before save.
+	CreatorIDValidator func(int) error
+	// UpdaterIDValidator is a validator for the "updater_id" field. It is called by the builders before save.
+	UpdaterIDValidator func(int) error
+	// DefaultUpdateTime holds the default value on creation for the "update_time" field.
+	DefaultUpdateTime func() time.Time
+	// UpdateDefaultUpdateTime holds the default value on update for the "update_time" field.
+	UpdateDefaultUpdateTime func() time.Time
 	// DefaultName holds the default value on creation for the "name" field.
 	DefaultName string
 	// NameValidator is a validator for the "name" field. It is called by the builders before save.
@@ -113,29 +113,29 @@ func ByID(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldID, opts...).ToFunc()
 }
 
-// ByCreatedAt orders the results by the created_at field.
-func ByCreatedAt(opts ...sql.OrderTermOption) OrderOption {
-	return sql.OrderByField(FieldCreatedAt, opts...).ToFunc()
+// ByCreateTime orders the results by the create_time field.
+func ByCreateTime(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldCreateTime, opts...).ToFunc()
 }
 
-// ByCreatedBy orders the results by the created_by field.
-func ByCreatedBy(opts ...sql.OrderTermOption) OrderOption {
-	return sql.OrderByField(FieldCreatedBy, opts...).ToFunc()
+// ByCreatorID orders the results by the creator_id field.
+func ByCreatorID(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldCreatorID, opts...).ToFunc()
 }
 
-// ByDeletedAt orders the results by the deleted_at field.
-func ByDeletedAt(opts ...sql.OrderTermOption) OrderOption {
-	return sql.OrderByField(FieldDeletedAt, opts...).ToFunc()
+// ByDeleteTime orders the results by the delete_time field.
+func ByDeleteTime(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldDeleteTime, opts...).ToFunc()
 }
 
-// ByUpdatedBy orders the results by the updated_by field.
-func ByUpdatedBy(opts ...sql.OrderTermOption) OrderOption {
-	return sql.OrderByField(FieldUpdatedBy, opts...).ToFunc()
+// ByUpdaterID orders the results by the updater_id field.
+func ByUpdaterID(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldUpdaterID, opts...).ToFunc()
 }
 
-// ByUpdatedAt orders the results by the updated_at field.
-func ByUpdatedAt(opts ...sql.OrderTermOption) OrderOption {
-	return sql.OrderByField(FieldUpdatedAt, opts...).ToFunc()
+// ByUpdateTime orders the results by the update_time field.
+func ByUpdateTime(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldUpdateTime, opts...).ToFunc()
 }
 
 // ByName orders the results by the name field.
@@ -162,17 +162,17 @@ func ByUpdaterField(field string, opts ...sql.OrderTermOption) OrderOption {
 	}
 }
 
-// ByDeviceInstallationAreaCount orders the results by device_installation_area count.
-func ByDeviceInstallationAreaCount(opts ...sql.OrderTermOption) OrderOption {
+// ByDeviceInstallationCount orders the results by device_installation count.
+func ByDeviceInstallationCount(opts ...sql.OrderTermOption) OrderOption {
 	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborsCount(s, newDeviceInstallationAreaStep(), opts...)
+		sqlgraph.OrderByNeighborsCount(s, newDeviceInstallationStep(), opts...)
 	}
 }
 
-// ByDeviceInstallationArea orders the results by device_installation_area terms.
-func ByDeviceInstallationArea(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+// ByDeviceInstallation orders the results by device_installation terms.
+func ByDeviceInstallation(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
 	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborTerms(s, newDeviceInstallationAreaStep(), append([]sql.OrderTerm{term}, terms...)...)
+		sqlgraph.OrderByNeighborTerms(s, newDeviceInstallationStep(), append([]sql.OrderTerm{term}, terms...)...)
 	}
 }
 func newCreatorStep() *sqlgraph.Step {
@@ -189,10 +189,10 @@ func newUpdaterStep() *sqlgraph.Step {
 		sqlgraph.Edge(sqlgraph.M2O, true, UpdaterTable, UpdaterColumn),
 	)
 }
-func newDeviceInstallationAreaStep() *sqlgraph.Step {
+func newDeviceInstallationStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
-		sqlgraph.To(DeviceInstallationAreaInverseTable, FieldID),
-		sqlgraph.Edge(sqlgraph.O2M, false, DeviceInstallationAreaTable, DeviceInstallationAreaColumn),
+		sqlgraph.To(DeviceInstallationInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.O2M, false, DeviceInstallationTable, DeviceInstallationColumn),
 	)
 }

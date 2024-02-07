@@ -20,13 +20,13 @@ import (
 // AreaQuery is the builder for querying Area entities.
 type AreaQuery struct {
 	config
-	ctx                        *QueryContext
-	order                      []area.OrderOption
-	inters                     []Interceptor
-	predicates                 []predicate.Area
-	withCreator                *AdminQuery
-	withUpdater                *AdminQuery
-	withDeviceInstallationArea *DeviceInstallationQuery
+	ctx                    *QueryContext
+	order                  []area.OrderOption
+	inters                 []Interceptor
+	predicates             []predicate.Area
+	withCreator            *AdminQuery
+	withUpdater            *AdminQuery
+	withDeviceInstallation *DeviceInstallationQuery
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
 	path func(context.Context) (*sql.Selector, error)
@@ -107,8 +107,8 @@ func (aq *AreaQuery) QueryUpdater() *AdminQuery {
 	return query
 }
 
-// QueryDeviceInstallationArea chains the current query on the "device_installation_area" edge.
-func (aq *AreaQuery) QueryDeviceInstallationArea() *DeviceInstallationQuery {
+// QueryDeviceInstallation chains the current query on the "device_installation" edge.
+func (aq *AreaQuery) QueryDeviceInstallation() *DeviceInstallationQuery {
 	query := (&DeviceInstallationClient{config: aq.config}).Query()
 	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
 		if err := aq.prepareQuery(ctx); err != nil {
@@ -121,7 +121,7 @@ func (aq *AreaQuery) QueryDeviceInstallationArea() *DeviceInstallationQuery {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(area.Table, area.FieldID, selector),
 			sqlgraph.To(deviceinstallation.Table, deviceinstallation.FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, false, area.DeviceInstallationAreaTable, area.DeviceInstallationAreaColumn),
+			sqlgraph.Edge(sqlgraph.O2M, false, area.DeviceInstallationTable, area.DeviceInstallationColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(aq.driver.Dialect(), step)
 		return fromU, nil
@@ -316,14 +316,14 @@ func (aq *AreaQuery) Clone() *AreaQuery {
 		return nil
 	}
 	return &AreaQuery{
-		config:                     aq.config,
-		ctx:                        aq.ctx.Clone(),
-		order:                      append([]area.OrderOption{}, aq.order...),
-		inters:                     append([]Interceptor{}, aq.inters...),
-		predicates:                 append([]predicate.Area{}, aq.predicates...),
-		withCreator:                aq.withCreator.Clone(),
-		withUpdater:                aq.withUpdater.Clone(),
-		withDeviceInstallationArea: aq.withDeviceInstallationArea.Clone(),
+		config:                 aq.config,
+		ctx:                    aq.ctx.Clone(),
+		order:                  append([]area.OrderOption{}, aq.order...),
+		inters:                 append([]Interceptor{}, aq.inters...),
+		predicates:             append([]predicate.Area{}, aq.predicates...),
+		withCreator:            aq.withCreator.Clone(),
+		withUpdater:            aq.withUpdater.Clone(),
+		withDeviceInstallation: aq.withDeviceInstallation.Clone(),
 		// clone intermediate query.
 		sql:  aq.sql.Clone(),
 		path: aq.path,
@@ -352,14 +352,14 @@ func (aq *AreaQuery) WithUpdater(opts ...func(*AdminQuery)) *AreaQuery {
 	return aq
 }
 
-// WithDeviceInstallationArea tells the query-builder to eager-load the nodes that are connected to
-// the "device_installation_area" edge. The optional arguments are used to configure the query builder of the edge.
-func (aq *AreaQuery) WithDeviceInstallationArea(opts ...func(*DeviceInstallationQuery)) *AreaQuery {
+// WithDeviceInstallation tells the query-builder to eager-load the nodes that are connected to
+// the "device_installation" edge. The optional arguments are used to configure the query builder of the edge.
+func (aq *AreaQuery) WithDeviceInstallation(opts ...func(*DeviceInstallationQuery)) *AreaQuery {
 	query := (&DeviceInstallationClient{config: aq.config}).Query()
 	for _, opt := range opts {
 		opt(query)
 	}
-	aq.withDeviceInstallationArea = query
+	aq.withDeviceInstallation = query
 	return aq
 }
 
@@ -369,12 +369,12 @@ func (aq *AreaQuery) WithDeviceInstallationArea(opts ...func(*DeviceInstallation
 // Example:
 //
 //	var v []struct {
-//		CreatedAt time.Time `json:"created_at"`
+//		CreateTime time.Time `json:"create_time"`
 //		Count int `json:"count,omitempty"`
 //	}
 //
 //	client.Area.Query().
-//		GroupBy(area.FieldCreatedAt).
+//		GroupBy(area.FieldCreateTime).
 //		Aggregate(dao.Count()).
 //		Scan(ctx, &v)
 func (aq *AreaQuery) GroupBy(field string, fields ...string) *AreaGroupBy {
@@ -392,11 +392,11 @@ func (aq *AreaQuery) GroupBy(field string, fields ...string) *AreaGroupBy {
 // Example:
 //
 //	var v []struct {
-//		CreatedAt time.Time `json:"created_at"`
+//		CreateTime time.Time `json:"create_time"`
 //	}
 //
 //	client.Area.Query().
-//		Select(area.FieldCreatedAt).
+//		Select(area.FieldCreateTime).
 //		Scan(ctx, &v)
 func (aq *AreaQuery) Select(fields ...string) *AreaSelect {
 	aq.ctx.Fields = append(aq.ctx.Fields, fields...)
@@ -444,7 +444,7 @@ func (aq *AreaQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Area, e
 		loadedTypes = [3]bool{
 			aq.withCreator != nil,
 			aq.withUpdater != nil,
-			aq.withDeviceInstallationArea != nil,
+			aq.withDeviceInstallation != nil,
 		}
 	)
 	_spec.ScanValues = func(columns []string) ([]any, error) {
@@ -477,11 +477,11 @@ func (aq *AreaQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Area, e
 			return nil, err
 		}
 	}
-	if query := aq.withDeviceInstallationArea; query != nil {
-		if err := aq.loadDeviceInstallationArea(ctx, query, nodes,
-			func(n *Area) { n.Edges.DeviceInstallationArea = []*DeviceInstallation{} },
+	if query := aq.withDeviceInstallation; query != nil {
+		if err := aq.loadDeviceInstallation(ctx, query, nodes,
+			func(n *Area) { n.Edges.DeviceInstallation = []*DeviceInstallation{} },
 			func(n *Area, e *DeviceInstallation) {
-				n.Edges.DeviceInstallationArea = append(n.Edges.DeviceInstallationArea, e)
+				n.Edges.DeviceInstallation = append(n.Edges.DeviceInstallation, e)
 			}); err != nil {
 			return nil, err
 		}
@@ -493,7 +493,7 @@ func (aq *AreaQuery) loadCreator(ctx context.Context, query *AdminQuery, nodes [
 	ids := make([]int, 0, len(nodes))
 	nodeids := make(map[int][]*Area)
 	for i := range nodes {
-		fk := nodes[i].CreatedBy
+		fk := nodes[i].CreatorID
 		if _, ok := nodeids[fk]; !ok {
 			ids = append(ids, fk)
 		}
@@ -510,7 +510,7 @@ func (aq *AreaQuery) loadCreator(ctx context.Context, query *AdminQuery, nodes [
 	for _, n := range neighbors {
 		nodes, ok := nodeids[n.ID]
 		if !ok {
-			return fmt.Errorf(`unexpected foreign-key "created_by" returned %v`, n.ID)
+			return fmt.Errorf(`unexpected foreign-key "creator_id" returned %v`, n.ID)
 		}
 		for i := range nodes {
 			assign(nodes[i], n)
@@ -522,7 +522,7 @@ func (aq *AreaQuery) loadUpdater(ctx context.Context, query *AdminQuery, nodes [
 	ids := make([]int, 0, len(nodes))
 	nodeids := make(map[int][]*Area)
 	for i := range nodes {
-		fk := nodes[i].UpdatedBy
+		fk := nodes[i].UpdaterID
 		if _, ok := nodeids[fk]; !ok {
 			ids = append(ids, fk)
 		}
@@ -539,7 +539,7 @@ func (aq *AreaQuery) loadUpdater(ctx context.Context, query *AdminQuery, nodes [
 	for _, n := range neighbors {
 		nodes, ok := nodeids[n.ID]
 		if !ok {
-			return fmt.Errorf(`unexpected foreign-key "updated_by" returned %v`, n.ID)
+			return fmt.Errorf(`unexpected foreign-key "updater_id" returned %v`, n.ID)
 		}
 		for i := range nodes {
 			assign(nodes[i], n)
@@ -547,7 +547,7 @@ func (aq *AreaQuery) loadUpdater(ctx context.Context, query *AdminQuery, nodes [
 	}
 	return nil
 }
-func (aq *AreaQuery) loadDeviceInstallationArea(ctx context.Context, query *DeviceInstallationQuery, nodes []*Area, init func(*Area), assign func(*Area, *DeviceInstallation)) error {
+func (aq *AreaQuery) loadDeviceInstallation(ctx context.Context, query *DeviceInstallationQuery, nodes []*Area, init func(*Area), assign func(*Area, *DeviceInstallation)) error {
 	fks := make([]driver.Value, 0, len(nodes))
 	nodeids := make(map[int]*Area)
 	for i := range nodes {
@@ -561,7 +561,7 @@ func (aq *AreaQuery) loadDeviceInstallationArea(ctx context.Context, query *Devi
 		query.ctx.AppendFieldOnce(deviceinstallation.FieldAreaID)
 	}
 	query.Where(predicate.DeviceInstallation(func(s *sql.Selector) {
-		s.Where(sql.InValues(s.C(area.DeviceInstallationAreaColumn), fks...))
+		s.Where(sql.InValues(s.C(area.DeviceInstallationColumn), fks...))
 	}))
 	neighbors, err := query.All(ctx)
 	if err != nil {
@@ -604,10 +604,10 @@ func (aq *AreaQuery) querySpec() *sqlgraph.QuerySpec {
 			}
 		}
 		if aq.withCreator != nil {
-			_spec.Node.AddColumnOnce(area.FieldCreatedBy)
+			_spec.Node.AddColumnOnce(area.FieldCreatorID)
 		}
 		if aq.withUpdater != nil {
-			_spec.Node.AddColumnOnce(area.FieldUpdatedBy)
+			_spec.Node.AddColumnOnce(area.FieldUpdaterID)
 		}
 	}
 	if ps := aq.predicates; len(ps) > 0 {

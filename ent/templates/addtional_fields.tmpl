@@ -3,12 +3,25 @@
 
 {{ define "model/fields/additional" }}
 
-{{- if eq $.Name "IPCEvent" }}
 
+{{- if eq $.Name "Department" }}
+AllEmployees []*Employee `json:"all_employees"`
+{{- end }}
+
+{{- if eq $.Name "Event" }}
+EventTypeLabel string `json:"event_type_label"`
+EventStatusLabel string `json:"event_status_label"`
+Location string `json:"location"`
+LocationWithAliasName string `json:"location_with_alias_name"`
 {{- end }}
 
 {{- if eq $.Name "Risk" }}
 
+{{- end }}
+
+{{- if eq $.Name "DeviceInstallation" }}
+AreaName string `json:"area_name"`
+LocationWithAliasName string `json:"location_with_alias_name"`
 {{- end }}
 
 

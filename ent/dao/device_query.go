@@ -6,7 +6,9 @@ import (
 	"aisecurity/ent/dao/admin"
 	"aisecurity/ent/dao/device"
 	"aisecurity/ent/dao/deviceinstallation"
-	"aisecurity/ent/dao/ipcevent"
+	"aisecurity/ent/dao/event"
+	"aisecurity/ent/dao/eventlog"
+	"aisecurity/ent/dao/fixing"
 	"aisecurity/ent/dao/predicate"
 	"context"
 	"database/sql/driver"
@@ -21,14 +23,16 @@ import (
 // DeviceQuery is the builder for querying Device entities.
 type DeviceQuery struct {
 	config
-	ctx                          *QueryContext
-	order                        []device.OrderOption
-	inters                       []Interceptor
-	predicates                   []predicate.Device
-	withCreator                  *AdminQuery
-	withUpdater                  *AdminQuery
-	withIpcEventDevice           *IPCEventQuery
-	withDeviceInstallationDevice *DeviceInstallationQuery
+	ctx                    *QueryContext
+	order                  []device.OrderOption
+	inters                 []Interceptor
+	predicates             []predicate.Device
+	withCreator            *AdminQuery
+	withUpdater            *AdminQuery
+	withEvent              *EventQuery
+	withDeviceInstallation *DeviceInstallationQuery
+	withEventLog           *EventLogQuery
+	withFixing             *FixingQuery
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
 	path func(context.Context) (*sql.Selector, error)
@@ -109,9 +113,9 @@ func (dq *DeviceQuery) QueryUpdater() *AdminQuery {
 	return query
 }
 
-// QueryIpcEventDevice chains the current query on the "ipc_event_device" edge.
-func (dq *DeviceQuery) QueryIpcEventDevice() *IPCEventQuery {
-	query := (&IPCEventClient{config: dq.config}).Query()
+// QueryEvent chains the current query on the "event" edge.
+func (dq *DeviceQuery) QueryEvent() *EventQuery {
+	query := (&EventClient{config: dq.config}).Query()
 	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
 		if err := dq.prepareQuery(ctx); err != nil {
 			return nil, err
@@ -122,8 +126,8 @@ func (dq *DeviceQuery) QueryIpcEventDevice() *IPCEventQuery {
 		}
 		step := sqlgraph.NewStep(
 			sqlgraph.From(device.Table, device.FieldID, selector),
-			sqlgraph.To(ipcevent.Table, ipcevent.FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, false, device.IpcEventDeviceTable, device.IpcEventDeviceColumn),
+			sqlgraph.To(event.Table, event.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, device.EventTable, device.EventColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(dq.driver.Dialect(), step)
 		return fromU, nil
@@ -131,8 +135,8 @@ func (dq *DeviceQuery) QueryIpcEventDevice() *IPCEventQuery {
 	return query
 }
 
-// QueryDeviceInstallationDevice chains the current query on the "device_installation_device" edge.
-func (dq *DeviceQuery) QueryDeviceInstallationDevice() *DeviceInstallationQuery {
+// QueryDeviceInstallation chains the current query on the "device_installation" edge.
+func (dq *DeviceQuery) QueryDeviceInstallation() *DeviceInstallationQuery {
 	query := (&DeviceInstallationClient{config: dq.config}).Query()
 	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
 		if err := dq.prepareQuery(ctx); err != nil {
@@ -145,7 +149,51 @@ func (dq *DeviceQuery) QueryDeviceInstallationDevice() *DeviceInstallationQuery 
 		step := sqlgraph.NewStep(
 			sqlgraph.From(device.Table, device.FieldID, selector),
 			sqlgraph.To(deviceinstallation.Table, deviceinstallation.FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, false, device.DeviceInstallationDeviceTable, device.DeviceInstallationDeviceColumn),
+			sqlgraph.Edge(sqlgraph.O2M, false, device.DeviceInstallationTable, device.DeviceInstallationColumn),
+		)
+		fromU = sqlgraph.SetNeighbors(dq.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
+}
+
+// QueryEventLog chains the current query on the "event_log" edge.
+func (dq *DeviceQuery) QueryEventLog() *EventLogQuery {
+	query := (&EventLogClient{config: dq.config}).Query()
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := dq.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := dq.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(device.Table, device.FieldID, selector),
+			sqlgraph.To(eventlog.Table, eventlog.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, device.EventLogTable, device.EventLogColumn),
+		)
+		fromU = sqlgraph.SetNeighbors(dq.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
+}
+
+// QueryFixing chains the current query on the "fixing" edge.
+func (dq *DeviceQuery) QueryFixing() *FixingQuery {
+	query := (&FixingClient{config: dq.config}).Query()
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := dq.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := dq.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(device.Table, device.FieldID, selector),
+			sqlgraph.To(fixing.Table, fixing.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, device.FixingTable, device.FixingColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(dq.driver.Dialect(), step)
 		return fromU, nil
@@ -340,15 +388,17 @@ func (dq *DeviceQuery) Clone() *DeviceQuery {
 		return nil
 	}
 	return &DeviceQuery{
-		config:                       dq.config,
-		ctx:                          dq.ctx.Clone(),
-		order:                        append([]device.OrderOption{}, dq.order...),
-		inters:                       append([]Interceptor{}, dq.inters...),
-		predicates:                   append([]predicate.Device{}, dq.predicates...),
-		withCreator:                  dq.withCreator.Clone(),
-		withUpdater:                  dq.withUpdater.Clone(),
-		withIpcEventDevice:           dq.withIpcEventDevice.Clone(),
-		withDeviceInstallationDevice: dq.withDeviceInstallationDevice.Clone(),
+		config:                 dq.config,
+		ctx:                    dq.ctx.Clone(),
+		order:                  append([]device.OrderOption{}, dq.order...),
+		inters:                 append([]Interceptor{}, dq.inters...),
+		predicates:             append([]predicate.Device{}, dq.predicates...),
+		withCreator:            dq.withCreator.Clone(),
+		withUpdater:            dq.withUpdater.Clone(),
+		withEvent:              dq.withEvent.Clone(),
+		withDeviceInstallation: dq.withDeviceInstallation.Clone(),
+		withEventLog:           dq.withEventLog.Clone(),
+		withFixing:             dq.withFixing.Clone(),
 		// clone intermediate query.
 		sql:  dq.sql.Clone(),
 		path: dq.path,
@@ -377,25 +427,47 @@ func (dq *DeviceQuery) WithUpdater(opts ...func(*AdminQuery)) *DeviceQuery {
 	return dq
 }
 
-// WithIpcEventDevice tells the query-builder to eager-load the nodes that are connected to
-// the "ipc_event_device" edge. The optional arguments are used to configure the query builder of the edge.
-func (dq *DeviceQuery) WithIpcEventDevice(opts ...func(*IPCEventQuery)) *DeviceQuery {
-	query := (&IPCEventClient{config: dq.config}).Query()
+// WithEvent tells the query-builder to eager-load the nodes that are connected to
+// the "event" edge. The optional arguments are used to configure the query builder of the edge.
+func (dq *DeviceQuery) WithEvent(opts ...func(*EventQuery)) *DeviceQuery {
+	query := (&EventClient{config: dq.config}).Query()
 	for _, opt := range opts {
 		opt(query)
 	}
-	dq.withIpcEventDevice = query
+	dq.withEvent = query
 	return dq
 }
 
-// WithDeviceInstallationDevice tells the query-builder to eager-load the nodes that are connected to
-// the "device_installation_device" edge. The optional arguments are used to configure the query builder of the edge.
-func (dq *DeviceQuery) WithDeviceInstallationDevice(opts ...func(*DeviceInstallationQuery)) *DeviceQuery {
+// WithDeviceInstallation tells the query-builder to eager-load the nodes that are connected to
+// the "device_installation" edge. The optional arguments are used to configure the query builder of the edge.
+func (dq *DeviceQuery) WithDeviceInstallation(opts ...func(*DeviceInstallationQuery)) *DeviceQuery {
 	query := (&DeviceInstallationClient{config: dq.config}).Query()
 	for _, opt := range opts {
 		opt(query)
 	}
-	dq.withDeviceInstallationDevice = query
+	dq.withDeviceInstallation = query
+	return dq
+}
+
+// WithEventLog tells the query-builder to eager-load the nodes that are connected to
+// the "event_log" edge. The optional arguments are used to configure the query builder of the edge.
+func (dq *DeviceQuery) WithEventLog(opts ...func(*EventLogQuery)) *DeviceQuery {
+	query := (&EventLogClient{config: dq.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	dq.withEventLog = query
+	return dq
+}
+
+// WithFixing tells the query-builder to eager-load the nodes that are connected to
+// the "fixing" edge. The optional arguments are used to configure the query builder of the edge.
+func (dq *DeviceQuery) WithFixing(opts ...func(*FixingQuery)) *DeviceQuery {
+	query := (&FixingClient{config: dq.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	dq.withFixing = query
 	return dq
 }
 
@@ -405,12 +477,12 @@ func (dq *DeviceQuery) WithDeviceInstallationDevice(opts ...func(*DeviceInstalla
 // Example:
 //
 //	var v []struct {
-//		CreatedAt time.Time `json:"created_at"`
+//		CreateTime time.Time `json:"create_time"`
 //		Count int `json:"count,omitempty"`
 //	}
 //
 //	client.Device.Query().
-//		GroupBy(device.FieldCreatedAt).
+//		GroupBy(device.FieldCreateTime).
 //		Aggregate(dao.Count()).
 //		Scan(ctx, &v)
 func (dq *DeviceQuery) GroupBy(field string, fields ...string) *DeviceGroupBy {
@@ -428,11 +500,11 @@ func (dq *DeviceQuery) GroupBy(field string, fields ...string) *DeviceGroupBy {
 // Example:
 //
 //	var v []struct {
-//		CreatedAt time.Time `json:"created_at"`
+//		CreateTime time.Time `json:"create_time"`
 //	}
 //
 //	client.Device.Query().
-//		Select(device.FieldCreatedAt).
+//		Select(device.FieldCreateTime).
 //		Scan(ctx, &v)
 func (dq *DeviceQuery) Select(fields ...string) *DeviceSelect {
 	dq.ctx.Fields = append(dq.ctx.Fields, fields...)
@@ -477,11 +549,13 @@ func (dq *DeviceQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Devic
 	var (
 		nodes       = []*Device{}
 		_spec       = dq.querySpec()
-		loadedTypes = [4]bool{
+		loadedTypes = [6]bool{
 			dq.withCreator != nil,
 			dq.withUpdater != nil,
-			dq.withIpcEventDevice != nil,
-			dq.withDeviceInstallationDevice != nil,
+			dq.withEvent != nil,
+			dq.withDeviceInstallation != nil,
+			dq.withEventLog != nil,
+			dq.withFixing != nil,
 		}
 	)
 	_spec.ScanValues = func(columns []string) ([]any, error) {
@@ -514,19 +588,33 @@ func (dq *DeviceQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Devic
 			return nil, err
 		}
 	}
-	if query := dq.withIpcEventDevice; query != nil {
-		if err := dq.loadIpcEventDevice(ctx, query, nodes,
-			func(n *Device) { n.Edges.IpcEventDevice = []*IPCEvent{} },
-			func(n *Device, e *IPCEvent) { n.Edges.IpcEventDevice = append(n.Edges.IpcEventDevice, e) }); err != nil {
+	if query := dq.withEvent; query != nil {
+		if err := dq.loadEvent(ctx, query, nodes,
+			func(n *Device) { n.Edges.Event = []*Event{} },
+			func(n *Device, e *Event) { n.Edges.Event = append(n.Edges.Event, e) }); err != nil {
 			return nil, err
 		}
 	}
-	if query := dq.withDeviceInstallationDevice; query != nil {
-		if err := dq.loadDeviceInstallationDevice(ctx, query, nodes,
-			func(n *Device) { n.Edges.DeviceInstallationDevice = []*DeviceInstallation{} },
+	if query := dq.withDeviceInstallation; query != nil {
+		if err := dq.loadDeviceInstallation(ctx, query, nodes,
+			func(n *Device) { n.Edges.DeviceInstallation = []*DeviceInstallation{} },
 			func(n *Device, e *DeviceInstallation) {
-				n.Edges.DeviceInstallationDevice = append(n.Edges.DeviceInstallationDevice, e)
+				n.Edges.DeviceInstallation = append(n.Edges.DeviceInstallation, e)
 			}); err != nil {
+			return nil, err
+		}
+	}
+	if query := dq.withEventLog; query != nil {
+		if err := dq.loadEventLog(ctx, query, nodes,
+			func(n *Device) { n.Edges.EventLog = []*EventLog{} },
+			func(n *Device, e *EventLog) { n.Edges.EventLog = append(n.Edges.EventLog, e) }); err != nil {
+			return nil, err
+		}
+	}
+	if query := dq.withFixing; query != nil {
+		if err := dq.loadFixing(ctx, query, nodes,
+			func(n *Device) { n.Edges.Fixing = []*Fixing{} },
+			func(n *Device, e *Fixing) { n.Edges.Fixing = append(n.Edges.Fixing, e) }); err != nil {
 			return nil, err
 		}
 	}
@@ -537,7 +625,7 @@ func (dq *DeviceQuery) loadCreator(ctx context.Context, query *AdminQuery, nodes
 	ids := make([]int, 0, len(nodes))
 	nodeids := make(map[int][]*Device)
 	for i := range nodes {
-		fk := nodes[i].CreatedBy
+		fk := nodes[i].CreatorID
 		if _, ok := nodeids[fk]; !ok {
 			ids = append(ids, fk)
 		}
@@ -554,7 +642,7 @@ func (dq *DeviceQuery) loadCreator(ctx context.Context, query *AdminQuery, nodes
 	for _, n := range neighbors {
 		nodes, ok := nodeids[n.ID]
 		if !ok {
-			return fmt.Errorf(`unexpected foreign-key "created_by" returned %v`, n.ID)
+			return fmt.Errorf(`unexpected foreign-key "creator_id" returned %v`, n.ID)
 		}
 		for i := range nodes {
 			assign(nodes[i], n)
@@ -566,7 +654,7 @@ func (dq *DeviceQuery) loadUpdater(ctx context.Context, query *AdminQuery, nodes
 	ids := make([]int, 0, len(nodes))
 	nodeids := make(map[int][]*Device)
 	for i := range nodes {
-		fk := nodes[i].UpdatedBy
+		fk := nodes[i].UpdaterID
 		if _, ok := nodeids[fk]; !ok {
 			ids = append(ids, fk)
 		}
@@ -583,7 +671,7 @@ func (dq *DeviceQuery) loadUpdater(ctx context.Context, query *AdminQuery, nodes
 	for _, n := range neighbors {
 		nodes, ok := nodeids[n.ID]
 		if !ok {
-			return fmt.Errorf(`unexpected foreign-key "updated_by" returned %v`, n.ID)
+			return fmt.Errorf(`unexpected foreign-key "updater_id" returned %v`, n.ID)
 		}
 		for i := range nodes {
 			assign(nodes[i], n)
@@ -591,7 +679,7 @@ func (dq *DeviceQuery) loadUpdater(ctx context.Context, query *AdminQuery, nodes
 	}
 	return nil
 }
-func (dq *DeviceQuery) loadIpcEventDevice(ctx context.Context, query *IPCEventQuery, nodes []*Device, init func(*Device), assign func(*Device, *IPCEvent)) error {
+func (dq *DeviceQuery) loadEvent(ctx context.Context, query *EventQuery, nodes []*Device, init func(*Device), assign func(*Device, *Event)) error {
 	fks := make([]driver.Value, 0, len(nodes))
 	nodeids := make(map[int]*Device)
 	for i := range nodes {
@@ -602,10 +690,10 @@ func (dq *DeviceQuery) loadIpcEventDevice(ctx context.Context, query *IPCEventQu
 		}
 	}
 	if len(query.ctx.Fields) > 0 {
-		query.ctx.AppendFieldOnce(ipcevent.FieldDeviceID)
+		query.ctx.AppendFieldOnce(event.FieldDeviceID)
 	}
-	query.Where(predicate.IPCEvent(func(s *sql.Selector) {
-		s.Where(sql.InValues(s.C(device.IpcEventDeviceColumn), fks...))
+	query.Where(predicate.Event(func(s *sql.Selector) {
+		s.Where(sql.InValues(s.C(device.EventColumn), fks...))
 	}))
 	neighbors, err := query.All(ctx)
 	if err != nil {
@@ -621,7 +709,7 @@ func (dq *DeviceQuery) loadIpcEventDevice(ctx context.Context, query *IPCEventQu
 	}
 	return nil
 }
-func (dq *DeviceQuery) loadDeviceInstallationDevice(ctx context.Context, query *DeviceInstallationQuery, nodes []*Device, init func(*Device), assign func(*Device, *DeviceInstallation)) error {
+func (dq *DeviceQuery) loadDeviceInstallation(ctx context.Context, query *DeviceInstallationQuery, nodes []*Device, init func(*Device), assign func(*Device, *DeviceInstallation)) error {
 	fks := make([]driver.Value, 0, len(nodes))
 	nodeids := make(map[int]*Device)
 	for i := range nodes {
@@ -635,7 +723,67 @@ func (dq *DeviceQuery) loadDeviceInstallationDevice(ctx context.Context, query *
 		query.ctx.AppendFieldOnce(deviceinstallation.FieldDeviceID)
 	}
 	query.Where(predicate.DeviceInstallation(func(s *sql.Selector) {
-		s.Where(sql.InValues(s.C(device.DeviceInstallationDeviceColumn), fks...))
+		s.Where(sql.InValues(s.C(device.DeviceInstallationColumn), fks...))
+	}))
+	neighbors, err := query.All(ctx)
+	if err != nil {
+		return err
+	}
+	for _, n := range neighbors {
+		fk := n.DeviceID
+		node, ok := nodeids[fk]
+		if !ok {
+			return fmt.Errorf(`unexpected referenced foreign-key "device_id" returned %v for node %v`, fk, n.ID)
+		}
+		assign(node, n)
+	}
+	return nil
+}
+func (dq *DeviceQuery) loadEventLog(ctx context.Context, query *EventLogQuery, nodes []*Device, init func(*Device), assign func(*Device, *EventLog)) error {
+	fks := make([]driver.Value, 0, len(nodes))
+	nodeids := make(map[int]*Device)
+	for i := range nodes {
+		fks = append(fks, nodes[i].ID)
+		nodeids[nodes[i].ID] = nodes[i]
+		if init != nil {
+			init(nodes[i])
+		}
+	}
+	if len(query.ctx.Fields) > 0 {
+		query.ctx.AppendFieldOnce(eventlog.FieldDeviceID)
+	}
+	query.Where(predicate.EventLog(func(s *sql.Selector) {
+		s.Where(sql.InValues(s.C(device.EventLogColumn), fks...))
+	}))
+	neighbors, err := query.All(ctx)
+	if err != nil {
+		return err
+	}
+	for _, n := range neighbors {
+		fk := n.DeviceID
+		node, ok := nodeids[fk]
+		if !ok {
+			return fmt.Errorf(`unexpected referenced foreign-key "device_id" returned %v for node %v`, fk, n.ID)
+		}
+		assign(node, n)
+	}
+	return nil
+}
+func (dq *DeviceQuery) loadFixing(ctx context.Context, query *FixingQuery, nodes []*Device, init func(*Device), assign func(*Device, *Fixing)) error {
+	fks := make([]driver.Value, 0, len(nodes))
+	nodeids := make(map[int]*Device)
+	for i := range nodes {
+		fks = append(fks, nodes[i].ID)
+		nodeids[nodes[i].ID] = nodes[i]
+		if init != nil {
+			init(nodes[i])
+		}
+	}
+	if len(query.ctx.Fields) > 0 {
+		query.ctx.AppendFieldOnce(fixing.FieldDeviceID)
+	}
+	query.Where(predicate.Fixing(func(s *sql.Selector) {
+		s.Where(sql.InValues(s.C(device.FixingColumn), fks...))
 	}))
 	neighbors, err := query.All(ctx)
 	if err != nil {
@@ -678,10 +826,10 @@ func (dq *DeviceQuery) querySpec() *sqlgraph.QuerySpec {
 			}
 		}
 		if dq.withCreator != nil {
-			_spec.Node.AddColumnOnce(device.FieldCreatedBy)
+			_spec.Node.AddColumnOnce(device.FieldCreatorID)
 		}
 		if dq.withUpdater != nil {
-			_spec.Node.AddColumnOnce(device.FieldUpdatedBy)
+			_spec.Node.AddColumnOnce(device.FieldUpdaterID)
 		}
 	}
 	if ps := dq.predicates; len(ps) > 0 {

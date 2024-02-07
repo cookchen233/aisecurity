@@ -56,29 +56,29 @@ func IDLTE(id int) predicate.Device {
 	return predicate.Device(sql.FieldLTE(FieldID, id))
 }
 
-// CreatedAt applies equality check predicate on the "created_at" field. It's identical to CreatedAtEQ.
-func CreatedAt(v time.Time) predicate.Device {
-	return predicate.Device(sql.FieldEQ(FieldCreatedAt, v))
+// CreateTime applies equality check predicate on the "create_time" field. It's identical to CreateTimeEQ.
+func CreateTime(v time.Time) predicate.Device {
+	return predicate.Device(sql.FieldEQ(FieldCreateTime, v))
 }
 
-// CreatedBy applies equality check predicate on the "created_by" field. It's identical to CreatedByEQ.
-func CreatedBy(v int) predicate.Device {
-	return predicate.Device(sql.FieldEQ(FieldCreatedBy, v))
+// CreatorID applies equality check predicate on the "creator_id" field. It's identical to CreatorIDEQ.
+func CreatorID(v int) predicate.Device {
+	return predicate.Device(sql.FieldEQ(FieldCreatorID, v))
 }
 
-// DeletedAt applies equality check predicate on the "deleted_at" field. It's identical to DeletedAtEQ.
-func DeletedAt(v time.Time) predicate.Device {
-	return predicate.Device(sql.FieldEQ(FieldDeletedAt, v))
+// DeleteTime applies equality check predicate on the "delete_time" field. It's identical to DeleteTimeEQ.
+func DeleteTime(v time.Time) predicate.Device {
+	return predicate.Device(sql.FieldEQ(FieldDeleteTime, v))
 }
 
-// UpdatedBy applies equality check predicate on the "updated_by" field. It's identical to UpdatedByEQ.
-func UpdatedBy(v int) predicate.Device {
-	return predicate.Device(sql.FieldEQ(FieldUpdatedBy, v))
+// UpdaterID applies equality check predicate on the "updater_id" field. It's identical to UpdaterIDEQ.
+func UpdaterID(v int) predicate.Device {
+	return predicate.Device(sql.FieldEQ(FieldUpdaterID, v))
 }
 
-// UpdatedAt applies equality check predicate on the "updated_at" field. It's identical to UpdatedAtEQ.
-func UpdatedAt(v time.Time) predicate.Device {
-	return predicate.Device(sql.FieldEQ(FieldUpdatedAt, v))
+// UpdateTime applies equality check predicate on the "update_time" field. It's identical to UpdateTimeEQ.
+func UpdateTime(v time.Time) predicate.Device {
+	return predicate.Device(sql.FieldEQ(FieldUpdateTime, v))
 }
 
 // Brand applies equality check predicate on the "brand" field. It's identical to BrandEQ.
@@ -109,174 +109,174 @@ func DeviceType(v enums.DeviceType) predicate.Device {
 	return predicate.Device(sql.FieldEQ(FieldDeviceType, vc))
 }
 
-// CreatedAtEQ applies the EQ predicate on the "created_at" field.
-func CreatedAtEQ(v time.Time) predicate.Device {
-	return predicate.Device(sql.FieldEQ(FieldCreatedAt, v))
+// CreateTimeEQ applies the EQ predicate on the "create_time" field.
+func CreateTimeEQ(v time.Time) predicate.Device {
+	return predicate.Device(sql.FieldEQ(FieldCreateTime, v))
 }
 
-// CreatedAtNEQ applies the NEQ predicate on the "created_at" field.
-func CreatedAtNEQ(v time.Time) predicate.Device {
-	return predicate.Device(sql.FieldNEQ(FieldCreatedAt, v))
+// CreateTimeNEQ applies the NEQ predicate on the "create_time" field.
+func CreateTimeNEQ(v time.Time) predicate.Device {
+	return predicate.Device(sql.FieldNEQ(FieldCreateTime, v))
 }
 
-// CreatedAtIn applies the In predicate on the "created_at" field.
-func CreatedAtIn(vs ...time.Time) predicate.Device {
-	return predicate.Device(sql.FieldIn(FieldCreatedAt, vs...))
+// CreateTimeIn applies the In predicate on the "create_time" field.
+func CreateTimeIn(vs ...time.Time) predicate.Device {
+	return predicate.Device(sql.FieldIn(FieldCreateTime, vs...))
 }
 
-// CreatedAtNotIn applies the NotIn predicate on the "created_at" field.
-func CreatedAtNotIn(vs ...time.Time) predicate.Device {
-	return predicate.Device(sql.FieldNotIn(FieldCreatedAt, vs...))
+// CreateTimeNotIn applies the NotIn predicate on the "create_time" field.
+func CreateTimeNotIn(vs ...time.Time) predicate.Device {
+	return predicate.Device(sql.FieldNotIn(FieldCreateTime, vs...))
 }
 
-// CreatedAtGT applies the GT predicate on the "created_at" field.
-func CreatedAtGT(v time.Time) predicate.Device {
-	return predicate.Device(sql.FieldGT(FieldCreatedAt, v))
+// CreateTimeGT applies the GT predicate on the "create_time" field.
+func CreateTimeGT(v time.Time) predicate.Device {
+	return predicate.Device(sql.FieldGT(FieldCreateTime, v))
 }
 
-// CreatedAtGTE applies the GTE predicate on the "created_at" field.
-func CreatedAtGTE(v time.Time) predicate.Device {
-	return predicate.Device(sql.FieldGTE(FieldCreatedAt, v))
+// CreateTimeGTE applies the GTE predicate on the "create_time" field.
+func CreateTimeGTE(v time.Time) predicate.Device {
+	return predicate.Device(sql.FieldGTE(FieldCreateTime, v))
 }
 
-// CreatedAtLT applies the LT predicate on the "created_at" field.
-func CreatedAtLT(v time.Time) predicate.Device {
-	return predicate.Device(sql.FieldLT(FieldCreatedAt, v))
+// CreateTimeLT applies the LT predicate on the "create_time" field.
+func CreateTimeLT(v time.Time) predicate.Device {
+	return predicate.Device(sql.FieldLT(FieldCreateTime, v))
 }
 
-// CreatedAtLTE applies the LTE predicate on the "created_at" field.
-func CreatedAtLTE(v time.Time) predicate.Device {
-	return predicate.Device(sql.FieldLTE(FieldCreatedAt, v))
+// CreateTimeLTE applies the LTE predicate on the "create_time" field.
+func CreateTimeLTE(v time.Time) predicate.Device {
+	return predicate.Device(sql.FieldLTE(FieldCreateTime, v))
 }
 
-// CreatedByEQ applies the EQ predicate on the "created_by" field.
-func CreatedByEQ(v int) predicate.Device {
-	return predicate.Device(sql.FieldEQ(FieldCreatedBy, v))
+// CreatorIDEQ applies the EQ predicate on the "creator_id" field.
+func CreatorIDEQ(v int) predicate.Device {
+	return predicate.Device(sql.FieldEQ(FieldCreatorID, v))
 }
 
-// CreatedByNEQ applies the NEQ predicate on the "created_by" field.
-func CreatedByNEQ(v int) predicate.Device {
-	return predicate.Device(sql.FieldNEQ(FieldCreatedBy, v))
+// CreatorIDNEQ applies the NEQ predicate on the "creator_id" field.
+func CreatorIDNEQ(v int) predicate.Device {
+	return predicate.Device(sql.FieldNEQ(FieldCreatorID, v))
 }
 
-// CreatedByIn applies the In predicate on the "created_by" field.
-func CreatedByIn(vs ...int) predicate.Device {
-	return predicate.Device(sql.FieldIn(FieldCreatedBy, vs...))
+// CreatorIDIn applies the In predicate on the "creator_id" field.
+func CreatorIDIn(vs ...int) predicate.Device {
+	return predicate.Device(sql.FieldIn(FieldCreatorID, vs...))
 }
 
-// CreatedByNotIn applies the NotIn predicate on the "created_by" field.
-func CreatedByNotIn(vs ...int) predicate.Device {
-	return predicate.Device(sql.FieldNotIn(FieldCreatedBy, vs...))
+// CreatorIDNotIn applies the NotIn predicate on the "creator_id" field.
+func CreatorIDNotIn(vs ...int) predicate.Device {
+	return predicate.Device(sql.FieldNotIn(FieldCreatorID, vs...))
 }
 
-// DeletedAtEQ applies the EQ predicate on the "deleted_at" field.
-func DeletedAtEQ(v time.Time) predicate.Device {
-	return predicate.Device(sql.FieldEQ(FieldDeletedAt, v))
+// DeleteTimeEQ applies the EQ predicate on the "delete_time" field.
+func DeleteTimeEQ(v time.Time) predicate.Device {
+	return predicate.Device(sql.FieldEQ(FieldDeleteTime, v))
 }
 
-// DeletedAtNEQ applies the NEQ predicate on the "deleted_at" field.
-func DeletedAtNEQ(v time.Time) predicate.Device {
-	return predicate.Device(sql.FieldNEQ(FieldDeletedAt, v))
+// DeleteTimeNEQ applies the NEQ predicate on the "delete_time" field.
+func DeleteTimeNEQ(v time.Time) predicate.Device {
+	return predicate.Device(sql.FieldNEQ(FieldDeleteTime, v))
 }
 
-// DeletedAtIn applies the In predicate on the "deleted_at" field.
-func DeletedAtIn(vs ...time.Time) predicate.Device {
-	return predicate.Device(sql.FieldIn(FieldDeletedAt, vs...))
+// DeleteTimeIn applies the In predicate on the "delete_time" field.
+func DeleteTimeIn(vs ...time.Time) predicate.Device {
+	return predicate.Device(sql.FieldIn(FieldDeleteTime, vs...))
 }
 
-// DeletedAtNotIn applies the NotIn predicate on the "deleted_at" field.
-func DeletedAtNotIn(vs ...time.Time) predicate.Device {
-	return predicate.Device(sql.FieldNotIn(FieldDeletedAt, vs...))
+// DeleteTimeNotIn applies the NotIn predicate on the "delete_time" field.
+func DeleteTimeNotIn(vs ...time.Time) predicate.Device {
+	return predicate.Device(sql.FieldNotIn(FieldDeleteTime, vs...))
 }
 
-// DeletedAtGT applies the GT predicate on the "deleted_at" field.
-func DeletedAtGT(v time.Time) predicate.Device {
-	return predicate.Device(sql.FieldGT(FieldDeletedAt, v))
+// DeleteTimeGT applies the GT predicate on the "delete_time" field.
+func DeleteTimeGT(v time.Time) predicate.Device {
+	return predicate.Device(sql.FieldGT(FieldDeleteTime, v))
 }
 
-// DeletedAtGTE applies the GTE predicate on the "deleted_at" field.
-func DeletedAtGTE(v time.Time) predicate.Device {
-	return predicate.Device(sql.FieldGTE(FieldDeletedAt, v))
+// DeleteTimeGTE applies the GTE predicate on the "delete_time" field.
+func DeleteTimeGTE(v time.Time) predicate.Device {
+	return predicate.Device(sql.FieldGTE(FieldDeleteTime, v))
 }
 
-// DeletedAtLT applies the LT predicate on the "deleted_at" field.
-func DeletedAtLT(v time.Time) predicate.Device {
-	return predicate.Device(sql.FieldLT(FieldDeletedAt, v))
+// DeleteTimeLT applies the LT predicate on the "delete_time" field.
+func DeleteTimeLT(v time.Time) predicate.Device {
+	return predicate.Device(sql.FieldLT(FieldDeleteTime, v))
 }
 
-// DeletedAtLTE applies the LTE predicate on the "deleted_at" field.
-func DeletedAtLTE(v time.Time) predicate.Device {
-	return predicate.Device(sql.FieldLTE(FieldDeletedAt, v))
+// DeleteTimeLTE applies the LTE predicate on the "delete_time" field.
+func DeleteTimeLTE(v time.Time) predicate.Device {
+	return predicate.Device(sql.FieldLTE(FieldDeleteTime, v))
 }
 
-// DeletedAtIsNil applies the IsNil predicate on the "deleted_at" field.
-func DeletedAtIsNil() predicate.Device {
-	return predicate.Device(sql.FieldIsNull(FieldDeletedAt))
+// DeleteTimeIsNil applies the IsNil predicate on the "delete_time" field.
+func DeleteTimeIsNil() predicate.Device {
+	return predicate.Device(sql.FieldIsNull(FieldDeleteTime))
 }
 
-// DeletedAtNotNil applies the NotNil predicate on the "deleted_at" field.
-func DeletedAtNotNil() predicate.Device {
-	return predicate.Device(sql.FieldNotNull(FieldDeletedAt))
+// DeleteTimeNotNil applies the NotNil predicate on the "delete_time" field.
+func DeleteTimeNotNil() predicate.Device {
+	return predicate.Device(sql.FieldNotNull(FieldDeleteTime))
 }
 
-// UpdatedByEQ applies the EQ predicate on the "updated_by" field.
-func UpdatedByEQ(v int) predicate.Device {
-	return predicate.Device(sql.FieldEQ(FieldUpdatedBy, v))
+// UpdaterIDEQ applies the EQ predicate on the "updater_id" field.
+func UpdaterIDEQ(v int) predicate.Device {
+	return predicate.Device(sql.FieldEQ(FieldUpdaterID, v))
 }
 
-// UpdatedByNEQ applies the NEQ predicate on the "updated_by" field.
-func UpdatedByNEQ(v int) predicate.Device {
-	return predicate.Device(sql.FieldNEQ(FieldUpdatedBy, v))
+// UpdaterIDNEQ applies the NEQ predicate on the "updater_id" field.
+func UpdaterIDNEQ(v int) predicate.Device {
+	return predicate.Device(sql.FieldNEQ(FieldUpdaterID, v))
 }
 
-// UpdatedByIn applies the In predicate on the "updated_by" field.
-func UpdatedByIn(vs ...int) predicate.Device {
-	return predicate.Device(sql.FieldIn(FieldUpdatedBy, vs...))
+// UpdaterIDIn applies the In predicate on the "updater_id" field.
+func UpdaterIDIn(vs ...int) predicate.Device {
+	return predicate.Device(sql.FieldIn(FieldUpdaterID, vs...))
 }
 
-// UpdatedByNotIn applies the NotIn predicate on the "updated_by" field.
-func UpdatedByNotIn(vs ...int) predicate.Device {
-	return predicate.Device(sql.FieldNotIn(FieldUpdatedBy, vs...))
+// UpdaterIDNotIn applies the NotIn predicate on the "updater_id" field.
+func UpdaterIDNotIn(vs ...int) predicate.Device {
+	return predicate.Device(sql.FieldNotIn(FieldUpdaterID, vs...))
 }
 
-// UpdatedAtEQ applies the EQ predicate on the "updated_at" field.
-func UpdatedAtEQ(v time.Time) predicate.Device {
-	return predicate.Device(sql.FieldEQ(FieldUpdatedAt, v))
+// UpdateTimeEQ applies the EQ predicate on the "update_time" field.
+func UpdateTimeEQ(v time.Time) predicate.Device {
+	return predicate.Device(sql.FieldEQ(FieldUpdateTime, v))
 }
 
-// UpdatedAtNEQ applies the NEQ predicate on the "updated_at" field.
-func UpdatedAtNEQ(v time.Time) predicate.Device {
-	return predicate.Device(sql.FieldNEQ(FieldUpdatedAt, v))
+// UpdateTimeNEQ applies the NEQ predicate on the "update_time" field.
+func UpdateTimeNEQ(v time.Time) predicate.Device {
+	return predicate.Device(sql.FieldNEQ(FieldUpdateTime, v))
 }
 
-// UpdatedAtIn applies the In predicate on the "updated_at" field.
-func UpdatedAtIn(vs ...time.Time) predicate.Device {
-	return predicate.Device(sql.FieldIn(FieldUpdatedAt, vs...))
+// UpdateTimeIn applies the In predicate on the "update_time" field.
+func UpdateTimeIn(vs ...time.Time) predicate.Device {
+	return predicate.Device(sql.FieldIn(FieldUpdateTime, vs...))
 }
 
-// UpdatedAtNotIn applies the NotIn predicate on the "updated_at" field.
-func UpdatedAtNotIn(vs ...time.Time) predicate.Device {
-	return predicate.Device(sql.FieldNotIn(FieldUpdatedAt, vs...))
+// UpdateTimeNotIn applies the NotIn predicate on the "update_time" field.
+func UpdateTimeNotIn(vs ...time.Time) predicate.Device {
+	return predicate.Device(sql.FieldNotIn(FieldUpdateTime, vs...))
 }
 
-// UpdatedAtGT applies the GT predicate on the "updated_at" field.
-func UpdatedAtGT(v time.Time) predicate.Device {
-	return predicate.Device(sql.FieldGT(FieldUpdatedAt, v))
+// UpdateTimeGT applies the GT predicate on the "update_time" field.
+func UpdateTimeGT(v time.Time) predicate.Device {
+	return predicate.Device(sql.FieldGT(FieldUpdateTime, v))
 }
 
-// UpdatedAtGTE applies the GTE predicate on the "updated_at" field.
-func UpdatedAtGTE(v time.Time) predicate.Device {
-	return predicate.Device(sql.FieldGTE(FieldUpdatedAt, v))
+// UpdateTimeGTE applies the GTE predicate on the "update_time" field.
+func UpdateTimeGTE(v time.Time) predicate.Device {
+	return predicate.Device(sql.FieldGTE(FieldUpdateTime, v))
 }
 
-// UpdatedAtLT applies the LT predicate on the "updated_at" field.
-func UpdatedAtLT(v time.Time) predicate.Device {
-	return predicate.Device(sql.FieldLT(FieldUpdatedAt, v))
+// UpdateTimeLT applies the LT predicate on the "update_time" field.
+func UpdateTimeLT(v time.Time) predicate.Device {
+	return predicate.Device(sql.FieldLT(FieldUpdateTime, v))
 }
 
-// UpdatedAtLTE applies the LTE predicate on the "updated_at" field.
-func UpdatedAtLTE(v time.Time) predicate.Device {
-	return predicate.Device(sql.FieldLTE(FieldUpdatedAt, v))
+// UpdateTimeLTE applies the LTE predicate on the "update_time" field.
+func UpdateTimeLTE(v time.Time) predicate.Device {
+	return predicate.Device(sql.FieldLTE(FieldUpdateTime, v))
 }
 
 // BrandEQ applies the EQ predicate on the "brand" field.
@@ -657,21 +657,21 @@ func HasUpdaterWith(preds ...predicate.Admin) predicate.Device {
 	})
 }
 
-// HasIpcEventDevice applies the HasEdge predicate on the "ipc_event_device" edge.
-func HasIpcEventDevice() predicate.Device {
+// HasEvent applies the HasEdge predicate on the "event" edge.
+func HasEvent() predicate.Device {
 	return predicate.Device(func(s *sql.Selector) {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(Table, FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, false, IpcEventDeviceTable, IpcEventDeviceColumn),
+			sqlgraph.Edge(sqlgraph.O2M, false, EventTable, EventColumn),
 		)
 		sqlgraph.HasNeighbors(s, step)
 	})
 }
 
-// HasIpcEventDeviceWith applies the HasEdge predicate on the "ipc_event_device" edge with a given conditions (other predicates).
-func HasIpcEventDeviceWith(preds ...predicate.IPCEvent) predicate.Device {
+// HasEventWith applies the HasEdge predicate on the "event" edge with a given conditions (other predicates).
+func HasEventWith(preds ...predicate.Event) predicate.Device {
 	return predicate.Device(func(s *sql.Selector) {
-		step := newIpcEventDeviceStep()
+		step := newEventStep()
 		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
 			for _, p := range preds {
 				p(s)
@@ -680,21 +680,67 @@ func HasIpcEventDeviceWith(preds ...predicate.IPCEvent) predicate.Device {
 	})
 }
 
-// HasDeviceInstallationDevice applies the HasEdge predicate on the "device_installation_device" edge.
-func HasDeviceInstallationDevice() predicate.Device {
+// HasDeviceInstallation applies the HasEdge predicate on the "device_installation" edge.
+func HasDeviceInstallation() predicate.Device {
 	return predicate.Device(func(s *sql.Selector) {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(Table, FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, false, DeviceInstallationDeviceTable, DeviceInstallationDeviceColumn),
+			sqlgraph.Edge(sqlgraph.O2M, false, DeviceInstallationTable, DeviceInstallationColumn),
 		)
 		sqlgraph.HasNeighbors(s, step)
 	})
 }
 
-// HasDeviceInstallationDeviceWith applies the HasEdge predicate on the "device_installation_device" edge with a given conditions (other predicates).
-func HasDeviceInstallationDeviceWith(preds ...predicate.DeviceInstallation) predicate.Device {
+// HasDeviceInstallationWith applies the HasEdge predicate on the "device_installation" edge with a given conditions (other predicates).
+func HasDeviceInstallationWith(preds ...predicate.DeviceInstallation) predicate.Device {
 	return predicate.Device(func(s *sql.Selector) {
-		step := newDeviceInstallationDeviceStep()
+		step := newDeviceInstallationStep()
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
+}
+
+// HasEventLog applies the HasEdge predicate on the "event_log" edge.
+func HasEventLog() predicate.Device {
+	return predicate.Device(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, EventLogTable, EventLogColumn),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasEventLogWith applies the HasEdge predicate on the "event_log" edge with a given conditions (other predicates).
+func HasEventLogWith(preds ...predicate.EventLog) predicate.Device {
+	return predicate.Device(func(s *sql.Selector) {
+		step := newEventLogStep()
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
+}
+
+// HasFixing applies the HasEdge predicate on the "fixing" edge.
+func HasFixing() predicate.Device {
+	return predicate.Device(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, FixingTable, FixingColumn),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasFixingWith applies the HasEdge predicate on the "fixing" edge with a given conditions (other predicates).
+func HasFixingWith(preds ...predicate.Fixing) predicate.Device {
+	return predicate.Device(func(s *sql.Selector) {
+		step := newFixingStep()
 		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
 			for _, p := range preds {
 				p(s)

@@ -20,18 +20,6 @@ func (f AdminFunc) Mutate(ctx context.Context, m dao.Mutation) (dao.Value, error
 	return nil, fmt.Errorf("unexpected mutation type %T. expect *dao.AdminMutation", m)
 }
 
-// The AdminRoleFunc type is an adapter to allow the use of ordinary
-// function as AdminRole mutator.
-type AdminRoleFunc func(context.Context, *dao.AdminRoleMutation) (dao.Value, error)
-
-// Mutate calls f(ctx, m).
-func (f AdminRoleFunc) Mutate(ctx context.Context, m dao.Mutation) (dao.Value, error) {
-	if mv, ok := m.(*dao.AdminRoleMutation); ok {
-		return f(ctx, mv)
-	}
-	return nil, fmt.Errorf("unexpected mutation type %T. expect *dao.AdminRoleMutation", m)
-}
-
 // The AreaFunc type is an adapter to allow the use of ordinary
 // function as Area mutator.
 type AreaFunc func(context.Context, *dao.AreaMutation) (dao.Value, error)
@@ -92,6 +80,18 @@ func (f EmployeeFunc) Mutate(ctx context.Context, m dao.Mutation) (dao.Value, er
 	return nil, fmt.Errorf("unexpected mutation type %T. expect *dao.EmployeeMutation", m)
 }
 
+// The EventFunc type is an adapter to allow the use of ordinary
+// function as Event mutator.
+type EventFunc func(context.Context, *dao.EventMutation) (dao.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f EventFunc) Mutate(ctx context.Context, m dao.Mutation) (dao.Value, error) {
+	if mv, ok := m.(*dao.EventMutation); ok {
+		return f(ctx, mv)
+	}
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *dao.EventMutation", m)
+}
+
 // The EventLevelFunc type is an adapter to allow the use of ordinary
 // function as EventLevel mutator.
 type EventLevelFunc func(context.Context, *dao.EventLevelMutation) (dao.Value, error)
@@ -104,16 +104,28 @@ func (f EventLevelFunc) Mutate(ctx context.Context, m dao.Mutation) (dao.Value, 
 	return nil, fmt.Errorf("unexpected mutation type %T. expect *dao.EventLevelMutation", m)
 }
 
-// The IPCEventFunc type is an adapter to allow the use of ordinary
-// function as IPCEvent mutator.
-type IPCEventFunc func(context.Context, *dao.IPCEventMutation) (dao.Value, error)
+// The EventLogFunc type is an adapter to allow the use of ordinary
+// function as EventLog mutator.
+type EventLogFunc func(context.Context, *dao.EventLogMutation) (dao.Value, error)
 
 // Mutate calls f(ctx, m).
-func (f IPCEventFunc) Mutate(ctx context.Context, m dao.Mutation) (dao.Value, error) {
-	if mv, ok := m.(*dao.IPCEventMutation); ok {
+func (f EventLogFunc) Mutate(ctx context.Context, m dao.Mutation) (dao.Value, error) {
+	if mv, ok := m.(*dao.EventLogMutation); ok {
 		return f(ctx, mv)
 	}
-	return nil, fmt.Errorf("unexpected mutation type %T. expect *dao.IPCEventMutation", m)
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *dao.EventLogMutation", m)
+}
+
+// The FixingFunc type is an adapter to allow the use of ordinary
+// function as Fixing mutator.
+type FixingFunc func(context.Context, *dao.FixingMutation) (dao.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f FixingFunc) Mutate(ctx context.Context, m dao.Mutation) (dao.Value, error) {
+	if mv, ok := m.(*dao.FixingMutation); ok {
+		return f(ctx, mv)
+	}
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *dao.FixingMutation", m)
 }
 
 // The OccupationFunc type is an adapter to allow the use of ordinary
@@ -126,6 +138,18 @@ func (f OccupationFunc) Mutate(ctx context.Context, m dao.Mutation) (dao.Value, 
 		return f(ctx, mv)
 	}
 	return nil, fmt.Errorf("unexpected mutation type %T. expect *dao.OccupationMutation", m)
+}
+
+// The PermissionFunc type is an adapter to allow the use of ordinary
+// function as Permission mutator.
+type PermissionFunc func(context.Context, *dao.PermissionMutation) (dao.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f PermissionFunc) Mutate(ctx context.Context, m dao.Mutation) (dao.Value, error) {
+	if mv, ok := m.(*dao.PermissionMutation); ok {
+		return f(ctx, mv)
+	}
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *dao.PermissionMutation", m)
 }
 
 // The RiskFunc type is an adapter to allow the use of ordinary
@@ -162,6 +186,54 @@ func (f RiskLocationFunc) Mutate(ctx context.Context, m dao.Mutation) (dao.Value
 		return f(ctx, mv)
 	}
 	return nil, fmt.Errorf("unexpected mutation type %T. expect *dao.RiskLocationMutation", m)
+}
+
+// The SweepFunc type is an adapter to allow the use of ordinary
+// function as Sweep mutator.
+type SweepFunc func(context.Context, *dao.SweepMutation) (dao.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f SweepFunc) Mutate(ctx context.Context, m dao.Mutation) (dao.Value, error) {
+	if mv, ok := m.(*dao.SweepMutation); ok {
+		return f(ctx, mv)
+	}
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *dao.SweepMutation", m)
+}
+
+// The SweepResultFunc type is an adapter to allow the use of ordinary
+// function as SweepResult mutator.
+type SweepResultFunc func(context.Context, *dao.SweepResultMutation) (dao.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f SweepResultFunc) Mutate(ctx context.Context, m dao.Mutation) (dao.Value, error) {
+	if mv, ok := m.(*dao.SweepResultMutation); ok {
+		return f(ctx, mv)
+	}
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *dao.SweepResultMutation", m)
+}
+
+// The SweepResultDetailsFunc type is an adapter to allow the use of ordinary
+// function as SweepResultDetails mutator.
+type SweepResultDetailsFunc func(context.Context, *dao.SweepResultDetailsMutation) (dao.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f SweepResultDetailsFunc) Mutate(ctx context.Context, m dao.Mutation) (dao.Value, error) {
+	if mv, ok := m.(*dao.SweepResultDetailsMutation); ok {
+		return f(ctx, mv)
+	}
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *dao.SweepResultDetailsMutation", m)
+}
+
+// The SweepScheduleFunc type is an adapter to allow the use of ordinary
+// function as SweepSchedule mutator.
+type SweepScheduleFunc func(context.Context, *dao.SweepScheduleMutation) (dao.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f SweepScheduleFunc) Mutate(ctx context.Context, m dao.Mutation) (dao.Value, error) {
+	if mv, ok := m.(*dao.SweepScheduleMutation); ok {
+		return f(ctx, mv)
+	}
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *dao.SweepScheduleMutation", m)
 }
 
 // The VideoFunc type is an adapter to allow the use of ordinary

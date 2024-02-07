@@ -3,6 +3,7 @@ package services
 import (
 	"aisecurity/ent/dao"
 	"aisecurity/ent/dao/risk"
+	"aisecurity/enums"
 	"aisecurity/expects"
 	"aisecurity/properties/maintain_status"
 	"aisecurity/structs"
@@ -11,7 +12,6 @@ import (
 	"aisecurity/structs/types"
 	"aisecurity/utils"
 	"aisecurity/utils/db"
-	"github.com/gin-gonic/gin"
 	"github.com/gogf/gf/v2/util/gconv"
 	"go.uber.org/zap"
 )
@@ -30,16 +30,18 @@ func NewRiskService() *RiskService {
 func (s *RiskService) Create(ent structs.IEntity) (structs.IEntity, error) {
 	e := ent.(*entities.Risk)
 	c := s.entClient.Create().
-		SetReporterID(max(1, s.Ctx.(*gin.Context).GetInt("admin_id"))).
 		SetTitle(e.Title).
 		SetContent(e.Content)
 	if e.Images != nil {
 		c.SetImages(e.Images)
 	}
-	save, err := c.SetRiskCategoryID(e.RiskCategoryID).
-		SetRiskLocationID(e.RiskLocationID).
-		SetMaintainerID(e.MaintainerID).
+	if e.Maintainer != nil {
+		c.SetMaintainer(e.Maintainer)
+	}
+	save, err := c.
 		SetMeasures(e.Measures).
+		SetRiskLocation(e.RiskLocation).
+		SetRiskCategory(e.RiskCategory).
 		SetMaintainStatus(maintain_status.Ready).
 		SetDueTime(e.DueTime).
 		Save(s.Ctx)
@@ -51,13 +53,15 @@ func (s *RiskService) Create(ent structs.IEntity) (structs.IEntity, error) {
 
 func (s *RiskService) Update(ent structs.IEntity) (structs.IEntity, error) {
 	e := ent.(*entities.Risk)
-	save, err := s.entClient.UpdateOneID(e.ID).
-		SetTitle(e.Title).
+	u := s.entClient.UpdateOneID(e.ID)
+	if e.Maintainer != nil {
+		u = u.SetMaintainer(e.Maintainer)
+	}
+	save, err := u.SetTitle(e.Title).
 		SetContent(e.Content).
 		SetImages(e.Images).
-		SetRiskCategoryID(e.RiskCategoryID).
-		SetRiskLocationID(e.RiskLocationID).
-		SetMaintainerID(e.MaintainerID).
+		SetRiskLocation(e.RiskLocation).
+		SetRiskCategory(e.RiskCategory).
 		SetMeasures(e.Measures).
 		//SetMaintainStatus(e.MaintainStatus).
 		SetDueTime(e.DueTime).
@@ -77,6 +81,7 @@ func (s *RiskService) GetDetails(fit structs.IFilter) (structs.IEntity, error) {
 	}
 	if len(list) == 0 {
 		return nil, utils.ErrorWithStack(expects.NewDataNotFound())
+
 	}
 	return list[0], nil
 }
@@ -84,20 +89,21 @@ func (s *RiskService) GetDetails(fit structs.IFilter) (structs.IEntity, error) {
 func (s *RiskService) GetList(fit structs.IFilter) ([]structs.IEntity, error) {
 	// list
 	list, err := s.query(fit).
-		WithRiskLocation().
-		WithRiskCategory().
-		WithMaintainer(func(q *dao.EmployeeQuery) {
-			q.WithDepartment().WithOccupations().WithAdmin(func(q *dao.AdminQuery) {
-				q.WithAdminRoles()
+		WithCreator(func(aQuery *dao.AdminQuery) {
+			aQuery.WithEmployee(func(eQuery *dao.EmployeeQuery) {
+				eQuery.WithDepartment().WithOccupation()
 			})
 		}).
-		WithReporter(func(q *dao.EmployeeQuery) {
-			q.WithDepartment().WithOccupations().WithAdmin(func(q *dao.AdminQuery) {
-				q.WithAdminRoles()
+		WithRiskLocation().
+		WithRiskCategory().
+		WithMaintainer(func(q *dao.AdminQuery) {
+			q.WithEmployee(func(q2 *dao.EmployeeQuery) {
+				q2.WithDepartment().WithOccupation()
 			})
 		}).
 		Limit(fit.GetLimit()).
 		Offset(fit.GetOffset()).
+		Order(dao.Desc(risk.FieldID)).
 		All(s.Ctx)
 	if err != nil {
 		return nil, utils.ErrorWithStack(err)
@@ -127,16 +133,12 @@ func (s *RiskService) query(fit structs.IFilter) *dao.RiskQuery {
 	if f.Title != "" {
 		q = q.Where(risk.TitleContainsFold(f.Title))
 	}
-	if f.CreatedBy != 0 {
-		q = q.Where(risk.CreatedBy(f.CreatedBy))
+	if f.CreatorID != 0 {
+		q = q.Where(risk.CreatorID(f.CreatorID))
 	}
 	maintainerIDs := utils.FilterZerosFromArray(f.MaintainerIDs)
 	if len(maintainerIDs) > 0 {
 		q = q.Where(risk.MaintainerIDIn(maintainerIDs...))
-	}
-	reporterIDs := utils.FilterZerosFromArray(f.ReporterIDs)
-	if len(reporterIDs) > 0 {
-		q = q.Where(risk.ReporterIDIn(reporterIDs...))
 	}
 	categoryIDs := utils.FilterZerosFromArray(f.RiskCategoryIDs)
 	if len(categoryIDs) > 0 {
@@ -149,6 +151,21 @@ func (s *RiskService) query(fit structs.IFilter) *dao.RiskQuery {
 	if f.MaintainStatus != 0 {
 		q = q.Where(risk.MaintainStatusIn(f.MaintainStatus))
 	}
+	if f.Status != 0 {
+		q = q.Where(risk.MaintainStatusIn(f.Status))
+	}
+	if !f.CreateTimeRange.Start.IsZero() {
+		q = q.Where(risk.CreateTimeGTE(f.CreateTimeRange.Start))
+	}
+	if !f.CreateTimeRange.End.IsZero() {
+		q = q.Where(risk.CreateTimeLTE(f.CreateTimeRange.End))
+	}
+	if !f.DueTimeRange.Start.IsZero() {
+		q = q.Where(risk.CreateTimeGTE(f.DueTimeRange.Start))
+	}
+	if !f.DueTimeRange.End.IsZero() {
+		q = q.Where(risk.CreateTimeLTE(f.DueTimeRange.End))
+	}
 	return q.Clone()
 }
 
@@ -160,34 +177,35 @@ func (s *RiskService) GetTotal(fit structs.IFilter) (int, error) {
 	return total, nil
 }
 
-func (s *RiskService) GetMaintainStatusCounts(fit structs.IFilter) ([]*types.MaintainStatusCounts, error) {
+func (s *RiskService) GetStatusCounts(fit structs.IFilter) ([]*types.StatusCount, error) {
 	// status counts
-	var counts []*types.MaintainStatusCounts
+	var queryCounts []struct {
+		MaintainStatus enums.MaintainStatus `json:"maintain_status"`
+		Count          int
+	}
 	err := s.query(fit).GroupBy(risk.FieldMaintainStatus).
 		Aggregate(dao.Count()).
-		Scan(s.Ctx, &counts)
+		Scan(s.Ctx, &queryCounts)
 	if err != nil {
-		return counts, utils.ErrorWithStack(err)
+		return nil, utils.ErrorWithStack(err)
 	}
-	for _, status := range maintain_status.Unknown.GetAll() {
-		if status == maintain_status.Unknown {
-			continue
-		}
-		var ex bool
-		for _, count := range counts {
-			if count.MaintainStatus == status {
-				count.Label = status.Label()
-				ex = true
+	var statusCounts []*types.StatusCount
+	for _, s := range enums.MaintainStatus(0).GetAll() {
+		var c int
+		for _, q := range queryCounts {
+			if q.MaintainStatus == s {
+				c = q.Count
 				break
 			}
+			if s == enums.MSUnknown {
+				c += q.Count
+			}
 		}
-		if !ex {
-			counts = append(counts, &types.MaintainStatusCounts{
-				MaintainStatus: status,
-				Count:          0,
-				Label:          status.Label(),
-			})
-		}
+		statusCounts = append(statusCounts, &types.StatusCount{
+			Value: int(s),
+			Label: s.Label(),
+			Count: c,
+		})
 	}
-	return counts, nil
+	return statusCounts, nil
 }

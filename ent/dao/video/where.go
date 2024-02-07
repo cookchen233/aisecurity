@@ -55,29 +55,29 @@ func IDLTE(id int) predicate.Video {
 	return predicate.Video(sql.FieldLTE(FieldID, id))
 }
 
-// CreatedAt applies equality check predicate on the "created_at" field. It's identical to CreatedAtEQ.
-func CreatedAt(v time.Time) predicate.Video {
-	return predicate.Video(sql.FieldEQ(FieldCreatedAt, v))
+// CreateTime applies equality check predicate on the "create_time" field. It's identical to CreateTimeEQ.
+func CreateTime(v time.Time) predicate.Video {
+	return predicate.Video(sql.FieldEQ(FieldCreateTime, v))
 }
 
-// CreatedBy applies equality check predicate on the "created_by" field. It's identical to CreatedByEQ.
-func CreatedBy(v int) predicate.Video {
-	return predicate.Video(sql.FieldEQ(FieldCreatedBy, v))
+// CreatorID applies equality check predicate on the "creator_id" field. It's identical to CreatorIDEQ.
+func CreatorID(v int) predicate.Video {
+	return predicate.Video(sql.FieldEQ(FieldCreatorID, v))
 }
 
-// DeletedAt applies equality check predicate on the "deleted_at" field. It's identical to DeletedAtEQ.
-func DeletedAt(v time.Time) predicate.Video {
-	return predicate.Video(sql.FieldEQ(FieldDeletedAt, v))
+// DeleteTime applies equality check predicate on the "delete_time" field. It's identical to DeleteTimeEQ.
+func DeleteTime(v time.Time) predicate.Video {
+	return predicate.Video(sql.FieldEQ(FieldDeleteTime, v))
 }
 
-// UpdatedBy applies equality check predicate on the "updated_by" field. It's identical to UpdatedByEQ.
-func UpdatedBy(v int) predicate.Video {
-	return predicate.Video(sql.FieldEQ(FieldUpdatedBy, v))
+// UpdaterID applies equality check predicate on the "updater_id" field. It's identical to UpdaterIDEQ.
+func UpdaterID(v int) predicate.Video {
+	return predicate.Video(sql.FieldEQ(FieldUpdaterID, v))
 }
 
-// UpdatedAt applies equality check predicate on the "updated_at" field. It's identical to UpdatedAtEQ.
-func UpdatedAt(v time.Time) predicate.Video {
-	return predicate.Video(sql.FieldEQ(FieldUpdatedAt, v))
+// UpdateTime applies equality check predicate on the "update_time" field. It's identical to UpdateTimeEQ.
+func UpdateTime(v time.Time) predicate.Video {
+	return predicate.Video(sql.FieldEQ(FieldUpdateTime, v))
 }
 
 // Name applies equality check predicate on the "name" field. It's identical to NameEQ.
@@ -105,179 +105,174 @@ func UploadedAt(v time.Time) predicate.Video {
 	return predicate.Video(sql.FieldEQ(FieldUploadedAt, v))
 }
 
-// UploadedAt2 applies equality check predicate on the "uploaded_at2" field. It's identical to UploadedAt2EQ.
-func UploadedAt2(v time.Time) predicate.Video {
-	return predicate.Video(sql.FieldEQ(FieldUploadedAt2, v))
+// CreateTimeEQ applies the EQ predicate on the "create_time" field.
+func CreateTimeEQ(v time.Time) predicate.Video {
+	return predicate.Video(sql.FieldEQ(FieldCreateTime, v))
 }
 
-// CreatedAtEQ applies the EQ predicate on the "created_at" field.
-func CreatedAtEQ(v time.Time) predicate.Video {
-	return predicate.Video(sql.FieldEQ(FieldCreatedAt, v))
+// CreateTimeNEQ applies the NEQ predicate on the "create_time" field.
+func CreateTimeNEQ(v time.Time) predicate.Video {
+	return predicate.Video(sql.FieldNEQ(FieldCreateTime, v))
 }
 
-// CreatedAtNEQ applies the NEQ predicate on the "created_at" field.
-func CreatedAtNEQ(v time.Time) predicate.Video {
-	return predicate.Video(sql.FieldNEQ(FieldCreatedAt, v))
+// CreateTimeIn applies the In predicate on the "create_time" field.
+func CreateTimeIn(vs ...time.Time) predicate.Video {
+	return predicate.Video(sql.FieldIn(FieldCreateTime, vs...))
 }
 
-// CreatedAtIn applies the In predicate on the "created_at" field.
-func CreatedAtIn(vs ...time.Time) predicate.Video {
-	return predicate.Video(sql.FieldIn(FieldCreatedAt, vs...))
+// CreateTimeNotIn applies the NotIn predicate on the "create_time" field.
+func CreateTimeNotIn(vs ...time.Time) predicate.Video {
+	return predicate.Video(sql.FieldNotIn(FieldCreateTime, vs...))
 }
 
-// CreatedAtNotIn applies the NotIn predicate on the "created_at" field.
-func CreatedAtNotIn(vs ...time.Time) predicate.Video {
-	return predicate.Video(sql.FieldNotIn(FieldCreatedAt, vs...))
+// CreateTimeGT applies the GT predicate on the "create_time" field.
+func CreateTimeGT(v time.Time) predicate.Video {
+	return predicate.Video(sql.FieldGT(FieldCreateTime, v))
 }
 
-// CreatedAtGT applies the GT predicate on the "created_at" field.
-func CreatedAtGT(v time.Time) predicate.Video {
-	return predicate.Video(sql.FieldGT(FieldCreatedAt, v))
+// CreateTimeGTE applies the GTE predicate on the "create_time" field.
+func CreateTimeGTE(v time.Time) predicate.Video {
+	return predicate.Video(sql.FieldGTE(FieldCreateTime, v))
 }
 
-// CreatedAtGTE applies the GTE predicate on the "created_at" field.
-func CreatedAtGTE(v time.Time) predicate.Video {
-	return predicate.Video(sql.FieldGTE(FieldCreatedAt, v))
+// CreateTimeLT applies the LT predicate on the "create_time" field.
+func CreateTimeLT(v time.Time) predicate.Video {
+	return predicate.Video(sql.FieldLT(FieldCreateTime, v))
 }
 
-// CreatedAtLT applies the LT predicate on the "created_at" field.
-func CreatedAtLT(v time.Time) predicate.Video {
-	return predicate.Video(sql.FieldLT(FieldCreatedAt, v))
+// CreateTimeLTE applies the LTE predicate on the "create_time" field.
+func CreateTimeLTE(v time.Time) predicate.Video {
+	return predicate.Video(sql.FieldLTE(FieldCreateTime, v))
 }
 
-// CreatedAtLTE applies the LTE predicate on the "created_at" field.
-func CreatedAtLTE(v time.Time) predicate.Video {
-	return predicate.Video(sql.FieldLTE(FieldCreatedAt, v))
+// CreatorIDEQ applies the EQ predicate on the "creator_id" field.
+func CreatorIDEQ(v int) predicate.Video {
+	return predicate.Video(sql.FieldEQ(FieldCreatorID, v))
 }
 
-// CreatedByEQ applies the EQ predicate on the "created_by" field.
-func CreatedByEQ(v int) predicate.Video {
-	return predicate.Video(sql.FieldEQ(FieldCreatedBy, v))
+// CreatorIDNEQ applies the NEQ predicate on the "creator_id" field.
+func CreatorIDNEQ(v int) predicate.Video {
+	return predicate.Video(sql.FieldNEQ(FieldCreatorID, v))
 }
 
-// CreatedByNEQ applies the NEQ predicate on the "created_by" field.
-func CreatedByNEQ(v int) predicate.Video {
-	return predicate.Video(sql.FieldNEQ(FieldCreatedBy, v))
+// CreatorIDIn applies the In predicate on the "creator_id" field.
+func CreatorIDIn(vs ...int) predicate.Video {
+	return predicate.Video(sql.FieldIn(FieldCreatorID, vs...))
 }
 
-// CreatedByIn applies the In predicate on the "created_by" field.
-func CreatedByIn(vs ...int) predicate.Video {
-	return predicate.Video(sql.FieldIn(FieldCreatedBy, vs...))
+// CreatorIDNotIn applies the NotIn predicate on the "creator_id" field.
+func CreatorIDNotIn(vs ...int) predicate.Video {
+	return predicate.Video(sql.FieldNotIn(FieldCreatorID, vs...))
 }
 
-// CreatedByNotIn applies the NotIn predicate on the "created_by" field.
-func CreatedByNotIn(vs ...int) predicate.Video {
-	return predicate.Video(sql.FieldNotIn(FieldCreatedBy, vs...))
+// DeleteTimeEQ applies the EQ predicate on the "delete_time" field.
+func DeleteTimeEQ(v time.Time) predicate.Video {
+	return predicate.Video(sql.FieldEQ(FieldDeleteTime, v))
 }
 
-// DeletedAtEQ applies the EQ predicate on the "deleted_at" field.
-func DeletedAtEQ(v time.Time) predicate.Video {
-	return predicate.Video(sql.FieldEQ(FieldDeletedAt, v))
+// DeleteTimeNEQ applies the NEQ predicate on the "delete_time" field.
+func DeleteTimeNEQ(v time.Time) predicate.Video {
+	return predicate.Video(sql.FieldNEQ(FieldDeleteTime, v))
 }
 
-// DeletedAtNEQ applies the NEQ predicate on the "deleted_at" field.
-func DeletedAtNEQ(v time.Time) predicate.Video {
-	return predicate.Video(sql.FieldNEQ(FieldDeletedAt, v))
+// DeleteTimeIn applies the In predicate on the "delete_time" field.
+func DeleteTimeIn(vs ...time.Time) predicate.Video {
+	return predicate.Video(sql.FieldIn(FieldDeleteTime, vs...))
 }
 
-// DeletedAtIn applies the In predicate on the "deleted_at" field.
-func DeletedAtIn(vs ...time.Time) predicate.Video {
-	return predicate.Video(sql.FieldIn(FieldDeletedAt, vs...))
+// DeleteTimeNotIn applies the NotIn predicate on the "delete_time" field.
+func DeleteTimeNotIn(vs ...time.Time) predicate.Video {
+	return predicate.Video(sql.FieldNotIn(FieldDeleteTime, vs...))
 }
 
-// DeletedAtNotIn applies the NotIn predicate on the "deleted_at" field.
-func DeletedAtNotIn(vs ...time.Time) predicate.Video {
-	return predicate.Video(sql.FieldNotIn(FieldDeletedAt, vs...))
+// DeleteTimeGT applies the GT predicate on the "delete_time" field.
+func DeleteTimeGT(v time.Time) predicate.Video {
+	return predicate.Video(sql.FieldGT(FieldDeleteTime, v))
 }
 
-// DeletedAtGT applies the GT predicate on the "deleted_at" field.
-func DeletedAtGT(v time.Time) predicate.Video {
-	return predicate.Video(sql.FieldGT(FieldDeletedAt, v))
+// DeleteTimeGTE applies the GTE predicate on the "delete_time" field.
+func DeleteTimeGTE(v time.Time) predicate.Video {
+	return predicate.Video(sql.FieldGTE(FieldDeleteTime, v))
 }
 
-// DeletedAtGTE applies the GTE predicate on the "deleted_at" field.
-func DeletedAtGTE(v time.Time) predicate.Video {
-	return predicate.Video(sql.FieldGTE(FieldDeletedAt, v))
+// DeleteTimeLT applies the LT predicate on the "delete_time" field.
+func DeleteTimeLT(v time.Time) predicate.Video {
+	return predicate.Video(sql.FieldLT(FieldDeleteTime, v))
 }
 
-// DeletedAtLT applies the LT predicate on the "deleted_at" field.
-func DeletedAtLT(v time.Time) predicate.Video {
-	return predicate.Video(sql.FieldLT(FieldDeletedAt, v))
+// DeleteTimeLTE applies the LTE predicate on the "delete_time" field.
+func DeleteTimeLTE(v time.Time) predicate.Video {
+	return predicate.Video(sql.FieldLTE(FieldDeleteTime, v))
 }
 
-// DeletedAtLTE applies the LTE predicate on the "deleted_at" field.
-func DeletedAtLTE(v time.Time) predicate.Video {
-	return predicate.Video(sql.FieldLTE(FieldDeletedAt, v))
+// DeleteTimeIsNil applies the IsNil predicate on the "delete_time" field.
+func DeleteTimeIsNil() predicate.Video {
+	return predicate.Video(sql.FieldIsNull(FieldDeleteTime))
 }
 
-// DeletedAtIsNil applies the IsNil predicate on the "deleted_at" field.
-func DeletedAtIsNil() predicate.Video {
-	return predicate.Video(sql.FieldIsNull(FieldDeletedAt))
+// DeleteTimeNotNil applies the NotNil predicate on the "delete_time" field.
+func DeleteTimeNotNil() predicate.Video {
+	return predicate.Video(sql.FieldNotNull(FieldDeleteTime))
 }
 
-// DeletedAtNotNil applies the NotNil predicate on the "deleted_at" field.
-func DeletedAtNotNil() predicate.Video {
-	return predicate.Video(sql.FieldNotNull(FieldDeletedAt))
+// UpdaterIDEQ applies the EQ predicate on the "updater_id" field.
+func UpdaterIDEQ(v int) predicate.Video {
+	return predicate.Video(sql.FieldEQ(FieldUpdaterID, v))
 }
 
-// UpdatedByEQ applies the EQ predicate on the "updated_by" field.
-func UpdatedByEQ(v int) predicate.Video {
-	return predicate.Video(sql.FieldEQ(FieldUpdatedBy, v))
+// UpdaterIDNEQ applies the NEQ predicate on the "updater_id" field.
+func UpdaterIDNEQ(v int) predicate.Video {
+	return predicate.Video(sql.FieldNEQ(FieldUpdaterID, v))
 }
 
-// UpdatedByNEQ applies the NEQ predicate on the "updated_by" field.
-func UpdatedByNEQ(v int) predicate.Video {
-	return predicate.Video(sql.FieldNEQ(FieldUpdatedBy, v))
+// UpdaterIDIn applies the In predicate on the "updater_id" field.
+func UpdaterIDIn(vs ...int) predicate.Video {
+	return predicate.Video(sql.FieldIn(FieldUpdaterID, vs...))
 }
 
-// UpdatedByIn applies the In predicate on the "updated_by" field.
-func UpdatedByIn(vs ...int) predicate.Video {
-	return predicate.Video(sql.FieldIn(FieldUpdatedBy, vs...))
+// UpdaterIDNotIn applies the NotIn predicate on the "updater_id" field.
+func UpdaterIDNotIn(vs ...int) predicate.Video {
+	return predicate.Video(sql.FieldNotIn(FieldUpdaterID, vs...))
 }
 
-// UpdatedByNotIn applies the NotIn predicate on the "updated_by" field.
-func UpdatedByNotIn(vs ...int) predicate.Video {
-	return predicate.Video(sql.FieldNotIn(FieldUpdatedBy, vs...))
+// UpdateTimeEQ applies the EQ predicate on the "update_time" field.
+func UpdateTimeEQ(v time.Time) predicate.Video {
+	return predicate.Video(sql.FieldEQ(FieldUpdateTime, v))
 }
 
-// UpdatedAtEQ applies the EQ predicate on the "updated_at" field.
-func UpdatedAtEQ(v time.Time) predicate.Video {
-	return predicate.Video(sql.FieldEQ(FieldUpdatedAt, v))
+// UpdateTimeNEQ applies the NEQ predicate on the "update_time" field.
+func UpdateTimeNEQ(v time.Time) predicate.Video {
+	return predicate.Video(sql.FieldNEQ(FieldUpdateTime, v))
 }
 
-// UpdatedAtNEQ applies the NEQ predicate on the "updated_at" field.
-func UpdatedAtNEQ(v time.Time) predicate.Video {
-	return predicate.Video(sql.FieldNEQ(FieldUpdatedAt, v))
+// UpdateTimeIn applies the In predicate on the "update_time" field.
+func UpdateTimeIn(vs ...time.Time) predicate.Video {
+	return predicate.Video(sql.FieldIn(FieldUpdateTime, vs...))
 }
 
-// UpdatedAtIn applies the In predicate on the "updated_at" field.
-func UpdatedAtIn(vs ...time.Time) predicate.Video {
-	return predicate.Video(sql.FieldIn(FieldUpdatedAt, vs...))
+// UpdateTimeNotIn applies the NotIn predicate on the "update_time" field.
+func UpdateTimeNotIn(vs ...time.Time) predicate.Video {
+	return predicate.Video(sql.FieldNotIn(FieldUpdateTime, vs...))
 }
 
-// UpdatedAtNotIn applies the NotIn predicate on the "updated_at" field.
-func UpdatedAtNotIn(vs ...time.Time) predicate.Video {
-	return predicate.Video(sql.FieldNotIn(FieldUpdatedAt, vs...))
+// UpdateTimeGT applies the GT predicate on the "update_time" field.
+func UpdateTimeGT(v time.Time) predicate.Video {
+	return predicate.Video(sql.FieldGT(FieldUpdateTime, v))
 }
 
-// UpdatedAtGT applies the GT predicate on the "updated_at" field.
-func UpdatedAtGT(v time.Time) predicate.Video {
-	return predicate.Video(sql.FieldGT(FieldUpdatedAt, v))
+// UpdateTimeGTE applies the GTE predicate on the "update_time" field.
+func UpdateTimeGTE(v time.Time) predicate.Video {
+	return predicate.Video(sql.FieldGTE(FieldUpdateTime, v))
 }
 
-// UpdatedAtGTE applies the GTE predicate on the "updated_at" field.
-func UpdatedAtGTE(v time.Time) predicate.Video {
-	return predicate.Video(sql.FieldGTE(FieldUpdatedAt, v))
+// UpdateTimeLT applies the LT predicate on the "update_time" field.
+func UpdateTimeLT(v time.Time) predicate.Video {
+	return predicate.Video(sql.FieldLT(FieldUpdateTime, v))
 }
 
-// UpdatedAtLT applies the LT predicate on the "updated_at" field.
-func UpdatedAtLT(v time.Time) predicate.Video {
-	return predicate.Video(sql.FieldLT(FieldUpdatedAt, v))
-}
-
-// UpdatedAtLTE applies the LTE predicate on the "updated_at" field.
-func UpdatedAtLTE(v time.Time) predicate.Video {
-	return predicate.Video(sql.FieldLTE(FieldUpdatedAt, v))
+// UpdateTimeLTE applies the LTE predicate on the "update_time" field.
+func UpdateTimeLTE(v time.Time) predicate.Video {
+	return predicate.Video(sql.FieldLTE(FieldUpdateTime, v))
 }
 
 // NameEQ applies the EQ predicate on the "name" field.
@@ -595,56 +590,6 @@ func UploadedAtNotNil() predicate.Video {
 	return predicate.Video(sql.FieldNotNull(FieldUploadedAt))
 }
 
-// UploadedAt2EQ applies the EQ predicate on the "uploaded_at2" field.
-func UploadedAt2EQ(v time.Time) predicate.Video {
-	return predicate.Video(sql.FieldEQ(FieldUploadedAt2, v))
-}
-
-// UploadedAt2NEQ applies the NEQ predicate on the "uploaded_at2" field.
-func UploadedAt2NEQ(v time.Time) predicate.Video {
-	return predicate.Video(sql.FieldNEQ(FieldUploadedAt2, v))
-}
-
-// UploadedAt2In applies the In predicate on the "uploaded_at2" field.
-func UploadedAt2In(vs ...time.Time) predicate.Video {
-	return predicate.Video(sql.FieldIn(FieldUploadedAt2, vs...))
-}
-
-// UploadedAt2NotIn applies the NotIn predicate on the "uploaded_at2" field.
-func UploadedAt2NotIn(vs ...time.Time) predicate.Video {
-	return predicate.Video(sql.FieldNotIn(FieldUploadedAt2, vs...))
-}
-
-// UploadedAt2GT applies the GT predicate on the "uploaded_at2" field.
-func UploadedAt2GT(v time.Time) predicate.Video {
-	return predicate.Video(sql.FieldGT(FieldUploadedAt2, v))
-}
-
-// UploadedAt2GTE applies the GTE predicate on the "uploaded_at2" field.
-func UploadedAt2GTE(v time.Time) predicate.Video {
-	return predicate.Video(sql.FieldGTE(FieldUploadedAt2, v))
-}
-
-// UploadedAt2LT applies the LT predicate on the "uploaded_at2" field.
-func UploadedAt2LT(v time.Time) predicate.Video {
-	return predicate.Video(sql.FieldLT(FieldUploadedAt2, v))
-}
-
-// UploadedAt2LTE applies the LTE predicate on the "uploaded_at2" field.
-func UploadedAt2LTE(v time.Time) predicate.Video {
-	return predicate.Video(sql.FieldLTE(FieldUploadedAt2, v))
-}
-
-// UploadedAt2IsNil applies the IsNil predicate on the "uploaded_at2" field.
-func UploadedAt2IsNil() predicate.Video {
-	return predicate.Video(sql.FieldIsNull(FieldUploadedAt2))
-}
-
-// UploadedAt2NotNil applies the NotNil predicate on the "uploaded_at2" field.
-func UploadedAt2NotNil() predicate.Video {
-	return predicate.Video(sql.FieldNotNull(FieldUploadedAt2))
-}
-
 // HasCreator applies the HasEdge predicate on the "creator" edge.
 func HasCreator() predicate.Video {
 	return predicate.Video(func(s *sql.Selector) {
@@ -691,21 +636,21 @@ func HasUpdaterWith(preds ...predicate.Admin) predicate.Video {
 	})
 }
 
-// HasIpcEventVideo applies the HasEdge predicate on the "ipc_event_video" edge.
-func HasIpcEventVideo() predicate.Video {
+// HasEvent applies the HasEdge predicate on the "event" edge.
+func HasEvent() predicate.Video {
 	return predicate.Video(func(s *sql.Selector) {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(Table, FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, false, IpcEventVideoTable, IpcEventVideoColumn),
+			sqlgraph.Edge(sqlgraph.O2M, false, EventTable, EventColumn),
 		)
 		sqlgraph.HasNeighbors(s, step)
 	})
 }
 
-// HasIpcEventVideoWith applies the HasEdge predicate on the "ipc_event_video" edge with a given conditions (other predicates).
-func HasIpcEventVideoWith(preds ...predicate.IPCEvent) predicate.Video {
+// HasEventWith applies the HasEdge predicate on the "event" edge with a given conditions (other predicates).
+func HasEventWith(preds ...predicate.Event) predicate.Video {
 	return predicate.Video(func(s *sql.Selector) {
-		step := newIpcEventVideoStep()
+		step := newEventStep()
 		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
 			for _, p := range preds {
 				p(s)

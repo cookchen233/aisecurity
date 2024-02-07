@@ -19,23 +19,27 @@ type Department struct {
 	// ID of the ent.
 	ID int `json:"id,omitempty"`
 	// 创建时间
-	CreatedAt time.Time `json:"created_at"`
+	CreateTime time.Time `json:"create_time"`
 	// 创建者
-	CreatedBy int `json:"created_by"`
+	CreatorID int `json:"creator_id"`
 	// 删除时间
-	DeletedAt *time.Time `json:"deleted_at"`
+	DeleteTime *time.Time `json:"delete_time"`
 	// 最后更新者
-	UpdatedBy int `json:"updated_by"`
+	UpdaterID int `json:"updater_id"`
 	// 最后更新时间
-	UpdatedAt time.Time `json:"updated_at"`
+	UpdateTime time.Time `json:"update_time"`
 	// 名称
 	Name string `json:"name" validate:"required"`
 	// 上级部门id
 	ParentID int `json:"parent_id"`
+	// 备注
+	Notes string `json:"notes"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the DepartmentQuery when eager-loading is set.
 	Edges        DepartmentEdges `json:"edges"`
 	selectValues sql.SelectValues
+
+	AllEmployees []*Employee `json:"all_employees"`
 }
 
 // DepartmentEdges holds the relations/edges for other nodes in the graph.
@@ -46,13 +50,15 @@ type DepartmentEdges struct {
 	Updater *Admin `json:"updater,omitempty"`
 	// Parent holds the value of the parent edge.
 	Parent *Department `json:"parent,omitempty"`
+	// Permissions holds the value of the permissions edge.
+	Permissions []*Permission `json:"permissions,omitempty"`
 	// Employees holds the value of the employees edge.
 	Employees []*Employee `json:"employees,omitempty"`
 	// Children holds the value of the children edge.
 	Children []*Department `json:"children,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
-	loadedTypes [5]bool
+	loadedTypes [6]bool
 }
 
 // CreatorOrErr returns the Creator value or an error if the edge
@@ -94,10 +100,19 @@ func (e DepartmentEdges) ParentOrErr() (*Department, error) {
 	return nil, &NotLoadedError{edge: "parent"}
 }
 
+// PermissionsOrErr returns the Permissions value or an error if the edge
+// was not loaded in eager-loading.
+func (e DepartmentEdges) PermissionsOrErr() ([]*Permission, error) {
+	if e.loadedTypes[3] {
+		return e.Permissions, nil
+	}
+	return nil, &NotLoadedError{edge: "permissions"}
+}
+
 // EmployeesOrErr returns the Employees value or an error if the edge
 // was not loaded in eager-loading.
 func (e DepartmentEdges) EmployeesOrErr() ([]*Employee, error) {
-	if e.loadedTypes[3] {
+	if e.loadedTypes[4] {
 		return e.Employees, nil
 	}
 	return nil, &NotLoadedError{edge: "employees"}
@@ -106,7 +121,7 @@ func (e DepartmentEdges) EmployeesOrErr() ([]*Employee, error) {
 // ChildrenOrErr returns the Children value or an error if the edge
 // was not loaded in eager-loading.
 func (e DepartmentEdges) ChildrenOrErr() ([]*Department, error) {
-	if e.loadedTypes[4] {
+	if e.loadedTypes[5] {
 		return e.Children, nil
 	}
 	return nil, &NotLoadedError{edge: "children"}
@@ -117,11 +132,11 @@ func (*Department) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
 	for i := range columns {
 		switch columns[i] {
-		case department.FieldID, department.FieldCreatedBy, department.FieldUpdatedBy, department.FieldParentID:
+		case department.FieldID, department.FieldCreatorID, department.FieldUpdaterID, department.FieldParentID:
 			values[i] = new(sql.NullInt64)
-		case department.FieldName:
+		case department.FieldName, department.FieldNotes:
 			values[i] = new(sql.NullString)
-		case department.FieldCreatedAt, department.FieldDeletedAt, department.FieldUpdatedAt:
+		case department.FieldCreateTime, department.FieldDeleteTime, department.FieldUpdateTime:
 			values[i] = new(sql.NullTime)
 		default:
 			values[i] = new(sql.UnknownType)
@@ -144,36 +159,36 @@ func (d *Department) assignValues(columns []string, values []any) error {
 				return fmt.Errorf("unexpected type %T for field id", value)
 			}
 			d.ID = int(value.Int64)
-		case department.FieldCreatedAt:
+		case department.FieldCreateTime:
 			if value, ok := values[i].(*sql.NullTime); !ok {
-				return fmt.Errorf("unexpected type %T for field created_at", values[i])
+				return fmt.Errorf("unexpected type %T for field create_time", values[i])
 			} else if value.Valid {
-				d.CreatedAt = value.Time
+				d.CreateTime = value.Time
 			}
-		case department.FieldCreatedBy:
+		case department.FieldCreatorID:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
-				return fmt.Errorf("unexpected type %T for field created_by", values[i])
+				return fmt.Errorf("unexpected type %T for field creator_id", values[i])
 			} else if value.Valid {
-				d.CreatedBy = int(value.Int64)
+				d.CreatorID = int(value.Int64)
 			}
-		case department.FieldDeletedAt:
+		case department.FieldDeleteTime:
 			if value, ok := values[i].(*sql.NullTime); !ok {
-				return fmt.Errorf("unexpected type %T for field deleted_at", values[i])
+				return fmt.Errorf("unexpected type %T for field delete_time", values[i])
 			} else if value.Valid {
-				d.DeletedAt = new(time.Time)
-				*d.DeletedAt = value.Time
+				d.DeleteTime = new(time.Time)
+				*d.DeleteTime = value.Time
 			}
-		case department.FieldUpdatedBy:
+		case department.FieldUpdaterID:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
-				return fmt.Errorf("unexpected type %T for field updated_by", values[i])
+				return fmt.Errorf("unexpected type %T for field updater_id", values[i])
 			} else if value.Valid {
-				d.UpdatedBy = int(value.Int64)
+				d.UpdaterID = int(value.Int64)
 			}
-		case department.FieldUpdatedAt:
+		case department.FieldUpdateTime:
 			if value, ok := values[i].(*sql.NullTime); !ok {
-				return fmt.Errorf("unexpected type %T for field updated_at", values[i])
+				return fmt.Errorf("unexpected type %T for field update_time", values[i])
 			} else if value.Valid {
-				d.UpdatedAt = value.Time
+				d.UpdateTime = value.Time
 			}
 		case department.FieldName:
 			if value, ok := values[i].(*sql.NullString); !ok {
@@ -186,6 +201,12 @@ func (d *Department) assignValues(columns []string, values []any) error {
 				return fmt.Errorf("unexpected type %T for field parent_id", values[i])
 			} else if value.Valid {
 				d.ParentID = int(value.Int64)
+			}
+		case department.FieldNotes:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field notes", values[i])
+			} else if value.Valid {
+				d.Notes = value.String
 			}
 		default:
 			d.selectValues.Set(columns[i], values[i])
@@ -213,6 +234,11 @@ func (d *Department) QueryUpdater() *AdminQuery {
 // QueryParent queries the "parent" edge of the Department entity.
 func (d *Department) QueryParent() *DepartmentQuery {
 	return NewDepartmentClient(d.config).QueryParent(d)
+}
+
+// QueryPermissions queries the "permissions" edge of the Department entity.
+func (d *Department) QueryPermissions() *PermissionQuery {
+	return NewDepartmentClient(d.config).QueryPermissions(d)
 }
 
 // QueryEmployees queries the "employees" edge of the Department entity.
@@ -248,28 +274,31 @@ func (d *Department) String() string {
 	var builder strings.Builder
 	builder.WriteString("Department(")
 	builder.WriteString(fmt.Sprintf("id=%v, ", d.ID))
-	builder.WriteString("created_at=")
-	builder.WriteString(d.CreatedAt.Format(time.ANSIC))
+	builder.WriteString("create_time=")
+	builder.WriteString(d.CreateTime.Format(time.ANSIC))
 	builder.WriteString(", ")
-	builder.WriteString("created_by=")
-	builder.WriteString(fmt.Sprintf("%v", d.CreatedBy))
+	builder.WriteString("creator_id=")
+	builder.WriteString(fmt.Sprintf("%v", d.CreatorID))
 	builder.WriteString(", ")
-	if v := d.DeletedAt; v != nil {
-		builder.WriteString("deleted_at=")
+	if v := d.DeleteTime; v != nil {
+		builder.WriteString("delete_time=")
 		builder.WriteString(v.Format(time.ANSIC))
 	}
 	builder.WriteString(", ")
-	builder.WriteString("updated_by=")
-	builder.WriteString(fmt.Sprintf("%v", d.UpdatedBy))
+	builder.WriteString("updater_id=")
+	builder.WriteString(fmt.Sprintf("%v", d.UpdaterID))
 	builder.WriteString(", ")
-	builder.WriteString("updated_at=")
-	builder.WriteString(d.UpdatedAt.Format(time.ANSIC))
+	builder.WriteString("update_time=")
+	builder.WriteString(d.UpdateTime.Format(time.ANSIC))
 	builder.WriteString(", ")
 	builder.WriteString("name=")
 	builder.WriteString(d.Name)
 	builder.WriteString(", ")
 	builder.WriteString("parent_id=")
 	builder.WriteString(fmt.Sprintf("%v", d.ParentID))
+	builder.WriteString(", ")
+	builder.WriteString("notes=")
+	builder.WriteString(d.Notes)
 	builder.WriteByte(')')
 	return builder.String()
 }

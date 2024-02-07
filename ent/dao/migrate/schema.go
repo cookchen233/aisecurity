@@ -11,16 +11,18 @@ var (
 	// AdminsColumns holds the columns for the "admins" table.
 	AdminsColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt, Increment: true},
-		{Name: "created_at", Type: field.TypeTime},
-		{Name: "deleted_at", Type: field.TypeTime, Nullable: true},
-		{Name: "updated_at", Type: field.TypeTime},
+		{Name: "create_time", Type: field.TypeTime},
+		{Name: "delete_time", Type: field.TypeTime, Nullable: true},
+		{Name: "update_time", Type: field.TypeTime},
 		{Name: "username", Type: field.TypeString, Size: 64},
 		{Name: "password", Type: field.TypeString, Size: 255},
 		{Name: "nickname", Type: field.TypeString, Size: 255},
 		{Name: "real_name", Type: field.TypeString, Size: 255},
-		{Name: "avatar", Type: field.TypeString, Nullable: true, Size: 255},
-		{Name: "created_by", Type: field.TypeInt, Nullable: true},
-		{Name: "updated_by", Type: field.TypeInt, Nullable: true},
+		{Name: "mobile", Type: field.TypeString, Nullable: true, Size: 255},
+		{Name: "avatar", Type: field.TypeJSON, Nullable: true},
+		{Name: "admin_status", Type: field.TypeInt, Default: 1},
+		{Name: "creator_id", Type: field.TypeInt, Nullable: true},
+		{Name: "updater_id", Type: field.TypeInt, Nullable: true},
 	}
 	// AdminsTable holds the schema information for the "admins" table.
 	AdminsTable = &schema.Table{
@@ -30,43 +32,13 @@ var (
 		ForeignKeys: []*schema.ForeignKey{
 			{
 				Symbol:     "admins_admins_admin_creator",
-				Columns:    []*schema.Column{AdminsColumns[9]},
+				Columns:    []*schema.Column{AdminsColumns[11]},
 				RefColumns: []*schema.Column{AdminsColumns[0]},
 				OnDelete:   schema.SetNull,
 			},
 			{
 				Symbol:     "admins_admins_admin_updater",
-				Columns:    []*schema.Column{AdminsColumns[10]},
-				RefColumns: []*schema.Column{AdminsColumns[0]},
-				OnDelete:   schema.SetNull,
-			},
-		},
-	}
-	// AdminRolesColumns holds the columns for the "admin_roles" table.
-	AdminRolesColumns = []*schema.Column{
-		{Name: "id", Type: field.TypeInt, Increment: true},
-		{Name: "created_at", Type: field.TypeTime},
-		{Name: "name", Type: field.TypeString, Size: 255},
-		{Name: "deleted_at", Type: field.TypeTime, Nullable: true},
-		{Name: "updated_at", Type: field.TypeTime},
-		{Name: "created_by", Type: field.TypeInt, Nullable: true},
-		{Name: "updated_by", Type: field.TypeInt, Nullable: true},
-	}
-	// AdminRolesTable holds the schema information for the "admin_roles" table.
-	AdminRolesTable = &schema.Table{
-		Name:       "admin_roles",
-		Columns:    AdminRolesColumns,
-		PrimaryKey: []*schema.Column{AdminRolesColumns[0]},
-		ForeignKeys: []*schema.ForeignKey{
-			{
-				Symbol:     "admin_roles_admins_admin_role_creator",
-				Columns:    []*schema.Column{AdminRolesColumns[5]},
-				RefColumns: []*schema.Column{AdminsColumns[0]},
-				OnDelete:   schema.SetNull,
-			},
-			{
-				Symbol:     "admin_roles_admins_admin_role_updater",
-				Columns:    []*schema.Column{AdminRolesColumns[6]},
+				Columns:    []*schema.Column{AdminsColumns[12]},
 				RefColumns: []*schema.Column{AdminsColumns[0]},
 				OnDelete:   schema.SetNull,
 			},
@@ -75,13 +47,13 @@ var (
 	// AreasColumns holds the columns for the "areas" table.
 	AreasColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt, Increment: true},
-		{Name: "created_at", Type: field.TypeTime},
-		{Name: "deleted_at", Type: field.TypeTime, Nullable: true},
-		{Name: "updated_at", Type: field.TypeTime},
+		{Name: "create_time", Type: field.TypeTime},
+		{Name: "delete_time", Type: field.TypeTime, Nullable: true},
+		{Name: "update_time", Type: field.TypeTime},
 		{Name: "name", Type: field.TypeString, Nullable: true, Size: 255, Default: "未命名区域"},
 		{Name: "description", Type: field.TypeString, Nullable: true},
-		{Name: "created_by", Type: field.TypeInt},
-		{Name: "updated_by", Type: field.TypeInt},
+		{Name: "creator_id", Type: field.TypeInt},
+		{Name: "updater_id", Type: field.TypeInt},
 	}
 	// AreasTable holds the schema information for the "areas" table.
 	AreasTable = &schema.Table{
@@ -106,12 +78,13 @@ var (
 	// DepartmentsColumns holds the columns for the "departments" table.
 	DepartmentsColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt, Increment: true},
-		{Name: "created_at", Type: field.TypeTime},
-		{Name: "deleted_at", Type: field.TypeTime, Nullable: true},
-		{Name: "updated_at", Type: field.TypeTime},
+		{Name: "create_time", Type: field.TypeTime},
+		{Name: "delete_time", Type: field.TypeTime, Nullable: true},
+		{Name: "update_time", Type: field.TypeTime},
 		{Name: "name", Type: field.TypeString, Size: 255},
-		{Name: "created_by", Type: field.TypeInt},
-		{Name: "updated_by", Type: field.TypeInt},
+		{Name: "notes", Type: field.TypeString, Nullable: true},
+		{Name: "creator_id", Type: field.TypeInt},
+		{Name: "updater_id", Type: field.TypeInt},
 		{Name: "parent_id", Type: field.TypeInt, Nullable: true},
 	}
 	// DepartmentsTable holds the schema information for the "departments" table.
@@ -122,19 +95,19 @@ var (
 		ForeignKeys: []*schema.ForeignKey{
 			{
 				Symbol:     "departments_admins_department_creator",
-				Columns:    []*schema.Column{DepartmentsColumns[5]},
-				RefColumns: []*schema.Column{AdminsColumns[0]},
-				OnDelete:   schema.NoAction,
-			},
-			{
-				Symbol:     "departments_admins_department_updater",
 				Columns:    []*schema.Column{DepartmentsColumns[6]},
 				RefColumns: []*schema.Column{AdminsColumns[0]},
 				OnDelete:   schema.NoAction,
 			},
 			{
-				Symbol:     "departments_departments_children",
+				Symbol:     "departments_admins_department_updater",
 				Columns:    []*schema.Column{DepartmentsColumns[7]},
+				RefColumns: []*schema.Column{AdminsColumns[0]},
+				OnDelete:   schema.NoAction,
+			},
+			{
+				Symbol:     "departments_departments_children",
+				Columns:    []*schema.Column{DepartmentsColumns[8]},
 				RefColumns: []*schema.Column{DepartmentsColumns[0]},
 				OnDelete:   schema.SetNull,
 			},
@@ -143,16 +116,16 @@ var (
 	// DevicesColumns holds the columns for the "devices" table.
 	DevicesColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt, Increment: true},
-		{Name: "created_at", Type: field.TypeTime},
-		{Name: "deleted_at", Type: field.TypeTime, Nullable: true},
-		{Name: "updated_at", Type: field.TypeTime},
+		{Name: "create_time", Type: field.TypeTime},
+		{Name: "delete_time", Type: field.TypeTime, Nullable: true},
+		{Name: "update_time", Type: field.TypeTime},
 		{Name: "brand", Type: field.TypeInt, Nullable: true, Default: 0},
 		{Name: "model", Type: field.TypeInt, Nullable: true, Default: 0},
 		{Name: "name", Type: field.TypeString, Nullable: true, Size: 255, Default: "未命名设备"},
 		{Name: "sn", Type: field.TypeString, Nullable: true, Size: 255},
 		{Name: "device_type", Type: field.TypeInt, Default: 0},
-		{Name: "created_by", Type: field.TypeInt},
-		{Name: "updated_by", Type: field.TypeInt},
+		{Name: "creator_id", Type: field.TypeInt},
+		{Name: "updater_id", Type: field.TypeInt},
 	}
 	// DevicesTable holds the schema information for the "devices" table.
 	DevicesTable = &schema.Table{
@@ -177,9 +150,9 @@ var (
 	// DeviceInstallationsColumns holds the columns for the "device_installations" table.
 	DeviceInstallationsColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt, Increment: true},
-		{Name: "created_at", Type: field.TypeTime},
-		{Name: "deleted_at", Type: field.TypeTime, Nullable: true},
-		{Name: "updated_at", Type: field.TypeTime},
+		{Name: "create_time", Type: field.TypeTime},
+		{Name: "delete_time", Type: field.TypeTime, Nullable: true},
+		{Name: "update_time", Type: field.TypeTime},
 		{Name: "alias_name", Type: field.TypeString, Nullable: true, Size: 255},
 		{Name: "longitude", Type: field.TypeFloat64},
 		{Name: "latitude", Type: field.TypeFloat64},
@@ -187,8 +160,8 @@ var (
 		{Name: "location", Type: field.TypeString, Nullable: true},
 		{Name: "installer", Type: field.TypeString, Nullable: true},
 		{Name: "install_time", Type: field.TypeTime, Nullable: true},
-		{Name: "created_by", Type: field.TypeInt},
-		{Name: "updated_by", Type: field.TypeInt},
+		{Name: "creator_id", Type: field.TypeInt},
+		{Name: "updater_id", Type: field.TypeInt},
 		{Name: "area_id", Type: field.TypeInt},
 		{Name: "device_id", Type: field.TypeInt},
 	}
@@ -211,13 +184,13 @@ var (
 				OnDelete:   schema.NoAction,
 			},
 			{
-				Symbol:     "device_installations_areas_device_installation_area",
+				Symbol:     "device_installations_areas_device_installation",
 				Columns:    []*schema.Column{DeviceInstallationsColumns[13]},
 				RefColumns: []*schema.Column{AreasColumns[0]},
 				OnDelete:   schema.NoAction,
 			},
 			{
-				Symbol:     "device_installations_devices_device_installation_device",
+				Symbol:     "device_installations_devices_device_installation",
 				Columns:    []*schema.Column{DeviceInstallationsColumns[14]},
 				RefColumns: []*schema.Column{DevicesColumns[0]},
 				OnDelete:   schema.NoAction,
@@ -227,13 +200,14 @@ var (
 	// EmployeesColumns holds the columns for the "employees" table.
 	EmployeesColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt, Increment: true},
-		{Name: "created_at", Type: field.TypeTime},
-		{Name: "deleted_at", Type: field.TypeTime, Nullable: true},
-		{Name: "updated_at", Type: field.TypeTime},
-		{Name: "created_by", Type: field.TypeInt},
-		{Name: "updated_by", Type: field.TypeInt},
-		{Name: "admin_id", Type: field.TypeInt},
-		{Name: "department_id", Type: field.TypeInt},
+		{Name: "create_time", Type: field.TypeTime},
+		{Name: "delete_time", Type: field.TypeTime, Nullable: true},
+		{Name: "update_time", Type: field.TypeTime},
+		{Name: "creator_id", Type: field.TypeInt},
+		{Name: "updater_id", Type: field.TypeInt},
+		{Name: "admin_id", Type: field.TypeInt, Unique: true},
+		{Name: "department_id", Type: field.TypeInt, Nullable: true},
+		{Name: "occupation_id", Type: field.TypeInt, Nullable: true},
 	}
 	// EmployeesTable holds the schema information for the "employees" table.
 	EmployeesTable = &schema.Table{
@@ -263,22 +237,80 @@ var (
 				Symbol:     "employees_departments_employees",
 				Columns:    []*schema.Column{EmployeesColumns[7]},
 				RefColumns: []*schema.Column{DepartmentsColumns[0]},
+				OnDelete:   schema.SetNull,
+			},
+			{
+				Symbol:     "employees_occupations_employee",
+				Columns:    []*schema.Column{EmployeesColumns[8]},
+				RefColumns: []*schema.Column{OccupationsColumns[0]},
+				OnDelete:   schema.SetNull,
+			},
+		},
+	}
+	// EventsColumns holds the columns for the "events" table.
+	EventsColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeInt, Increment: true},
+		{Name: "create_time", Type: field.TypeTime},
+		{Name: "delete_time", Type: field.TypeTime, Nullable: true},
+		{Name: "update_time", Type: field.TypeTime},
+		{Name: "event_time", Type: field.TypeTime},
+		{Name: "event_type", Type: field.TypeInt, Default: 0},
+		{Name: "event_status", Type: field.TypeInt, Default: 1},
+		{Name: "images", Type: field.TypeJSON, Nullable: true},
+		{Name: "labeled_images", Type: field.TypeJSON, Nullable: true},
+		{Name: "data_id", Type: field.TypeString, Size: 255},
+		{Name: "description", Type: field.TypeString, Nullable: true},
+		{Name: "raw_data", Type: field.TypeString, Nullable: true},
+		{Name: "creator_id", Type: field.TypeInt},
+		{Name: "updater_id", Type: field.TypeInt},
+		{Name: "device_id", Type: field.TypeInt},
+		{Name: "video_id", Type: field.TypeInt, Nullable: true},
+	}
+	// EventsTable holds the schema information for the "events" table.
+	EventsTable = &schema.Table{
+		Name:       "events",
+		Columns:    EventsColumns,
+		PrimaryKey: []*schema.Column{EventsColumns[0]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:     "events_admins_event_creator",
+				Columns:    []*schema.Column{EventsColumns[12]},
+				RefColumns: []*schema.Column{AdminsColumns[0]},
 				OnDelete:   schema.NoAction,
+			},
+			{
+				Symbol:     "events_admins_event_updater",
+				Columns:    []*schema.Column{EventsColumns[13]},
+				RefColumns: []*schema.Column{AdminsColumns[0]},
+				OnDelete:   schema.NoAction,
+			},
+			{
+				Symbol:     "events_devices_event",
+				Columns:    []*schema.Column{EventsColumns[14]},
+				RefColumns: []*schema.Column{DevicesColumns[0]},
+				OnDelete:   schema.NoAction,
+			},
+			{
+				Symbol:     "events_videos_event",
+				Columns:    []*schema.Column{EventsColumns[15]},
+				RefColumns: []*schema.Column{VideosColumns[0]},
+				OnDelete:   schema.SetNull,
 			},
 		},
 	}
 	// EventLevelsColumns holds the columns for the "event_levels" table.
 	EventLevelsColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt, Increment: true},
-		{Name: "created_at", Type: field.TypeTime},
-		{Name: "deleted_at", Type: field.TypeTime, Nullable: true},
-		{Name: "updated_at", Type: field.TypeTime},
+		{Name: "create_time", Type: field.TypeTime},
+		{Name: "delete_time", Type: field.TypeTime, Nullable: true},
+		{Name: "update_time", Type: field.TypeTime},
 		{Name: "name", Type: field.TypeString, Nullable: true, Size: 255},
 		{Name: "event_types", Type: field.TypeJSON},
 		{Name: "description", Type: field.TypeString, Nullable: true},
-		{Name: "is_report", Type: field.TypeBool, Nullable: true, Default: false},
-		{Name: "created_by", Type: field.TypeInt},
-		{Name: "updated_by", Type: field.TypeInt},
+		{Name: "icon", Type: field.TypeString, Nullable: true, Size: 255},
+		{Name: "notify_types", Type: field.TypeJSON},
+		{Name: "creator_id", Type: field.TypeInt},
+		{Name: "updater_id", Type: field.TypeInt},
 	}
 	// EventLevelsTable holds the schema information for the "event_levels" table.
 	EventLevelsTable = &schema.Table{
@@ -288,79 +320,141 @@ var (
 		ForeignKeys: []*schema.ForeignKey{
 			{
 				Symbol:     "event_levels_admins_event_level_creator",
-				Columns:    []*schema.Column{EventLevelsColumns[8]},
+				Columns:    []*schema.Column{EventLevelsColumns[9]},
 				RefColumns: []*schema.Column{AdminsColumns[0]},
 				OnDelete:   schema.NoAction,
 			},
 			{
 				Symbol:     "event_levels_admins_event_level_updater",
-				Columns:    []*schema.Column{EventLevelsColumns[9]},
+				Columns:    []*schema.Column{EventLevelsColumns[10]},
 				RefColumns: []*schema.Column{AdminsColumns[0]},
 				OnDelete:   schema.NoAction,
 			},
 		},
 	}
-	// IpcEventsColumns holds the columns for the "ipc_events" table.
-	IpcEventsColumns = []*schema.Column{
+	// EventLogsColumns holds the columns for the "event_logs" table.
+	EventLogsColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt, Increment: true},
-		{Name: "created_at", Type: field.TypeTime},
-		{Name: "deleted_at", Type: field.TypeTime, Nullable: true},
-		{Name: "updated_at", Type: field.TypeTime},
-		{Name: "event_time", Type: field.TypeTime},
-		{Name: "event_type", Type: field.TypeInt, Default: 0},
-		{Name: "event_status", Type: field.TypeInt, Default: 1},
-		{Name: "images", Type: field.TypeJSON, Nullable: true},
-		{Name: "labeled_images", Type: field.TypeJSON, Nullable: true},
-		{Name: "event_id", Type: field.TypeString, Size: 255},
-		{Name: "description", Type: field.TypeString, Nullable: true},
-		{Name: "raw_data", Type: field.TypeString, Nullable: true},
-		{Name: "created_by", Type: field.TypeInt},
-		{Name: "updated_by", Type: field.TypeInt},
+		{Name: "create_time", Type: field.TypeTime},
+		{Name: "delete_time", Type: field.TypeTime, Nullable: true},
+		{Name: "update_time", Type: field.TypeTime},
+		{Name: "log_type", Type: field.TypeInt, Default: 0},
+		{Name: "notes", Type: field.TypeString, Nullable: true},
+		{Name: "creator_id", Type: field.TypeInt},
+		{Name: "updater_id", Type: field.TypeInt},
+		{Name: "actor_id", Type: field.TypeInt, Nullable: true},
+		{Name: "actor2_id", Type: field.TypeInt, Nullable: true},
 		{Name: "device_id", Type: field.TypeInt},
-		{Name: "video_id", Type: field.TypeInt, Nullable: true},
+		{Name: "event_id", Type: field.TypeInt},
 	}
-	// IpcEventsTable holds the schema information for the "ipc_events" table.
-	IpcEventsTable = &schema.Table{
-		Name:       "ipc_events",
-		Columns:    IpcEventsColumns,
-		PrimaryKey: []*schema.Column{IpcEventsColumns[0]},
+	// EventLogsTable holds the schema information for the "event_logs" table.
+	EventLogsTable = &schema.Table{
+		Name:       "event_logs",
+		Columns:    EventLogsColumns,
+		PrimaryKey: []*schema.Column{EventLogsColumns[0]},
 		ForeignKeys: []*schema.ForeignKey{
 			{
-				Symbol:     "ipc_events_admins_ipc_event_creator",
-				Columns:    []*schema.Column{IpcEventsColumns[12]},
+				Symbol:     "event_logs_admins_event_log_creator",
+				Columns:    []*schema.Column{EventLogsColumns[6]},
 				RefColumns: []*schema.Column{AdminsColumns[0]},
 				OnDelete:   schema.NoAction,
 			},
 			{
-				Symbol:     "ipc_events_admins_ipc_event_updater",
-				Columns:    []*schema.Column{IpcEventsColumns[13]},
+				Symbol:     "event_logs_admins_event_log_updater",
+				Columns:    []*schema.Column{EventLogsColumns[7]},
 				RefColumns: []*schema.Column{AdminsColumns[0]},
 				OnDelete:   schema.NoAction,
 			},
 			{
-				Symbol:     "ipc_events_devices_ipc_event_device",
-				Columns:    []*schema.Column{IpcEventsColumns[14]},
+				Symbol:     "event_logs_admins_event_log_actor",
+				Columns:    []*schema.Column{EventLogsColumns[8]},
+				RefColumns: []*schema.Column{AdminsColumns[0]},
+				OnDelete:   schema.SetNull,
+			},
+			{
+				Symbol:     "event_logs_admins_event_log_actor2",
+				Columns:    []*schema.Column{EventLogsColumns[9]},
+				RefColumns: []*schema.Column{AdminsColumns[0]},
+				OnDelete:   schema.SetNull,
+			},
+			{
+				Symbol:     "event_logs_devices_event_log",
+				Columns:    []*schema.Column{EventLogsColumns[10]},
 				RefColumns: []*schema.Column{DevicesColumns[0]},
 				OnDelete:   schema.NoAction,
 			},
 			{
-				Symbol:     "ipc_events_videos_ipc_event_video",
-				Columns:    []*schema.Column{IpcEventsColumns[15]},
-				RefColumns: []*schema.Column{VideosColumns[0]},
-				OnDelete:   schema.SetNull,
+				Symbol:     "event_logs_events_event_log",
+				Columns:    []*schema.Column{EventLogsColumns[11]},
+				RefColumns: []*schema.Column{EventsColumns[0]},
+				OnDelete:   schema.NoAction,
+			},
+		},
+	}
+	// FixingsColumns holds the columns for the "fixings" table.
+	FixingsColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeInt, Increment: true},
+		{Name: "create_time", Type: field.TypeTime},
+		{Name: "delete_time", Type: field.TypeTime, Nullable: true},
+		{Name: "update_time", Type: field.TypeTime},
+		{Name: "assign_notes", Type: field.TypeString, Nullable: true},
+		{Name: "fix_time", Type: field.TypeTime, Nullable: true},
+		{Name: "complete_time", Type: field.TypeTime, Nullable: true},
+		{Name: "complete_notes", Type: field.TypeString, Nullable: true},
+		{Name: "creator_id", Type: field.TypeInt},
+		{Name: "updater_id", Type: field.TypeInt},
+		{Name: "fixer_id", Type: field.TypeInt},
+		{Name: "device_id", Type: field.TypeInt},
+		{Name: "event_id", Type: field.TypeInt, Unique: true},
+	}
+	// FixingsTable holds the schema information for the "fixings" table.
+	FixingsTable = &schema.Table{
+		Name:       "fixings",
+		Columns:    FixingsColumns,
+		PrimaryKey: []*schema.Column{FixingsColumns[0]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:     "fixings_admins_fixing_creator",
+				Columns:    []*schema.Column{FixingsColumns[8]},
+				RefColumns: []*schema.Column{AdminsColumns[0]},
+				OnDelete:   schema.NoAction,
+			},
+			{
+				Symbol:     "fixings_admins_fixing_updater",
+				Columns:    []*schema.Column{FixingsColumns[9]},
+				RefColumns: []*schema.Column{AdminsColumns[0]},
+				OnDelete:   schema.NoAction,
+			},
+			{
+				Symbol:     "fixings_admins_fixer",
+				Columns:    []*schema.Column{FixingsColumns[10]},
+				RefColumns: []*schema.Column{AdminsColumns[0]},
+				OnDelete:   schema.NoAction,
+			},
+			{
+				Symbol:     "fixings_devices_fixing",
+				Columns:    []*schema.Column{FixingsColumns[11]},
+				RefColumns: []*schema.Column{DevicesColumns[0]},
+				OnDelete:   schema.NoAction,
+			},
+			{
+				Symbol:     "fixings_events_fixing",
+				Columns:    []*schema.Column{FixingsColumns[12]},
+				RefColumns: []*schema.Column{EventsColumns[0]},
+				OnDelete:   schema.NoAction,
 			},
 		},
 	}
 	// OccupationsColumns holds the columns for the "occupations" table.
 	OccupationsColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt, Increment: true},
-		{Name: "created_at", Type: field.TypeTime},
-		{Name: "deleted_at", Type: field.TypeTime, Nullable: true},
-		{Name: "updated_at", Type: field.TypeTime},
+		{Name: "create_time", Type: field.TypeTime},
+		{Name: "delete_time", Type: field.TypeTime, Nullable: true},
+		{Name: "update_time", Type: field.TypeTime},
 		{Name: "name", Type: field.TypeString, Size: 255},
 		{Name: "description", Type: field.TypeString, Nullable: true},
-		{Name: "created_by", Type: field.TypeInt},
-		{Name: "updated_by", Type: field.TypeInt},
+		{Name: "creator_id", Type: field.TypeInt},
+		{Name: "updater_id", Type: field.TypeInt},
 	}
 	// OccupationsTable holds the schema information for the "occupations" table.
 	OccupationsTable = &schema.Table{
@@ -382,21 +476,51 @@ var (
 			},
 		},
 	}
+	// PermissionsColumns holds the columns for the "permissions" table.
+	PermissionsColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeInt, Increment: true},
+		{Name: "create_time", Type: field.TypeTime},
+		{Name: "delete_time", Type: field.TypeTime, Nullable: true},
+		{Name: "update_time", Type: field.TypeTime},
+		{Name: "name", Type: field.TypeString, Size: 255},
+		{Name: "access_ids", Type: field.TypeJSON},
+		{Name: "creator_id", Type: field.TypeInt},
+		{Name: "updater_id", Type: field.TypeInt},
+	}
+	// PermissionsTable holds the schema information for the "permissions" table.
+	PermissionsTable = &schema.Table{
+		Name:       "permissions",
+		Columns:    PermissionsColumns,
+		PrimaryKey: []*schema.Column{PermissionsColumns[0]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:     "permissions_admins_permission_creator",
+				Columns:    []*schema.Column{PermissionsColumns[6]},
+				RefColumns: []*schema.Column{AdminsColumns[0]},
+				OnDelete:   schema.NoAction,
+			},
+			{
+				Symbol:     "permissions_admins_permission_updater",
+				Columns:    []*schema.Column{PermissionsColumns[7]},
+				RefColumns: []*schema.Column{AdminsColumns[0]},
+				OnDelete:   schema.NoAction,
+			},
+		},
+	}
 	// RisksColumns holds the columns for the "risks" table.
 	RisksColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt, Increment: true},
-		{Name: "created_at", Type: field.TypeTime},
-		{Name: "deleted_at", Type: field.TypeTime, Nullable: true},
-		{Name: "updated_at", Type: field.TypeTime},
+		{Name: "create_time", Type: field.TypeTime},
+		{Name: "delete_time", Type: field.TypeTime, Nullable: true},
+		{Name: "update_time", Type: field.TypeTime},
 		{Name: "title", Type: field.TypeString, Size: 255},
 		{Name: "content", Type: field.TypeString, Nullable: true},
 		{Name: "images", Type: field.TypeJSON, Nullable: true},
 		{Name: "measures", Type: field.TypeString, Nullable: true},
 		{Name: "maintain_status", Type: field.TypeInt, Default: 0},
 		{Name: "due_time", Type: field.TypeTime},
-		{Name: "created_by", Type: field.TypeInt},
-		{Name: "updated_by", Type: field.TypeInt},
-		{Name: "reporter_id", Type: field.TypeInt},
+		{Name: "creator_id", Type: field.TypeInt},
+		{Name: "updater_id", Type: field.TypeInt},
 		{Name: "maintainer_id", Type: field.TypeInt},
 		{Name: "risk_category_id", Type: field.TypeInt},
 		{Name: "risk_location_id", Type: field.TypeInt},
@@ -420,26 +544,20 @@ var (
 				OnDelete:   schema.NoAction,
 			},
 			{
-				Symbol:     "risks_employees_risk_reporter",
+				Symbol:     "risks_admins_risk_maintainer",
 				Columns:    []*schema.Column{RisksColumns[12]},
-				RefColumns: []*schema.Column{EmployeesColumns[0]},
-				OnDelete:   schema.NoAction,
-			},
-			{
-				Symbol:     "risks_employees_risk_maintainer",
-				Columns:    []*schema.Column{RisksColumns[13]},
-				RefColumns: []*schema.Column{EmployeesColumns[0]},
+				RefColumns: []*schema.Column{AdminsColumns[0]},
 				OnDelete:   schema.NoAction,
 			},
 			{
 				Symbol:     "risks_risk_categories_risk",
-				Columns:    []*schema.Column{RisksColumns[14]},
+				Columns:    []*schema.Column{RisksColumns[13]},
 				RefColumns: []*schema.Column{RiskCategoriesColumns[0]},
 				OnDelete:   schema.NoAction,
 			},
 			{
 				Symbol:     "risks_risk_locations_risk",
-				Columns:    []*schema.Column{RisksColumns[15]},
+				Columns:    []*schema.Column{RisksColumns[14]},
 				RefColumns: []*schema.Column{RiskLocationsColumns[0]},
 				OnDelete:   schema.NoAction,
 			},
@@ -448,12 +566,12 @@ var (
 	// RiskCategoriesColumns holds the columns for the "risk_categories" table.
 	RiskCategoriesColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt, Increment: true},
-		{Name: "created_at", Type: field.TypeTime},
-		{Name: "deleted_at", Type: field.TypeTime, Nullable: true},
-		{Name: "updated_at", Type: field.TypeTime},
+		{Name: "create_time", Type: field.TypeTime},
+		{Name: "delete_time", Type: field.TypeTime, Nullable: true},
+		{Name: "update_time", Type: field.TypeTime},
 		{Name: "name", Type: field.TypeString, Size: 255},
-		{Name: "created_by", Type: field.TypeInt},
-		{Name: "updated_by", Type: field.TypeInt},
+		{Name: "creator_id", Type: field.TypeInt},
+		{Name: "updater_id", Type: field.TypeInt},
 	}
 	// RiskCategoriesTable holds the schema information for the "risk_categories" table.
 	RiskCategoriesTable = &schema.Table{
@@ -478,12 +596,12 @@ var (
 	// RiskLocationsColumns holds the columns for the "risk_locations" table.
 	RiskLocationsColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt, Increment: true},
-		{Name: "created_at", Type: field.TypeTime},
-		{Name: "deleted_at", Type: field.TypeTime, Nullable: true},
-		{Name: "updated_at", Type: field.TypeTime},
+		{Name: "create_time", Type: field.TypeTime},
+		{Name: "delete_time", Type: field.TypeTime, Nullable: true},
+		{Name: "update_time", Type: field.TypeTime},
 		{Name: "name", Type: field.TypeString, Size: 255},
-		{Name: "created_by", Type: field.TypeInt},
-		{Name: "updated_by", Type: field.TypeInt},
+		{Name: "creator_id", Type: field.TypeInt},
+		{Name: "updater_id", Type: field.TypeInt},
 	}
 	// RiskLocationsTable holds the schema information for the "risk_locations" table.
 	RiskLocationsTable = &schema.Table{
@@ -505,20 +623,203 @@ var (
 			},
 		},
 	}
+	// SweepsColumns holds the columns for the "sweeps" table.
+	SweepsColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeInt, Increment: true},
+		{Name: "create_time", Type: field.TypeTime},
+		{Name: "delete_time", Type: field.TypeTime, Nullable: true},
+		{Name: "update_time", Type: field.TypeTime},
+		{Name: "name", Type: field.TypeString, Size: 255},
+		{Name: "sweep_jobs", Type: field.TypeJSON, Nullable: true},
+		{Name: "creator_id", Type: field.TypeInt},
+		{Name: "updater_id", Type: field.TypeInt},
+		{Name: "risk_category_id", Type: field.TypeInt},
+		{Name: "risk_location_id", Type: field.TypeInt},
+	}
+	// SweepsTable holds the schema information for the "sweeps" table.
+	SweepsTable = &schema.Table{
+		Name:       "sweeps",
+		Columns:    SweepsColumns,
+		PrimaryKey: []*schema.Column{SweepsColumns[0]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:     "sweeps_admins_sweep_creator",
+				Columns:    []*schema.Column{SweepsColumns[6]},
+				RefColumns: []*schema.Column{AdminsColumns[0]},
+				OnDelete:   schema.NoAction,
+			},
+			{
+				Symbol:     "sweeps_admins_sweep_updater",
+				Columns:    []*schema.Column{SweepsColumns[7]},
+				RefColumns: []*schema.Column{AdminsColumns[0]},
+				OnDelete:   schema.NoAction,
+			},
+			{
+				Symbol:     "sweeps_risk_categories_sweep",
+				Columns:    []*schema.Column{SweepsColumns[8]},
+				RefColumns: []*schema.Column{RiskCategoriesColumns[0]},
+				OnDelete:   schema.NoAction,
+			},
+			{
+				Symbol:     "sweeps_risk_locations_sweep",
+				Columns:    []*schema.Column{SweepsColumns[9]},
+				RefColumns: []*schema.Column{RiskLocationsColumns[0]},
+				OnDelete:   schema.NoAction,
+			},
+		},
+	}
+	// SweepResultsColumns holds the columns for the "sweep_results" table.
+	SweepResultsColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeInt, Increment: true},
+		{Name: "create_time", Type: field.TypeTime},
+		{Name: "delete_time", Type: field.TypeTime, Nullable: true},
+		{Name: "update_time", Type: field.TypeTime},
+		{Name: "check_in_time", Type: field.TypeTime, Nullable: true},
+		{Name: "check_in_image", Type: field.TypeJSON, Nullable: true},
+		{Name: "sweep_jobs", Type: field.TypeJSON, Nullable: true},
+		{Name: "creator_id", Type: field.TypeInt},
+		{Name: "updater_id", Type: field.TypeInt},
+		{Name: "sweep_id", Type: field.TypeInt},
+		{Name: "sweep_schedule_id", Type: field.TypeInt},
+	}
+	// SweepResultsTable holds the schema information for the "sweep_results" table.
+	SweepResultsTable = &schema.Table{
+		Name:       "sweep_results",
+		Columns:    SweepResultsColumns,
+		PrimaryKey: []*schema.Column{SweepResultsColumns[0]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:     "sweep_results_admins_sweep_result_creator",
+				Columns:    []*schema.Column{SweepResultsColumns[7]},
+				RefColumns: []*schema.Column{AdminsColumns[0]},
+				OnDelete:   schema.NoAction,
+			},
+			{
+				Symbol:     "sweep_results_admins_sweep_result_updater",
+				Columns:    []*schema.Column{SweepResultsColumns[8]},
+				RefColumns: []*schema.Column{AdminsColumns[0]},
+				OnDelete:   schema.NoAction,
+			},
+			{
+				Symbol:     "sweep_results_sweeps_sweep_result",
+				Columns:    []*schema.Column{SweepResultsColumns[9]},
+				RefColumns: []*schema.Column{SweepsColumns[0]},
+				OnDelete:   schema.NoAction,
+			},
+			{
+				Symbol:     "sweep_results_sweep_schedules_sweep_result",
+				Columns:    []*schema.Column{SweepResultsColumns[10]},
+				RefColumns: []*schema.Column{SweepSchedulesColumns[0]},
+				OnDelete:   schema.NoAction,
+			},
+		},
+	}
+	// SweepResultDetailsColumns holds the columns for the "sweep_result_details" table.
+	SweepResultDetailsColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeInt, Increment: true},
+		{Name: "create_time", Type: field.TypeTime},
+		{Name: "delete_time", Type: field.TypeTime, Nullable: true},
+		{Name: "update_time", Type: field.TypeTime},
+		{Name: "title", Type: field.TypeString, Size: 255},
+		{Name: "result", Type: field.TypeInt},
+		{Name: "creator_id", Type: field.TypeInt},
+		{Name: "updater_id", Type: field.TypeInt},
+		{Name: "sweep_id", Type: field.TypeInt},
+		{Name: "sweep_result_id", Type: field.TypeInt},
+		{Name: "sweep_schedule_id", Type: field.TypeInt},
+	}
+	// SweepResultDetailsTable holds the schema information for the "sweep_result_details" table.
+	SweepResultDetailsTable = &schema.Table{
+		Name:       "sweep_result_details",
+		Columns:    SweepResultDetailsColumns,
+		PrimaryKey: []*schema.Column{SweepResultDetailsColumns[0]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:     "sweep_result_details_admins_sweep_result_details_creator",
+				Columns:    []*schema.Column{SweepResultDetailsColumns[6]},
+				RefColumns: []*schema.Column{AdminsColumns[0]},
+				OnDelete:   schema.NoAction,
+			},
+			{
+				Symbol:     "sweep_result_details_admins_sweep_result_details_updater",
+				Columns:    []*schema.Column{SweepResultDetailsColumns[7]},
+				RefColumns: []*schema.Column{AdminsColumns[0]},
+				OnDelete:   schema.NoAction,
+			},
+			{
+				Symbol:     "sweep_result_details_sweeps_sweep_result_details",
+				Columns:    []*schema.Column{SweepResultDetailsColumns[8]},
+				RefColumns: []*schema.Column{SweepsColumns[0]},
+				OnDelete:   schema.NoAction,
+			},
+			{
+				Symbol:     "sweep_result_details_sweep_results_sweep_result_details",
+				Columns:    []*schema.Column{SweepResultDetailsColumns[9]},
+				RefColumns: []*schema.Column{SweepResultsColumns[0]},
+				OnDelete:   schema.NoAction,
+			},
+			{
+				Symbol:     "sweep_result_details_sweep_schedules_sweep_result_details",
+				Columns:    []*schema.Column{SweepResultDetailsColumns[10]},
+				RefColumns: []*schema.Column{SweepSchedulesColumns[0]},
+				OnDelete:   schema.NoAction,
+			},
+		},
+	}
+	// SweepSchedulesColumns holds the columns for the "sweep_schedules" table.
+	SweepSchedulesColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeInt, Increment: true},
+		{Name: "create_time", Type: field.TypeTime},
+		{Name: "delete_time", Type: field.TypeTime, Nullable: true},
+		{Name: "update_time", Type: field.TypeTime},
+		{Name: "name", Type: field.TypeString, Size: 255},
+		{Name: "schedule_status", Type: field.TypeInt, Nullable: true, Default: 1},
+		{Name: "action_time", Type: field.TypeTime},
+		{Name: "remind", Type: field.TypeJSON},
+		{Name: "repeat", Type: field.TypeJSON},
+		{Name: "creator_id", Type: field.TypeInt},
+		{Name: "updater_id", Type: field.TypeInt},
+		{Name: "sweep_id", Type: field.TypeInt},
+	}
+	// SweepSchedulesTable holds the schema information for the "sweep_schedules" table.
+	SweepSchedulesTable = &schema.Table{
+		Name:       "sweep_schedules",
+		Columns:    SweepSchedulesColumns,
+		PrimaryKey: []*schema.Column{SweepSchedulesColumns[0]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:     "sweep_schedules_admins_sweep_schedule_creator",
+				Columns:    []*schema.Column{SweepSchedulesColumns[9]},
+				RefColumns: []*schema.Column{AdminsColumns[0]},
+				OnDelete:   schema.NoAction,
+			},
+			{
+				Symbol:     "sweep_schedules_admins_sweep_schedule_updater",
+				Columns:    []*schema.Column{SweepSchedulesColumns[10]},
+				RefColumns: []*schema.Column{AdminsColumns[0]},
+				OnDelete:   schema.NoAction,
+			},
+			{
+				Symbol:     "sweep_schedules_sweeps_sweep_schedule",
+				Columns:    []*schema.Column{SweepSchedulesColumns[11]},
+				RefColumns: []*schema.Column{SweepsColumns[0]},
+				OnDelete:   schema.NoAction,
+			},
+		},
+	}
 	// VideosColumns holds the columns for the "videos" table.
 	VideosColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt, Increment: true},
-		{Name: "created_at", Type: field.TypeTime},
-		{Name: "deleted_at", Type: field.TypeTime, Nullable: true},
-		{Name: "updated_at", Type: field.TypeTime},
+		{Name: "create_time", Type: field.TypeTime},
+		{Name: "delete_time", Type: field.TypeTime, Nullable: true},
+		{Name: "update_time", Type: field.TypeTime},
 		{Name: "name", Type: field.TypeString, Nullable: true},
 		{Name: "url", Type: field.TypeString, Nullable: true},
 		{Name: "size", Type: field.TypeInt64, Default: 0},
 		{Name: "duration", Type: field.TypeString, Nullable: true},
 		{Name: "uploaded_at", Type: field.TypeTime, Nullable: true},
-		{Name: "uploaded_at2", Type: field.TypeTime, Nullable: true},
-		{Name: "created_by", Type: field.TypeInt},
-		{Name: "updated_by", Type: field.TypeInt},
+		{Name: "creator_id", Type: field.TypeInt},
+		{Name: "updater_id", Type: field.TypeInt},
 	}
 	// VideosTable holds the schema information for the "videos" table.
 	VideosTable = &schema.Table{
@@ -528,89 +829,89 @@ var (
 		ForeignKeys: []*schema.ForeignKey{
 			{
 				Symbol:     "videos_admins_video_creator",
-				Columns:    []*schema.Column{VideosColumns[10]},
+				Columns:    []*schema.Column{VideosColumns[9]},
 				RefColumns: []*schema.Column{AdminsColumns[0]},
 				OnDelete:   schema.NoAction,
 			},
 			{
 				Symbol:     "videos_admins_video_updater",
-				Columns:    []*schema.Column{VideosColumns[11]},
+				Columns:    []*schema.Column{VideosColumns[10]},
 				RefColumns: []*schema.Column{AdminsColumns[0]},
 				OnDelete:   schema.NoAction,
 			},
 		},
 	}
-	// AdminRoleAdminsColumns holds the columns for the "admin_role_admins" table.
-	AdminRoleAdminsColumns = []*schema.Column{
-		{Name: "admin_role_id", Type: field.TypeInt},
+	// AdminSweepScheduleColumns holds the columns for the "admin_sweep_schedule" table.
+	AdminSweepScheduleColumns = []*schema.Column{
 		{Name: "admin_id", Type: field.TypeInt},
+		{Name: "sweep_schedule_id", Type: field.TypeInt},
 	}
-	// AdminRoleAdminsTable holds the schema information for the "admin_role_admins" table.
-	AdminRoleAdminsTable = &schema.Table{
-		Name:       "admin_role_admins",
-		Columns:    AdminRoleAdminsColumns,
-		PrimaryKey: []*schema.Column{AdminRoleAdminsColumns[0], AdminRoleAdminsColumns[1]},
+	// AdminSweepScheduleTable holds the schema information for the "admin_sweep_schedule" table.
+	AdminSweepScheduleTable = &schema.Table{
+		Name:       "admin_sweep_schedule",
+		Columns:    AdminSweepScheduleColumns,
+		PrimaryKey: []*schema.Column{AdminSweepScheduleColumns[0], AdminSweepScheduleColumns[1]},
 		ForeignKeys: []*schema.ForeignKey{
 			{
-				Symbol:     "admin_role_admins_admin_role_id",
-				Columns:    []*schema.Column{AdminRoleAdminsColumns[0]},
-				RefColumns: []*schema.Column{AdminRolesColumns[0]},
+				Symbol:     "admin_sweep_schedule_admin_id",
+				Columns:    []*schema.Column{AdminSweepScheduleColumns[0]},
+				RefColumns: []*schema.Column{AdminsColumns[0]},
 				OnDelete:   schema.Cascade,
 			},
 			{
-				Symbol:     "admin_role_admins_admin_id",
-				Columns:    []*schema.Column{AdminRoleAdminsColumns[1]},
+				Symbol:     "admin_sweep_schedule_sweep_schedule_id",
+				Columns:    []*schema.Column{AdminSweepScheduleColumns[1]},
+				RefColumns: []*schema.Column{SweepSchedulesColumns[0]},
+				OnDelete:   schema.Cascade,
+			},
+		},
+	}
+	// PermissionAdminColumns holds the columns for the "permission_admin" table.
+	PermissionAdminColumns = []*schema.Column{
+		{Name: "permission_id", Type: field.TypeInt},
+		{Name: "admin_id", Type: field.TypeInt},
+	}
+	// PermissionAdminTable holds the schema information for the "permission_admin" table.
+	PermissionAdminTable = &schema.Table{
+		Name:       "permission_admin",
+		Columns:    PermissionAdminColumns,
+		PrimaryKey: []*schema.Column{PermissionAdminColumns[0], PermissionAdminColumns[1]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:     "permission_admin_permission_id",
+				Columns:    []*schema.Column{PermissionAdminColumns[0]},
+				RefColumns: []*schema.Column{PermissionsColumns[0]},
+				OnDelete:   schema.Cascade,
+			},
+			{
+				Symbol:     "permission_admin_admin_id",
+				Columns:    []*schema.Column{PermissionAdminColumns[1]},
 				RefColumns: []*schema.Column{AdminsColumns[0]},
 				OnDelete:   schema.Cascade,
 			},
 		},
 	}
-	// IpcEventFixersColumns holds the columns for the "ipc_event_fixers" table.
-	IpcEventFixersColumns = []*schema.Column{
-		{Name: "ipc_event_id", Type: field.TypeInt},
-		{Name: "employee_id", Type: field.TypeInt},
+	// PermissionDepartmentColumns holds the columns for the "permission_department" table.
+	PermissionDepartmentColumns = []*schema.Column{
+		{Name: "permission_id", Type: field.TypeInt},
+		{Name: "department_id", Type: field.TypeInt},
 	}
-	// IpcEventFixersTable holds the schema information for the "ipc_event_fixers" table.
-	IpcEventFixersTable = &schema.Table{
-		Name:       "ipc_event_fixers",
-		Columns:    IpcEventFixersColumns,
-		PrimaryKey: []*schema.Column{IpcEventFixersColumns[0], IpcEventFixersColumns[1]},
+	// PermissionDepartmentTable holds the schema information for the "permission_department" table.
+	PermissionDepartmentTable = &schema.Table{
+		Name:       "permission_department",
+		Columns:    PermissionDepartmentColumns,
+		PrimaryKey: []*schema.Column{PermissionDepartmentColumns[0], PermissionDepartmentColumns[1]},
 		ForeignKeys: []*schema.ForeignKey{
 			{
-				Symbol:     "ipc_event_fixers_ipc_event_id",
-				Columns:    []*schema.Column{IpcEventFixersColumns[0]},
-				RefColumns: []*schema.Column{IpcEventsColumns[0]},
+				Symbol:     "permission_department_permission_id",
+				Columns:    []*schema.Column{PermissionDepartmentColumns[0]},
+				RefColumns: []*schema.Column{PermissionsColumns[0]},
 				OnDelete:   schema.Cascade,
 			},
 			{
-				Symbol:     "ipc_event_fixers_employee_id",
-				Columns:    []*schema.Column{IpcEventFixersColumns[1]},
-				RefColumns: []*schema.Column{EmployeesColumns[0]},
-				OnDelete:   schema.Cascade,
-			},
-		},
-	}
-	// OccupationEmployeesColumns holds the columns for the "occupation_employees" table.
-	OccupationEmployeesColumns = []*schema.Column{
-		{Name: "occupation_id", Type: field.TypeInt},
-		{Name: "employee_id", Type: field.TypeInt},
-	}
-	// OccupationEmployeesTable holds the schema information for the "occupation_employees" table.
-	OccupationEmployeesTable = &schema.Table{
-		Name:       "occupation_employees",
-		Columns:    OccupationEmployeesColumns,
-		PrimaryKey: []*schema.Column{OccupationEmployeesColumns[0], OccupationEmployeesColumns[1]},
-		ForeignKeys: []*schema.ForeignKey{
-			{
-				Symbol:     "occupation_employees_occupation_id",
-				Columns:    []*schema.Column{OccupationEmployeesColumns[0]},
-				RefColumns: []*schema.Column{OccupationsColumns[0]},
-				OnDelete:   schema.Cascade,
-			},
-			{
-				Symbol:     "occupation_employees_employee_id",
-				Columns:    []*schema.Column{OccupationEmployeesColumns[1]},
-				RefColumns: []*schema.Column{EmployeesColumns[0]},
+				Symbol:     "permission_department_department_id",
+				Columns:    []*schema.Column{PermissionDepartmentColumns[1]},
+				RefColumns: []*schema.Column{DepartmentsColumns[0]},
 				OnDelete:   schema.Cascade,
 			},
 		},
@@ -618,30 +919,34 @@ var (
 	// Tables holds all the tables in the schema.
 	Tables = []*schema.Table{
 		AdminsTable,
-		AdminRolesTable,
 		AreasTable,
 		DepartmentsTable,
 		DevicesTable,
 		DeviceInstallationsTable,
 		EmployeesTable,
+		EventsTable,
 		EventLevelsTable,
-		IpcEventsTable,
+		EventLogsTable,
+		FixingsTable,
 		OccupationsTable,
+		PermissionsTable,
 		RisksTable,
 		RiskCategoriesTable,
 		RiskLocationsTable,
+		SweepsTable,
+		SweepResultsTable,
+		SweepResultDetailsTable,
+		SweepSchedulesTable,
 		VideosTable,
-		AdminRoleAdminsTable,
-		IpcEventFixersTable,
-		OccupationEmployeesTable,
+		AdminSweepScheduleTable,
+		PermissionAdminTable,
+		PermissionDepartmentTable,
 	}
 )
 
 func init() {
 	AdminsTable.ForeignKeys[0].RefTable = AdminsTable
 	AdminsTable.ForeignKeys[1].RefTable = AdminsTable
-	AdminRolesTable.ForeignKeys[0].RefTable = AdminsTable
-	AdminRolesTable.ForeignKeys[1].RefTable = AdminsTable
 	AreasTable.ForeignKeys[0].RefTable = AdminsTable
 	AreasTable.ForeignKeys[1].RefTable = AdminsTable
 	DepartmentsTable.ForeignKeys[0].RefTable = AdminsTable
@@ -657,30 +962,59 @@ func init() {
 	EmployeesTable.ForeignKeys[1].RefTable = AdminsTable
 	EmployeesTable.ForeignKeys[2].RefTable = AdminsTable
 	EmployeesTable.ForeignKeys[3].RefTable = DepartmentsTable
+	EmployeesTable.ForeignKeys[4].RefTable = OccupationsTable
+	EventsTable.ForeignKeys[0].RefTable = AdminsTable
+	EventsTable.ForeignKeys[1].RefTable = AdminsTable
+	EventsTable.ForeignKeys[2].RefTable = DevicesTable
+	EventsTable.ForeignKeys[3].RefTable = VideosTable
 	EventLevelsTable.ForeignKeys[0].RefTable = AdminsTable
 	EventLevelsTable.ForeignKeys[1].RefTable = AdminsTable
-	IpcEventsTable.ForeignKeys[0].RefTable = AdminsTable
-	IpcEventsTable.ForeignKeys[1].RefTable = AdminsTable
-	IpcEventsTable.ForeignKeys[2].RefTable = DevicesTable
-	IpcEventsTable.ForeignKeys[3].RefTable = VideosTable
+	EventLogsTable.ForeignKeys[0].RefTable = AdminsTable
+	EventLogsTable.ForeignKeys[1].RefTable = AdminsTable
+	EventLogsTable.ForeignKeys[2].RefTable = AdminsTable
+	EventLogsTable.ForeignKeys[3].RefTable = AdminsTable
+	EventLogsTable.ForeignKeys[4].RefTable = DevicesTable
+	EventLogsTable.ForeignKeys[5].RefTable = EventsTable
+	FixingsTable.ForeignKeys[0].RefTable = AdminsTable
+	FixingsTable.ForeignKeys[1].RefTable = AdminsTable
+	FixingsTable.ForeignKeys[2].RefTable = AdminsTable
+	FixingsTable.ForeignKeys[3].RefTable = DevicesTable
+	FixingsTable.ForeignKeys[4].RefTable = EventsTable
 	OccupationsTable.ForeignKeys[0].RefTable = AdminsTable
 	OccupationsTable.ForeignKeys[1].RefTable = AdminsTable
+	PermissionsTable.ForeignKeys[0].RefTable = AdminsTable
+	PermissionsTable.ForeignKeys[1].RefTable = AdminsTable
 	RisksTable.ForeignKeys[0].RefTable = AdminsTable
 	RisksTable.ForeignKeys[1].RefTable = AdminsTable
-	RisksTable.ForeignKeys[2].RefTable = EmployeesTable
-	RisksTable.ForeignKeys[3].RefTable = EmployeesTable
-	RisksTable.ForeignKeys[4].RefTable = RiskCategoriesTable
-	RisksTable.ForeignKeys[5].RefTable = RiskLocationsTable
+	RisksTable.ForeignKeys[2].RefTable = AdminsTable
+	RisksTable.ForeignKeys[3].RefTable = RiskCategoriesTable
+	RisksTable.ForeignKeys[4].RefTable = RiskLocationsTable
 	RiskCategoriesTable.ForeignKeys[0].RefTable = AdminsTable
 	RiskCategoriesTable.ForeignKeys[1].RefTable = AdminsTable
 	RiskLocationsTable.ForeignKeys[0].RefTable = AdminsTable
 	RiskLocationsTable.ForeignKeys[1].RefTable = AdminsTable
+	SweepsTable.ForeignKeys[0].RefTable = AdminsTable
+	SweepsTable.ForeignKeys[1].RefTable = AdminsTable
+	SweepsTable.ForeignKeys[2].RefTable = RiskCategoriesTable
+	SweepsTable.ForeignKeys[3].RefTable = RiskLocationsTable
+	SweepResultsTable.ForeignKeys[0].RefTable = AdminsTable
+	SweepResultsTable.ForeignKeys[1].RefTable = AdminsTable
+	SweepResultsTable.ForeignKeys[2].RefTable = SweepsTable
+	SweepResultsTable.ForeignKeys[3].RefTable = SweepSchedulesTable
+	SweepResultDetailsTable.ForeignKeys[0].RefTable = AdminsTable
+	SweepResultDetailsTable.ForeignKeys[1].RefTable = AdminsTable
+	SweepResultDetailsTable.ForeignKeys[2].RefTable = SweepsTable
+	SweepResultDetailsTable.ForeignKeys[3].RefTable = SweepResultsTable
+	SweepResultDetailsTable.ForeignKeys[4].RefTable = SweepSchedulesTable
+	SweepSchedulesTable.ForeignKeys[0].RefTable = AdminsTable
+	SweepSchedulesTable.ForeignKeys[1].RefTable = AdminsTable
+	SweepSchedulesTable.ForeignKeys[2].RefTable = SweepsTable
 	VideosTable.ForeignKeys[0].RefTable = AdminsTable
 	VideosTable.ForeignKeys[1].RefTable = AdminsTable
-	AdminRoleAdminsTable.ForeignKeys[0].RefTable = AdminRolesTable
-	AdminRoleAdminsTable.ForeignKeys[1].RefTable = AdminsTable
-	IpcEventFixersTable.ForeignKeys[0].RefTable = IpcEventsTable
-	IpcEventFixersTable.ForeignKeys[1].RefTable = EmployeesTable
-	OccupationEmployeesTable.ForeignKeys[0].RefTable = OccupationsTable
-	OccupationEmployeesTable.ForeignKeys[1].RefTable = EmployeesTable
+	AdminSweepScheduleTable.ForeignKeys[0].RefTable = AdminsTable
+	AdminSweepScheduleTable.ForeignKeys[1].RefTable = SweepSchedulesTable
+	PermissionAdminTable.ForeignKeys[0].RefTable = PermissionsTable
+	PermissionAdminTable.ForeignKeys[1].RefTable = AdminsTable
+	PermissionDepartmentTable.ForeignKeys[0].RefTable = PermissionsTable
+	PermissionDepartmentTable.ForeignKeys[1].RefTable = DepartmentsTable
 }

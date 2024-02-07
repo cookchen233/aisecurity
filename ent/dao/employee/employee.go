@@ -15,36 +15,32 @@ const (
 	Label = "employee"
 	// FieldID holds the string denoting the id field in the database.
 	FieldID = "id"
-	// FieldCreatedAt holds the string denoting the created_at field in the database.
-	FieldCreatedAt = "created_at"
-	// FieldCreatedBy holds the string denoting the created_by field in the database.
-	FieldCreatedBy = "created_by"
-	// FieldDeletedAt holds the string denoting the deleted_at field in the database.
-	FieldDeletedAt = "deleted_at"
-	// FieldUpdatedBy holds the string denoting the updated_by field in the database.
-	FieldUpdatedBy = "updated_by"
-	// FieldUpdatedAt holds the string denoting the updated_at field in the database.
-	FieldUpdatedAt = "updated_at"
+	// FieldCreateTime holds the string denoting the create_time field in the database.
+	FieldCreateTime = "create_time"
+	// FieldCreatorID holds the string denoting the creator_id field in the database.
+	FieldCreatorID = "creator_id"
+	// FieldDeleteTime holds the string denoting the delete_time field in the database.
+	FieldDeleteTime = "delete_time"
+	// FieldUpdaterID holds the string denoting the updater_id field in the database.
+	FieldUpdaterID = "updater_id"
+	// FieldUpdateTime holds the string denoting the update_time field in the database.
+	FieldUpdateTime = "update_time"
 	// FieldAdminID holds the string denoting the admin_id field in the database.
 	FieldAdminID = "admin_id"
 	// FieldDepartmentID holds the string denoting the department_id field in the database.
 	FieldDepartmentID = "department_id"
+	// FieldOccupationID holds the string denoting the occupation_id field in the database.
+	FieldOccupationID = "occupation_id"
 	// EdgeCreator holds the string denoting the creator edge name in mutations.
 	EdgeCreator = "creator"
 	// EdgeUpdater holds the string denoting the updater edge name in mutations.
 	EdgeUpdater = "updater"
 	// EdgeAdmin holds the string denoting the admin edge name in mutations.
 	EdgeAdmin = "admin"
+	// EdgeOccupation holds the string denoting the occupation edge name in mutations.
+	EdgeOccupation = "occupation"
 	// EdgeDepartment holds the string denoting the department edge name in mutations.
 	EdgeDepartment = "department"
-	// EdgeOccupations holds the string denoting the occupations edge name in mutations.
-	EdgeOccupations = "occupations"
-	// EdgeIpcEvents holds the string denoting the ipc_events edge name in mutations.
-	EdgeIpcEvents = "ipc_events"
-	// EdgeRiskReporter holds the string denoting the risk_reporter edge name in mutations.
-	EdgeRiskReporter = "risk_reporter"
-	// EdgeRiskMaintainer holds the string denoting the risk_maintainer edge name in mutations.
-	EdgeRiskMaintainer = "risk_maintainer"
 	// Table holds the table name of the employee in the database.
 	Table = "employees"
 	// CreatorTable is the table that holds the creator relation/edge.
@@ -53,14 +49,14 @@ const (
 	// It exists in this package in order to avoid circular dependency with the "admin" package.
 	CreatorInverseTable = "admins"
 	// CreatorColumn is the table column denoting the creator relation/edge.
-	CreatorColumn = "created_by"
+	CreatorColumn = "creator_id"
 	// UpdaterTable is the table that holds the updater relation/edge.
 	UpdaterTable = "employees"
 	// UpdaterInverseTable is the table name for the Admin entity.
 	// It exists in this package in order to avoid circular dependency with the "admin" package.
 	UpdaterInverseTable = "admins"
 	// UpdaterColumn is the table column denoting the updater relation/edge.
-	UpdaterColumn = "updated_by"
+	UpdaterColumn = "updater_id"
 	// AdminTable is the table that holds the admin relation/edge.
 	AdminTable = "employees"
 	// AdminInverseTable is the table name for the Admin entity.
@@ -68,6 +64,13 @@ const (
 	AdminInverseTable = "admins"
 	// AdminColumn is the table column denoting the admin relation/edge.
 	AdminColumn = "admin_id"
+	// OccupationTable is the table that holds the occupation relation/edge.
+	OccupationTable = "employees"
+	// OccupationInverseTable is the table name for the Occupation entity.
+	// It exists in this package in order to avoid circular dependency with the "occupation" package.
+	OccupationInverseTable = "occupations"
+	// OccupationColumn is the table column denoting the occupation relation/edge.
+	OccupationColumn = "occupation_id"
 	// DepartmentTable is the table that holds the department relation/edge.
 	DepartmentTable = "employees"
 	// DepartmentInverseTable is the table name for the Department entity.
@@ -75,52 +78,20 @@ const (
 	DepartmentInverseTable = "departments"
 	// DepartmentColumn is the table column denoting the department relation/edge.
 	DepartmentColumn = "department_id"
-	// OccupationsTable is the table that holds the occupations relation/edge. The primary key declared below.
-	OccupationsTable = "occupation_employees"
-	// OccupationsInverseTable is the table name for the Occupation entity.
-	// It exists in this package in order to avoid circular dependency with the "occupation" package.
-	OccupationsInverseTable = "occupations"
-	// IpcEventsTable is the table that holds the ipc_events relation/edge. The primary key declared below.
-	IpcEventsTable = "ipc_event_fixers"
-	// IpcEventsInverseTable is the table name for the IPCEvent entity.
-	// It exists in this package in order to avoid circular dependency with the "ipcevent" package.
-	IpcEventsInverseTable = "ipc_events"
-	// RiskReporterTable is the table that holds the risk_reporter relation/edge.
-	RiskReporterTable = "risks"
-	// RiskReporterInverseTable is the table name for the Risk entity.
-	// It exists in this package in order to avoid circular dependency with the "risk" package.
-	RiskReporterInverseTable = "risks"
-	// RiskReporterColumn is the table column denoting the risk_reporter relation/edge.
-	RiskReporterColumn = "reporter_id"
-	// RiskMaintainerTable is the table that holds the risk_maintainer relation/edge.
-	RiskMaintainerTable = "risks"
-	// RiskMaintainerInverseTable is the table name for the Risk entity.
-	// It exists in this package in order to avoid circular dependency with the "risk" package.
-	RiskMaintainerInverseTable = "risks"
-	// RiskMaintainerColumn is the table column denoting the risk_maintainer relation/edge.
-	RiskMaintainerColumn = "maintainer_id"
 )
 
 // Columns holds all SQL columns for employee fields.
 var Columns = []string{
 	FieldID,
-	FieldCreatedAt,
-	FieldCreatedBy,
-	FieldDeletedAt,
-	FieldUpdatedBy,
-	FieldUpdatedAt,
+	FieldCreateTime,
+	FieldCreatorID,
+	FieldDeleteTime,
+	FieldUpdaterID,
+	FieldUpdateTime,
 	FieldAdminID,
 	FieldDepartmentID,
+	FieldOccupationID,
 }
-
-var (
-	// OccupationsPrimaryKey and OccupationsColumn2 are the table columns denoting the
-	// primary key for the occupations relation (M2M).
-	OccupationsPrimaryKey = []string{"occupation_id", "employee_id"}
-	// IpcEventsPrimaryKey and IpcEventsColumn2 are the table columns denoting the
-	// primary key for the ipc_events relation (M2M).
-	IpcEventsPrimaryKey = []string{"ipc_event_id", "employee_id"}
-)
 
 // ValidColumn reports if the column name is valid (part of the table columns).
 func ValidColumn(column string) bool {
@@ -139,20 +110,22 @@ func ValidColumn(column string) bool {
 //	import _ "aisecurity/ent/dao/runtime"
 var (
 	Hooks [1]ent.Hook
-	// DefaultCreatedAt holds the default value on creation for the "created_at" field.
-	DefaultCreatedAt func() time.Time
-	// CreatedByValidator is a validator for the "created_by" field. It is called by the builders before save.
-	CreatedByValidator func(int) error
-	// UpdatedByValidator is a validator for the "updated_by" field. It is called by the builders before save.
-	UpdatedByValidator func(int) error
-	// DefaultUpdatedAt holds the default value on creation for the "updated_at" field.
-	DefaultUpdatedAt func() time.Time
-	// UpdateDefaultUpdatedAt holds the default value on update for the "updated_at" field.
-	UpdateDefaultUpdatedAt func() time.Time
+	// DefaultCreateTime holds the default value on creation for the "create_time" field.
+	DefaultCreateTime func() time.Time
+	// CreatorIDValidator is a validator for the "creator_id" field. It is called by the builders before save.
+	CreatorIDValidator func(int) error
+	// UpdaterIDValidator is a validator for the "updater_id" field. It is called by the builders before save.
+	UpdaterIDValidator func(int) error
+	// DefaultUpdateTime holds the default value on creation for the "update_time" field.
+	DefaultUpdateTime func() time.Time
+	// UpdateDefaultUpdateTime holds the default value on update for the "update_time" field.
+	UpdateDefaultUpdateTime func() time.Time
 	// AdminIDValidator is a validator for the "admin_id" field. It is called by the builders before save.
 	AdminIDValidator func(int) error
 	// DepartmentIDValidator is a validator for the "department_id" field. It is called by the builders before save.
 	DepartmentIDValidator func(int) error
+	// OccupationIDValidator is a validator for the "occupation_id" field. It is called by the builders before save.
+	OccupationIDValidator func(int) error
 )
 
 // OrderOption defines the ordering options for the Employee queries.
@@ -163,29 +136,29 @@ func ByID(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldID, opts...).ToFunc()
 }
 
-// ByCreatedAt orders the results by the created_at field.
-func ByCreatedAt(opts ...sql.OrderTermOption) OrderOption {
-	return sql.OrderByField(FieldCreatedAt, opts...).ToFunc()
+// ByCreateTime orders the results by the create_time field.
+func ByCreateTime(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldCreateTime, opts...).ToFunc()
 }
 
-// ByCreatedBy orders the results by the created_by field.
-func ByCreatedBy(opts ...sql.OrderTermOption) OrderOption {
-	return sql.OrderByField(FieldCreatedBy, opts...).ToFunc()
+// ByCreatorID orders the results by the creator_id field.
+func ByCreatorID(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldCreatorID, opts...).ToFunc()
 }
 
-// ByDeletedAt orders the results by the deleted_at field.
-func ByDeletedAt(opts ...sql.OrderTermOption) OrderOption {
-	return sql.OrderByField(FieldDeletedAt, opts...).ToFunc()
+// ByDeleteTime orders the results by the delete_time field.
+func ByDeleteTime(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldDeleteTime, opts...).ToFunc()
 }
 
-// ByUpdatedBy orders the results by the updated_by field.
-func ByUpdatedBy(opts ...sql.OrderTermOption) OrderOption {
-	return sql.OrderByField(FieldUpdatedBy, opts...).ToFunc()
+// ByUpdaterID orders the results by the updater_id field.
+func ByUpdaterID(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldUpdaterID, opts...).ToFunc()
 }
 
-// ByUpdatedAt orders the results by the updated_at field.
-func ByUpdatedAt(opts ...sql.OrderTermOption) OrderOption {
-	return sql.OrderByField(FieldUpdatedAt, opts...).ToFunc()
+// ByUpdateTime orders the results by the update_time field.
+func ByUpdateTime(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldUpdateTime, opts...).ToFunc()
 }
 
 // ByAdminID orders the results by the admin_id field.
@@ -196,6 +169,11 @@ func ByAdminID(opts ...sql.OrderTermOption) OrderOption {
 // ByDepartmentID orders the results by the department_id field.
 func ByDepartmentID(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldDepartmentID, opts...).ToFunc()
+}
+
+// ByOccupationID orders the results by the occupation_id field.
+func ByOccupationID(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldOccupationID, opts...).ToFunc()
 }
 
 // ByCreatorField orders the results by creator field.
@@ -219,66 +197,17 @@ func ByAdminField(field string, opts ...sql.OrderTermOption) OrderOption {
 	}
 }
 
+// ByOccupationField orders the results by occupation field.
+func ByOccupationField(field string, opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newOccupationStep(), sql.OrderByField(field, opts...))
+	}
+}
+
 // ByDepartmentField orders the results by department field.
 func ByDepartmentField(field string, opts ...sql.OrderTermOption) OrderOption {
 	return func(s *sql.Selector) {
 		sqlgraph.OrderByNeighborTerms(s, newDepartmentStep(), sql.OrderByField(field, opts...))
-	}
-}
-
-// ByOccupationsCount orders the results by occupations count.
-func ByOccupationsCount(opts ...sql.OrderTermOption) OrderOption {
-	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborsCount(s, newOccupationsStep(), opts...)
-	}
-}
-
-// ByOccupations orders the results by occupations terms.
-func ByOccupations(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
-	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborTerms(s, newOccupationsStep(), append([]sql.OrderTerm{term}, terms...)...)
-	}
-}
-
-// ByIpcEventsCount orders the results by ipc_events count.
-func ByIpcEventsCount(opts ...sql.OrderTermOption) OrderOption {
-	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborsCount(s, newIpcEventsStep(), opts...)
-	}
-}
-
-// ByIpcEvents orders the results by ipc_events terms.
-func ByIpcEvents(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
-	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborTerms(s, newIpcEventsStep(), append([]sql.OrderTerm{term}, terms...)...)
-	}
-}
-
-// ByRiskReporterCount orders the results by risk_reporter count.
-func ByRiskReporterCount(opts ...sql.OrderTermOption) OrderOption {
-	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborsCount(s, newRiskReporterStep(), opts...)
-	}
-}
-
-// ByRiskReporter orders the results by risk_reporter terms.
-func ByRiskReporter(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
-	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborTerms(s, newRiskReporterStep(), append([]sql.OrderTerm{term}, terms...)...)
-	}
-}
-
-// ByRiskMaintainerCount orders the results by risk_maintainer count.
-func ByRiskMaintainerCount(opts ...sql.OrderTermOption) OrderOption {
-	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborsCount(s, newRiskMaintainerStep(), opts...)
-	}
-}
-
-// ByRiskMaintainer orders the results by risk_maintainer terms.
-func ByRiskMaintainer(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
-	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborTerms(s, newRiskMaintainerStep(), append([]sql.OrderTerm{term}, terms...)...)
 	}
 }
 func newCreatorStep() *sqlgraph.Step {
@@ -299,7 +228,14 @@ func newAdminStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
 		sqlgraph.To(AdminInverseTable, FieldID),
-		sqlgraph.Edge(sqlgraph.M2O, true, AdminTable, AdminColumn),
+		sqlgraph.Edge(sqlgraph.O2O, true, AdminTable, AdminColumn),
+	)
+}
+func newOccupationStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(OccupationInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.M2O, true, OccupationTable, OccupationColumn),
 	)
 }
 func newDepartmentStep() *sqlgraph.Step {
@@ -307,33 +243,5 @@ func newDepartmentStep() *sqlgraph.Step {
 		sqlgraph.From(Table, FieldID),
 		sqlgraph.To(DepartmentInverseTable, FieldID),
 		sqlgraph.Edge(sqlgraph.M2O, true, DepartmentTable, DepartmentColumn),
-	)
-}
-func newOccupationsStep() *sqlgraph.Step {
-	return sqlgraph.NewStep(
-		sqlgraph.From(Table, FieldID),
-		sqlgraph.To(OccupationsInverseTable, FieldID),
-		sqlgraph.Edge(sqlgraph.M2M, true, OccupationsTable, OccupationsPrimaryKey...),
-	)
-}
-func newIpcEventsStep() *sqlgraph.Step {
-	return sqlgraph.NewStep(
-		sqlgraph.From(Table, FieldID),
-		sqlgraph.To(IpcEventsInverseTable, FieldID),
-		sqlgraph.Edge(sqlgraph.M2M, true, IpcEventsTable, IpcEventsPrimaryKey...),
-	)
-}
-func newRiskReporterStep() *sqlgraph.Step {
-	return sqlgraph.NewStep(
-		sqlgraph.From(Table, FieldID),
-		sqlgraph.To(RiskReporterInverseTable, FieldID),
-		sqlgraph.Edge(sqlgraph.O2M, false, RiskReporterTable, RiskReporterColumn),
-	)
-}
-func newRiskMaintainerStep() *sqlgraph.Step {
-	return sqlgraph.NewStep(
-		sqlgraph.From(Table, FieldID),
-		sqlgraph.To(RiskMaintainerInverseTable, FieldID),
-		sqlgraph.Edge(sqlgraph.O2M, false, RiskMaintainerTable, RiskMaintainerColumn),
 	)
 }

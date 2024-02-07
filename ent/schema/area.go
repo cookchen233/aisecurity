@@ -29,9 +29,9 @@ func (Area) Fields() []ent.Field {
 // Edges of the Area.
 func (Area) Edges() []ent.Edge {
 	return []ent.Edge{
-		edge.From("creator", Admin.Type).Ref("area_creator").Field("created_by").Immutable().Unique().Required(),
-		edge.From("updater", Admin.Type).Ref("area_updater").Field("updated_by").Required().Unique(),
+		edge.From("creator", Admin.Type).Ref("area_creator").Field("creator_id").Immutable().Unique().Required(),
+		edge.From("updater", Admin.Type).Ref("area_updater").Field("updater_id").Required().Unique(),
 
-		edge.To("device_installation_area", DeviceInstallation.Type),
+		edge.To("device_installation", DeviceInstallation.Type),
 	}
 }

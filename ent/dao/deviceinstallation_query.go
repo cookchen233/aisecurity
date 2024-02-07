@@ -404,12 +404,12 @@ func (diq *DeviceInstallationQuery) WithDevice(opts ...func(*DeviceQuery)) *Devi
 // Example:
 //
 //	var v []struct {
-//		CreatedAt time.Time `json:"created_at"`
+//		CreateTime time.Time `json:"create_time"`
 //		Count int `json:"count,omitempty"`
 //	}
 //
 //	client.DeviceInstallation.Query().
-//		GroupBy(deviceinstallation.FieldCreatedAt).
+//		GroupBy(deviceinstallation.FieldCreateTime).
 //		Aggregate(dao.Count()).
 //		Scan(ctx, &v)
 func (diq *DeviceInstallationQuery) GroupBy(field string, fields ...string) *DeviceInstallationGroupBy {
@@ -427,11 +427,11 @@ func (diq *DeviceInstallationQuery) GroupBy(field string, fields ...string) *Dev
 // Example:
 //
 //	var v []struct {
-//		CreatedAt time.Time `json:"created_at"`
+//		CreateTime time.Time `json:"create_time"`
 //	}
 //
 //	client.DeviceInstallation.Query().
-//		Select(deviceinstallation.FieldCreatedAt).
+//		Select(deviceinstallation.FieldCreateTime).
 //		Scan(ctx, &v)
 func (diq *DeviceInstallationQuery) Select(fields ...string) *DeviceInstallationSelect {
 	diq.ctx.Fields = append(diq.ctx.Fields, fields...)
@@ -532,7 +532,7 @@ func (diq *DeviceInstallationQuery) loadCreator(ctx context.Context, query *Admi
 	ids := make([]int, 0, len(nodes))
 	nodeids := make(map[int][]*DeviceInstallation)
 	for i := range nodes {
-		fk := nodes[i].CreatedBy
+		fk := nodes[i].CreatorID
 		if _, ok := nodeids[fk]; !ok {
 			ids = append(ids, fk)
 		}
@@ -549,7 +549,7 @@ func (diq *DeviceInstallationQuery) loadCreator(ctx context.Context, query *Admi
 	for _, n := range neighbors {
 		nodes, ok := nodeids[n.ID]
 		if !ok {
-			return fmt.Errorf(`unexpected foreign-key "created_by" returned %v`, n.ID)
+			return fmt.Errorf(`unexpected foreign-key "creator_id" returned %v`, n.ID)
 		}
 		for i := range nodes {
 			assign(nodes[i], n)
@@ -561,7 +561,7 @@ func (diq *DeviceInstallationQuery) loadUpdater(ctx context.Context, query *Admi
 	ids := make([]int, 0, len(nodes))
 	nodeids := make(map[int][]*DeviceInstallation)
 	for i := range nodes {
-		fk := nodes[i].UpdatedBy
+		fk := nodes[i].UpdaterID
 		if _, ok := nodeids[fk]; !ok {
 			ids = append(ids, fk)
 		}
@@ -578,7 +578,7 @@ func (diq *DeviceInstallationQuery) loadUpdater(ctx context.Context, query *Admi
 	for _, n := range neighbors {
 		nodes, ok := nodeids[n.ID]
 		if !ok {
-			return fmt.Errorf(`unexpected foreign-key "updated_by" returned %v`, n.ID)
+			return fmt.Errorf(`unexpected foreign-key "updater_id" returned %v`, n.ID)
 		}
 		for i := range nodes {
 			assign(nodes[i], n)
@@ -671,10 +671,10 @@ func (diq *DeviceInstallationQuery) querySpec() *sqlgraph.QuerySpec {
 			}
 		}
 		if diq.withCreator != nil {
-			_spec.Node.AddColumnOnce(deviceinstallation.FieldCreatedBy)
+			_spec.Node.AddColumnOnce(deviceinstallation.FieldCreatorID)
 		}
 		if diq.withUpdater != nil {
-			_spec.Node.AddColumnOnce(deviceinstallation.FieldUpdatedBy)
+			_spec.Node.AddColumnOnce(deviceinstallation.FieldUpdaterID)
 		}
 		if diq.withArea != nil {
 			_spec.Node.AddColumnOnce(deviceinstallation.FieldAreaID)

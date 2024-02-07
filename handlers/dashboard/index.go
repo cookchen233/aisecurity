@@ -2,6 +2,7 @@ package dashboard
 
 import (
 	"aisecurity/ent/dao"
+	"aisecurity/expects"
 	"aisecurity/handlers"
 	"aisecurity/services"
 	"aisecurity/structs"
@@ -14,8 +15,11 @@ import (
 	"fmt"
 	"github.com/gin-contrib/sessions"
 	"github.com/gin-gonic/gin"
-	"github.com/pkg/errors"
+	"github.com/gogf/gf/v2/util/gconv"
+	"github.com/golang-jwt/jwt/v5"
 	"golang.org/x/crypto/bcrypt"
+	"os"
+	"time"
 )
 
 type IndexHandler struct {
@@ -31,7 +35,7 @@ func (h *IndexHandler) GetFilter(c *gin.Context) structs.IFilter {
 	return h.Filter
 }
 func (h *IndexHandler) GetEntity(c *gin.Context) structs.IEntity { return h.Entity }
-func (h *IndexHandler) SetRequestContext(c *gin.Context, h2 handlers.IHandler) {
+func (h *IndexHandler) SetRequestContext(c *gin.Context, childHandler handlers.IHandler) {
 	h.Service = services.NewAdminService()
 	h.Service.Ctx = c
 	h.Filter = &filters.Admin{}
@@ -39,37 +43,45 @@ func (h *IndexHandler) SetRequestContext(c *gin.Context, h2 handlers.IHandler) {
 	h.DashboardHandler.SetRequestContext(c, h)
 }
 
+func (h *IndexHandler) CreateSuperAdmin(c *gin.Context) {
+	saved, err := h.Service.CreateSuperAdmin()
+	if err != nil {
+		http.Error(c, utils.ErrorWithStack(err), 2000)
+		return
+	}
+	http.Success(c, saved)
+}
+
 func (h *IndexHandler) Login(c *gin.Context) {
 	var p posts.DashboardLogin
 	if err := c.BindJSON(&p); err != nil {
-		http.Error(c, err, 900)
+		http.Error(c, err, 1000)
 		return
 	}
 	if err := h.Validate(p); err != nil {
-		http.Error(c, err, 900)
+		http.Error(c, err, 1000)
 		return
 	}
 
 	admin, err := h.Service.GetByUserName(p.Username)
 	if err != nil {
 		if dao.IsNotFound(err) {
-			http.Error(c, errors.Wrap(fmt.Errorf(""), "用户名或密码错误"), 901)
+			http.Error(c, utils.ErrorWithStack(expects.NewClientError("用户名或密码错误")))
 			return
 		}
-		http.Error(c, err, 900)
+		http.Error(c, err, 1000)
 		return
 	}
 
-	// Compare the provided password with the stored hash
-	if err := bcrypt.CompareHashAndPassword([]byte(admin.Password), []byte(p.Password)); err != nil {
-		http.Error(c, errors.Wrap(fmt.Errorf(""), "用户名或密码错误"), 901)
+	a := admin.(*entities.Admin)
+	if err := bcrypt.CompareHashAndPassword([]byte(a.Password), []byte(p.Password)); err != nil {
+		http.Error(c, utils.ErrorWithStack(expects.NewClientError("用户名或密码错误")))
 		return
 	}
 
 	// Create a session and set its values
 	session := sessions.Default(c)
-	session.Set("authenticated", true)
-	session.Set("admin_id", admin.ID)
+	session.Set("admin_id", a.ID)
 	persistSeconds := 0
 	if p.PersistDays > 0 {
 		persistSeconds = max(p.PersistDays, 30) * 86400
@@ -81,28 +93,89 @@ func (h *IndexHandler) Login(c *gin.Context) {
 	})
 	err = session.Save()
 	if err != nil {
-		http.Error(c, err, 900)
+		http.Error(c, err, 1000)
 		return
 	}
-	http.Success(c, admin)
+
+	resp, err := h.GetJWTResponse(a, time.Duration(max(3600*24, persistSeconds))*time.Second)
+	if err != nil {
+		http.Error(c, err, 2000)
+		return
+	}
+
+	http.Success(c, resp)
 }
 
-func (h *IndexHandler) Logout(c *gin.Context) {
+func (h *IndexHandler) GetCurrentAdmin(c *gin.Context) {
+	jwtData, ex := c.Get("jwt_data")
+	if !ex {
+		http.Error(c, utils.ErrorWithStack(fmt.Errorf("jwt data does not exist")), 2000)
+		return
+	}
+	j := jwtData.(map[string]any)
 
+	admin, err := h.Service.GetByID(c.GetInt("admin_id"))
+	if err != nil {
+		http.Error(c, err, 2000)
+		return
+	}
+	a := admin.(*entities.Admin)
+
+	resp, err := h.GetJWTResponse(a, gconv.Duration(j["persist"]))
+	if err != nil {
+		http.Error(c, err, 2000)
+		return
+	}
+
+	http.Success(c, resp)
+}
+
+func (h *IndexHandler) GetJWTResponse(admin *entities.Admin, persist time.Duration) (*types.JWTResponse, error) {
+	var accessIDs []string
+	for _, v := range admin.Edges.Permissions {
+		accessIDs = append(accessIDs, v.AccessIds...)
+	}
+	jwtAdmin := types.JWTAdmin{
+		ID:          admin.ID,
+		DisplayName: admin.Nickname,
+		Email:       admin.Username,
+		PhotoURL:    admin.Avatar.URL,
+		PhoneNumber: admin.Username,
+		AccessIDs:   accessIDs,
+	}
+	jwtData := map[string]any{
+		"admin":   jwtAdmin,
+		"persist": persist,
+	}
+	// Create a new map for jwt claims
+	claims := jwt.MapClaims{
+		"exp":  time.Now().Add(persist).Unix(),
+		"data": jwtData,
+	}
+
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
+	tokenString, err := token.SignedString([]byte(os.Getenv("SESSION_KEY")))
+	if err != nil {
+		return nil, err
+	}
+	return &types.JWTResponse{
+		AccessToken: tokenString,
+		Admin:       jwtAdmin,
+	}, nil
 }
 
 func (h *IndexHandler) UploadImages(c *gin.Context) {
 	var basePath = "./data/uploads/images"
-	var maxSize int64 = 1024 * 1024 * 1
+	var maxSize int64 = 1024 * 1024 * 3
 	var allowedMimeTypes = types.NewAllowedMimeTypes([]string{
 		"image/jpeg",
 		"image/png",
 	})
 	form, _ := c.MultipartForm()
 	fileHeaders := form.File["files"]
-	uploadedFiles, err, code := h.UploadFile(c, basePath, fileHeaders, maxSize, allowedMimeTypes)
+	uploadedFiles, err := h.UploadFile(c, basePath, fileHeaders, maxSize, allowedMimeTypes)
 	if err != nil {
-		http.Error(c, utils.ErrorWithStack(err), code)
+		http.Error(c, utils.ErrorWithStack(err))
 		return
 	}
 	http.Success(c, uploadedFiles)

@@ -7,6 +7,7 @@ import (
 	"aisecurity/ent/dao/predicate"
 	"aisecurity/ent/dao/risk"
 	"aisecurity/ent/dao/risklocation"
+	"aisecurity/ent/dao/sweep"
 	"context"
 	"errors"
 	"fmt"
@@ -30,43 +31,43 @@ func (rlu *RiskLocationUpdate) Where(ps ...predicate.RiskLocation) *RiskLocation
 	return rlu
 }
 
-// SetDeletedAt sets the "deleted_at" field.
-func (rlu *RiskLocationUpdate) SetDeletedAt(t time.Time) *RiskLocationUpdate {
-	rlu.mutation.SetDeletedAt(t)
+// SetDeleteTime sets the "delete_time" field.
+func (rlu *RiskLocationUpdate) SetDeleteTime(t time.Time) *RiskLocationUpdate {
+	rlu.mutation.SetDeleteTime(t)
 	return rlu
 }
 
-// SetNillableDeletedAt sets the "deleted_at" field if the given value is not nil.
-func (rlu *RiskLocationUpdate) SetNillableDeletedAt(t *time.Time) *RiskLocationUpdate {
+// SetNillableDeleteTime sets the "delete_time" field if the given value is not nil.
+func (rlu *RiskLocationUpdate) SetNillableDeleteTime(t *time.Time) *RiskLocationUpdate {
 	if t != nil {
-		rlu.SetDeletedAt(*t)
+		rlu.SetDeleteTime(*t)
 	}
 	return rlu
 }
 
-// ClearDeletedAt clears the value of the "deleted_at" field.
-func (rlu *RiskLocationUpdate) ClearDeletedAt() *RiskLocationUpdate {
-	rlu.mutation.ClearDeletedAt()
+// ClearDeleteTime clears the value of the "delete_time" field.
+func (rlu *RiskLocationUpdate) ClearDeleteTime() *RiskLocationUpdate {
+	rlu.mutation.ClearDeleteTime()
 	return rlu
 }
 
-// SetUpdatedBy sets the "updated_by" field.
-func (rlu *RiskLocationUpdate) SetUpdatedBy(i int) *RiskLocationUpdate {
-	rlu.mutation.SetUpdatedBy(i)
+// SetUpdaterID sets the "updater_id" field.
+func (rlu *RiskLocationUpdate) SetUpdaterID(i int) *RiskLocationUpdate {
+	rlu.mutation.SetUpdaterID(i)
 	return rlu
 }
 
-// SetNillableUpdatedBy sets the "updated_by" field if the given value is not nil.
-func (rlu *RiskLocationUpdate) SetNillableUpdatedBy(i *int) *RiskLocationUpdate {
+// SetNillableUpdaterID sets the "updater_id" field if the given value is not nil.
+func (rlu *RiskLocationUpdate) SetNillableUpdaterID(i *int) *RiskLocationUpdate {
 	if i != nil {
-		rlu.SetUpdatedBy(*i)
+		rlu.SetUpdaterID(*i)
 	}
 	return rlu
 }
 
-// SetUpdatedAt sets the "updated_at" field.
-func (rlu *RiskLocationUpdate) SetUpdatedAt(t time.Time) *RiskLocationUpdate {
-	rlu.mutation.SetUpdatedAt(t)
+// SetUpdateTime sets the "update_time" field.
+func (rlu *RiskLocationUpdate) SetUpdateTime(t time.Time) *RiskLocationUpdate {
+	rlu.mutation.SetUpdateTime(t)
 	return rlu
 }
 
@@ -81,12 +82,6 @@ func (rlu *RiskLocationUpdate) SetNillableName(s *string) *RiskLocationUpdate {
 	if s != nil {
 		rlu.SetName(*s)
 	}
-	return rlu
-}
-
-// SetUpdaterID sets the "updater" edge to the Admin entity by ID.
-func (rlu *RiskLocationUpdate) SetUpdaterID(id int) *RiskLocationUpdate {
-	rlu.mutation.SetUpdaterID(id)
 	return rlu
 }
 
@@ -108,6 +103,21 @@ func (rlu *RiskLocationUpdate) AddRisk(r ...*Risk) *RiskLocationUpdate {
 		ids[i] = r[i].ID
 	}
 	return rlu.AddRiskIDs(ids...)
+}
+
+// AddSweepIDs adds the "sweep" edge to the Sweep entity by IDs.
+func (rlu *RiskLocationUpdate) AddSweepIDs(ids ...int) *RiskLocationUpdate {
+	rlu.mutation.AddSweepIDs(ids...)
+	return rlu
+}
+
+// AddSweep adds the "sweep" edges to the Sweep entity.
+func (rlu *RiskLocationUpdate) AddSweep(s ...*Sweep) *RiskLocationUpdate {
+	ids := make([]int, len(s))
+	for i := range s {
+		ids[i] = s[i].ID
+	}
+	return rlu.AddSweepIDs(ids...)
 }
 
 // Mutation returns the RiskLocationMutation object of the builder.
@@ -142,6 +152,27 @@ func (rlu *RiskLocationUpdate) RemoveRisk(r ...*Risk) *RiskLocationUpdate {
 	return rlu.RemoveRiskIDs(ids...)
 }
 
+// ClearSweep clears all "sweep" edges to the Sweep entity.
+func (rlu *RiskLocationUpdate) ClearSweep() *RiskLocationUpdate {
+	rlu.mutation.ClearSweep()
+	return rlu
+}
+
+// RemoveSweepIDs removes the "sweep" edge to Sweep entities by IDs.
+func (rlu *RiskLocationUpdate) RemoveSweepIDs(ids ...int) *RiskLocationUpdate {
+	rlu.mutation.RemoveSweepIDs(ids...)
+	return rlu
+}
+
+// RemoveSweep removes "sweep" edges to Sweep entities.
+func (rlu *RiskLocationUpdate) RemoveSweep(s ...*Sweep) *RiskLocationUpdate {
+	ids := make([]int, len(s))
+	for i := range s {
+		ids[i] = s[i].ID
+	}
+	return rlu.RemoveSweepIDs(ids...)
+}
+
 // Save executes the query and returns the number of nodes affected by the update operation.
 func (rlu *RiskLocationUpdate) Save(ctx context.Context) (int, error) {
 	if err := rlu.defaults(); err != nil {
@@ -174,21 +205,21 @@ func (rlu *RiskLocationUpdate) ExecX(ctx context.Context) {
 
 // defaults sets the default values of the builder before save.
 func (rlu *RiskLocationUpdate) defaults() error {
-	if _, ok := rlu.mutation.UpdatedAt(); !ok {
-		if risklocation.UpdateDefaultUpdatedAt == nil {
-			return fmt.Errorf("dao: uninitialized risklocation.UpdateDefaultUpdatedAt (forgotten import dao/runtime?)")
+	if _, ok := rlu.mutation.UpdateTime(); !ok {
+		if risklocation.UpdateDefaultUpdateTime == nil {
+			return fmt.Errorf("dao: uninitialized risklocation.UpdateDefaultUpdateTime (forgotten import dao/runtime?)")
 		}
-		v := risklocation.UpdateDefaultUpdatedAt()
-		rlu.mutation.SetUpdatedAt(v)
+		v := risklocation.UpdateDefaultUpdateTime()
+		rlu.mutation.SetUpdateTime(v)
 	}
 	return nil
 }
 
 // check runs all checks and user-defined validators on the builder.
 func (rlu *RiskLocationUpdate) check() error {
-	if v, ok := rlu.mutation.UpdatedBy(); ok {
-		if err := risklocation.UpdatedByValidator(v); err != nil {
-			return &ValidationError{Name: "updated_by", err: fmt.Errorf(`dao: validator failed for field "RiskLocation.updated_by": %w`, err)}
+	if v, ok := rlu.mutation.UpdaterID(); ok {
+		if err := risklocation.UpdaterIDValidator(v); err != nil {
+			return &ValidationError{Name: "updater_id", err: fmt.Errorf(`dao: validator failed for field "RiskLocation.updater_id": %w`, err)}
 		}
 	}
 	if v, ok := rlu.mutation.Name(); ok {
@@ -217,14 +248,14 @@ func (rlu *RiskLocationUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			}
 		}
 	}
-	if value, ok := rlu.mutation.DeletedAt(); ok {
-		_spec.SetField(risklocation.FieldDeletedAt, field.TypeTime, value)
+	if value, ok := rlu.mutation.DeleteTime(); ok {
+		_spec.SetField(risklocation.FieldDeleteTime, field.TypeTime, value)
 	}
-	if rlu.mutation.DeletedAtCleared() {
-		_spec.ClearField(risklocation.FieldDeletedAt, field.TypeTime)
+	if rlu.mutation.DeleteTimeCleared() {
+		_spec.ClearField(risklocation.FieldDeleteTime, field.TypeTime)
 	}
-	if value, ok := rlu.mutation.UpdatedAt(); ok {
-		_spec.SetField(risklocation.FieldUpdatedAt, field.TypeTime, value)
+	if value, ok := rlu.mutation.UpdateTime(); ok {
+		_spec.SetField(risklocation.FieldUpdateTime, field.TypeTime, value)
 	}
 	if value, ok := rlu.mutation.Name(); ok {
 		_spec.SetField(risklocation.FieldName, field.TypeString, value)
@@ -303,6 +334,51 @@ func (rlu *RiskLocationUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
+	if rlu.mutation.SweepCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   risklocation.SweepTable,
+			Columns: []string{risklocation.SweepColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(sweep.FieldID, field.TypeInt),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := rlu.mutation.RemovedSweepIDs(); len(nodes) > 0 && !rlu.mutation.SweepCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   risklocation.SweepTable,
+			Columns: []string{risklocation.SweepColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(sweep.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := rlu.mutation.SweepIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   risklocation.SweepTable,
+			Columns: []string{risklocation.SweepColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(sweep.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
 	if n, err = sqlgraph.UpdateNodes(ctx, rlu.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
 			err = &NotFoundError{risklocation.Label}
@@ -323,43 +399,43 @@ type RiskLocationUpdateOne struct {
 	mutation *RiskLocationMutation
 }
 
-// SetDeletedAt sets the "deleted_at" field.
-func (rluo *RiskLocationUpdateOne) SetDeletedAt(t time.Time) *RiskLocationUpdateOne {
-	rluo.mutation.SetDeletedAt(t)
+// SetDeleteTime sets the "delete_time" field.
+func (rluo *RiskLocationUpdateOne) SetDeleteTime(t time.Time) *RiskLocationUpdateOne {
+	rluo.mutation.SetDeleteTime(t)
 	return rluo
 }
 
-// SetNillableDeletedAt sets the "deleted_at" field if the given value is not nil.
-func (rluo *RiskLocationUpdateOne) SetNillableDeletedAt(t *time.Time) *RiskLocationUpdateOne {
+// SetNillableDeleteTime sets the "delete_time" field if the given value is not nil.
+func (rluo *RiskLocationUpdateOne) SetNillableDeleteTime(t *time.Time) *RiskLocationUpdateOne {
 	if t != nil {
-		rluo.SetDeletedAt(*t)
+		rluo.SetDeleteTime(*t)
 	}
 	return rluo
 }
 
-// ClearDeletedAt clears the value of the "deleted_at" field.
-func (rluo *RiskLocationUpdateOne) ClearDeletedAt() *RiskLocationUpdateOne {
-	rluo.mutation.ClearDeletedAt()
+// ClearDeleteTime clears the value of the "delete_time" field.
+func (rluo *RiskLocationUpdateOne) ClearDeleteTime() *RiskLocationUpdateOne {
+	rluo.mutation.ClearDeleteTime()
 	return rluo
 }
 
-// SetUpdatedBy sets the "updated_by" field.
-func (rluo *RiskLocationUpdateOne) SetUpdatedBy(i int) *RiskLocationUpdateOne {
-	rluo.mutation.SetUpdatedBy(i)
+// SetUpdaterID sets the "updater_id" field.
+func (rluo *RiskLocationUpdateOne) SetUpdaterID(i int) *RiskLocationUpdateOne {
+	rluo.mutation.SetUpdaterID(i)
 	return rluo
 }
 
-// SetNillableUpdatedBy sets the "updated_by" field if the given value is not nil.
-func (rluo *RiskLocationUpdateOne) SetNillableUpdatedBy(i *int) *RiskLocationUpdateOne {
+// SetNillableUpdaterID sets the "updater_id" field if the given value is not nil.
+func (rluo *RiskLocationUpdateOne) SetNillableUpdaterID(i *int) *RiskLocationUpdateOne {
 	if i != nil {
-		rluo.SetUpdatedBy(*i)
+		rluo.SetUpdaterID(*i)
 	}
 	return rluo
 }
 
-// SetUpdatedAt sets the "updated_at" field.
-func (rluo *RiskLocationUpdateOne) SetUpdatedAt(t time.Time) *RiskLocationUpdateOne {
-	rluo.mutation.SetUpdatedAt(t)
+// SetUpdateTime sets the "update_time" field.
+func (rluo *RiskLocationUpdateOne) SetUpdateTime(t time.Time) *RiskLocationUpdateOne {
+	rluo.mutation.SetUpdateTime(t)
 	return rluo
 }
 
@@ -374,12 +450,6 @@ func (rluo *RiskLocationUpdateOne) SetNillableName(s *string) *RiskLocationUpdat
 	if s != nil {
 		rluo.SetName(*s)
 	}
-	return rluo
-}
-
-// SetUpdaterID sets the "updater" edge to the Admin entity by ID.
-func (rluo *RiskLocationUpdateOne) SetUpdaterID(id int) *RiskLocationUpdateOne {
-	rluo.mutation.SetUpdaterID(id)
 	return rluo
 }
 
@@ -401,6 +471,21 @@ func (rluo *RiskLocationUpdateOne) AddRisk(r ...*Risk) *RiskLocationUpdateOne {
 		ids[i] = r[i].ID
 	}
 	return rluo.AddRiskIDs(ids...)
+}
+
+// AddSweepIDs adds the "sweep" edge to the Sweep entity by IDs.
+func (rluo *RiskLocationUpdateOne) AddSweepIDs(ids ...int) *RiskLocationUpdateOne {
+	rluo.mutation.AddSweepIDs(ids...)
+	return rluo
+}
+
+// AddSweep adds the "sweep" edges to the Sweep entity.
+func (rluo *RiskLocationUpdateOne) AddSweep(s ...*Sweep) *RiskLocationUpdateOne {
+	ids := make([]int, len(s))
+	for i := range s {
+		ids[i] = s[i].ID
+	}
+	return rluo.AddSweepIDs(ids...)
 }
 
 // Mutation returns the RiskLocationMutation object of the builder.
@@ -433,6 +518,27 @@ func (rluo *RiskLocationUpdateOne) RemoveRisk(r ...*Risk) *RiskLocationUpdateOne
 		ids[i] = r[i].ID
 	}
 	return rluo.RemoveRiskIDs(ids...)
+}
+
+// ClearSweep clears all "sweep" edges to the Sweep entity.
+func (rluo *RiskLocationUpdateOne) ClearSweep() *RiskLocationUpdateOne {
+	rluo.mutation.ClearSweep()
+	return rluo
+}
+
+// RemoveSweepIDs removes the "sweep" edge to Sweep entities by IDs.
+func (rluo *RiskLocationUpdateOne) RemoveSweepIDs(ids ...int) *RiskLocationUpdateOne {
+	rluo.mutation.RemoveSweepIDs(ids...)
+	return rluo
+}
+
+// RemoveSweep removes "sweep" edges to Sweep entities.
+func (rluo *RiskLocationUpdateOne) RemoveSweep(s ...*Sweep) *RiskLocationUpdateOne {
+	ids := make([]int, len(s))
+	for i := range s {
+		ids[i] = s[i].ID
+	}
+	return rluo.RemoveSweepIDs(ids...)
 }
 
 // Where appends a list predicates to the RiskLocationUpdate builder.
@@ -480,21 +586,21 @@ func (rluo *RiskLocationUpdateOne) ExecX(ctx context.Context) {
 
 // defaults sets the default values of the builder before save.
 func (rluo *RiskLocationUpdateOne) defaults() error {
-	if _, ok := rluo.mutation.UpdatedAt(); !ok {
-		if risklocation.UpdateDefaultUpdatedAt == nil {
-			return fmt.Errorf("dao: uninitialized risklocation.UpdateDefaultUpdatedAt (forgotten import dao/runtime?)")
+	if _, ok := rluo.mutation.UpdateTime(); !ok {
+		if risklocation.UpdateDefaultUpdateTime == nil {
+			return fmt.Errorf("dao: uninitialized risklocation.UpdateDefaultUpdateTime (forgotten import dao/runtime?)")
 		}
-		v := risklocation.UpdateDefaultUpdatedAt()
-		rluo.mutation.SetUpdatedAt(v)
+		v := risklocation.UpdateDefaultUpdateTime()
+		rluo.mutation.SetUpdateTime(v)
 	}
 	return nil
 }
 
 // check runs all checks and user-defined validators on the builder.
 func (rluo *RiskLocationUpdateOne) check() error {
-	if v, ok := rluo.mutation.UpdatedBy(); ok {
-		if err := risklocation.UpdatedByValidator(v); err != nil {
-			return &ValidationError{Name: "updated_by", err: fmt.Errorf(`dao: validator failed for field "RiskLocation.updated_by": %w`, err)}
+	if v, ok := rluo.mutation.UpdaterID(); ok {
+		if err := risklocation.UpdaterIDValidator(v); err != nil {
+			return &ValidationError{Name: "updater_id", err: fmt.Errorf(`dao: validator failed for field "RiskLocation.updater_id": %w`, err)}
 		}
 	}
 	if v, ok := rluo.mutation.Name(); ok {
@@ -540,14 +646,14 @@ func (rluo *RiskLocationUpdateOne) sqlSave(ctx context.Context) (_node *RiskLoca
 			}
 		}
 	}
-	if value, ok := rluo.mutation.DeletedAt(); ok {
-		_spec.SetField(risklocation.FieldDeletedAt, field.TypeTime, value)
+	if value, ok := rluo.mutation.DeleteTime(); ok {
+		_spec.SetField(risklocation.FieldDeleteTime, field.TypeTime, value)
 	}
-	if rluo.mutation.DeletedAtCleared() {
-		_spec.ClearField(risklocation.FieldDeletedAt, field.TypeTime)
+	if rluo.mutation.DeleteTimeCleared() {
+		_spec.ClearField(risklocation.FieldDeleteTime, field.TypeTime)
 	}
-	if value, ok := rluo.mutation.UpdatedAt(); ok {
-		_spec.SetField(risklocation.FieldUpdatedAt, field.TypeTime, value)
+	if value, ok := rluo.mutation.UpdateTime(); ok {
+		_spec.SetField(risklocation.FieldUpdateTime, field.TypeTime, value)
 	}
 	if value, ok := rluo.mutation.Name(); ok {
 		_spec.SetField(risklocation.FieldName, field.TypeString, value)
@@ -619,6 +725,51 @@ func (rluo *RiskLocationUpdateOne) sqlSave(ctx context.Context) (_node *RiskLoca
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(risk.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if rluo.mutation.SweepCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   risklocation.SweepTable,
+			Columns: []string{risklocation.SweepColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(sweep.FieldID, field.TypeInt),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := rluo.mutation.RemovedSweepIDs(); len(nodes) > 0 && !rluo.mutation.SweepCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   risklocation.SweepTable,
+			Columns: []string{risklocation.SweepColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(sweep.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := rluo.mutation.SweepIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   risklocation.SweepTable,
+			Columns: []string{risklocation.SweepColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(sweep.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {

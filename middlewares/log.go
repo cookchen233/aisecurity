@@ -1,7 +1,6 @@
 package middlewares
 
 import (
-	"aisecurity/properties"
 	"aisecurity/utils"
 	http2 "aisecurity/utils/http"
 	"bytes"
@@ -190,7 +189,7 @@ func Recovery() gin.HandlerFunc {
 						zap.String("panicRecoveredTime", time.Now().Format(time.RFC3339)),
 					)
 				}
-				http2.Error(c, panicErr, properties.ServerError)
+				http2.Error(c, panicErr)
 				return
 			}
 		}()

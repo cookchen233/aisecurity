@@ -4,7 +4,6 @@ package dao
 
 import (
 	"aisecurity/ent/dao/admin"
-	"aisecurity/ent/dao/employee"
 	"aisecurity/ent/dao/predicate"
 	"aisecurity/ent/dao/risk"
 	"aisecurity/ent/dao/riskcategory"
@@ -29,8 +28,7 @@ type RiskQuery struct {
 	withUpdater      *AdminQuery
 	withRiskCategory *RiskCategoryQuery
 	withRiskLocation *RiskLocationQuery
-	withReporter     *EmployeeQuery
-	withMaintainer   *EmployeeQuery
+	withMaintainer   *AdminQuery
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
 	path func(context.Context) (*sql.Selector, error)
@@ -155,31 +153,9 @@ func (rq *RiskQuery) QueryRiskLocation() *RiskLocationQuery {
 	return query
 }
 
-// QueryReporter chains the current query on the "reporter" edge.
-func (rq *RiskQuery) QueryReporter() *EmployeeQuery {
-	query := (&EmployeeClient{config: rq.config}).Query()
-	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
-		if err := rq.prepareQuery(ctx); err != nil {
-			return nil, err
-		}
-		selector := rq.sqlQuery(ctx)
-		if err := selector.Err(); err != nil {
-			return nil, err
-		}
-		step := sqlgraph.NewStep(
-			sqlgraph.From(risk.Table, risk.FieldID, selector),
-			sqlgraph.To(employee.Table, employee.FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, true, risk.ReporterTable, risk.ReporterColumn),
-		)
-		fromU = sqlgraph.SetNeighbors(rq.driver.Dialect(), step)
-		return fromU, nil
-	}
-	return query
-}
-
 // QueryMaintainer chains the current query on the "maintainer" edge.
-func (rq *RiskQuery) QueryMaintainer() *EmployeeQuery {
-	query := (&EmployeeClient{config: rq.config}).Query()
+func (rq *RiskQuery) QueryMaintainer() *AdminQuery {
+	query := (&AdminClient{config: rq.config}).Query()
 	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
 		if err := rq.prepareQuery(ctx); err != nil {
 			return nil, err
@@ -190,7 +166,7 @@ func (rq *RiskQuery) QueryMaintainer() *EmployeeQuery {
 		}
 		step := sqlgraph.NewStep(
 			sqlgraph.From(risk.Table, risk.FieldID, selector),
-			sqlgraph.To(employee.Table, employee.FieldID),
+			sqlgraph.To(admin.Table, admin.FieldID),
 			sqlgraph.Edge(sqlgraph.M2O, true, risk.MaintainerTable, risk.MaintainerColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(rq.driver.Dialect(), step)
@@ -395,7 +371,6 @@ func (rq *RiskQuery) Clone() *RiskQuery {
 		withUpdater:      rq.withUpdater.Clone(),
 		withRiskCategory: rq.withRiskCategory.Clone(),
 		withRiskLocation: rq.withRiskLocation.Clone(),
-		withReporter:     rq.withReporter.Clone(),
 		withMaintainer:   rq.withMaintainer.Clone(),
 		// clone intermediate query.
 		sql:  rq.sql.Clone(),
@@ -447,21 +422,10 @@ func (rq *RiskQuery) WithRiskLocation(opts ...func(*RiskLocationQuery)) *RiskQue
 	return rq
 }
 
-// WithReporter tells the query-builder to eager-load the nodes that are connected to
-// the "reporter" edge. The optional arguments are used to configure the query builder of the edge.
-func (rq *RiskQuery) WithReporter(opts ...func(*EmployeeQuery)) *RiskQuery {
-	query := (&EmployeeClient{config: rq.config}).Query()
-	for _, opt := range opts {
-		opt(query)
-	}
-	rq.withReporter = query
-	return rq
-}
-
 // WithMaintainer tells the query-builder to eager-load the nodes that are connected to
 // the "maintainer" edge. The optional arguments are used to configure the query builder of the edge.
-func (rq *RiskQuery) WithMaintainer(opts ...func(*EmployeeQuery)) *RiskQuery {
-	query := (&EmployeeClient{config: rq.config}).Query()
+func (rq *RiskQuery) WithMaintainer(opts ...func(*AdminQuery)) *RiskQuery {
+	query := (&AdminClient{config: rq.config}).Query()
 	for _, opt := range opts {
 		opt(query)
 	}
@@ -475,12 +439,12 @@ func (rq *RiskQuery) WithMaintainer(opts ...func(*EmployeeQuery)) *RiskQuery {
 // Example:
 //
 //	var v []struct {
-//		CreatedAt time.Time `json:"created_at"`
+//		CreateTime time.Time `json:"create_time"`
 //		Count int `json:"count,omitempty"`
 //	}
 //
 //	client.Risk.Query().
-//		GroupBy(risk.FieldCreatedAt).
+//		GroupBy(risk.FieldCreateTime).
 //		Aggregate(dao.Count()).
 //		Scan(ctx, &v)
 func (rq *RiskQuery) GroupBy(field string, fields ...string) *RiskGroupBy {
@@ -498,11 +462,11 @@ func (rq *RiskQuery) GroupBy(field string, fields ...string) *RiskGroupBy {
 // Example:
 //
 //	var v []struct {
-//		CreatedAt time.Time `json:"created_at"`
+//		CreateTime time.Time `json:"create_time"`
 //	}
 //
 //	client.Risk.Query().
-//		Select(risk.FieldCreatedAt).
+//		Select(risk.FieldCreateTime).
 //		Scan(ctx, &v)
 func (rq *RiskQuery) Select(fields ...string) *RiskSelect {
 	rq.ctx.Fields = append(rq.ctx.Fields, fields...)
@@ -547,12 +511,11 @@ func (rq *RiskQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Risk, e
 	var (
 		nodes       = []*Risk{}
 		_spec       = rq.querySpec()
-		loadedTypes = [6]bool{
+		loadedTypes = [5]bool{
 			rq.withCreator != nil,
 			rq.withUpdater != nil,
 			rq.withRiskCategory != nil,
 			rq.withRiskLocation != nil,
-			rq.withReporter != nil,
 			rq.withMaintainer != nil,
 		}
 	)
@@ -598,15 +561,9 @@ func (rq *RiskQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Risk, e
 			return nil, err
 		}
 	}
-	if query := rq.withReporter; query != nil {
-		if err := rq.loadReporter(ctx, query, nodes, nil,
-			func(n *Risk, e *Employee) { n.Edges.Reporter = e }); err != nil {
-			return nil, err
-		}
-	}
 	if query := rq.withMaintainer; query != nil {
 		if err := rq.loadMaintainer(ctx, query, nodes, nil,
-			func(n *Risk, e *Employee) { n.Edges.Maintainer = e }); err != nil {
+			func(n *Risk, e *Admin) { n.Edges.Maintainer = e }); err != nil {
 			return nil, err
 		}
 	}
@@ -617,7 +574,7 @@ func (rq *RiskQuery) loadCreator(ctx context.Context, query *AdminQuery, nodes [
 	ids := make([]int, 0, len(nodes))
 	nodeids := make(map[int][]*Risk)
 	for i := range nodes {
-		fk := nodes[i].CreatedBy
+		fk := nodes[i].CreatorID
 		if _, ok := nodeids[fk]; !ok {
 			ids = append(ids, fk)
 		}
@@ -634,7 +591,7 @@ func (rq *RiskQuery) loadCreator(ctx context.Context, query *AdminQuery, nodes [
 	for _, n := range neighbors {
 		nodes, ok := nodeids[n.ID]
 		if !ok {
-			return fmt.Errorf(`unexpected foreign-key "created_by" returned %v`, n.ID)
+			return fmt.Errorf(`unexpected foreign-key "creator_id" returned %v`, n.ID)
 		}
 		for i := range nodes {
 			assign(nodes[i], n)
@@ -646,7 +603,7 @@ func (rq *RiskQuery) loadUpdater(ctx context.Context, query *AdminQuery, nodes [
 	ids := make([]int, 0, len(nodes))
 	nodeids := make(map[int][]*Risk)
 	for i := range nodes {
-		fk := nodes[i].UpdatedBy
+		fk := nodes[i].UpdaterID
 		if _, ok := nodeids[fk]; !ok {
 			ids = append(ids, fk)
 		}
@@ -663,7 +620,7 @@ func (rq *RiskQuery) loadUpdater(ctx context.Context, query *AdminQuery, nodes [
 	for _, n := range neighbors {
 		nodes, ok := nodeids[n.ID]
 		if !ok {
-			return fmt.Errorf(`unexpected foreign-key "updated_by" returned %v`, n.ID)
+			return fmt.Errorf(`unexpected foreign-key "updater_id" returned %v`, n.ID)
 		}
 		for i := range nodes {
 			assign(nodes[i], n)
@@ -729,36 +686,7 @@ func (rq *RiskQuery) loadRiskLocation(ctx context.Context, query *RiskLocationQu
 	}
 	return nil
 }
-func (rq *RiskQuery) loadReporter(ctx context.Context, query *EmployeeQuery, nodes []*Risk, init func(*Risk), assign func(*Risk, *Employee)) error {
-	ids := make([]int, 0, len(nodes))
-	nodeids := make(map[int][]*Risk)
-	for i := range nodes {
-		fk := nodes[i].ReporterID
-		if _, ok := nodeids[fk]; !ok {
-			ids = append(ids, fk)
-		}
-		nodeids[fk] = append(nodeids[fk], nodes[i])
-	}
-	if len(ids) == 0 {
-		return nil
-	}
-	query.Where(employee.IDIn(ids...))
-	neighbors, err := query.All(ctx)
-	if err != nil {
-		return err
-	}
-	for _, n := range neighbors {
-		nodes, ok := nodeids[n.ID]
-		if !ok {
-			return fmt.Errorf(`unexpected foreign-key "reporter_id" returned %v`, n.ID)
-		}
-		for i := range nodes {
-			assign(nodes[i], n)
-		}
-	}
-	return nil
-}
-func (rq *RiskQuery) loadMaintainer(ctx context.Context, query *EmployeeQuery, nodes []*Risk, init func(*Risk), assign func(*Risk, *Employee)) error {
+func (rq *RiskQuery) loadMaintainer(ctx context.Context, query *AdminQuery, nodes []*Risk, init func(*Risk), assign func(*Risk, *Admin)) error {
 	ids := make([]int, 0, len(nodes))
 	nodeids := make(map[int][]*Risk)
 	for i := range nodes {
@@ -771,7 +699,7 @@ func (rq *RiskQuery) loadMaintainer(ctx context.Context, query *EmployeeQuery, n
 	if len(ids) == 0 {
 		return nil
 	}
-	query.Where(employee.IDIn(ids...))
+	query.Where(admin.IDIn(ids...))
 	neighbors, err := query.All(ctx)
 	if err != nil {
 		return err
@@ -814,19 +742,16 @@ func (rq *RiskQuery) querySpec() *sqlgraph.QuerySpec {
 			}
 		}
 		if rq.withCreator != nil {
-			_spec.Node.AddColumnOnce(risk.FieldCreatedBy)
+			_spec.Node.AddColumnOnce(risk.FieldCreatorID)
 		}
 		if rq.withUpdater != nil {
-			_spec.Node.AddColumnOnce(risk.FieldUpdatedBy)
+			_spec.Node.AddColumnOnce(risk.FieldUpdaterID)
 		}
 		if rq.withRiskCategory != nil {
 			_spec.Node.AddColumnOnce(risk.FieldRiskCategoryID)
 		}
 		if rq.withRiskLocation != nil {
 			_spec.Node.AddColumnOnce(risk.FieldRiskLocationID)
-		}
-		if rq.withReporter != nil {
-			_spec.Node.AddColumnOnce(risk.FieldReporterID)
 		}
 		if rq.withMaintainer != nil {
 			_spec.Node.AddColumnOnce(risk.FieldMaintainerID)

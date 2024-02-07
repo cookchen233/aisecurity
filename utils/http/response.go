@@ -2,41 +2,46 @@ package http
 
 import (
 	"aisecurity/expects"
-	"aisecurity/properties"
+	"aisecurity/structs"
 	"aisecurity/utils"
 	"github.com/gin-gonic/gin"
 	"github.com/pkg/errors"
 	"net/http"
 	"reflect"
-	"strings"
 )
 
 type Payload struct {
-	Code    properties.ResponseCode `json:"code"`
-	Message string                  `json:"message"`
-	Data    interface{}             `json:"data"`
-	Ref     string                  `json:"ref"`
-	Traceid string                  `json:"traceid"`
+	Code    int         `json:"code"`
+	Message string      `json:"message"`
+	Data    interface{} `json:"data"`
+	Ref     string      `json:"ref"`
+	Traceid string      `json:"traceid"`
 }
 
 func Success(c *gin.Context, data interface{}) {
-	data = prepareData(data)
-	traceid, ex := c.Get("traceid")
-	if !ex {
-		traceid = ""
-	}
-	c.JSON(http.StatusOK, Payload{
+	data2 := prepareData(data)
+	traceid := c.GetString("traceid")
+	payload := Payload{
 		Code:    http.StatusOK,
 		Message: "成功",
-		Data:    data,
-		Traceid: traceid.(string),
-	})
+		Data:    data2,
+		Traceid: traceid,
+	}
+	c.Set("payload", payload)
+	c.JSON(http.StatusOK, payload)
 	if len(c.Errors) > 0 {
 		Error(c, c.Errors[0], 1000)
 	}
 }
 
 func prepareData(data interface{}) interface{} {
+	_, ok := data.(structs.IEntity)
+	if ok {
+		return struct {
+			Item interface{} `json:"item"`
+		}{data}
+	}
+
 	varValue := reflect.ValueOf(data)
 	varType := reflect.TypeOf(data)
 
@@ -56,14 +61,12 @@ func prepareData(data interface{}) interface{} {
 		return struct {
 			List interface{} `json:"list"`
 		}{data}
-	case reflect.Struct:
-		return prepareStructData(varValue, varType, data)
-	case reflect.Pointer:
-		return preparePointerData(varValue, data)
+	//case reflect.Struct:
+	//	return prepareStructData(varValue, varType, data)
+	//case reflect.Pointer:
+	//	return preparePointerData(varValue, data)
 	default:
-		return struct {
-			Value interface{} `json:"value"`
-		}{data}
+		return data
 	}
 }
 
@@ -106,28 +109,15 @@ func preparePointerData(varValue reflect.Value, data interface{}) interface{} {
 	return dereferencedValue.Interface()
 }
 
-func SuccessWithCode(c *gin.Context, data interface{}, code properties.ResponseCode) {
-	data = prepareData(data)
-	traceid, ex := c.Get("traceid")
-	if !ex {
-		traceid = ""
+func Error(c *gin.Context, err error, codes ...int) {
+	code := 3000
+	if len(codes) > 0 {
+		code = codes[0]
 	}
-	c.JSON(http.StatusOK, Payload{
-		Code:    code,
-		Message: "成功",
-		Data:    data,
-		Traceid: traceid.(string),
-	})
-	if len(c.Errors) > 0 {
-		Error(c, c.Errors[0], 1000)
-	}
-}
-
-func Error(c *gin.Context, err error, code properties.ResponseCode) {
 	var statusCode = c.Writer.Status()
 	if !c.Writer.Written() {
 		statusCode = http.StatusBadRequest
-		if code >= 1000 {
+		if code >= 2000 {
 			statusCode = http.StatusInternalServerError
 		}
 		c.Status(statusCode)
@@ -139,34 +129,27 @@ func Error(c *gin.Context, err error, code properties.ResponseCode) {
 		//c.Error(err)
 	}
 
-	// if specified code
-	var errMessage = code.Message()
-
-	// if wrapped messages
-	cause := errors.Cause(err)
-	fullErrMsg := err.Error()
-	causeErrMsg := cause.Error()
-	if fullErrMsg != causeErrMsg {
-		errMessage = strings.TrimRight(strings.TrimSuffix(fullErrMsg, causeErrMsg), ": ")
-	}
-
-	// if err is IExpect type
-	if code == properties.ServerError || code == properties.RequestError {
-		var expect expects.IExpect
-		if errors.As(err, &expect) {
-			errMessage = expect.ExpectedError()
+	var responseError expects.IExpect
+	var expect expects.IExpect
+	if errors.As(err, &expect) {
+		responseError = expect
+	} else {
+		if code >= 2000 {
+			responseError = expects.NewServerError("服务器发生错误, 请稍后再试")
+		} else {
+			responseError = expects.NewClientError("请求数据错误, 请检查")
 		}
 	}
 
-	traceid, ex := c.Get("traceid")
-	if !ex {
-		traceid = ""
-	}
-	c.AbortWithStatusJSON(statusCode, Payload{
-		code,
-		errMessage,
+	traceid := c.GetString("traceid")
+	payload := Payload{
+		responseError.GetCode(),
+		responseError.GetMessage(),
 		nil,
-		fullErrMsg,
-		traceid.(string),
-	})
+		err.Error(),
+		traceid,
+	}
+	c.AbortWithStatusJSON(statusCode, payload)
+	c.Set("payload", payload)
+
 }

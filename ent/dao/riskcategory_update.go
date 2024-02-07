@@ -7,6 +7,7 @@ import (
 	"aisecurity/ent/dao/predicate"
 	"aisecurity/ent/dao/risk"
 	"aisecurity/ent/dao/riskcategory"
+	"aisecurity/ent/dao/sweep"
 	"context"
 	"errors"
 	"fmt"
@@ -30,43 +31,43 @@ func (rcu *RiskCategoryUpdate) Where(ps ...predicate.RiskCategory) *RiskCategory
 	return rcu
 }
 
-// SetDeletedAt sets the "deleted_at" field.
-func (rcu *RiskCategoryUpdate) SetDeletedAt(t time.Time) *RiskCategoryUpdate {
-	rcu.mutation.SetDeletedAt(t)
+// SetDeleteTime sets the "delete_time" field.
+func (rcu *RiskCategoryUpdate) SetDeleteTime(t time.Time) *RiskCategoryUpdate {
+	rcu.mutation.SetDeleteTime(t)
 	return rcu
 }
 
-// SetNillableDeletedAt sets the "deleted_at" field if the given value is not nil.
-func (rcu *RiskCategoryUpdate) SetNillableDeletedAt(t *time.Time) *RiskCategoryUpdate {
+// SetNillableDeleteTime sets the "delete_time" field if the given value is not nil.
+func (rcu *RiskCategoryUpdate) SetNillableDeleteTime(t *time.Time) *RiskCategoryUpdate {
 	if t != nil {
-		rcu.SetDeletedAt(*t)
+		rcu.SetDeleteTime(*t)
 	}
 	return rcu
 }
 
-// ClearDeletedAt clears the value of the "deleted_at" field.
-func (rcu *RiskCategoryUpdate) ClearDeletedAt() *RiskCategoryUpdate {
-	rcu.mutation.ClearDeletedAt()
+// ClearDeleteTime clears the value of the "delete_time" field.
+func (rcu *RiskCategoryUpdate) ClearDeleteTime() *RiskCategoryUpdate {
+	rcu.mutation.ClearDeleteTime()
 	return rcu
 }
 
-// SetUpdatedBy sets the "updated_by" field.
-func (rcu *RiskCategoryUpdate) SetUpdatedBy(i int) *RiskCategoryUpdate {
-	rcu.mutation.SetUpdatedBy(i)
+// SetUpdaterID sets the "updater_id" field.
+func (rcu *RiskCategoryUpdate) SetUpdaterID(i int) *RiskCategoryUpdate {
+	rcu.mutation.SetUpdaterID(i)
 	return rcu
 }
 
-// SetNillableUpdatedBy sets the "updated_by" field if the given value is not nil.
-func (rcu *RiskCategoryUpdate) SetNillableUpdatedBy(i *int) *RiskCategoryUpdate {
+// SetNillableUpdaterID sets the "updater_id" field if the given value is not nil.
+func (rcu *RiskCategoryUpdate) SetNillableUpdaterID(i *int) *RiskCategoryUpdate {
 	if i != nil {
-		rcu.SetUpdatedBy(*i)
+		rcu.SetUpdaterID(*i)
 	}
 	return rcu
 }
 
-// SetUpdatedAt sets the "updated_at" field.
-func (rcu *RiskCategoryUpdate) SetUpdatedAt(t time.Time) *RiskCategoryUpdate {
-	rcu.mutation.SetUpdatedAt(t)
+// SetUpdateTime sets the "update_time" field.
+func (rcu *RiskCategoryUpdate) SetUpdateTime(t time.Time) *RiskCategoryUpdate {
+	rcu.mutation.SetUpdateTime(t)
 	return rcu
 }
 
@@ -81,12 +82,6 @@ func (rcu *RiskCategoryUpdate) SetNillableName(s *string) *RiskCategoryUpdate {
 	if s != nil {
 		rcu.SetName(*s)
 	}
-	return rcu
-}
-
-// SetUpdaterID sets the "updater" edge to the Admin entity by ID.
-func (rcu *RiskCategoryUpdate) SetUpdaterID(id int) *RiskCategoryUpdate {
-	rcu.mutation.SetUpdaterID(id)
 	return rcu
 }
 
@@ -108,6 +103,21 @@ func (rcu *RiskCategoryUpdate) AddRisk(r ...*Risk) *RiskCategoryUpdate {
 		ids[i] = r[i].ID
 	}
 	return rcu.AddRiskIDs(ids...)
+}
+
+// AddSweepIDs adds the "sweep" edge to the Sweep entity by IDs.
+func (rcu *RiskCategoryUpdate) AddSweepIDs(ids ...int) *RiskCategoryUpdate {
+	rcu.mutation.AddSweepIDs(ids...)
+	return rcu
+}
+
+// AddSweep adds the "sweep" edges to the Sweep entity.
+func (rcu *RiskCategoryUpdate) AddSweep(s ...*Sweep) *RiskCategoryUpdate {
+	ids := make([]int, len(s))
+	for i := range s {
+		ids[i] = s[i].ID
+	}
+	return rcu.AddSweepIDs(ids...)
 }
 
 // Mutation returns the RiskCategoryMutation object of the builder.
@@ -142,6 +152,27 @@ func (rcu *RiskCategoryUpdate) RemoveRisk(r ...*Risk) *RiskCategoryUpdate {
 	return rcu.RemoveRiskIDs(ids...)
 }
 
+// ClearSweep clears all "sweep" edges to the Sweep entity.
+func (rcu *RiskCategoryUpdate) ClearSweep() *RiskCategoryUpdate {
+	rcu.mutation.ClearSweep()
+	return rcu
+}
+
+// RemoveSweepIDs removes the "sweep" edge to Sweep entities by IDs.
+func (rcu *RiskCategoryUpdate) RemoveSweepIDs(ids ...int) *RiskCategoryUpdate {
+	rcu.mutation.RemoveSweepIDs(ids...)
+	return rcu
+}
+
+// RemoveSweep removes "sweep" edges to Sweep entities.
+func (rcu *RiskCategoryUpdate) RemoveSweep(s ...*Sweep) *RiskCategoryUpdate {
+	ids := make([]int, len(s))
+	for i := range s {
+		ids[i] = s[i].ID
+	}
+	return rcu.RemoveSweepIDs(ids...)
+}
+
 // Save executes the query and returns the number of nodes affected by the update operation.
 func (rcu *RiskCategoryUpdate) Save(ctx context.Context) (int, error) {
 	if err := rcu.defaults(); err != nil {
@@ -174,21 +205,21 @@ func (rcu *RiskCategoryUpdate) ExecX(ctx context.Context) {
 
 // defaults sets the default values of the builder before save.
 func (rcu *RiskCategoryUpdate) defaults() error {
-	if _, ok := rcu.mutation.UpdatedAt(); !ok {
-		if riskcategory.UpdateDefaultUpdatedAt == nil {
-			return fmt.Errorf("dao: uninitialized riskcategory.UpdateDefaultUpdatedAt (forgotten import dao/runtime?)")
+	if _, ok := rcu.mutation.UpdateTime(); !ok {
+		if riskcategory.UpdateDefaultUpdateTime == nil {
+			return fmt.Errorf("dao: uninitialized riskcategory.UpdateDefaultUpdateTime (forgotten import dao/runtime?)")
 		}
-		v := riskcategory.UpdateDefaultUpdatedAt()
-		rcu.mutation.SetUpdatedAt(v)
+		v := riskcategory.UpdateDefaultUpdateTime()
+		rcu.mutation.SetUpdateTime(v)
 	}
 	return nil
 }
 
 // check runs all checks and user-defined validators on the builder.
 func (rcu *RiskCategoryUpdate) check() error {
-	if v, ok := rcu.mutation.UpdatedBy(); ok {
-		if err := riskcategory.UpdatedByValidator(v); err != nil {
-			return &ValidationError{Name: "updated_by", err: fmt.Errorf(`dao: validator failed for field "RiskCategory.updated_by": %w`, err)}
+	if v, ok := rcu.mutation.UpdaterID(); ok {
+		if err := riskcategory.UpdaterIDValidator(v); err != nil {
+			return &ValidationError{Name: "updater_id", err: fmt.Errorf(`dao: validator failed for field "RiskCategory.updater_id": %w`, err)}
 		}
 	}
 	if v, ok := rcu.mutation.Name(); ok {
@@ -217,14 +248,14 @@ func (rcu *RiskCategoryUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			}
 		}
 	}
-	if value, ok := rcu.mutation.DeletedAt(); ok {
-		_spec.SetField(riskcategory.FieldDeletedAt, field.TypeTime, value)
+	if value, ok := rcu.mutation.DeleteTime(); ok {
+		_spec.SetField(riskcategory.FieldDeleteTime, field.TypeTime, value)
 	}
-	if rcu.mutation.DeletedAtCleared() {
-		_spec.ClearField(riskcategory.FieldDeletedAt, field.TypeTime)
+	if rcu.mutation.DeleteTimeCleared() {
+		_spec.ClearField(riskcategory.FieldDeleteTime, field.TypeTime)
 	}
-	if value, ok := rcu.mutation.UpdatedAt(); ok {
-		_spec.SetField(riskcategory.FieldUpdatedAt, field.TypeTime, value)
+	if value, ok := rcu.mutation.UpdateTime(); ok {
+		_spec.SetField(riskcategory.FieldUpdateTime, field.TypeTime, value)
 	}
 	if value, ok := rcu.mutation.Name(); ok {
 		_spec.SetField(riskcategory.FieldName, field.TypeString, value)
@@ -303,6 +334,51 @@ func (rcu *RiskCategoryUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
+	if rcu.mutation.SweepCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   riskcategory.SweepTable,
+			Columns: []string{riskcategory.SweepColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(sweep.FieldID, field.TypeInt),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := rcu.mutation.RemovedSweepIDs(); len(nodes) > 0 && !rcu.mutation.SweepCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   riskcategory.SweepTable,
+			Columns: []string{riskcategory.SweepColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(sweep.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := rcu.mutation.SweepIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   riskcategory.SweepTable,
+			Columns: []string{riskcategory.SweepColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(sweep.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
 	if n, err = sqlgraph.UpdateNodes(ctx, rcu.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
 			err = &NotFoundError{riskcategory.Label}
@@ -323,43 +399,43 @@ type RiskCategoryUpdateOne struct {
 	mutation *RiskCategoryMutation
 }
 
-// SetDeletedAt sets the "deleted_at" field.
-func (rcuo *RiskCategoryUpdateOne) SetDeletedAt(t time.Time) *RiskCategoryUpdateOne {
-	rcuo.mutation.SetDeletedAt(t)
+// SetDeleteTime sets the "delete_time" field.
+func (rcuo *RiskCategoryUpdateOne) SetDeleteTime(t time.Time) *RiskCategoryUpdateOne {
+	rcuo.mutation.SetDeleteTime(t)
 	return rcuo
 }
 
-// SetNillableDeletedAt sets the "deleted_at" field if the given value is not nil.
-func (rcuo *RiskCategoryUpdateOne) SetNillableDeletedAt(t *time.Time) *RiskCategoryUpdateOne {
+// SetNillableDeleteTime sets the "delete_time" field if the given value is not nil.
+func (rcuo *RiskCategoryUpdateOne) SetNillableDeleteTime(t *time.Time) *RiskCategoryUpdateOne {
 	if t != nil {
-		rcuo.SetDeletedAt(*t)
+		rcuo.SetDeleteTime(*t)
 	}
 	return rcuo
 }
 
-// ClearDeletedAt clears the value of the "deleted_at" field.
-func (rcuo *RiskCategoryUpdateOne) ClearDeletedAt() *RiskCategoryUpdateOne {
-	rcuo.mutation.ClearDeletedAt()
+// ClearDeleteTime clears the value of the "delete_time" field.
+func (rcuo *RiskCategoryUpdateOne) ClearDeleteTime() *RiskCategoryUpdateOne {
+	rcuo.mutation.ClearDeleteTime()
 	return rcuo
 }
 
-// SetUpdatedBy sets the "updated_by" field.
-func (rcuo *RiskCategoryUpdateOne) SetUpdatedBy(i int) *RiskCategoryUpdateOne {
-	rcuo.mutation.SetUpdatedBy(i)
+// SetUpdaterID sets the "updater_id" field.
+func (rcuo *RiskCategoryUpdateOne) SetUpdaterID(i int) *RiskCategoryUpdateOne {
+	rcuo.mutation.SetUpdaterID(i)
 	return rcuo
 }
 
-// SetNillableUpdatedBy sets the "updated_by" field if the given value is not nil.
-func (rcuo *RiskCategoryUpdateOne) SetNillableUpdatedBy(i *int) *RiskCategoryUpdateOne {
+// SetNillableUpdaterID sets the "updater_id" field if the given value is not nil.
+func (rcuo *RiskCategoryUpdateOne) SetNillableUpdaterID(i *int) *RiskCategoryUpdateOne {
 	if i != nil {
-		rcuo.SetUpdatedBy(*i)
+		rcuo.SetUpdaterID(*i)
 	}
 	return rcuo
 }
 
-// SetUpdatedAt sets the "updated_at" field.
-func (rcuo *RiskCategoryUpdateOne) SetUpdatedAt(t time.Time) *RiskCategoryUpdateOne {
-	rcuo.mutation.SetUpdatedAt(t)
+// SetUpdateTime sets the "update_time" field.
+func (rcuo *RiskCategoryUpdateOne) SetUpdateTime(t time.Time) *RiskCategoryUpdateOne {
+	rcuo.mutation.SetUpdateTime(t)
 	return rcuo
 }
 
@@ -374,12 +450,6 @@ func (rcuo *RiskCategoryUpdateOne) SetNillableName(s *string) *RiskCategoryUpdat
 	if s != nil {
 		rcuo.SetName(*s)
 	}
-	return rcuo
-}
-
-// SetUpdaterID sets the "updater" edge to the Admin entity by ID.
-func (rcuo *RiskCategoryUpdateOne) SetUpdaterID(id int) *RiskCategoryUpdateOne {
-	rcuo.mutation.SetUpdaterID(id)
 	return rcuo
 }
 
@@ -401,6 +471,21 @@ func (rcuo *RiskCategoryUpdateOne) AddRisk(r ...*Risk) *RiskCategoryUpdateOne {
 		ids[i] = r[i].ID
 	}
 	return rcuo.AddRiskIDs(ids...)
+}
+
+// AddSweepIDs adds the "sweep" edge to the Sweep entity by IDs.
+func (rcuo *RiskCategoryUpdateOne) AddSweepIDs(ids ...int) *RiskCategoryUpdateOne {
+	rcuo.mutation.AddSweepIDs(ids...)
+	return rcuo
+}
+
+// AddSweep adds the "sweep" edges to the Sweep entity.
+func (rcuo *RiskCategoryUpdateOne) AddSweep(s ...*Sweep) *RiskCategoryUpdateOne {
+	ids := make([]int, len(s))
+	for i := range s {
+		ids[i] = s[i].ID
+	}
+	return rcuo.AddSweepIDs(ids...)
 }
 
 // Mutation returns the RiskCategoryMutation object of the builder.
@@ -433,6 +518,27 @@ func (rcuo *RiskCategoryUpdateOne) RemoveRisk(r ...*Risk) *RiskCategoryUpdateOne
 		ids[i] = r[i].ID
 	}
 	return rcuo.RemoveRiskIDs(ids...)
+}
+
+// ClearSweep clears all "sweep" edges to the Sweep entity.
+func (rcuo *RiskCategoryUpdateOne) ClearSweep() *RiskCategoryUpdateOne {
+	rcuo.mutation.ClearSweep()
+	return rcuo
+}
+
+// RemoveSweepIDs removes the "sweep" edge to Sweep entities by IDs.
+func (rcuo *RiskCategoryUpdateOne) RemoveSweepIDs(ids ...int) *RiskCategoryUpdateOne {
+	rcuo.mutation.RemoveSweepIDs(ids...)
+	return rcuo
+}
+
+// RemoveSweep removes "sweep" edges to Sweep entities.
+func (rcuo *RiskCategoryUpdateOne) RemoveSweep(s ...*Sweep) *RiskCategoryUpdateOne {
+	ids := make([]int, len(s))
+	for i := range s {
+		ids[i] = s[i].ID
+	}
+	return rcuo.RemoveSweepIDs(ids...)
 }
 
 // Where appends a list predicates to the RiskCategoryUpdate builder.
@@ -480,21 +586,21 @@ func (rcuo *RiskCategoryUpdateOne) ExecX(ctx context.Context) {
 
 // defaults sets the default values of the builder before save.
 func (rcuo *RiskCategoryUpdateOne) defaults() error {
-	if _, ok := rcuo.mutation.UpdatedAt(); !ok {
-		if riskcategory.UpdateDefaultUpdatedAt == nil {
-			return fmt.Errorf("dao: uninitialized riskcategory.UpdateDefaultUpdatedAt (forgotten import dao/runtime?)")
+	if _, ok := rcuo.mutation.UpdateTime(); !ok {
+		if riskcategory.UpdateDefaultUpdateTime == nil {
+			return fmt.Errorf("dao: uninitialized riskcategory.UpdateDefaultUpdateTime (forgotten import dao/runtime?)")
 		}
-		v := riskcategory.UpdateDefaultUpdatedAt()
-		rcuo.mutation.SetUpdatedAt(v)
+		v := riskcategory.UpdateDefaultUpdateTime()
+		rcuo.mutation.SetUpdateTime(v)
 	}
 	return nil
 }
 
 // check runs all checks and user-defined validators on the builder.
 func (rcuo *RiskCategoryUpdateOne) check() error {
-	if v, ok := rcuo.mutation.UpdatedBy(); ok {
-		if err := riskcategory.UpdatedByValidator(v); err != nil {
-			return &ValidationError{Name: "updated_by", err: fmt.Errorf(`dao: validator failed for field "RiskCategory.updated_by": %w`, err)}
+	if v, ok := rcuo.mutation.UpdaterID(); ok {
+		if err := riskcategory.UpdaterIDValidator(v); err != nil {
+			return &ValidationError{Name: "updater_id", err: fmt.Errorf(`dao: validator failed for field "RiskCategory.updater_id": %w`, err)}
 		}
 	}
 	if v, ok := rcuo.mutation.Name(); ok {
@@ -540,14 +646,14 @@ func (rcuo *RiskCategoryUpdateOne) sqlSave(ctx context.Context) (_node *RiskCate
 			}
 		}
 	}
-	if value, ok := rcuo.mutation.DeletedAt(); ok {
-		_spec.SetField(riskcategory.FieldDeletedAt, field.TypeTime, value)
+	if value, ok := rcuo.mutation.DeleteTime(); ok {
+		_spec.SetField(riskcategory.FieldDeleteTime, field.TypeTime, value)
 	}
-	if rcuo.mutation.DeletedAtCleared() {
-		_spec.ClearField(riskcategory.FieldDeletedAt, field.TypeTime)
+	if rcuo.mutation.DeleteTimeCleared() {
+		_spec.ClearField(riskcategory.FieldDeleteTime, field.TypeTime)
 	}
-	if value, ok := rcuo.mutation.UpdatedAt(); ok {
-		_spec.SetField(riskcategory.FieldUpdatedAt, field.TypeTime, value)
+	if value, ok := rcuo.mutation.UpdateTime(); ok {
+		_spec.SetField(riskcategory.FieldUpdateTime, field.TypeTime, value)
 	}
 	if value, ok := rcuo.mutation.Name(); ok {
 		_spec.SetField(riskcategory.FieldName, field.TypeString, value)
@@ -619,6 +725,51 @@ func (rcuo *RiskCategoryUpdateOne) sqlSave(ctx context.Context) (_node *RiskCate
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(risk.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if rcuo.mutation.SweepCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   riskcategory.SweepTable,
+			Columns: []string{riskcategory.SweepColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(sweep.FieldID, field.TypeInt),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := rcuo.mutation.RemovedSweepIDs(); len(nodes) > 0 && !rcuo.mutation.SweepCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   riskcategory.SweepTable,
+			Columns: []string{riskcategory.SweepColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(sweep.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := rcuo.mutation.SweepIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   riskcategory.SweepTable,
+			Columns: []string{riskcategory.SweepColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(sweep.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {

@@ -6,7 +6,9 @@ import (
 	"aisecurity/ent/dao/admin"
 	"aisecurity/ent/dao/device"
 	"aisecurity/ent/dao/deviceinstallation"
-	"aisecurity/ent/dao/ipcevent"
+	"aisecurity/ent/dao/event"
+	"aisecurity/ent/dao/eventlog"
+	"aisecurity/ent/dao/fixing"
 	"aisecurity/ent/dao/predicate"
 	"aisecurity/enums"
 	"context"
@@ -32,43 +34,43 @@ func (du *DeviceUpdate) Where(ps ...predicate.Device) *DeviceUpdate {
 	return du
 }
 
-// SetDeletedAt sets the "deleted_at" field.
-func (du *DeviceUpdate) SetDeletedAt(t time.Time) *DeviceUpdate {
-	du.mutation.SetDeletedAt(t)
+// SetDeleteTime sets the "delete_time" field.
+func (du *DeviceUpdate) SetDeleteTime(t time.Time) *DeviceUpdate {
+	du.mutation.SetDeleteTime(t)
 	return du
 }
 
-// SetNillableDeletedAt sets the "deleted_at" field if the given value is not nil.
-func (du *DeviceUpdate) SetNillableDeletedAt(t *time.Time) *DeviceUpdate {
+// SetNillableDeleteTime sets the "delete_time" field if the given value is not nil.
+func (du *DeviceUpdate) SetNillableDeleteTime(t *time.Time) *DeviceUpdate {
 	if t != nil {
-		du.SetDeletedAt(*t)
+		du.SetDeleteTime(*t)
 	}
 	return du
 }
 
-// ClearDeletedAt clears the value of the "deleted_at" field.
-func (du *DeviceUpdate) ClearDeletedAt() *DeviceUpdate {
-	du.mutation.ClearDeletedAt()
+// ClearDeleteTime clears the value of the "delete_time" field.
+func (du *DeviceUpdate) ClearDeleteTime() *DeviceUpdate {
+	du.mutation.ClearDeleteTime()
 	return du
 }
 
-// SetUpdatedBy sets the "updated_by" field.
-func (du *DeviceUpdate) SetUpdatedBy(i int) *DeviceUpdate {
-	du.mutation.SetUpdatedBy(i)
+// SetUpdaterID sets the "updater_id" field.
+func (du *DeviceUpdate) SetUpdaterID(i int) *DeviceUpdate {
+	du.mutation.SetUpdaterID(i)
 	return du
 }
 
-// SetNillableUpdatedBy sets the "updated_by" field if the given value is not nil.
-func (du *DeviceUpdate) SetNillableUpdatedBy(i *int) *DeviceUpdate {
+// SetNillableUpdaterID sets the "updater_id" field if the given value is not nil.
+func (du *DeviceUpdate) SetNillableUpdaterID(i *int) *DeviceUpdate {
 	if i != nil {
-		du.SetUpdatedBy(*i)
+		du.SetUpdaterID(*i)
 	}
 	return du
 }
 
-// SetUpdatedAt sets the "updated_at" field.
-func (du *DeviceUpdate) SetUpdatedAt(t time.Time) *DeviceUpdate {
-	du.mutation.SetUpdatedAt(t)
+// SetUpdateTime sets the "update_time" field.
+func (du *DeviceUpdate) SetUpdateTime(t time.Time) *DeviceUpdate {
+	du.mutation.SetUpdateTime(t)
 	return du
 }
 
@@ -187,45 +189,69 @@ func (du *DeviceUpdate) AddDeviceType(et enums.DeviceType) *DeviceUpdate {
 	return du
 }
 
-// SetUpdaterID sets the "updater" edge to the Admin entity by ID.
-func (du *DeviceUpdate) SetUpdaterID(id int) *DeviceUpdate {
-	du.mutation.SetUpdaterID(id)
-	return du
-}
-
 // SetUpdater sets the "updater" edge to the Admin entity.
 func (du *DeviceUpdate) SetUpdater(a *Admin) *DeviceUpdate {
 	return du.SetUpdaterID(a.ID)
 }
 
-// AddIpcEventDeviceIDs adds the "ipc_event_device" edge to the IPCEvent entity by IDs.
-func (du *DeviceUpdate) AddIpcEventDeviceIDs(ids ...int) *DeviceUpdate {
-	du.mutation.AddIpcEventDeviceIDs(ids...)
+// AddEventIDs adds the "event" edge to the Event entity by IDs.
+func (du *DeviceUpdate) AddEventIDs(ids ...int) *DeviceUpdate {
+	du.mutation.AddEventIDs(ids...)
 	return du
 }
 
-// AddIpcEventDevice adds the "ipc_event_device" edges to the IPCEvent entity.
-func (du *DeviceUpdate) AddIpcEventDevice(i ...*IPCEvent) *DeviceUpdate {
-	ids := make([]int, len(i))
-	for j := range i {
-		ids[j] = i[j].ID
+// AddEvent adds the "event" edges to the Event entity.
+func (du *DeviceUpdate) AddEvent(e ...*Event) *DeviceUpdate {
+	ids := make([]int, len(e))
+	for i := range e {
+		ids[i] = e[i].ID
 	}
-	return du.AddIpcEventDeviceIDs(ids...)
+	return du.AddEventIDs(ids...)
 }
 
-// AddDeviceInstallationDeviceIDs adds the "device_installation_device" edge to the DeviceInstallation entity by IDs.
-func (du *DeviceUpdate) AddDeviceInstallationDeviceIDs(ids ...int) *DeviceUpdate {
-	du.mutation.AddDeviceInstallationDeviceIDs(ids...)
+// AddDeviceInstallationIDs adds the "device_installation" edge to the DeviceInstallation entity by IDs.
+func (du *DeviceUpdate) AddDeviceInstallationIDs(ids ...int) *DeviceUpdate {
+	du.mutation.AddDeviceInstallationIDs(ids...)
 	return du
 }
 
-// AddDeviceInstallationDevice adds the "device_installation_device" edges to the DeviceInstallation entity.
-func (du *DeviceUpdate) AddDeviceInstallationDevice(d ...*DeviceInstallation) *DeviceUpdate {
+// AddDeviceInstallation adds the "device_installation" edges to the DeviceInstallation entity.
+func (du *DeviceUpdate) AddDeviceInstallation(d ...*DeviceInstallation) *DeviceUpdate {
 	ids := make([]int, len(d))
 	for i := range d {
 		ids[i] = d[i].ID
 	}
-	return du.AddDeviceInstallationDeviceIDs(ids...)
+	return du.AddDeviceInstallationIDs(ids...)
+}
+
+// AddEventLogIDs adds the "event_log" edge to the EventLog entity by IDs.
+func (du *DeviceUpdate) AddEventLogIDs(ids ...int) *DeviceUpdate {
+	du.mutation.AddEventLogIDs(ids...)
+	return du
+}
+
+// AddEventLog adds the "event_log" edges to the EventLog entity.
+func (du *DeviceUpdate) AddEventLog(e ...*EventLog) *DeviceUpdate {
+	ids := make([]int, len(e))
+	for i := range e {
+		ids[i] = e[i].ID
+	}
+	return du.AddEventLogIDs(ids...)
+}
+
+// AddFixingIDs adds the "fixing" edge to the Fixing entity by IDs.
+func (du *DeviceUpdate) AddFixingIDs(ids ...int) *DeviceUpdate {
+	du.mutation.AddFixingIDs(ids...)
+	return du
+}
+
+// AddFixing adds the "fixing" edges to the Fixing entity.
+func (du *DeviceUpdate) AddFixing(f ...*Fixing) *DeviceUpdate {
+	ids := make([]int, len(f))
+	for i := range f {
+		ids[i] = f[i].ID
+	}
+	return du.AddFixingIDs(ids...)
 }
 
 // Mutation returns the DeviceMutation object of the builder.
@@ -239,46 +265,88 @@ func (du *DeviceUpdate) ClearUpdater() *DeviceUpdate {
 	return du
 }
 
-// ClearIpcEventDevice clears all "ipc_event_device" edges to the IPCEvent entity.
-func (du *DeviceUpdate) ClearIpcEventDevice() *DeviceUpdate {
-	du.mutation.ClearIpcEventDevice()
+// ClearEvent clears all "event" edges to the Event entity.
+func (du *DeviceUpdate) ClearEvent() *DeviceUpdate {
+	du.mutation.ClearEvent()
 	return du
 }
 
-// RemoveIpcEventDeviceIDs removes the "ipc_event_device" edge to IPCEvent entities by IDs.
-func (du *DeviceUpdate) RemoveIpcEventDeviceIDs(ids ...int) *DeviceUpdate {
-	du.mutation.RemoveIpcEventDeviceIDs(ids...)
+// RemoveEventIDs removes the "event" edge to Event entities by IDs.
+func (du *DeviceUpdate) RemoveEventIDs(ids ...int) *DeviceUpdate {
+	du.mutation.RemoveEventIDs(ids...)
 	return du
 }
 
-// RemoveIpcEventDevice removes "ipc_event_device" edges to IPCEvent entities.
-func (du *DeviceUpdate) RemoveIpcEventDevice(i ...*IPCEvent) *DeviceUpdate {
-	ids := make([]int, len(i))
-	for j := range i {
-		ids[j] = i[j].ID
+// RemoveEvent removes "event" edges to Event entities.
+func (du *DeviceUpdate) RemoveEvent(e ...*Event) *DeviceUpdate {
+	ids := make([]int, len(e))
+	for i := range e {
+		ids[i] = e[i].ID
 	}
-	return du.RemoveIpcEventDeviceIDs(ids...)
+	return du.RemoveEventIDs(ids...)
 }
 
-// ClearDeviceInstallationDevice clears all "device_installation_device" edges to the DeviceInstallation entity.
-func (du *DeviceUpdate) ClearDeviceInstallationDevice() *DeviceUpdate {
-	du.mutation.ClearDeviceInstallationDevice()
+// ClearDeviceInstallation clears all "device_installation" edges to the DeviceInstallation entity.
+func (du *DeviceUpdate) ClearDeviceInstallation() *DeviceUpdate {
+	du.mutation.ClearDeviceInstallation()
 	return du
 }
 
-// RemoveDeviceInstallationDeviceIDs removes the "device_installation_device" edge to DeviceInstallation entities by IDs.
-func (du *DeviceUpdate) RemoveDeviceInstallationDeviceIDs(ids ...int) *DeviceUpdate {
-	du.mutation.RemoveDeviceInstallationDeviceIDs(ids...)
+// RemoveDeviceInstallationIDs removes the "device_installation" edge to DeviceInstallation entities by IDs.
+func (du *DeviceUpdate) RemoveDeviceInstallationIDs(ids ...int) *DeviceUpdate {
+	du.mutation.RemoveDeviceInstallationIDs(ids...)
 	return du
 }
 
-// RemoveDeviceInstallationDevice removes "device_installation_device" edges to DeviceInstallation entities.
-func (du *DeviceUpdate) RemoveDeviceInstallationDevice(d ...*DeviceInstallation) *DeviceUpdate {
+// RemoveDeviceInstallation removes "device_installation" edges to DeviceInstallation entities.
+func (du *DeviceUpdate) RemoveDeviceInstallation(d ...*DeviceInstallation) *DeviceUpdate {
 	ids := make([]int, len(d))
 	for i := range d {
 		ids[i] = d[i].ID
 	}
-	return du.RemoveDeviceInstallationDeviceIDs(ids...)
+	return du.RemoveDeviceInstallationIDs(ids...)
+}
+
+// ClearEventLog clears all "event_log" edges to the EventLog entity.
+func (du *DeviceUpdate) ClearEventLog() *DeviceUpdate {
+	du.mutation.ClearEventLog()
+	return du
+}
+
+// RemoveEventLogIDs removes the "event_log" edge to EventLog entities by IDs.
+func (du *DeviceUpdate) RemoveEventLogIDs(ids ...int) *DeviceUpdate {
+	du.mutation.RemoveEventLogIDs(ids...)
+	return du
+}
+
+// RemoveEventLog removes "event_log" edges to EventLog entities.
+func (du *DeviceUpdate) RemoveEventLog(e ...*EventLog) *DeviceUpdate {
+	ids := make([]int, len(e))
+	for i := range e {
+		ids[i] = e[i].ID
+	}
+	return du.RemoveEventLogIDs(ids...)
+}
+
+// ClearFixing clears all "fixing" edges to the Fixing entity.
+func (du *DeviceUpdate) ClearFixing() *DeviceUpdate {
+	du.mutation.ClearFixing()
+	return du
+}
+
+// RemoveFixingIDs removes the "fixing" edge to Fixing entities by IDs.
+func (du *DeviceUpdate) RemoveFixingIDs(ids ...int) *DeviceUpdate {
+	du.mutation.RemoveFixingIDs(ids...)
+	return du
+}
+
+// RemoveFixing removes "fixing" edges to Fixing entities.
+func (du *DeviceUpdate) RemoveFixing(f ...*Fixing) *DeviceUpdate {
+	ids := make([]int, len(f))
+	for i := range f {
+		ids[i] = f[i].ID
+	}
+	return du.RemoveFixingIDs(ids...)
 }
 
 // Save executes the query and returns the number of nodes affected by the update operation.
@@ -313,21 +381,21 @@ func (du *DeviceUpdate) ExecX(ctx context.Context) {
 
 // defaults sets the default values of the builder before save.
 func (du *DeviceUpdate) defaults() error {
-	if _, ok := du.mutation.UpdatedAt(); !ok {
-		if device.UpdateDefaultUpdatedAt == nil {
-			return fmt.Errorf("dao: uninitialized device.UpdateDefaultUpdatedAt (forgotten import dao/runtime?)")
+	if _, ok := du.mutation.UpdateTime(); !ok {
+		if device.UpdateDefaultUpdateTime == nil {
+			return fmt.Errorf("dao: uninitialized device.UpdateDefaultUpdateTime (forgotten import dao/runtime?)")
 		}
-		v := device.UpdateDefaultUpdatedAt()
-		du.mutation.SetUpdatedAt(v)
+		v := device.UpdateDefaultUpdateTime()
+		du.mutation.SetUpdateTime(v)
 	}
 	return nil
 }
 
 // check runs all checks and user-defined validators on the builder.
 func (du *DeviceUpdate) check() error {
-	if v, ok := du.mutation.UpdatedBy(); ok {
-		if err := device.UpdatedByValidator(v); err != nil {
-			return &ValidationError{Name: "updated_by", err: fmt.Errorf(`dao: validator failed for field "Device.updated_by": %w`, err)}
+	if v, ok := du.mutation.UpdaterID(); ok {
+		if err := device.UpdaterIDValidator(v); err != nil {
+			return &ValidationError{Name: "updater_id", err: fmt.Errorf(`dao: validator failed for field "Device.updater_id": %w`, err)}
 		}
 	}
 	if v, ok := du.mutation.Brand(); ok {
@@ -376,14 +444,14 @@ func (du *DeviceUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			}
 		}
 	}
-	if value, ok := du.mutation.DeletedAt(); ok {
-		_spec.SetField(device.FieldDeletedAt, field.TypeTime, value)
+	if value, ok := du.mutation.DeleteTime(); ok {
+		_spec.SetField(device.FieldDeleteTime, field.TypeTime, value)
 	}
-	if du.mutation.DeletedAtCleared() {
-		_spec.ClearField(device.FieldDeletedAt, field.TypeTime)
+	if du.mutation.DeleteTimeCleared() {
+		_spec.ClearField(device.FieldDeleteTime, field.TypeTime)
 	}
-	if value, ok := du.mutation.UpdatedAt(); ok {
-		_spec.SetField(device.FieldUpdatedAt, field.TypeTime, value)
+	if value, ok := du.mutation.UpdateTime(); ok {
+		_spec.SetField(device.FieldUpdateTime, field.TypeTime, value)
 	}
 	if value, ok := du.mutation.Brand(); ok {
 		_spec.SetField(device.FieldBrand, field.TypeInt, value)
@@ -450,28 +518,28 @@ func (du *DeviceUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if du.mutation.IpcEventDeviceCleared() {
+	if du.mutation.EventCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
-			Table:   device.IpcEventDeviceTable,
-			Columns: []string{device.IpcEventDeviceColumn},
+			Table:   device.EventTable,
+			Columns: []string{device.EventColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(ipcevent.FieldID, field.TypeInt),
+				IDSpec: sqlgraph.NewFieldSpec(event.FieldID, field.TypeInt),
 			},
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := du.mutation.RemovedIpcEventDeviceIDs(); len(nodes) > 0 && !du.mutation.IpcEventDeviceCleared() {
+	if nodes := du.mutation.RemovedEventIDs(); len(nodes) > 0 && !du.mutation.EventCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
-			Table:   device.IpcEventDeviceTable,
-			Columns: []string{device.IpcEventDeviceColumn},
+			Table:   device.EventTable,
+			Columns: []string{device.EventColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(ipcevent.FieldID, field.TypeInt),
+				IDSpec: sqlgraph.NewFieldSpec(event.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {
@@ -479,15 +547,15 @@ func (du *DeviceUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := du.mutation.IpcEventDeviceIDs(); len(nodes) > 0 {
+	if nodes := du.mutation.EventIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
-			Table:   device.IpcEventDeviceTable,
-			Columns: []string{device.IpcEventDeviceColumn},
+			Table:   device.EventTable,
+			Columns: []string{device.EventColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(ipcevent.FieldID, field.TypeInt),
+				IDSpec: sqlgraph.NewFieldSpec(event.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {
@@ -495,12 +563,12 @@ func (du *DeviceUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if du.mutation.DeviceInstallationDeviceCleared() {
+	if du.mutation.DeviceInstallationCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
-			Table:   device.DeviceInstallationDeviceTable,
-			Columns: []string{device.DeviceInstallationDeviceColumn},
+			Table:   device.DeviceInstallationTable,
+			Columns: []string{device.DeviceInstallationColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(deviceinstallation.FieldID, field.TypeInt),
@@ -508,12 +576,12 @@ func (du *DeviceUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := du.mutation.RemovedDeviceInstallationDeviceIDs(); len(nodes) > 0 && !du.mutation.DeviceInstallationDeviceCleared() {
+	if nodes := du.mutation.RemovedDeviceInstallationIDs(); len(nodes) > 0 && !du.mutation.DeviceInstallationCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
-			Table:   device.DeviceInstallationDeviceTable,
-			Columns: []string{device.DeviceInstallationDeviceColumn},
+			Table:   device.DeviceInstallationTable,
+			Columns: []string{device.DeviceInstallationColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(deviceinstallation.FieldID, field.TypeInt),
@@ -524,15 +592,105 @@ func (du *DeviceUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := du.mutation.DeviceInstallationDeviceIDs(); len(nodes) > 0 {
+	if nodes := du.mutation.DeviceInstallationIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
-			Table:   device.DeviceInstallationDeviceTable,
-			Columns: []string{device.DeviceInstallationDeviceColumn},
+			Table:   device.DeviceInstallationTable,
+			Columns: []string{device.DeviceInstallationColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(deviceinstallation.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if du.mutation.EventLogCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   device.EventLogTable,
+			Columns: []string{device.EventLogColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(eventlog.FieldID, field.TypeInt),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := du.mutation.RemovedEventLogIDs(); len(nodes) > 0 && !du.mutation.EventLogCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   device.EventLogTable,
+			Columns: []string{device.EventLogColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(eventlog.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := du.mutation.EventLogIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   device.EventLogTable,
+			Columns: []string{device.EventLogColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(eventlog.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if du.mutation.FixingCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   device.FixingTable,
+			Columns: []string{device.FixingColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(fixing.FieldID, field.TypeInt),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := du.mutation.RemovedFixingIDs(); len(nodes) > 0 && !du.mutation.FixingCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   device.FixingTable,
+			Columns: []string{device.FixingColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(fixing.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := du.mutation.FixingIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   device.FixingTable,
+			Columns: []string{device.FixingColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(fixing.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {
@@ -560,43 +718,43 @@ type DeviceUpdateOne struct {
 	mutation *DeviceMutation
 }
 
-// SetDeletedAt sets the "deleted_at" field.
-func (duo *DeviceUpdateOne) SetDeletedAt(t time.Time) *DeviceUpdateOne {
-	duo.mutation.SetDeletedAt(t)
+// SetDeleteTime sets the "delete_time" field.
+func (duo *DeviceUpdateOne) SetDeleteTime(t time.Time) *DeviceUpdateOne {
+	duo.mutation.SetDeleteTime(t)
 	return duo
 }
 
-// SetNillableDeletedAt sets the "deleted_at" field if the given value is not nil.
-func (duo *DeviceUpdateOne) SetNillableDeletedAt(t *time.Time) *DeviceUpdateOne {
+// SetNillableDeleteTime sets the "delete_time" field if the given value is not nil.
+func (duo *DeviceUpdateOne) SetNillableDeleteTime(t *time.Time) *DeviceUpdateOne {
 	if t != nil {
-		duo.SetDeletedAt(*t)
+		duo.SetDeleteTime(*t)
 	}
 	return duo
 }
 
-// ClearDeletedAt clears the value of the "deleted_at" field.
-func (duo *DeviceUpdateOne) ClearDeletedAt() *DeviceUpdateOne {
-	duo.mutation.ClearDeletedAt()
+// ClearDeleteTime clears the value of the "delete_time" field.
+func (duo *DeviceUpdateOne) ClearDeleteTime() *DeviceUpdateOne {
+	duo.mutation.ClearDeleteTime()
 	return duo
 }
 
-// SetUpdatedBy sets the "updated_by" field.
-func (duo *DeviceUpdateOne) SetUpdatedBy(i int) *DeviceUpdateOne {
-	duo.mutation.SetUpdatedBy(i)
+// SetUpdaterID sets the "updater_id" field.
+func (duo *DeviceUpdateOne) SetUpdaterID(i int) *DeviceUpdateOne {
+	duo.mutation.SetUpdaterID(i)
 	return duo
 }
 
-// SetNillableUpdatedBy sets the "updated_by" field if the given value is not nil.
-func (duo *DeviceUpdateOne) SetNillableUpdatedBy(i *int) *DeviceUpdateOne {
+// SetNillableUpdaterID sets the "updater_id" field if the given value is not nil.
+func (duo *DeviceUpdateOne) SetNillableUpdaterID(i *int) *DeviceUpdateOne {
 	if i != nil {
-		duo.SetUpdatedBy(*i)
+		duo.SetUpdaterID(*i)
 	}
 	return duo
 }
 
-// SetUpdatedAt sets the "updated_at" field.
-func (duo *DeviceUpdateOne) SetUpdatedAt(t time.Time) *DeviceUpdateOne {
-	duo.mutation.SetUpdatedAt(t)
+// SetUpdateTime sets the "update_time" field.
+func (duo *DeviceUpdateOne) SetUpdateTime(t time.Time) *DeviceUpdateOne {
+	duo.mutation.SetUpdateTime(t)
 	return duo
 }
 
@@ -715,45 +873,69 @@ func (duo *DeviceUpdateOne) AddDeviceType(et enums.DeviceType) *DeviceUpdateOne 
 	return duo
 }
 
-// SetUpdaterID sets the "updater" edge to the Admin entity by ID.
-func (duo *DeviceUpdateOne) SetUpdaterID(id int) *DeviceUpdateOne {
-	duo.mutation.SetUpdaterID(id)
-	return duo
-}
-
 // SetUpdater sets the "updater" edge to the Admin entity.
 func (duo *DeviceUpdateOne) SetUpdater(a *Admin) *DeviceUpdateOne {
 	return duo.SetUpdaterID(a.ID)
 }
 
-// AddIpcEventDeviceIDs adds the "ipc_event_device" edge to the IPCEvent entity by IDs.
-func (duo *DeviceUpdateOne) AddIpcEventDeviceIDs(ids ...int) *DeviceUpdateOne {
-	duo.mutation.AddIpcEventDeviceIDs(ids...)
+// AddEventIDs adds the "event" edge to the Event entity by IDs.
+func (duo *DeviceUpdateOne) AddEventIDs(ids ...int) *DeviceUpdateOne {
+	duo.mutation.AddEventIDs(ids...)
 	return duo
 }
 
-// AddIpcEventDevice adds the "ipc_event_device" edges to the IPCEvent entity.
-func (duo *DeviceUpdateOne) AddIpcEventDevice(i ...*IPCEvent) *DeviceUpdateOne {
-	ids := make([]int, len(i))
-	for j := range i {
-		ids[j] = i[j].ID
+// AddEvent adds the "event" edges to the Event entity.
+func (duo *DeviceUpdateOne) AddEvent(e ...*Event) *DeviceUpdateOne {
+	ids := make([]int, len(e))
+	for i := range e {
+		ids[i] = e[i].ID
 	}
-	return duo.AddIpcEventDeviceIDs(ids...)
+	return duo.AddEventIDs(ids...)
 }
 
-// AddDeviceInstallationDeviceIDs adds the "device_installation_device" edge to the DeviceInstallation entity by IDs.
-func (duo *DeviceUpdateOne) AddDeviceInstallationDeviceIDs(ids ...int) *DeviceUpdateOne {
-	duo.mutation.AddDeviceInstallationDeviceIDs(ids...)
+// AddDeviceInstallationIDs adds the "device_installation" edge to the DeviceInstallation entity by IDs.
+func (duo *DeviceUpdateOne) AddDeviceInstallationIDs(ids ...int) *DeviceUpdateOne {
+	duo.mutation.AddDeviceInstallationIDs(ids...)
 	return duo
 }
 
-// AddDeviceInstallationDevice adds the "device_installation_device" edges to the DeviceInstallation entity.
-func (duo *DeviceUpdateOne) AddDeviceInstallationDevice(d ...*DeviceInstallation) *DeviceUpdateOne {
+// AddDeviceInstallation adds the "device_installation" edges to the DeviceInstallation entity.
+func (duo *DeviceUpdateOne) AddDeviceInstallation(d ...*DeviceInstallation) *DeviceUpdateOne {
 	ids := make([]int, len(d))
 	for i := range d {
 		ids[i] = d[i].ID
 	}
-	return duo.AddDeviceInstallationDeviceIDs(ids...)
+	return duo.AddDeviceInstallationIDs(ids...)
+}
+
+// AddEventLogIDs adds the "event_log" edge to the EventLog entity by IDs.
+func (duo *DeviceUpdateOne) AddEventLogIDs(ids ...int) *DeviceUpdateOne {
+	duo.mutation.AddEventLogIDs(ids...)
+	return duo
+}
+
+// AddEventLog adds the "event_log" edges to the EventLog entity.
+func (duo *DeviceUpdateOne) AddEventLog(e ...*EventLog) *DeviceUpdateOne {
+	ids := make([]int, len(e))
+	for i := range e {
+		ids[i] = e[i].ID
+	}
+	return duo.AddEventLogIDs(ids...)
+}
+
+// AddFixingIDs adds the "fixing" edge to the Fixing entity by IDs.
+func (duo *DeviceUpdateOne) AddFixingIDs(ids ...int) *DeviceUpdateOne {
+	duo.mutation.AddFixingIDs(ids...)
+	return duo
+}
+
+// AddFixing adds the "fixing" edges to the Fixing entity.
+func (duo *DeviceUpdateOne) AddFixing(f ...*Fixing) *DeviceUpdateOne {
+	ids := make([]int, len(f))
+	for i := range f {
+		ids[i] = f[i].ID
+	}
+	return duo.AddFixingIDs(ids...)
 }
 
 // Mutation returns the DeviceMutation object of the builder.
@@ -767,46 +949,88 @@ func (duo *DeviceUpdateOne) ClearUpdater() *DeviceUpdateOne {
 	return duo
 }
 
-// ClearIpcEventDevice clears all "ipc_event_device" edges to the IPCEvent entity.
-func (duo *DeviceUpdateOne) ClearIpcEventDevice() *DeviceUpdateOne {
-	duo.mutation.ClearIpcEventDevice()
+// ClearEvent clears all "event" edges to the Event entity.
+func (duo *DeviceUpdateOne) ClearEvent() *DeviceUpdateOne {
+	duo.mutation.ClearEvent()
 	return duo
 }
 
-// RemoveIpcEventDeviceIDs removes the "ipc_event_device" edge to IPCEvent entities by IDs.
-func (duo *DeviceUpdateOne) RemoveIpcEventDeviceIDs(ids ...int) *DeviceUpdateOne {
-	duo.mutation.RemoveIpcEventDeviceIDs(ids...)
+// RemoveEventIDs removes the "event" edge to Event entities by IDs.
+func (duo *DeviceUpdateOne) RemoveEventIDs(ids ...int) *DeviceUpdateOne {
+	duo.mutation.RemoveEventIDs(ids...)
 	return duo
 }
 
-// RemoveIpcEventDevice removes "ipc_event_device" edges to IPCEvent entities.
-func (duo *DeviceUpdateOne) RemoveIpcEventDevice(i ...*IPCEvent) *DeviceUpdateOne {
-	ids := make([]int, len(i))
-	for j := range i {
-		ids[j] = i[j].ID
+// RemoveEvent removes "event" edges to Event entities.
+func (duo *DeviceUpdateOne) RemoveEvent(e ...*Event) *DeviceUpdateOne {
+	ids := make([]int, len(e))
+	for i := range e {
+		ids[i] = e[i].ID
 	}
-	return duo.RemoveIpcEventDeviceIDs(ids...)
+	return duo.RemoveEventIDs(ids...)
 }
 
-// ClearDeviceInstallationDevice clears all "device_installation_device" edges to the DeviceInstallation entity.
-func (duo *DeviceUpdateOne) ClearDeviceInstallationDevice() *DeviceUpdateOne {
-	duo.mutation.ClearDeviceInstallationDevice()
+// ClearDeviceInstallation clears all "device_installation" edges to the DeviceInstallation entity.
+func (duo *DeviceUpdateOne) ClearDeviceInstallation() *DeviceUpdateOne {
+	duo.mutation.ClearDeviceInstallation()
 	return duo
 }
 
-// RemoveDeviceInstallationDeviceIDs removes the "device_installation_device" edge to DeviceInstallation entities by IDs.
-func (duo *DeviceUpdateOne) RemoveDeviceInstallationDeviceIDs(ids ...int) *DeviceUpdateOne {
-	duo.mutation.RemoveDeviceInstallationDeviceIDs(ids...)
+// RemoveDeviceInstallationIDs removes the "device_installation" edge to DeviceInstallation entities by IDs.
+func (duo *DeviceUpdateOne) RemoveDeviceInstallationIDs(ids ...int) *DeviceUpdateOne {
+	duo.mutation.RemoveDeviceInstallationIDs(ids...)
 	return duo
 }
 
-// RemoveDeviceInstallationDevice removes "device_installation_device" edges to DeviceInstallation entities.
-func (duo *DeviceUpdateOne) RemoveDeviceInstallationDevice(d ...*DeviceInstallation) *DeviceUpdateOne {
+// RemoveDeviceInstallation removes "device_installation" edges to DeviceInstallation entities.
+func (duo *DeviceUpdateOne) RemoveDeviceInstallation(d ...*DeviceInstallation) *DeviceUpdateOne {
 	ids := make([]int, len(d))
 	for i := range d {
 		ids[i] = d[i].ID
 	}
-	return duo.RemoveDeviceInstallationDeviceIDs(ids...)
+	return duo.RemoveDeviceInstallationIDs(ids...)
+}
+
+// ClearEventLog clears all "event_log" edges to the EventLog entity.
+func (duo *DeviceUpdateOne) ClearEventLog() *DeviceUpdateOne {
+	duo.mutation.ClearEventLog()
+	return duo
+}
+
+// RemoveEventLogIDs removes the "event_log" edge to EventLog entities by IDs.
+func (duo *DeviceUpdateOne) RemoveEventLogIDs(ids ...int) *DeviceUpdateOne {
+	duo.mutation.RemoveEventLogIDs(ids...)
+	return duo
+}
+
+// RemoveEventLog removes "event_log" edges to EventLog entities.
+func (duo *DeviceUpdateOne) RemoveEventLog(e ...*EventLog) *DeviceUpdateOne {
+	ids := make([]int, len(e))
+	for i := range e {
+		ids[i] = e[i].ID
+	}
+	return duo.RemoveEventLogIDs(ids...)
+}
+
+// ClearFixing clears all "fixing" edges to the Fixing entity.
+func (duo *DeviceUpdateOne) ClearFixing() *DeviceUpdateOne {
+	duo.mutation.ClearFixing()
+	return duo
+}
+
+// RemoveFixingIDs removes the "fixing" edge to Fixing entities by IDs.
+func (duo *DeviceUpdateOne) RemoveFixingIDs(ids ...int) *DeviceUpdateOne {
+	duo.mutation.RemoveFixingIDs(ids...)
+	return duo
+}
+
+// RemoveFixing removes "fixing" edges to Fixing entities.
+func (duo *DeviceUpdateOne) RemoveFixing(f ...*Fixing) *DeviceUpdateOne {
+	ids := make([]int, len(f))
+	for i := range f {
+		ids[i] = f[i].ID
+	}
+	return duo.RemoveFixingIDs(ids...)
 }
 
 // Where appends a list predicates to the DeviceUpdate builder.
@@ -854,21 +1078,21 @@ func (duo *DeviceUpdateOne) ExecX(ctx context.Context) {
 
 // defaults sets the default values of the builder before save.
 func (duo *DeviceUpdateOne) defaults() error {
-	if _, ok := duo.mutation.UpdatedAt(); !ok {
-		if device.UpdateDefaultUpdatedAt == nil {
-			return fmt.Errorf("dao: uninitialized device.UpdateDefaultUpdatedAt (forgotten import dao/runtime?)")
+	if _, ok := duo.mutation.UpdateTime(); !ok {
+		if device.UpdateDefaultUpdateTime == nil {
+			return fmt.Errorf("dao: uninitialized device.UpdateDefaultUpdateTime (forgotten import dao/runtime?)")
 		}
-		v := device.UpdateDefaultUpdatedAt()
-		duo.mutation.SetUpdatedAt(v)
+		v := device.UpdateDefaultUpdateTime()
+		duo.mutation.SetUpdateTime(v)
 	}
 	return nil
 }
 
 // check runs all checks and user-defined validators on the builder.
 func (duo *DeviceUpdateOne) check() error {
-	if v, ok := duo.mutation.UpdatedBy(); ok {
-		if err := device.UpdatedByValidator(v); err != nil {
-			return &ValidationError{Name: "updated_by", err: fmt.Errorf(`dao: validator failed for field "Device.updated_by": %w`, err)}
+	if v, ok := duo.mutation.UpdaterID(); ok {
+		if err := device.UpdaterIDValidator(v); err != nil {
+			return &ValidationError{Name: "updater_id", err: fmt.Errorf(`dao: validator failed for field "Device.updater_id": %w`, err)}
 		}
 	}
 	if v, ok := duo.mutation.Brand(); ok {
@@ -934,14 +1158,14 @@ func (duo *DeviceUpdateOne) sqlSave(ctx context.Context) (_node *Device, err err
 			}
 		}
 	}
-	if value, ok := duo.mutation.DeletedAt(); ok {
-		_spec.SetField(device.FieldDeletedAt, field.TypeTime, value)
+	if value, ok := duo.mutation.DeleteTime(); ok {
+		_spec.SetField(device.FieldDeleteTime, field.TypeTime, value)
 	}
-	if duo.mutation.DeletedAtCleared() {
-		_spec.ClearField(device.FieldDeletedAt, field.TypeTime)
+	if duo.mutation.DeleteTimeCleared() {
+		_spec.ClearField(device.FieldDeleteTime, field.TypeTime)
 	}
-	if value, ok := duo.mutation.UpdatedAt(); ok {
-		_spec.SetField(device.FieldUpdatedAt, field.TypeTime, value)
+	if value, ok := duo.mutation.UpdateTime(); ok {
+		_spec.SetField(device.FieldUpdateTime, field.TypeTime, value)
 	}
 	if value, ok := duo.mutation.Brand(); ok {
 		_spec.SetField(device.FieldBrand, field.TypeInt, value)
@@ -1008,28 +1232,28 @@ func (duo *DeviceUpdateOne) sqlSave(ctx context.Context) (_node *Device, err err
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if duo.mutation.IpcEventDeviceCleared() {
+	if duo.mutation.EventCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
-			Table:   device.IpcEventDeviceTable,
-			Columns: []string{device.IpcEventDeviceColumn},
+			Table:   device.EventTable,
+			Columns: []string{device.EventColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(ipcevent.FieldID, field.TypeInt),
+				IDSpec: sqlgraph.NewFieldSpec(event.FieldID, field.TypeInt),
 			},
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := duo.mutation.RemovedIpcEventDeviceIDs(); len(nodes) > 0 && !duo.mutation.IpcEventDeviceCleared() {
+	if nodes := duo.mutation.RemovedEventIDs(); len(nodes) > 0 && !duo.mutation.EventCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
-			Table:   device.IpcEventDeviceTable,
-			Columns: []string{device.IpcEventDeviceColumn},
+			Table:   device.EventTable,
+			Columns: []string{device.EventColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(ipcevent.FieldID, field.TypeInt),
+				IDSpec: sqlgraph.NewFieldSpec(event.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {
@@ -1037,15 +1261,15 @@ func (duo *DeviceUpdateOne) sqlSave(ctx context.Context) (_node *Device, err err
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := duo.mutation.IpcEventDeviceIDs(); len(nodes) > 0 {
+	if nodes := duo.mutation.EventIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
-			Table:   device.IpcEventDeviceTable,
-			Columns: []string{device.IpcEventDeviceColumn},
+			Table:   device.EventTable,
+			Columns: []string{device.EventColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(ipcevent.FieldID, field.TypeInt),
+				IDSpec: sqlgraph.NewFieldSpec(event.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {
@@ -1053,12 +1277,12 @@ func (duo *DeviceUpdateOne) sqlSave(ctx context.Context) (_node *Device, err err
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if duo.mutation.DeviceInstallationDeviceCleared() {
+	if duo.mutation.DeviceInstallationCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
-			Table:   device.DeviceInstallationDeviceTable,
-			Columns: []string{device.DeviceInstallationDeviceColumn},
+			Table:   device.DeviceInstallationTable,
+			Columns: []string{device.DeviceInstallationColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(deviceinstallation.FieldID, field.TypeInt),
@@ -1066,12 +1290,12 @@ func (duo *DeviceUpdateOne) sqlSave(ctx context.Context) (_node *Device, err err
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := duo.mutation.RemovedDeviceInstallationDeviceIDs(); len(nodes) > 0 && !duo.mutation.DeviceInstallationDeviceCleared() {
+	if nodes := duo.mutation.RemovedDeviceInstallationIDs(); len(nodes) > 0 && !duo.mutation.DeviceInstallationCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
-			Table:   device.DeviceInstallationDeviceTable,
-			Columns: []string{device.DeviceInstallationDeviceColumn},
+			Table:   device.DeviceInstallationTable,
+			Columns: []string{device.DeviceInstallationColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(deviceinstallation.FieldID, field.TypeInt),
@@ -1082,15 +1306,105 @@ func (duo *DeviceUpdateOne) sqlSave(ctx context.Context) (_node *Device, err err
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := duo.mutation.DeviceInstallationDeviceIDs(); len(nodes) > 0 {
+	if nodes := duo.mutation.DeviceInstallationIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
 			Inverse: false,
-			Table:   device.DeviceInstallationDeviceTable,
-			Columns: []string{device.DeviceInstallationDeviceColumn},
+			Table:   device.DeviceInstallationTable,
+			Columns: []string{device.DeviceInstallationColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(deviceinstallation.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if duo.mutation.EventLogCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   device.EventLogTable,
+			Columns: []string{device.EventLogColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(eventlog.FieldID, field.TypeInt),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := duo.mutation.RemovedEventLogIDs(); len(nodes) > 0 && !duo.mutation.EventLogCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   device.EventLogTable,
+			Columns: []string{device.EventLogColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(eventlog.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := duo.mutation.EventLogIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   device.EventLogTable,
+			Columns: []string{device.EventLogColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(eventlog.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if duo.mutation.FixingCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   device.FixingTable,
+			Columns: []string{device.FixingColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(fixing.FieldID, field.TypeInt),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := duo.mutation.RemovedFixingIDs(); len(nodes) > 0 && !duo.mutation.FixingCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   device.FixingTable,
+			Columns: []string{device.FixingColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(fixing.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := duo.mutation.FixingIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   device.FixingTable,
+			Columns: []string{device.FixingColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(fixing.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {

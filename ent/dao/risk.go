@@ -4,7 +4,6 @@ package dao
 
 import (
 	"aisecurity/ent/dao/admin"
-	"aisecurity/ent/dao/employee"
 	"aisecurity/ent/dao/risk"
 	"aisecurity/ent/dao/riskcategory"
 	"aisecurity/ent/dao/risklocation"
@@ -25,27 +24,25 @@ type Risk struct {
 	// ID of the ent.
 	ID int `json:"id,omitempty"`
 	// 创建时间
-	CreatedAt time.Time `json:"created_at"`
+	CreateTime time.Time `json:"create_time"`
 	// 创建者
-	CreatedBy int `json:"created_by"`
+	CreatorID int `json:"creator_id"`
 	// 删除时间
-	DeletedAt *time.Time `json:"deleted_at"`
+	DeleteTime *time.Time `json:"delete_time"`
 	// 最后更新者
-	UpdatedBy int `json:"updated_by"`
+	UpdaterID int `json:"updater_id"`
 	// 最后更新时间
-	UpdatedAt time.Time `json:"updated_at"`
+	UpdateTime time.Time `json:"update_time"`
 	// 标题
 	Title string `json:"title" validate:"required"`
 	// 内容
 	Content string `json:"content"`
 	// 图片
 	Images []types.UploadedImage `json:"images"`
-	// 风险类别
+	// 隐患类别
 	RiskCategoryID int `json:"risk_category_id"`
-	// 地点
+	// 隐患地点
 	RiskLocationID int `json:"risk_location_id"`
-	// 汇报人
-	ReporterID int `json:"reporter_id"`
 	// 整改人
 	MaintainerID int `json:"maintainer_id"`
 	// 整改措施
@@ -70,13 +67,11 @@ type RiskEdges struct {
 	RiskCategory *RiskCategory `json:"risk_category,omitempty"`
 	// RiskLocation holds the value of the risk_location edge.
 	RiskLocation *RiskLocation `json:"risk_location,omitempty"`
-	// Reporter holds the value of the reporter edge.
-	Reporter *Employee `json:"reporter,omitempty"`
 	// Maintainer holds the value of the maintainer edge.
-	Maintainer *Employee `json:"maintainer,omitempty"`
+	Maintainer *Admin `json:"maintainer,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
-	loadedTypes [6]bool
+	loadedTypes [5]bool
 }
 
 // CreatorOrErr returns the Creator value or an error if the edge
@@ -131,26 +126,13 @@ func (e RiskEdges) RiskLocationOrErr() (*RiskLocation, error) {
 	return nil, &NotLoadedError{edge: "risk_location"}
 }
 
-// ReporterOrErr returns the Reporter value or an error if the edge
-// was not loaded in eager-loading, or loaded but was not found.
-func (e RiskEdges) ReporterOrErr() (*Employee, error) {
-	if e.loadedTypes[4] {
-		if e.Reporter == nil {
-			// Edge was loaded but was not found.
-			return nil, &NotFoundError{label: employee.Label}
-		}
-		return e.Reporter, nil
-	}
-	return nil, &NotLoadedError{edge: "reporter"}
-}
-
 // MaintainerOrErr returns the Maintainer value or an error if the edge
 // was not loaded in eager-loading, or loaded but was not found.
-func (e RiskEdges) MaintainerOrErr() (*Employee, error) {
-	if e.loadedTypes[5] {
+func (e RiskEdges) MaintainerOrErr() (*Admin, error) {
+	if e.loadedTypes[4] {
 		if e.Maintainer == nil {
 			// Edge was loaded but was not found.
-			return nil, &NotFoundError{label: employee.Label}
+			return nil, &NotFoundError{label: admin.Label}
 		}
 		return e.Maintainer, nil
 	}
@@ -164,11 +146,11 @@ func (*Risk) scanValues(columns []string) ([]any, error) {
 		switch columns[i] {
 		case risk.FieldImages:
 			values[i] = new([]byte)
-		case risk.FieldID, risk.FieldCreatedBy, risk.FieldUpdatedBy, risk.FieldRiskCategoryID, risk.FieldRiskLocationID, risk.FieldReporterID, risk.FieldMaintainerID, risk.FieldMaintainStatus:
+		case risk.FieldID, risk.FieldCreatorID, risk.FieldUpdaterID, risk.FieldRiskCategoryID, risk.FieldRiskLocationID, risk.FieldMaintainerID, risk.FieldMaintainStatus:
 			values[i] = new(sql.NullInt64)
 		case risk.FieldTitle, risk.FieldContent, risk.FieldMeasures:
 			values[i] = new(sql.NullString)
-		case risk.FieldCreatedAt, risk.FieldDeletedAt, risk.FieldUpdatedAt, risk.FieldDueTime:
+		case risk.FieldCreateTime, risk.FieldDeleteTime, risk.FieldUpdateTime, risk.FieldDueTime:
 			values[i] = new(sql.NullTime)
 		default:
 			values[i] = new(sql.UnknownType)
@@ -191,36 +173,36 @@ func (r *Risk) assignValues(columns []string, values []any) error {
 				return fmt.Errorf("unexpected type %T for field id", value)
 			}
 			r.ID = int(value.Int64)
-		case risk.FieldCreatedAt:
+		case risk.FieldCreateTime:
 			if value, ok := values[i].(*sql.NullTime); !ok {
-				return fmt.Errorf("unexpected type %T for field created_at", values[i])
+				return fmt.Errorf("unexpected type %T for field create_time", values[i])
 			} else if value.Valid {
-				r.CreatedAt = value.Time
+				r.CreateTime = value.Time
 			}
-		case risk.FieldCreatedBy:
+		case risk.FieldCreatorID:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
-				return fmt.Errorf("unexpected type %T for field created_by", values[i])
+				return fmt.Errorf("unexpected type %T for field creator_id", values[i])
 			} else if value.Valid {
-				r.CreatedBy = int(value.Int64)
+				r.CreatorID = int(value.Int64)
 			}
-		case risk.FieldDeletedAt:
+		case risk.FieldDeleteTime:
 			if value, ok := values[i].(*sql.NullTime); !ok {
-				return fmt.Errorf("unexpected type %T for field deleted_at", values[i])
+				return fmt.Errorf("unexpected type %T for field delete_time", values[i])
 			} else if value.Valid {
-				r.DeletedAt = new(time.Time)
-				*r.DeletedAt = value.Time
+				r.DeleteTime = new(time.Time)
+				*r.DeleteTime = value.Time
 			}
-		case risk.FieldUpdatedBy:
+		case risk.FieldUpdaterID:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
-				return fmt.Errorf("unexpected type %T for field updated_by", values[i])
+				return fmt.Errorf("unexpected type %T for field updater_id", values[i])
 			} else if value.Valid {
-				r.UpdatedBy = int(value.Int64)
+				r.UpdaterID = int(value.Int64)
 			}
-		case risk.FieldUpdatedAt:
+		case risk.FieldUpdateTime:
 			if value, ok := values[i].(*sql.NullTime); !ok {
-				return fmt.Errorf("unexpected type %T for field updated_at", values[i])
+				return fmt.Errorf("unexpected type %T for field update_time", values[i])
 			} else if value.Valid {
-				r.UpdatedAt = value.Time
+				r.UpdateTime = value.Time
 			}
 		case risk.FieldTitle:
 			if value, ok := values[i].(*sql.NullString); !ok {
@@ -253,12 +235,6 @@ func (r *Risk) assignValues(columns []string, values []any) error {
 				return fmt.Errorf("unexpected type %T for field risk_location_id", values[i])
 			} else if value.Valid {
 				r.RiskLocationID = int(value.Int64)
-			}
-		case risk.FieldReporterID:
-			if value, ok := values[i].(*sql.NullInt64); !ok {
-				return fmt.Errorf("unexpected type %T for field reporter_id", values[i])
-			} else if value.Valid {
-				r.ReporterID = int(value.Int64)
 			}
 		case risk.FieldMaintainerID:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
@@ -317,13 +293,8 @@ func (r *Risk) QueryRiskLocation() *RiskLocationQuery {
 	return NewRiskClient(r.config).QueryRiskLocation(r)
 }
 
-// QueryReporter queries the "reporter" edge of the Risk entity.
-func (r *Risk) QueryReporter() *EmployeeQuery {
-	return NewRiskClient(r.config).QueryReporter(r)
-}
-
 // QueryMaintainer queries the "maintainer" edge of the Risk entity.
-func (r *Risk) QueryMaintainer() *EmployeeQuery {
+func (r *Risk) QueryMaintainer() *AdminQuery {
 	return NewRiskClient(r.config).QueryMaintainer(r)
 }
 
@@ -350,22 +321,22 @@ func (r *Risk) String() string {
 	var builder strings.Builder
 	builder.WriteString("Risk(")
 	builder.WriteString(fmt.Sprintf("id=%v, ", r.ID))
-	builder.WriteString("created_at=")
-	builder.WriteString(r.CreatedAt.Format(time.ANSIC))
+	builder.WriteString("create_time=")
+	builder.WriteString(r.CreateTime.Format(time.ANSIC))
 	builder.WriteString(", ")
-	builder.WriteString("created_by=")
-	builder.WriteString(fmt.Sprintf("%v", r.CreatedBy))
+	builder.WriteString("creator_id=")
+	builder.WriteString(fmt.Sprintf("%v", r.CreatorID))
 	builder.WriteString(", ")
-	if v := r.DeletedAt; v != nil {
-		builder.WriteString("deleted_at=")
+	if v := r.DeleteTime; v != nil {
+		builder.WriteString("delete_time=")
 		builder.WriteString(v.Format(time.ANSIC))
 	}
 	builder.WriteString(", ")
-	builder.WriteString("updated_by=")
-	builder.WriteString(fmt.Sprintf("%v", r.UpdatedBy))
+	builder.WriteString("updater_id=")
+	builder.WriteString(fmt.Sprintf("%v", r.UpdaterID))
 	builder.WriteString(", ")
-	builder.WriteString("updated_at=")
-	builder.WriteString(r.UpdatedAt.Format(time.ANSIC))
+	builder.WriteString("update_time=")
+	builder.WriteString(r.UpdateTime.Format(time.ANSIC))
 	builder.WriteString(", ")
 	builder.WriteString("title=")
 	builder.WriteString(r.Title)
@@ -381,9 +352,6 @@ func (r *Risk) String() string {
 	builder.WriteString(", ")
 	builder.WriteString("risk_location_id=")
 	builder.WriteString(fmt.Sprintf("%v", r.RiskLocationID))
-	builder.WriteString(", ")
-	builder.WriteString("reporter_id=")
-	builder.WriteString(fmt.Sprintf("%v", r.ReporterID))
 	builder.WriteString(", ")
 	builder.WriteString("maintainer_id=")
 	builder.WriteString(fmt.Sprintf("%v", r.MaintainerID))

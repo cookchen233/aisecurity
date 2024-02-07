@@ -12,18 +12,24 @@ import (
 	"aisecurity/ent/dao/migrate"
 
 	"aisecurity/ent/dao/admin"
-	"aisecurity/ent/dao/adminrole"
 	"aisecurity/ent/dao/area"
 	"aisecurity/ent/dao/department"
 	"aisecurity/ent/dao/device"
 	"aisecurity/ent/dao/deviceinstallation"
 	"aisecurity/ent/dao/employee"
+	"aisecurity/ent/dao/event"
 	"aisecurity/ent/dao/eventlevel"
-	"aisecurity/ent/dao/ipcevent"
+	"aisecurity/ent/dao/eventlog"
+	"aisecurity/ent/dao/fixing"
 	"aisecurity/ent/dao/occupation"
+	"aisecurity/ent/dao/permission"
 	"aisecurity/ent/dao/risk"
 	"aisecurity/ent/dao/riskcategory"
 	"aisecurity/ent/dao/risklocation"
+	"aisecurity/ent/dao/sweep"
+	"aisecurity/ent/dao/sweepresult"
+	"aisecurity/ent/dao/sweepresultdetails"
+	"aisecurity/ent/dao/sweepschedule"
 	"aisecurity/ent/dao/video"
 
 	"entgo.io/ent"
@@ -41,8 +47,6 @@ type Client struct {
 	Schema *migrate.Schema
 	// Admin is the client for interacting with the Admin builders.
 	Admin *AdminClient
-	// AdminRole is the client for interacting with the AdminRole builders.
-	AdminRole *AdminRoleClient
 	// Area is the client for interacting with the Area builders.
 	Area *AreaClient
 	// Department is the client for interacting with the Department builders.
@@ -53,18 +57,32 @@ type Client struct {
 	DeviceInstallation *DeviceInstallationClient
 	// Employee is the client for interacting with the Employee builders.
 	Employee *EmployeeClient
+	// Event is the client for interacting with the Event builders.
+	Event *EventClient
 	// EventLevel is the client for interacting with the EventLevel builders.
 	EventLevel *EventLevelClient
-	// IPCEvent is the client for interacting with the IPCEvent builders.
-	IPCEvent *IPCEventClient
+	// EventLog is the client for interacting with the EventLog builders.
+	EventLog *EventLogClient
+	// Fixing is the client for interacting with the Fixing builders.
+	Fixing *FixingClient
 	// Occupation is the client for interacting with the Occupation builders.
 	Occupation *OccupationClient
+	// Permission is the client for interacting with the Permission builders.
+	Permission *PermissionClient
 	// Risk is the client for interacting with the Risk builders.
 	Risk *RiskClient
 	// RiskCategory is the client for interacting with the RiskCategory builders.
 	RiskCategory *RiskCategoryClient
 	// RiskLocation is the client for interacting with the RiskLocation builders.
 	RiskLocation *RiskLocationClient
+	// Sweep is the client for interacting with the Sweep builders.
+	Sweep *SweepClient
+	// SweepResult is the client for interacting with the SweepResult builders.
+	SweepResult *SweepResultClient
+	// SweepResultDetails is the client for interacting with the SweepResultDetails builders.
+	SweepResultDetails *SweepResultDetailsClient
+	// SweepSchedule is the client for interacting with the SweepSchedule builders.
+	SweepSchedule *SweepScheduleClient
 	// Video is the client for interacting with the Video builders.
 	Video *VideoClient
 }
@@ -79,18 +97,24 @@ func NewClient(opts ...Option) *Client {
 func (c *Client) init() {
 	c.Schema = migrate.NewSchema(c.driver)
 	c.Admin = NewAdminClient(c.config)
-	c.AdminRole = NewAdminRoleClient(c.config)
 	c.Area = NewAreaClient(c.config)
 	c.Department = NewDepartmentClient(c.config)
 	c.Device = NewDeviceClient(c.config)
 	c.DeviceInstallation = NewDeviceInstallationClient(c.config)
 	c.Employee = NewEmployeeClient(c.config)
+	c.Event = NewEventClient(c.config)
 	c.EventLevel = NewEventLevelClient(c.config)
-	c.IPCEvent = NewIPCEventClient(c.config)
+	c.EventLog = NewEventLogClient(c.config)
+	c.Fixing = NewFixingClient(c.config)
 	c.Occupation = NewOccupationClient(c.config)
+	c.Permission = NewPermissionClient(c.config)
 	c.Risk = NewRiskClient(c.config)
 	c.RiskCategory = NewRiskCategoryClient(c.config)
 	c.RiskLocation = NewRiskLocationClient(c.config)
+	c.Sweep = NewSweepClient(c.config)
+	c.SweepResult = NewSweepResultClient(c.config)
+	c.SweepResultDetails = NewSweepResultDetailsClient(c.config)
+	c.SweepSchedule = NewSweepScheduleClient(c.config)
 	c.Video = NewVideoClient(c.config)
 }
 
@@ -185,18 +209,24 @@ func (c *Client) Tx(ctx context.Context) (*Tx, error) {
 		ctx:                ctx,
 		config:             cfg,
 		Admin:              NewAdminClient(cfg),
-		AdminRole:          NewAdminRoleClient(cfg),
 		Area:               NewAreaClient(cfg),
 		Department:         NewDepartmentClient(cfg),
 		Device:             NewDeviceClient(cfg),
 		DeviceInstallation: NewDeviceInstallationClient(cfg),
 		Employee:           NewEmployeeClient(cfg),
+		Event:              NewEventClient(cfg),
 		EventLevel:         NewEventLevelClient(cfg),
-		IPCEvent:           NewIPCEventClient(cfg),
+		EventLog:           NewEventLogClient(cfg),
+		Fixing:             NewFixingClient(cfg),
 		Occupation:         NewOccupationClient(cfg),
+		Permission:         NewPermissionClient(cfg),
 		Risk:               NewRiskClient(cfg),
 		RiskCategory:       NewRiskCategoryClient(cfg),
 		RiskLocation:       NewRiskLocationClient(cfg),
+		Sweep:              NewSweepClient(cfg),
+		SweepResult:        NewSweepResultClient(cfg),
+		SweepResultDetails: NewSweepResultDetailsClient(cfg),
+		SweepSchedule:      NewSweepScheduleClient(cfg),
 		Video:              NewVideoClient(cfg),
 	}, nil
 }
@@ -218,18 +248,24 @@ func (c *Client) BeginTx(ctx context.Context, opts *sql.TxOptions) (*Tx, error) 
 		ctx:                ctx,
 		config:             cfg,
 		Admin:              NewAdminClient(cfg),
-		AdminRole:          NewAdminRoleClient(cfg),
 		Area:               NewAreaClient(cfg),
 		Department:         NewDepartmentClient(cfg),
 		Device:             NewDeviceClient(cfg),
 		DeviceInstallation: NewDeviceInstallationClient(cfg),
 		Employee:           NewEmployeeClient(cfg),
+		Event:              NewEventClient(cfg),
 		EventLevel:         NewEventLevelClient(cfg),
-		IPCEvent:           NewIPCEventClient(cfg),
+		EventLog:           NewEventLogClient(cfg),
+		Fixing:             NewFixingClient(cfg),
 		Occupation:         NewOccupationClient(cfg),
+		Permission:         NewPermissionClient(cfg),
 		Risk:               NewRiskClient(cfg),
 		RiskCategory:       NewRiskCategoryClient(cfg),
 		RiskLocation:       NewRiskLocationClient(cfg),
+		Sweep:              NewSweepClient(cfg),
+		SweepResult:        NewSweepResultClient(cfg),
+		SweepResultDetails: NewSweepResultDetailsClient(cfg),
+		SweepSchedule:      NewSweepScheduleClient(cfg),
 		Video:              NewVideoClient(cfg),
 	}, nil
 }
@@ -260,9 +296,10 @@ func (c *Client) Close() error {
 // In order to add hooks to a specific client, call: `client.Node.Use(...)`.
 func (c *Client) Use(hooks ...Hook) {
 	for _, n := range []interface{ Use(...Hook) }{
-		c.Admin, c.AdminRole, c.Area, c.Department, c.Device, c.DeviceInstallation,
-		c.Employee, c.EventLevel, c.IPCEvent, c.Occupation, c.Risk, c.RiskCategory,
-		c.RiskLocation, c.Video,
+		c.Admin, c.Area, c.Department, c.Device, c.DeviceInstallation, c.Employee,
+		c.Event, c.EventLevel, c.EventLog, c.Fixing, c.Occupation, c.Permission,
+		c.Risk, c.RiskCategory, c.RiskLocation, c.Sweep, c.SweepResult,
+		c.SweepResultDetails, c.SweepSchedule, c.Video,
 	} {
 		n.Use(hooks...)
 	}
@@ -272,9 +309,10 @@ func (c *Client) Use(hooks ...Hook) {
 // In order to add interceptors to a specific client, call: `client.Node.Intercept(...)`.
 func (c *Client) Intercept(interceptors ...Interceptor) {
 	for _, n := range []interface{ Intercept(...Interceptor) }{
-		c.Admin, c.AdminRole, c.Area, c.Department, c.Device, c.DeviceInstallation,
-		c.Employee, c.EventLevel, c.IPCEvent, c.Occupation, c.Risk, c.RiskCategory,
-		c.RiskLocation, c.Video,
+		c.Admin, c.Area, c.Department, c.Device, c.DeviceInstallation, c.Employee,
+		c.Event, c.EventLevel, c.EventLog, c.Fixing, c.Occupation, c.Permission,
+		c.Risk, c.RiskCategory, c.RiskLocation, c.Sweep, c.SweepResult,
+		c.SweepResultDetails, c.SweepSchedule, c.Video,
 	} {
 		n.Intercept(interceptors...)
 	}
@@ -285,8 +323,6 @@ func (c *Client) Mutate(ctx context.Context, m Mutation) (Value, error) {
 	switch m := m.(type) {
 	case *AdminMutation:
 		return c.Admin.mutate(ctx, m)
-	case *AdminRoleMutation:
-		return c.AdminRole.mutate(ctx, m)
 	case *AreaMutation:
 		return c.Area.mutate(ctx, m)
 	case *DepartmentMutation:
@@ -297,18 +333,32 @@ func (c *Client) Mutate(ctx context.Context, m Mutation) (Value, error) {
 		return c.DeviceInstallation.mutate(ctx, m)
 	case *EmployeeMutation:
 		return c.Employee.mutate(ctx, m)
+	case *EventMutation:
+		return c.Event.mutate(ctx, m)
 	case *EventLevelMutation:
 		return c.EventLevel.mutate(ctx, m)
-	case *IPCEventMutation:
-		return c.IPCEvent.mutate(ctx, m)
+	case *EventLogMutation:
+		return c.EventLog.mutate(ctx, m)
+	case *FixingMutation:
+		return c.Fixing.mutate(ctx, m)
 	case *OccupationMutation:
 		return c.Occupation.mutate(ctx, m)
+	case *PermissionMutation:
+		return c.Permission.mutate(ctx, m)
 	case *RiskMutation:
 		return c.Risk.mutate(ctx, m)
 	case *RiskCategoryMutation:
 		return c.RiskCategory.mutate(ctx, m)
 	case *RiskLocationMutation:
 		return c.RiskLocation.mutate(ctx, m)
+	case *SweepMutation:
+		return c.Sweep.mutate(ctx, m)
+	case *SweepResultMutation:
+		return c.SweepResult.mutate(ctx, m)
+	case *SweepResultDetailsMutation:
+		return c.SweepResultDetails.mutate(ctx, m)
+	case *SweepScheduleMutation:
+		return c.SweepSchedule.mutate(ctx, m)
 	case *VideoMutation:
 		return c.Video.mutate(ctx, m)
 	default:
@@ -456,15 +506,15 @@ func (c *AdminClient) QueryUpdater(a *Admin) *AdminQuery {
 	return query
 }
 
-// QueryAdminRoles queries the admin_roles edge of a Admin.
-func (c *AdminClient) QueryAdminRoles(a *Admin) *AdminRoleQuery {
-	query := (&AdminRoleClient{config: c.config}).Query()
+// QueryPermissions queries the permissions edge of a Admin.
+func (c *AdminClient) QueryPermissions(a *Admin) *PermissionQuery {
+	query := (&PermissionClient{config: c.config}).Query()
 	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
 		id := a.ID
 		step := sqlgraph.NewStep(
 			sqlgraph.From(admin.Table, admin.FieldID, id),
-			sqlgraph.To(adminrole.Table, adminrole.FieldID),
-			sqlgraph.Edge(sqlgraph.M2M, true, admin.AdminRolesTable, admin.AdminRolesPrimaryKey...),
+			sqlgraph.To(permission.Table, permission.FieldID),
+			sqlgraph.Edge(sqlgraph.M2M, true, admin.PermissionsTable, admin.PermissionsPrimaryKey...),
 		)
 		fromV = sqlgraph.Neighbors(a.driver.Dialect(), step)
 		return fromV, nil
@@ -504,15 +554,15 @@ func (c *AdminClient) QueryAdminUpdater(a *Admin) *AdminQuery {
 	return query
 }
 
-// QueryAdminRoleCreator queries the admin_role_creator edge of a Admin.
-func (c *AdminClient) QueryAdminRoleCreator(a *Admin) *AdminRoleQuery {
-	query := (&AdminRoleClient{config: c.config}).Query()
+// QueryPermissionCreator queries the permission_creator edge of a Admin.
+func (c *AdminClient) QueryPermissionCreator(a *Admin) *PermissionQuery {
+	query := (&PermissionClient{config: c.config}).Query()
 	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
 		id := a.ID
 		step := sqlgraph.NewStep(
 			sqlgraph.From(admin.Table, admin.FieldID, id),
-			sqlgraph.To(adminrole.Table, adminrole.FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, false, admin.AdminRoleCreatorTable, admin.AdminRoleCreatorColumn),
+			sqlgraph.To(permission.Table, permission.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, admin.PermissionCreatorTable, admin.PermissionCreatorColumn),
 		)
 		fromV = sqlgraph.Neighbors(a.driver.Dialect(), step)
 		return fromV, nil
@@ -520,15 +570,15 @@ func (c *AdminClient) QueryAdminRoleCreator(a *Admin) *AdminRoleQuery {
 	return query
 }
 
-// QueryAdminRoleUpdater queries the admin_role_updater edge of a Admin.
-func (c *AdminClient) QueryAdminRoleUpdater(a *Admin) *AdminRoleQuery {
-	query := (&AdminRoleClient{config: c.config}).Query()
+// QueryPermissionUpdater queries the permission_updater edge of a Admin.
+func (c *AdminClient) QueryPermissionUpdater(a *Admin) *PermissionQuery {
+	query := (&PermissionClient{config: c.config}).Query()
 	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
 		id := a.ID
 		step := sqlgraph.NewStep(
 			sqlgraph.From(admin.Table, admin.FieldID, id),
-			sqlgraph.To(adminrole.Table, adminrole.FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, false, admin.AdminRoleUpdaterTable, admin.AdminRoleUpdaterColumn),
+			sqlgraph.To(permission.Table, permission.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, admin.PermissionUpdaterTable, admin.PermissionUpdaterColumn),
 		)
 		fromV = sqlgraph.Neighbors(a.driver.Dialect(), step)
 		return fromV, nil
@@ -561,6 +611,22 @@ func (c *AdminClient) QueryRiskUpdater(a *Admin) *RiskQuery {
 			sqlgraph.From(admin.Table, admin.FieldID, id),
 			sqlgraph.To(risk.Table, risk.FieldID),
 			sqlgraph.Edge(sqlgraph.O2M, false, admin.RiskUpdaterTable, admin.RiskUpdaterColumn),
+		)
+		fromV = sqlgraph.Neighbors(a.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryRiskMaintainer queries the risk_maintainer edge of a Admin.
+func (c *AdminClient) QueryRiskMaintainer(a *Admin) *RiskQuery {
+	query := (&RiskClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := a.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(admin.Table, admin.FieldID, id),
+			sqlgraph.To(risk.Table, risk.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, admin.RiskMaintainerTable, admin.RiskMaintainerColumn),
 		)
 		fromV = sqlgraph.Neighbors(a.driver.Dialect(), step)
 		return fromV, nil
@@ -704,7 +770,7 @@ func (c *AdminClient) QueryEmployee(a *Admin) *EmployeeQuery {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(admin.Table, admin.FieldID, id),
 			sqlgraph.To(employee.Table, employee.FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, false, admin.EmployeeTable, admin.EmployeeColumn),
+			sqlgraph.Edge(sqlgraph.O2O, false, admin.EmployeeTable, admin.EmployeeColumn),
 		)
 		fromV = sqlgraph.Neighbors(a.driver.Dialect(), step)
 		return fromV, nil
@@ -744,15 +810,15 @@ func (c *AdminClient) QueryOccupationUpdater(a *Admin) *OccupationQuery {
 	return query
 }
 
-// QueryIpcEventCreator queries the ipc_event_creator edge of a Admin.
-func (c *AdminClient) QueryIpcEventCreator(a *Admin) *IPCEventQuery {
-	query := (&IPCEventClient{config: c.config}).Query()
+// QueryEventCreator queries the event_creator edge of a Admin.
+func (c *AdminClient) QueryEventCreator(a *Admin) *EventQuery {
+	query := (&EventClient{config: c.config}).Query()
 	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
 		id := a.ID
 		step := sqlgraph.NewStep(
 			sqlgraph.From(admin.Table, admin.FieldID, id),
-			sqlgraph.To(ipcevent.Table, ipcevent.FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, false, admin.IpcEventCreatorTable, admin.IpcEventCreatorColumn),
+			sqlgraph.To(event.Table, event.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, admin.EventCreatorTable, admin.EventCreatorColumn),
 		)
 		fromV = sqlgraph.Neighbors(a.driver.Dialect(), step)
 		return fromV, nil
@@ -760,15 +826,15 @@ func (c *AdminClient) QueryIpcEventCreator(a *Admin) *IPCEventQuery {
 	return query
 }
 
-// QueryIpcEventUpdater queries the ipc_event_updater edge of a Admin.
-func (c *AdminClient) QueryIpcEventUpdater(a *Admin) *IPCEventQuery {
-	query := (&IPCEventClient{config: c.config}).Query()
+// QueryEventUpdater queries the event_updater edge of a Admin.
+func (c *AdminClient) QueryEventUpdater(a *Admin) *EventQuery {
+	query := (&EventClient{config: c.config}).Query()
 	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
 		id := a.ID
 		step := sqlgraph.NewStep(
 			sqlgraph.From(admin.Table, admin.FieldID, id),
-			sqlgraph.To(ipcevent.Table, ipcevent.FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, false, admin.IpcEventUpdaterTable, admin.IpcEventUpdaterColumn),
+			sqlgraph.To(event.Table, event.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, admin.EventUpdaterTable, admin.EventUpdaterColumn),
 		)
 		fromV = sqlgraph.Neighbors(a.driver.Dialect(), step)
 		return fromV, nil
@@ -936,6 +1002,262 @@ func (c *AdminClient) QueryEventLevelUpdater(a *Admin) *EventLevelQuery {
 	return query
 }
 
+// QueryFixingCreator queries the fixing_creator edge of a Admin.
+func (c *AdminClient) QueryFixingCreator(a *Admin) *FixingQuery {
+	query := (&FixingClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := a.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(admin.Table, admin.FieldID, id),
+			sqlgraph.To(fixing.Table, fixing.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, admin.FixingCreatorTable, admin.FixingCreatorColumn),
+		)
+		fromV = sqlgraph.Neighbors(a.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryFixingUpdater queries the fixing_updater edge of a Admin.
+func (c *AdminClient) QueryFixingUpdater(a *Admin) *FixingQuery {
+	query := (&FixingClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := a.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(admin.Table, admin.FieldID, id),
+			sqlgraph.To(fixing.Table, fixing.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, admin.FixingUpdaterTable, admin.FixingUpdaterColumn),
+		)
+		fromV = sqlgraph.Neighbors(a.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryFixer queries the fixer edge of a Admin.
+func (c *AdminClient) QueryFixer(a *Admin) *FixingQuery {
+	query := (&FixingClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := a.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(admin.Table, admin.FieldID, id),
+			sqlgraph.To(fixing.Table, fixing.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, admin.FixerTable, admin.FixerColumn),
+		)
+		fromV = sqlgraph.Neighbors(a.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryEventLogCreator queries the event_log_creator edge of a Admin.
+func (c *AdminClient) QueryEventLogCreator(a *Admin) *EventLogQuery {
+	query := (&EventLogClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := a.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(admin.Table, admin.FieldID, id),
+			sqlgraph.To(eventlog.Table, eventlog.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, admin.EventLogCreatorTable, admin.EventLogCreatorColumn),
+		)
+		fromV = sqlgraph.Neighbors(a.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryEventLogUpdater queries the event_log_updater edge of a Admin.
+func (c *AdminClient) QueryEventLogUpdater(a *Admin) *EventLogQuery {
+	query := (&EventLogClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := a.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(admin.Table, admin.FieldID, id),
+			sqlgraph.To(eventlog.Table, eventlog.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, admin.EventLogUpdaterTable, admin.EventLogUpdaterColumn),
+		)
+		fromV = sqlgraph.Neighbors(a.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryEventLogActor queries the event_log_actor edge of a Admin.
+func (c *AdminClient) QueryEventLogActor(a *Admin) *EventLogQuery {
+	query := (&EventLogClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := a.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(admin.Table, admin.FieldID, id),
+			sqlgraph.To(eventlog.Table, eventlog.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, admin.EventLogActorTable, admin.EventLogActorColumn),
+		)
+		fromV = sqlgraph.Neighbors(a.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryEventLogActor2 queries the event_log_actor2 edge of a Admin.
+func (c *AdminClient) QueryEventLogActor2(a *Admin) *EventLogQuery {
+	query := (&EventLogClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := a.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(admin.Table, admin.FieldID, id),
+			sqlgraph.To(eventlog.Table, eventlog.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, admin.EventLogActor2Table, admin.EventLogActor2Column),
+		)
+		fromV = sqlgraph.Neighbors(a.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QuerySweepCreator queries the sweep_creator edge of a Admin.
+func (c *AdminClient) QuerySweepCreator(a *Admin) *SweepQuery {
+	query := (&SweepClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := a.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(admin.Table, admin.FieldID, id),
+			sqlgraph.To(sweep.Table, sweep.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, admin.SweepCreatorTable, admin.SweepCreatorColumn),
+		)
+		fromV = sqlgraph.Neighbors(a.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QuerySweepUpdater queries the sweep_updater edge of a Admin.
+func (c *AdminClient) QuerySweepUpdater(a *Admin) *SweepQuery {
+	query := (&SweepClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := a.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(admin.Table, admin.FieldID, id),
+			sqlgraph.To(sweep.Table, sweep.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, admin.SweepUpdaterTable, admin.SweepUpdaterColumn),
+		)
+		fromV = sqlgraph.Neighbors(a.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QuerySweepScheduleCreator queries the sweep_schedule_creator edge of a Admin.
+func (c *AdminClient) QuerySweepScheduleCreator(a *Admin) *SweepScheduleQuery {
+	query := (&SweepScheduleClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := a.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(admin.Table, admin.FieldID, id),
+			sqlgraph.To(sweepschedule.Table, sweepschedule.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, admin.SweepScheduleCreatorTable, admin.SweepScheduleCreatorColumn),
+		)
+		fromV = sqlgraph.Neighbors(a.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QuerySweepScheduleUpdater queries the sweep_schedule_updater edge of a Admin.
+func (c *AdminClient) QuerySweepScheduleUpdater(a *Admin) *SweepScheduleQuery {
+	query := (&SweepScheduleClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := a.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(admin.Table, admin.FieldID, id),
+			sqlgraph.To(sweepschedule.Table, sweepschedule.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, admin.SweepScheduleUpdaterTable, admin.SweepScheduleUpdaterColumn),
+		)
+		fromV = sqlgraph.Neighbors(a.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QuerySweepSchedule queries the sweep_schedule edge of a Admin.
+func (c *AdminClient) QuerySweepSchedule(a *Admin) *SweepScheduleQuery {
+	query := (&SweepScheduleClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := a.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(admin.Table, admin.FieldID, id),
+			sqlgraph.To(sweepschedule.Table, sweepschedule.FieldID),
+			sqlgraph.Edge(sqlgraph.M2M, false, admin.SweepScheduleTable, admin.SweepSchedulePrimaryKey...),
+		)
+		fromV = sqlgraph.Neighbors(a.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QuerySweepResultCreator queries the sweep_result_creator edge of a Admin.
+func (c *AdminClient) QuerySweepResultCreator(a *Admin) *SweepResultQuery {
+	query := (&SweepResultClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := a.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(admin.Table, admin.FieldID, id),
+			sqlgraph.To(sweepresult.Table, sweepresult.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, admin.SweepResultCreatorTable, admin.SweepResultCreatorColumn),
+		)
+		fromV = sqlgraph.Neighbors(a.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QuerySweepResultUpdater queries the sweep_result_updater edge of a Admin.
+func (c *AdminClient) QuerySweepResultUpdater(a *Admin) *SweepResultQuery {
+	query := (&SweepResultClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := a.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(admin.Table, admin.FieldID, id),
+			sqlgraph.To(sweepresult.Table, sweepresult.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, admin.SweepResultUpdaterTable, admin.SweepResultUpdaterColumn),
+		)
+		fromV = sqlgraph.Neighbors(a.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QuerySweepResultDetailsCreator queries the sweep_result_details_creator edge of a Admin.
+func (c *AdminClient) QuerySweepResultDetailsCreator(a *Admin) *SweepResultDetailsQuery {
+	query := (&SweepResultDetailsClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := a.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(admin.Table, admin.FieldID, id),
+			sqlgraph.To(sweepresultdetails.Table, sweepresultdetails.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, admin.SweepResultDetailsCreatorTable, admin.SweepResultDetailsCreatorColumn),
+		)
+		fromV = sqlgraph.Neighbors(a.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QuerySweepResultDetailsUpdater queries the sweep_result_details_updater edge of a Admin.
+func (c *AdminClient) QuerySweepResultDetailsUpdater(a *Admin) *SweepResultDetailsQuery {
+	query := (&SweepResultDetailsClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := a.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(admin.Table, admin.FieldID, id),
+			sqlgraph.To(sweepresultdetails.Table, sweepresultdetails.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, admin.SweepResultDetailsUpdaterTable, admin.SweepResultDetailsUpdaterColumn),
+		)
+		fromV = sqlgraph.Neighbors(a.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
 // Hooks returns the client hooks.
 func (c *AdminClient) Hooks() []Hook {
 	hooks := c.hooks.Admin
@@ -959,187 +1281,6 @@ func (c *AdminClient) mutate(ctx context.Context, m *AdminMutation) (Value, erro
 		return (&AdminDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
 	default:
 		return nil, fmt.Errorf("dao: unknown Admin mutation op: %q", m.Op())
-	}
-}
-
-// AdminRoleClient is a client for the AdminRole schema.
-type AdminRoleClient struct {
-	config
-}
-
-// NewAdminRoleClient returns a client for the AdminRole from the given config.
-func NewAdminRoleClient(c config) *AdminRoleClient {
-	return &AdminRoleClient{config: c}
-}
-
-// Use adds a list of mutation hooks to the hooks stack.
-// A call to `Use(f, g, h)` equals to `adminrole.Hooks(f(g(h())))`.
-func (c *AdminRoleClient) Use(hooks ...Hook) {
-	c.hooks.AdminRole = append(c.hooks.AdminRole, hooks...)
-}
-
-// Intercept adds a list of query interceptors to the interceptors stack.
-// A call to `Intercept(f, g, h)` equals to `adminrole.Intercept(f(g(h())))`.
-func (c *AdminRoleClient) Intercept(interceptors ...Interceptor) {
-	c.inters.AdminRole = append(c.inters.AdminRole, interceptors...)
-}
-
-// Create returns a builder for creating a AdminRole entity.
-func (c *AdminRoleClient) Create() *AdminRoleCreate {
-	mutation := newAdminRoleMutation(c.config, OpCreate)
-	return &AdminRoleCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
-}
-
-// CreateBulk returns a builder for creating a bulk of AdminRole entities.
-func (c *AdminRoleClient) CreateBulk(builders ...*AdminRoleCreate) *AdminRoleCreateBulk {
-	return &AdminRoleCreateBulk{config: c.config, builders: builders}
-}
-
-// MapCreateBulk creates a bulk creation builder from the given slice. For each item in the slice, the function creates
-// a builder and applies setFunc on it.
-func (c *AdminRoleClient) MapCreateBulk(slice any, setFunc func(*AdminRoleCreate, int)) *AdminRoleCreateBulk {
-	rv := reflect.ValueOf(slice)
-	if rv.Kind() != reflect.Slice {
-		return &AdminRoleCreateBulk{err: fmt.Errorf("calling to AdminRoleClient.MapCreateBulk with wrong type %T, need slice", slice)}
-	}
-	builders := make([]*AdminRoleCreate, rv.Len())
-	for i := 0; i < rv.Len(); i++ {
-		builders[i] = c.Create()
-		setFunc(builders[i], i)
-	}
-	return &AdminRoleCreateBulk{config: c.config, builders: builders}
-}
-
-// Update returns an update builder for AdminRole.
-func (c *AdminRoleClient) Update() *AdminRoleUpdate {
-	mutation := newAdminRoleMutation(c.config, OpUpdate)
-	return &AdminRoleUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
-}
-
-// UpdateOne returns an update builder for the given entity.
-func (c *AdminRoleClient) UpdateOne(ar *AdminRole) *AdminRoleUpdateOne {
-	mutation := newAdminRoleMutation(c.config, OpUpdateOne, withAdminRole(ar))
-	return &AdminRoleUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
-}
-
-// UpdateOneID returns an update builder for the given id.
-func (c *AdminRoleClient) UpdateOneID(id int) *AdminRoleUpdateOne {
-	mutation := newAdminRoleMutation(c.config, OpUpdateOne, withAdminRoleID(id))
-	return &AdminRoleUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
-}
-
-// Delete returns a delete builder for AdminRole.
-func (c *AdminRoleClient) Delete() *AdminRoleDelete {
-	mutation := newAdminRoleMutation(c.config, OpDelete)
-	return &AdminRoleDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
-}
-
-// DeleteOne returns a builder for deleting the given entity.
-func (c *AdminRoleClient) DeleteOne(ar *AdminRole) *AdminRoleDeleteOne {
-	return c.DeleteOneID(ar.ID)
-}
-
-// DeleteOneID returns a builder for deleting the given entity by its id.
-func (c *AdminRoleClient) DeleteOneID(id int) *AdminRoleDeleteOne {
-	builder := c.Delete().Where(adminrole.ID(id))
-	builder.mutation.id = &id
-	builder.mutation.op = OpDeleteOne
-	return &AdminRoleDeleteOne{builder}
-}
-
-// Query returns a query builder for AdminRole.
-func (c *AdminRoleClient) Query() *AdminRoleQuery {
-	return &AdminRoleQuery{
-		config: c.config,
-		ctx:    &QueryContext{Type: TypeAdminRole},
-		inters: c.Interceptors(),
-	}
-}
-
-// Get returns a AdminRole entity by its id.
-func (c *AdminRoleClient) Get(ctx context.Context, id int) (*AdminRole, error) {
-	return c.Query().Where(adminrole.ID(id)).Only(ctx)
-}
-
-// GetX is like Get, but panics if an error occurs.
-func (c *AdminRoleClient) GetX(ctx context.Context, id int) *AdminRole {
-	obj, err := c.Get(ctx, id)
-	if err != nil {
-		panic(err)
-	}
-	return obj
-}
-
-// QueryCreator queries the creator edge of a AdminRole.
-func (c *AdminRoleClient) QueryCreator(ar *AdminRole) *AdminQuery {
-	query := (&AdminClient{config: c.config}).Query()
-	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
-		id := ar.ID
-		step := sqlgraph.NewStep(
-			sqlgraph.From(adminrole.Table, adminrole.FieldID, id),
-			sqlgraph.To(admin.Table, admin.FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, true, adminrole.CreatorTable, adminrole.CreatorColumn),
-		)
-		fromV = sqlgraph.Neighbors(ar.driver.Dialect(), step)
-		return fromV, nil
-	}
-	return query
-}
-
-// QueryUpdater queries the updater edge of a AdminRole.
-func (c *AdminRoleClient) QueryUpdater(ar *AdminRole) *AdminQuery {
-	query := (&AdminClient{config: c.config}).Query()
-	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
-		id := ar.ID
-		step := sqlgraph.NewStep(
-			sqlgraph.From(adminrole.Table, adminrole.FieldID, id),
-			sqlgraph.To(admin.Table, admin.FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, true, adminrole.UpdaterTable, adminrole.UpdaterColumn),
-		)
-		fromV = sqlgraph.Neighbors(ar.driver.Dialect(), step)
-		return fromV, nil
-	}
-	return query
-}
-
-// QueryAdmins queries the admins edge of a AdminRole.
-func (c *AdminRoleClient) QueryAdmins(ar *AdminRole) *AdminQuery {
-	query := (&AdminClient{config: c.config}).Query()
-	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
-		id := ar.ID
-		step := sqlgraph.NewStep(
-			sqlgraph.From(adminrole.Table, adminrole.FieldID, id),
-			sqlgraph.To(admin.Table, admin.FieldID),
-			sqlgraph.Edge(sqlgraph.M2M, false, adminrole.AdminsTable, adminrole.AdminsPrimaryKey...),
-		)
-		fromV = sqlgraph.Neighbors(ar.driver.Dialect(), step)
-		return fromV, nil
-	}
-	return query
-}
-
-// Hooks returns the client hooks.
-func (c *AdminRoleClient) Hooks() []Hook {
-	return c.hooks.AdminRole
-}
-
-// Interceptors returns the client interceptors.
-func (c *AdminRoleClient) Interceptors() []Interceptor {
-	return c.inters.AdminRole
-}
-
-func (c *AdminRoleClient) mutate(ctx context.Context, m *AdminRoleMutation) (Value, error) {
-	switch m.Op() {
-	case OpCreate:
-		return (&AdminRoleCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
-	case OpUpdate:
-		return (&AdminRoleUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
-	case OpUpdateOne:
-		return (&AdminRoleUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
-	case OpDelete, OpDeleteOne:
-		return (&AdminRoleDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
-	default:
-		return nil, fmt.Errorf("dao: unknown AdminRole mutation op: %q", m.Op())
 	}
 }
 
@@ -1283,15 +1424,15 @@ func (c *AreaClient) QueryUpdater(a *Area) *AdminQuery {
 	return query
 }
 
-// QueryDeviceInstallationArea queries the device_installation_area edge of a Area.
-func (c *AreaClient) QueryDeviceInstallationArea(a *Area) *DeviceInstallationQuery {
+// QueryDeviceInstallation queries the device_installation edge of a Area.
+func (c *AreaClient) QueryDeviceInstallation(a *Area) *DeviceInstallationQuery {
 	query := (&DeviceInstallationClient{config: c.config}).Query()
 	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
 		id := a.ID
 		step := sqlgraph.NewStep(
 			sqlgraph.From(area.Table, area.FieldID, id),
 			sqlgraph.To(deviceinstallation.Table, deviceinstallation.FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, false, area.DeviceInstallationAreaTable, area.DeviceInstallationAreaColumn),
+			sqlgraph.Edge(sqlgraph.O2M, false, area.DeviceInstallationTable, area.DeviceInstallationColumn),
 		)
 		fromV = sqlgraph.Neighbors(a.driver.Dialect(), step)
 		return fromV, nil
@@ -1474,6 +1615,22 @@ func (c *DepartmentClient) QueryParent(d *Department) *DepartmentQuery {
 			sqlgraph.From(department.Table, department.FieldID, id),
 			sqlgraph.To(department.Table, department.FieldID),
 			sqlgraph.Edge(sqlgraph.M2O, true, department.ParentTable, department.ParentColumn),
+		)
+		fromV = sqlgraph.Neighbors(d.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryPermissions queries the permissions edge of a Department.
+func (c *DepartmentClient) QueryPermissions(d *Department) *PermissionQuery {
+	query := (&PermissionClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := d.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(department.Table, department.FieldID, id),
+			sqlgraph.To(permission.Table, permission.FieldID),
+			sqlgraph.Edge(sqlgraph.M2M, true, department.PermissionsTable, department.PermissionsPrimaryKey...),
 		)
 		fromV = sqlgraph.Neighbors(d.driver.Dialect(), step)
 		return fromV, nil
@@ -1679,15 +1836,15 @@ func (c *DeviceClient) QueryUpdater(d *Device) *AdminQuery {
 	return query
 }
 
-// QueryIpcEventDevice queries the ipc_event_device edge of a Device.
-func (c *DeviceClient) QueryIpcEventDevice(d *Device) *IPCEventQuery {
-	query := (&IPCEventClient{config: c.config}).Query()
+// QueryEvent queries the event edge of a Device.
+func (c *DeviceClient) QueryEvent(d *Device) *EventQuery {
+	query := (&EventClient{config: c.config}).Query()
 	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
 		id := d.ID
 		step := sqlgraph.NewStep(
 			sqlgraph.From(device.Table, device.FieldID, id),
-			sqlgraph.To(ipcevent.Table, ipcevent.FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, false, device.IpcEventDeviceTable, device.IpcEventDeviceColumn),
+			sqlgraph.To(event.Table, event.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, device.EventTable, device.EventColumn),
 		)
 		fromV = sqlgraph.Neighbors(d.driver.Dialect(), step)
 		return fromV, nil
@@ -1695,15 +1852,47 @@ func (c *DeviceClient) QueryIpcEventDevice(d *Device) *IPCEventQuery {
 	return query
 }
 
-// QueryDeviceInstallationDevice queries the device_installation_device edge of a Device.
-func (c *DeviceClient) QueryDeviceInstallationDevice(d *Device) *DeviceInstallationQuery {
+// QueryDeviceInstallation queries the device_installation edge of a Device.
+func (c *DeviceClient) QueryDeviceInstallation(d *Device) *DeviceInstallationQuery {
 	query := (&DeviceInstallationClient{config: c.config}).Query()
 	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
 		id := d.ID
 		step := sqlgraph.NewStep(
 			sqlgraph.From(device.Table, device.FieldID, id),
 			sqlgraph.To(deviceinstallation.Table, deviceinstallation.FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, false, device.DeviceInstallationDeviceTable, device.DeviceInstallationDeviceColumn),
+			sqlgraph.Edge(sqlgraph.O2M, false, device.DeviceInstallationTable, device.DeviceInstallationColumn),
+		)
+		fromV = sqlgraph.Neighbors(d.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryEventLog queries the event_log edge of a Device.
+func (c *DeviceClient) QueryEventLog(d *Device) *EventLogQuery {
+	query := (&EventLogClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := d.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(device.Table, device.FieldID, id),
+			sqlgraph.To(eventlog.Table, eventlog.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, device.EventLogTable, device.EventLogColumn),
+		)
+		fromV = sqlgraph.Neighbors(d.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryFixing queries the fixing edge of a Device.
+func (c *DeviceClient) QueryFixing(d *Device) *FixingQuery {
+	query := (&FixingClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := d.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(device.Table, device.FieldID, id),
+			sqlgraph.To(fixing.Table, fixing.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, device.FixingTable, device.FixingColumn),
 		)
 		fromV = sqlgraph.Neighbors(d.driver.Dialect(), step)
 		return fromV, nil
@@ -2083,7 +2272,23 @@ func (c *EmployeeClient) QueryAdmin(e *Employee) *AdminQuery {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(employee.Table, employee.FieldID, id),
 			sqlgraph.To(admin.Table, admin.FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, true, employee.AdminTable, employee.AdminColumn),
+			sqlgraph.Edge(sqlgraph.O2O, true, employee.AdminTable, employee.AdminColumn),
+		)
+		fromV = sqlgraph.Neighbors(e.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryOccupation queries the occupation edge of a Employee.
+func (c *EmployeeClient) QueryOccupation(e *Employee) *OccupationQuery {
+	query := (&OccupationClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := e.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(employee.Table, employee.FieldID, id),
+			sqlgraph.To(occupation.Table, occupation.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, employee.OccupationTable, employee.OccupationColumn),
 		)
 		fromV = sqlgraph.Neighbors(e.driver.Dialect(), step)
 		return fromV, nil
@@ -2100,70 +2305,6 @@ func (c *EmployeeClient) QueryDepartment(e *Employee) *DepartmentQuery {
 			sqlgraph.From(employee.Table, employee.FieldID, id),
 			sqlgraph.To(department.Table, department.FieldID),
 			sqlgraph.Edge(sqlgraph.M2O, true, employee.DepartmentTable, employee.DepartmentColumn),
-		)
-		fromV = sqlgraph.Neighbors(e.driver.Dialect(), step)
-		return fromV, nil
-	}
-	return query
-}
-
-// QueryOccupations queries the occupations edge of a Employee.
-func (c *EmployeeClient) QueryOccupations(e *Employee) *OccupationQuery {
-	query := (&OccupationClient{config: c.config}).Query()
-	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
-		id := e.ID
-		step := sqlgraph.NewStep(
-			sqlgraph.From(employee.Table, employee.FieldID, id),
-			sqlgraph.To(occupation.Table, occupation.FieldID),
-			sqlgraph.Edge(sqlgraph.M2M, true, employee.OccupationsTable, employee.OccupationsPrimaryKey...),
-		)
-		fromV = sqlgraph.Neighbors(e.driver.Dialect(), step)
-		return fromV, nil
-	}
-	return query
-}
-
-// QueryIpcEvents queries the ipc_events edge of a Employee.
-func (c *EmployeeClient) QueryIpcEvents(e *Employee) *IPCEventQuery {
-	query := (&IPCEventClient{config: c.config}).Query()
-	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
-		id := e.ID
-		step := sqlgraph.NewStep(
-			sqlgraph.From(employee.Table, employee.FieldID, id),
-			sqlgraph.To(ipcevent.Table, ipcevent.FieldID),
-			sqlgraph.Edge(sqlgraph.M2M, true, employee.IpcEventsTable, employee.IpcEventsPrimaryKey...),
-		)
-		fromV = sqlgraph.Neighbors(e.driver.Dialect(), step)
-		return fromV, nil
-	}
-	return query
-}
-
-// QueryRiskReporter queries the risk_reporter edge of a Employee.
-func (c *EmployeeClient) QueryRiskReporter(e *Employee) *RiskQuery {
-	query := (&RiskClient{config: c.config}).Query()
-	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
-		id := e.ID
-		step := sqlgraph.NewStep(
-			sqlgraph.From(employee.Table, employee.FieldID, id),
-			sqlgraph.To(risk.Table, risk.FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, false, employee.RiskReporterTable, employee.RiskReporterColumn),
-		)
-		fromV = sqlgraph.Neighbors(e.driver.Dialect(), step)
-		return fromV, nil
-	}
-	return query
-}
-
-// QueryRiskMaintainer queries the risk_maintainer edge of a Employee.
-func (c *EmployeeClient) QueryRiskMaintainer(e *Employee) *RiskQuery {
-	query := (&RiskClient{config: c.config}).Query()
-	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
-		id := e.ID
-		step := sqlgraph.NewStep(
-			sqlgraph.From(employee.Table, employee.FieldID, id),
-			sqlgraph.To(risk.Table, risk.FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, false, employee.RiskMaintainerTable, employee.RiskMaintainerColumn),
 		)
 		fromV = sqlgraph.Neighbors(e.driver.Dialect(), step)
 		return fromV, nil
@@ -2194,6 +2335,236 @@ func (c *EmployeeClient) mutate(ctx context.Context, m *EmployeeMutation) (Value
 		return (&EmployeeDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
 	default:
 		return nil, fmt.Errorf("dao: unknown Employee mutation op: %q", m.Op())
+	}
+}
+
+// EventClient is a client for the Event schema.
+type EventClient struct {
+	config
+}
+
+// NewEventClient returns a client for the Event from the given config.
+func NewEventClient(c config) *EventClient {
+	return &EventClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `event.Hooks(f(g(h())))`.
+func (c *EventClient) Use(hooks ...Hook) {
+	c.hooks.Event = append(c.hooks.Event, hooks...)
+}
+
+// Intercept adds a list of query interceptors to the interceptors stack.
+// A call to `Intercept(f, g, h)` equals to `event.Intercept(f(g(h())))`.
+func (c *EventClient) Intercept(interceptors ...Interceptor) {
+	c.inters.Event = append(c.inters.Event, interceptors...)
+}
+
+// Create returns a builder for creating a Event entity.
+func (c *EventClient) Create() *EventCreate {
+	mutation := newEventMutation(c.config, OpCreate)
+	return &EventCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of Event entities.
+func (c *EventClient) CreateBulk(builders ...*EventCreate) *EventCreateBulk {
+	return &EventCreateBulk{config: c.config, builders: builders}
+}
+
+// MapCreateBulk creates a bulk creation builder from the given slice. For each item in the slice, the function creates
+// a builder and applies setFunc on it.
+func (c *EventClient) MapCreateBulk(slice any, setFunc func(*EventCreate, int)) *EventCreateBulk {
+	rv := reflect.ValueOf(slice)
+	if rv.Kind() != reflect.Slice {
+		return &EventCreateBulk{err: fmt.Errorf("calling to EventClient.MapCreateBulk with wrong type %T, need slice", slice)}
+	}
+	builders := make([]*EventCreate, rv.Len())
+	for i := 0; i < rv.Len(); i++ {
+		builders[i] = c.Create()
+		setFunc(builders[i], i)
+	}
+	return &EventCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for Event.
+func (c *EventClient) Update() *EventUpdate {
+	mutation := newEventMutation(c.config, OpUpdate)
+	return &EventUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *EventClient) UpdateOne(e *Event) *EventUpdateOne {
+	mutation := newEventMutation(c.config, OpUpdateOne, withEvent(e))
+	return &EventUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *EventClient) UpdateOneID(id int) *EventUpdateOne {
+	mutation := newEventMutation(c.config, OpUpdateOne, withEventID(id))
+	return &EventUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for Event.
+func (c *EventClient) Delete() *EventDelete {
+	mutation := newEventMutation(c.config, OpDelete)
+	return &EventDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a builder for deleting the given entity.
+func (c *EventClient) DeleteOne(e *Event) *EventDeleteOne {
+	return c.DeleteOneID(e.ID)
+}
+
+// DeleteOneID returns a builder for deleting the given entity by its id.
+func (c *EventClient) DeleteOneID(id int) *EventDeleteOne {
+	builder := c.Delete().Where(event.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &EventDeleteOne{builder}
+}
+
+// Query returns a query builder for Event.
+func (c *EventClient) Query() *EventQuery {
+	return &EventQuery{
+		config: c.config,
+		ctx:    &QueryContext{Type: TypeEvent},
+		inters: c.Interceptors(),
+	}
+}
+
+// Get returns a Event entity by its id.
+func (c *EventClient) Get(ctx context.Context, id int) (*Event, error) {
+	return c.Query().Where(event.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *EventClient) GetX(ctx context.Context, id int) *Event {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// QueryCreator queries the creator edge of a Event.
+func (c *EventClient) QueryCreator(e *Event) *AdminQuery {
+	query := (&AdminClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := e.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(event.Table, event.FieldID, id),
+			sqlgraph.To(admin.Table, admin.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, event.CreatorTable, event.CreatorColumn),
+		)
+		fromV = sqlgraph.Neighbors(e.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryUpdater queries the updater edge of a Event.
+func (c *EventClient) QueryUpdater(e *Event) *AdminQuery {
+	query := (&AdminClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := e.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(event.Table, event.FieldID, id),
+			sqlgraph.To(admin.Table, admin.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, event.UpdaterTable, event.UpdaterColumn),
+		)
+		fromV = sqlgraph.Neighbors(e.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryVideo queries the video edge of a Event.
+func (c *EventClient) QueryVideo(e *Event) *VideoQuery {
+	query := (&VideoClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := e.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(event.Table, event.FieldID, id),
+			sqlgraph.To(video.Table, video.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, event.VideoTable, event.VideoColumn),
+		)
+		fromV = sqlgraph.Neighbors(e.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryDevice queries the device edge of a Event.
+func (c *EventClient) QueryDevice(e *Event) *DeviceQuery {
+	query := (&DeviceClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := e.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(event.Table, event.FieldID, id),
+			sqlgraph.To(device.Table, device.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, event.DeviceTable, event.DeviceColumn),
+		)
+		fromV = sqlgraph.Neighbors(e.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryFixing queries the fixing edge of a Event.
+func (c *EventClient) QueryFixing(e *Event) *FixingQuery {
+	query := (&FixingClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := e.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(event.Table, event.FieldID, id),
+			sqlgraph.To(fixing.Table, fixing.FieldID),
+			sqlgraph.Edge(sqlgraph.O2O, false, event.FixingTable, event.FixingColumn),
+		)
+		fromV = sqlgraph.Neighbors(e.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryEventLog queries the event_log edge of a Event.
+func (c *EventClient) QueryEventLog(e *Event) *EventLogQuery {
+	query := (&EventLogClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := e.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(event.Table, event.FieldID, id),
+			sqlgraph.To(eventlog.Table, eventlog.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, event.EventLogTable, event.EventLogColumn),
+		)
+		fromV = sqlgraph.Neighbors(e.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// Hooks returns the client hooks.
+func (c *EventClient) Hooks() []Hook {
+	hooks := c.hooks.Event
+	return append(hooks[:len(hooks):len(hooks)], event.Hooks[:]...)
+}
+
+// Interceptors returns the client interceptors.
+func (c *EventClient) Interceptors() []Interceptor {
+	return c.inters.Event
+}
+
+func (c *EventClient) mutate(ctx context.Context, m *EventMutation) (Value, error) {
+	switch m.Op() {
+	case OpCreate:
+		return (&EventCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdate:
+		return (&EventUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdateOne:
+		return (&EventUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpDelete, OpDeleteOne:
+		return (&EventDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+	default:
+		return nil, fmt.Errorf("dao: unknown Event mutation op: %q", m.Op())
 	}
 }
 
@@ -2363,107 +2734,107 @@ func (c *EventLevelClient) mutate(ctx context.Context, m *EventLevelMutation) (V
 	}
 }
 
-// IPCEventClient is a client for the IPCEvent schema.
-type IPCEventClient struct {
+// EventLogClient is a client for the EventLog schema.
+type EventLogClient struct {
 	config
 }
 
-// NewIPCEventClient returns a client for the IPCEvent from the given config.
-func NewIPCEventClient(c config) *IPCEventClient {
-	return &IPCEventClient{config: c}
+// NewEventLogClient returns a client for the EventLog from the given config.
+func NewEventLogClient(c config) *EventLogClient {
+	return &EventLogClient{config: c}
 }
 
 // Use adds a list of mutation hooks to the hooks stack.
-// A call to `Use(f, g, h)` equals to `ipcevent.Hooks(f(g(h())))`.
-func (c *IPCEventClient) Use(hooks ...Hook) {
-	c.hooks.IPCEvent = append(c.hooks.IPCEvent, hooks...)
+// A call to `Use(f, g, h)` equals to `eventlog.Hooks(f(g(h())))`.
+func (c *EventLogClient) Use(hooks ...Hook) {
+	c.hooks.EventLog = append(c.hooks.EventLog, hooks...)
 }
 
 // Intercept adds a list of query interceptors to the interceptors stack.
-// A call to `Intercept(f, g, h)` equals to `ipcevent.Intercept(f(g(h())))`.
-func (c *IPCEventClient) Intercept(interceptors ...Interceptor) {
-	c.inters.IPCEvent = append(c.inters.IPCEvent, interceptors...)
+// A call to `Intercept(f, g, h)` equals to `eventlog.Intercept(f(g(h())))`.
+func (c *EventLogClient) Intercept(interceptors ...Interceptor) {
+	c.inters.EventLog = append(c.inters.EventLog, interceptors...)
 }
 
-// Create returns a builder for creating a IPCEvent entity.
-func (c *IPCEventClient) Create() *IPCEventCreate {
-	mutation := newIPCEventMutation(c.config, OpCreate)
-	return &IPCEventCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+// Create returns a builder for creating a EventLog entity.
+func (c *EventLogClient) Create() *EventLogCreate {
+	mutation := newEventLogMutation(c.config, OpCreate)
+	return &EventLogCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
 }
 
-// CreateBulk returns a builder for creating a bulk of IPCEvent entities.
-func (c *IPCEventClient) CreateBulk(builders ...*IPCEventCreate) *IPCEventCreateBulk {
-	return &IPCEventCreateBulk{config: c.config, builders: builders}
+// CreateBulk returns a builder for creating a bulk of EventLog entities.
+func (c *EventLogClient) CreateBulk(builders ...*EventLogCreate) *EventLogCreateBulk {
+	return &EventLogCreateBulk{config: c.config, builders: builders}
 }
 
 // MapCreateBulk creates a bulk creation builder from the given slice. For each item in the slice, the function creates
 // a builder and applies setFunc on it.
-func (c *IPCEventClient) MapCreateBulk(slice any, setFunc func(*IPCEventCreate, int)) *IPCEventCreateBulk {
+func (c *EventLogClient) MapCreateBulk(slice any, setFunc func(*EventLogCreate, int)) *EventLogCreateBulk {
 	rv := reflect.ValueOf(slice)
 	if rv.Kind() != reflect.Slice {
-		return &IPCEventCreateBulk{err: fmt.Errorf("calling to IPCEventClient.MapCreateBulk with wrong type %T, need slice", slice)}
+		return &EventLogCreateBulk{err: fmt.Errorf("calling to EventLogClient.MapCreateBulk with wrong type %T, need slice", slice)}
 	}
-	builders := make([]*IPCEventCreate, rv.Len())
+	builders := make([]*EventLogCreate, rv.Len())
 	for i := 0; i < rv.Len(); i++ {
 		builders[i] = c.Create()
 		setFunc(builders[i], i)
 	}
-	return &IPCEventCreateBulk{config: c.config, builders: builders}
+	return &EventLogCreateBulk{config: c.config, builders: builders}
 }
 
-// Update returns an update builder for IPCEvent.
-func (c *IPCEventClient) Update() *IPCEventUpdate {
-	mutation := newIPCEventMutation(c.config, OpUpdate)
-	return &IPCEventUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+// Update returns an update builder for EventLog.
+func (c *EventLogClient) Update() *EventLogUpdate {
+	mutation := newEventLogMutation(c.config, OpUpdate)
+	return &EventLogUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
 }
 
 // UpdateOne returns an update builder for the given entity.
-func (c *IPCEventClient) UpdateOne(ie *IPCEvent) *IPCEventUpdateOne {
-	mutation := newIPCEventMutation(c.config, OpUpdateOne, withIPCEvent(ie))
-	return &IPCEventUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+func (c *EventLogClient) UpdateOne(el *EventLog) *EventLogUpdateOne {
+	mutation := newEventLogMutation(c.config, OpUpdateOne, withEventLog(el))
+	return &EventLogUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
 }
 
 // UpdateOneID returns an update builder for the given id.
-func (c *IPCEventClient) UpdateOneID(id int) *IPCEventUpdateOne {
-	mutation := newIPCEventMutation(c.config, OpUpdateOne, withIPCEventID(id))
-	return &IPCEventUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+func (c *EventLogClient) UpdateOneID(id int) *EventLogUpdateOne {
+	mutation := newEventLogMutation(c.config, OpUpdateOne, withEventLogID(id))
+	return &EventLogUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
 }
 
-// Delete returns a delete builder for IPCEvent.
-func (c *IPCEventClient) Delete() *IPCEventDelete {
-	mutation := newIPCEventMutation(c.config, OpDelete)
-	return &IPCEventDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+// Delete returns a delete builder for EventLog.
+func (c *EventLogClient) Delete() *EventLogDelete {
+	mutation := newEventLogMutation(c.config, OpDelete)
+	return &EventLogDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
 }
 
 // DeleteOne returns a builder for deleting the given entity.
-func (c *IPCEventClient) DeleteOne(ie *IPCEvent) *IPCEventDeleteOne {
-	return c.DeleteOneID(ie.ID)
+func (c *EventLogClient) DeleteOne(el *EventLog) *EventLogDeleteOne {
+	return c.DeleteOneID(el.ID)
 }
 
 // DeleteOneID returns a builder for deleting the given entity by its id.
-func (c *IPCEventClient) DeleteOneID(id int) *IPCEventDeleteOne {
-	builder := c.Delete().Where(ipcevent.ID(id))
+func (c *EventLogClient) DeleteOneID(id int) *EventLogDeleteOne {
+	builder := c.Delete().Where(eventlog.ID(id))
 	builder.mutation.id = &id
 	builder.mutation.op = OpDeleteOne
-	return &IPCEventDeleteOne{builder}
+	return &EventLogDeleteOne{builder}
 }
 
-// Query returns a query builder for IPCEvent.
-func (c *IPCEventClient) Query() *IPCEventQuery {
-	return &IPCEventQuery{
+// Query returns a query builder for EventLog.
+func (c *EventLogClient) Query() *EventLogQuery {
+	return &EventLogQuery{
 		config: c.config,
-		ctx:    &QueryContext{Type: TypeIPCEvent},
+		ctx:    &QueryContext{Type: TypeEventLog},
 		inters: c.Interceptors(),
 	}
 }
 
-// Get returns a IPCEvent entity by its id.
-func (c *IPCEventClient) Get(ctx context.Context, id int) (*IPCEvent, error) {
-	return c.Query().Where(ipcevent.ID(id)).Only(ctx)
+// Get returns a EventLog entity by its id.
+func (c *EventLogClient) Get(ctx context.Context, id int) (*EventLog, error) {
+	return c.Query().Where(eventlog.ID(id)).Only(ctx)
 }
 
 // GetX is like Get, but panics if an error occurs.
-func (c *IPCEventClient) GetX(ctx context.Context, id int) *IPCEvent {
+func (c *EventLogClient) GetX(ctx context.Context, id int) *EventLog {
 	obj, err := c.Get(ctx, id)
 	if err != nil {
 		panic(err)
@@ -2471,109 +2842,339 @@ func (c *IPCEventClient) GetX(ctx context.Context, id int) *IPCEvent {
 	return obj
 }
 
-// QueryCreator queries the creator edge of a IPCEvent.
-func (c *IPCEventClient) QueryCreator(ie *IPCEvent) *AdminQuery {
+// QueryCreator queries the creator edge of a EventLog.
+func (c *EventLogClient) QueryCreator(el *EventLog) *AdminQuery {
 	query := (&AdminClient{config: c.config}).Query()
 	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
-		id := ie.ID
+		id := el.ID
 		step := sqlgraph.NewStep(
-			sqlgraph.From(ipcevent.Table, ipcevent.FieldID, id),
+			sqlgraph.From(eventlog.Table, eventlog.FieldID, id),
 			sqlgraph.To(admin.Table, admin.FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, true, ipcevent.CreatorTable, ipcevent.CreatorColumn),
+			sqlgraph.Edge(sqlgraph.M2O, true, eventlog.CreatorTable, eventlog.CreatorColumn),
 		)
-		fromV = sqlgraph.Neighbors(ie.driver.Dialect(), step)
+		fromV = sqlgraph.Neighbors(el.driver.Dialect(), step)
 		return fromV, nil
 	}
 	return query
 }
 
-// QueryUpdater queries the updater edge of a IPCEvent.
-func (c *IPCEventClient) QueryUpdater(ie *IPCEvent) *AdminQuery {
+// QueryUpdater queries the updater edge of a EventLog.
+func (c *EventLogClient) QueryUpdater(el *EventLog) *AdminQuery {
 	query := (&AdminClient{config: c.config}).Query()
 	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
-		id := ie.ID
+		id := el.ID
 		step := sqlgraph.NewStep(
-			sqlgraph.From(ipcevent.Table, ipcevent.FieldID, id),
+			sqlgraph.From(eventlog.Table, eventlog.FieldID, id),
 			sqlgraph.To(admin.Table, admin.FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, true, ipcevent.UpdaterTable, ipcevent.UpdaterColumn),
+			sqlgraph.Edge(sqlgraph.M2O, true, eventlog.UpdaterTable, eventlog.UpdaterColumn),
 		)
-		fromV = sqlgraph.Neighbors(ie.driver.Dialect(), step)
+		fromV = sqlgraph.Neighbors(el.driver.Dialect(), step)
 		return fromV, nil
 	}
 	return query
 }
 
-// QueryVideo queries the video edge of a IPCEvent.
-func (c *IPCEventClient) QueryVideo(ie *IPCEvent) *VideoQuery {
-	query := (&VideoClient{config: c.config}).Query()
+// QueryEvent queries the event edge of a EventLog.
+func (c *EventLogClient) QueryEvent(el *EventLog) *EventQuery {
+	query := (&EventClient{config: c.config}).Query()
 	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
-		id := ie.ID
+		id := el.ID
 		step := sqlgraph.NewStep(
-			sqlgraph.From(ipcevent.Table, ipcevent.FieldID, id),
-			sqlgraph.To(video.Table, video.FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, true, ipcevent.VideoTable, ipcevent.VideoColumn),
+			sqlgraph.From(eventlog.Table, eventlog.FieldID, id),
+			sqlgraph.To(event.Table, event.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, eventlog.EventTable, eventlog.EventColumn),
 		)
-		fromV = sqlgraph.Neighbors(ie.driver.Dialect(), step)
+		fromV = sqlgraph.Neighbors(el.driver.Dialect(), step)
 		return fromV, nil
 	}
 	return query
 }
 
-// QueryDevice queries the device edge of a IPCEvent.
-func (c *IPCEventClient) QueryDevice(ie *IPCEvent) *DeviceQuery {
+// QueryDevice queries the device edge of a EventLog.
+func (c *EventLogClient) QueryDevice(el *EventLog) *DeviceQuery {
 	query := (&DeviceClient{config: c.config}).Query()
 	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
-		id := ie.ID
+		id := el.ID
 		step := sqlgraph.NewStep(
-			sqlgraph.From(ipcevent.Table, ipcevent.FieldID, id),
+			sqlgraph.From(eventlog.Table, eventlog.FieldID, id),
 			sqlgraph.To(device.Table, device.FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, true, ipcevent.DeviceTable, ipcevent.DeviceColumn),
+			sqlgraph.Edge(sqlgraph.M2O, true, eventlog.DeviceTable, eventlog.DeviceColumn),
 		)
-		fromV = sqlgraph.Neighbors(ie.driver.Dialect(), step)
+		fromV = sqlgraph.Neighbors(el.driver.Dialect(), step)
 		return fromV, nil
 	}
 	return query
 }
 
-// QueryFixers queries the fixers edge of a IPCEvent.
-func (c *IPCEventClient) QueryFixers(ie *IPCEvent) *EmployeeQuery {
-	query := (&EmployeeClient{config: c.config}).Query()
+// QueryActor queries the actor edge of a EventLog.
+func (c *EventLogClient) QueryActor(el *EventLog) *AdminQuery {
+	query := (&AdminClient{config: c.config}).Query()
 	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
-		id := ie.ID
+		id := el.ID
 		step := sqlgraph.NewStep(
-			sqlgraph.From(ipcevent.Table, ipcevent.FieldID, id),
-			sqlgraph.To(employee.Table, employee.FieldID),
-			sqlgraph.Edge(sqlgraph.M2M, false, ipcevent.FixersTable, ipcevent.FixersPrimaryKey...),
+			sqlgraph.From(eventlog.Table, eventlog.FieldID, id),
+			sqlgraph.To(admin.Table, admin.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, eventlog.ActorTable, eventlog.ActorColumn),
 		)
-		fromV = sqlgraph.Neighbors(ie.driver.Dialect(), step)
+		fromV = sqlgraph.Neighbors(el.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryActor2 queries the actor2 edge of a EventLog.
+func (c *EventLogClient) QueryActor2(el *EventLog) *AdminQuery {
+	query := (&AdminClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := el.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(eventlog.Table, eventlog.FieldID, id),
+			sqlgraph.To(admin.Table, admin.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, eventlog.Actor2Table, eventlog.Actor2Column),
+		)
+		fromV = sqlgraph.Neighbors(el.driver.Dialect(), step)
 		return fromV, nil
 	}
 	return query
 }
 
 // Hooks returns the client hooks.
-func (c *IPCEventClient) Hooks() []Hook {
-	hooks := c.hooks.IPCEvent
-	return append(hooks[:len(hooks):len(hooks)], ipcevent.Hooks[:]...)
+func (c *EventLogClient) Hooks() []Hook {
+	hooks := c.hooks.EventLog
+	return append(hooks[:len(hooks):len(hooks)], eventlog.Hooks[:]...)
 }
 
 // Interceptors returns the client interceptors.
-func (c *IPCEventClient) Interceptors() []Interceptor {
-	return c.inters.IPCEvent
+func (c *EventLogClient) Interceptors() []Interceptor {
+	return c.inters.EventLog
 }
 
-func (c *IPCEventClient) mutate(ctx context.Context, m *IPCEventMutation) (Value, error) {
+func (c *EventLogClient) mutate(ctx context.Context, m *EventLogMutation) (Value, error) {
 	switch m.Op() {
 	case OpCreate:
-		return (&IPCEventCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+		return (&EventLogCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
 	case OpUpdate:
-		return (&IPCEventUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+		return (&EventLogUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
 	case OpUpdateOne:
-		return (&IPCEventUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+		return (&EventLogUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
 	case OpDelete, OpDeleteOne:
-		return (&IPCEventDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+		return (&EventLogDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
 	default:
-		return nil, fmt.Errorf("dao: unknown IPCEvent mutation op: %q", m.Op())
+		return nil, fmt.Errorf("dao: unknown EventLog mutation op: %q", m.Op())
+	}
+}
+
+// FixingClient is a client for the Fixing schema.
+type FixingClient struct {
+	config
+}
+
+// NewFixingClient returns a client for the Fixing from the given config.
+func NewFixingClient(c config) *FixingClient {
+	return &FixingClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `fixing.Hooks(f(g(h())))`.
+func (c *FixingClient) Use(hooks ...Hook) {
+	c.hooks.Fixing = append(c.hooks.Fixing, hooks...)
+}
+
+// Intercept adds a list of query interceptors to the interceptors stack.
+// A call to `Intercept(f, g, h)` equals to `fixing.Intercept(f(g(h())))`.
+func (c *FixingClient) Intercept(interceptors ...Interceptor) {
+	c.inters.Fixing = append(c.inters.Fixing, interceptors...)
+}
+
+// Create returns a builder for creating a Fixing entity.
+func (c *FixingClient) Create() *FixingCreate {
+	mutation := newFixingMutation(c.config, OpCreate)
+	return &FixingCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of Fixing entities.
+func (c *FixingClient) CreateBulk(builders ...*FixingCreate) *FixingCreateBulk {
+	return &FixingCreateBulk{config: c.config, builders: builders}
+}
+
+// MapCreateBulk creates a bulk creation builder from the given slice. For each item in the slice, the function creates
+// a builder and applies setFunc on it.
+func (c *FixingClient) MapCreateBulk(slice any, setFunc func(*FixingCreate, int)) *FixingCreateBulk {
+	rv := reflect.ValueOf(slice)
+	if rv.Kind() != reflect.Slice {
+		return &FixingCreateBulk{err: fmt.Errorf("calling to FixingClient.MapCreateBulk with wrong type %T, need slice", slice)}
+	}
+	builders := make([]*FixingCreate, rv.Len())
+	for i := 0; i < rv.Len(); i++ {
+		builders[i] = c.Create()
+		setFunc(builders[i], i)
+	}
+	return &FixingCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for Fixing.
+func (c *FixingClient) Update() *FixingUpdate {
+	mutation := newFixingMutation(c.config, OpUpdate)
+	return &FixingUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *FixingClient) UpdateOne(f *Fixing) *FixingUpdateOne {
+	mutation := newFixingMutation(c.config, OpUpdateOne, withFixing(f))
+	return &FixingUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *FixingClient) UpdateOneID(id int) *FixingUpdateOne {
+	mutation := newFixingMutation(c.config, OpUpdateOne, withFixingID(id))
+	return &FixingUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for Fixing.
+func (c *FixingClient) Delete() *FixingDelete {
+	mutation := newFixingMutation(c.config, OpDelete)
+	return &FixingDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a builder for deleting the given entity.
+func (c *FixingClient) DeleteOne(f *Fixing) *FixingDeleteOne {
+	return c.DeleteOneID(f.ID)
+}
+
+// DeleteOneID returns a builder for deleting the given entity by its id.
+func (c *FixingClient) DeleteOneID(id int) *FixingDeleteOne {
+	builder := c.Delete().Where(fixing.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &FixingDeleteOne{builder}
+}
+
+// Query returns a query builder for Fixing.
+func (c *FixingClient) Query() *FixingQuery {
+	return &FixingQuery{
+		config: c.config,
+		ctx:    &QueryContext{Type: TypeFixing},
+		inters: c.Interceptors(),
+	}
+}
+
+// Get returns a Fixing entity by its id.
+func (c *FixingClient) Get(ctx context.Context, id int) (*Fixing, error) {
+	return c.Query().Where(fixing.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *FixingClient) GetX(ctx context.Context, id int) *Fixing {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// QueryCreator queries the creator edge of a Fixing.
+func (c *FixingClient) QueryCreator(f *Fixing) *AdminQuery {
+	query := (&AdminClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := f.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(fixing.Table, fixing.FieldID, id),
+			sqlgraph.To(admin.Table, admin.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, fixing.CreatorTable, fixing.CreatorColumn),
+		)
+		fromV = sqlgraph.Neighbors(f.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryUpdater queries the updater edge of a Fixing.
+func (c *FixingClient) QueryUpdater(f *Fixing) *AdminQuery {
+	query := (&AdminClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := f.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(fixing.Table, fixing.FieldID, id),
+			sqlgraph.To(admin.Table, admin.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, fixing.UpdaterTable, fixing.UpdaterColumn),
+		)
+		fromV = sqlgraph.Neighbors(f.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryFixer queries the fixer edge of a Fixing.
+func (c *FixingClient) QueryFixer(f *Fixing) *AdminQuery {
+	query := (&AdminClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := f.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(fixing.Table, fixing.FieldID, id),
+			sqlgraph.To(admin.Table, admin.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, fixing.FixerTable, fixing.FixerColumn),
+		)
+		fromV = sqlgraph.Neighbors(f.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryEvent queries the event edge of a Fixing.
+func (c *FixingClient) QueryEvent(f *Fixing) *EventQuery {
+	query := (&EventClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := f.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(fixing.Table, fixing.FieldID, id),
+			sqlgraph.To(event.Table, event.FieldID),
+			sqlgraph.Edge(sqlgraph.O2O, true, fixing.EventTable, fixing.EventColumn),
+		)
+		fromV = sqlgraph.Neighbors(f.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryDevice queries the device edge of a Fixing.
+func (c *FixingClient) QueryDevice(f *Fixing) *DeviceQuery {
+	query := (&DeviceClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := f.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(fixing.Table, fixing.FieldID, id),
+			sqlgraph.To(device.Table, device.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, fixing.DeviceTable, fixing.DeviceColumn),
+		)
+		fromV = sqlgraph.Neighbors(f.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// Hooks returns the client hooks.
+func (c *FixingClient) Hooks() []Hook {
+	hooks := c.hooks.Fixing
+	return append(hooks[:len(hooks):len(hooks)], fixing.Hooks[:]...)
+}
+
+// Interceptors returns the client interceptors.
+func (c *FixingClient) Interceptors() []Interceptor {
+	return c.inters.Fixing
+}
+
+func (c *FixingClient) mutate(ctx context.Context, m *FixingMutation) (Value, error) {
+	switch m.Op() {
+	case OpCreate:
+		return (&FixingCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdate:
+		return (&FixingUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdateOne:
+		return (&FixingUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpDelete, OpDeleteOne:
+		return (&FixingDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+	default:
+		return nil, fmt.Errorf("dao: unknown Fixing mutation op: %q", m.Op())
 	}
 }
 
@@ -2717,15 +3318,15 @@ func (c *OccupationClient) QueryUpdater(o *Occupation) *AdminQuery {
 	return query
 }
 
-// QueryEmployees queries the employees edge of a Occupation.
-func (c *OccupationClient) QueryEmployees(o *Occupation) *EmployeeQuery {
+// QueryEmployee queries the employee edge of a Occupation.
+func (c *OccupationClient) QueryEmployee(o *Occupation) *EmployeeQuery {
 	query := (&EmployeeClient{config: c.config}).Query()
 	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
 		id := o.ID
 		step := sqlgraph.NewStep(
 			sqlgraph.From(occupation.Table, occupation.FieldID, id),
 			sqlgraph.To(employee.Table, employee.FieldID),
-			sqlgraph.Edge(sqlgraph.M2M, false, occupation.EmployeesTable, occupation.EmployeesPrimaryKey...),
+			sqlgraph.Edge(sqlgraph.O2M, false, occupation.EmployeeTable, occupation.EmployeeColumn),
 		)
 		fromV = sqlgraph.Neighbors(o.driver.Dialect(), step)
 		return fromV, nil
@@ -2756,6 +3357,204 @@ func (c *OccupationClient) mutate(ctx context.Context, m *OccupationMutation) (V
 		return (&OccupationDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
 	default:
 		return nil, fmt.Errorf("dao: unknown Occupation mutation op: %q", m.Op())
+	}
+}
+
+// PermissionClient is a client for the Permission schema.
+type PermissionClient struct {
+	config
+}
+
+// NewPermissionClient returns a client for the Permission from the given config.
+func NewPermissionClient(c config) *PermissionClient {
+	return &PermissionClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `permission.Hooks(f(g(h())))`.
+func (c *PermissionClient) Use(hooks ...Hook) {
+	c.hooks.Permission = append(c.hooks.Permission, hooks...)
+}
+
+// Intercept adds a list of query interceptors to the interceptors stack.
+// A call to `Intercept(f, g, h)` equals to `permission.Intercept(f(g(h())))`.
+func (c *PermissionClient) Intercept(interceptors ...Interceptor) {
+	c.inters.Permission = append(c.inters.Permission, interceptors...)
+}
+
+// Create returns a builder for creating a Permission entity.
+func (c *PermissionClient) Create() *PermissionCreate {
+	mutation := newPermissionMutation(c.config, OpCreate)
+	return &PermissionCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of Permission entities.
+func (c *PermissionClient) CreateBulk(builders ...*PermissionCreate) *PermissionCreateBulk {
+	return &PermissionCreateBulk{config: c.config, builders: builders}
+}
+
+// MapCreateBulk creates a bulk creation builder from the given slice. For each item in the slice, the function creates
+// a builder and applies setFunc on it.
+func (c *PermissionClient) MapCreateBulk(slice any, setFunc func(*PermissionCreate, int)) *PermissionCreateBulk {
+	rv := reflect.ValueOf(slice)
+	if rv.Kind() != reflect.Slice {
+		return &PermissionCreateBulk{err: fmt.Errorf("calling to PermissionClient.MapCreateBulk with wrong type %T, need slice", slice)}
+	}
+	builders := make([]*PermissionCreate, rv.Len())
+	for i := 0; i < rv.Len(); i++ {
+		builders[i] = c.Create()
+		setFunc(builders[i], i)
+	}
+	return &PermissionCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for Permission.
+func (c *PermissionClient) Update() *PermissionUpdate {
+	mutation := newPermissionMutation(c.config, OpUpdate)
+	return &PermissionUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *PermissionClient) UpdateOne(pe *Permission) *PermissionUpdateOne {
+	mutation := newPermissionMutation(c.config, OpUpdateOne, withPermission(pe))
+	return &PermissionUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *PermissionClient) UpdateOneID(id int) *PermissionUpdateOne {
+	mutation := newPermissionMutation(c.config, OpUpdateOne, withPermissionID(id))
+	return &PermissionUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for Permission.
+func (c *PermissionClient) Delete() *PermissionDelete {
+	mutation := newPermissionMutation(c.config, OpDelete)
+	return &PermissionDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a builder for deleting the given entity.
+func (c *PermissionClient) DeleteOne(pe *Permission) *PermissionDeleteOne {
+	return c.DeleteOneID(pe.ID)
+}
+
+// DeleteOneID returns a builder for deleting the given entity by its id.
+func (c *PermissionClient) DeleteOneID(id int) *PermissionDeleteOne {
+	builder := c.Delete().Where(permission.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &PermissionDeleteOne{builder}
+}
+
+// Query returns a query builder for Permission.
+func (c *PermissionClient) Query() *PermissionQuery {
+	return &PermissionQuery{
+		config: c.config,
+		ctx:    &QueryContext{Type: TypePermission},
+		inters: c.Interceptors(),
+	}
+}
+
+// Get returns a Permission entity by its id.
+func (c *PermissionClient) Get(ctx context.Context, id int) (*Permission, error) {
+	return c.Query().Where(permission.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *PermissionClient) GetX(ctx context.Context, id int) *Permission {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// QueryCreator queries the creator edge of a Permission.
+func (c *PermissionClient) QueryCreator(pe *Permission) *AdminQuery {
+	query := (&AdminClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := pe.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(permission.Table, permission.FieldID, id),
+			sqlgraph.To(admin.Table, admin.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, permission.CreatorTable, permission.CreatorColumn),
+		)
+		fromV = sqlgraph.Neighbors(pe.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryUpdater queries the updater edge of a Permission.
+func (c *PermissionClient) QueryUpdater(pe *Permission) *AdminQuery {
+	query := (&AdminClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := pe.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(permission.Table, permission.FieldID, id),
+			sqlgraph.To(admin.Table, admin.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, permission.UpdaterTable, permission.UpdaterColumn),
+		)
+		fromV = sqlgraph.Neighbors(pe.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryAdmin queries the admin edge of a Permission.
+func (c *PermissionClient) QueryAdmin(pe *Permission) *AdminQuery {
+	query := (&AdminClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := pe.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(permission.Table, permission.FieldID, id),
+			sqlgraph.To(admin.Table, admin.FieldID),
+			sqlgraph.Edge(sqlgraph.M2M, false, permission.AdminTable, permission.AdminPrimaryKey...),
+		)
+		fromV = sqlgraph.Neighbors(pe.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryDepartment queries the department edge of a Permission.
+func (c *PermissionClient) QueryDepartment(pe *Permission) *DepartmentQuery {
+	query := (&DepartmentClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := pe.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(permission.Table, permission.FieldID, id),
+			sqlgraph.To(department.Table, department.FieldID),
+			sqlgraph.Edge(sqlgraph.M2M, false, permission.DepartmentTable, permission.DepartmentPrimaryKey...),
+		)
+		fromV = sqlgraph.Neighbors(pe.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// Hooks returns the client hooks.
+func (c *PermissionClient) Hooks() []Hook {
+	hooks := c.hooks.Permission
+	return append(hooks[:len(hooks):len(hooks)], permission.Hooks[:]...)
+}
+
+// Interceptors returns the client interceptors.
+func (c *PermissionClient) Interceptors() []Interceptor {
+	return c.inters.Permission
+}
+
+func (c *PermissionClient) mutate(ctx context.Context, m *PermissionMutation) (Value, error) {
+	switch m.Op() {
+	case OpCreate:
+		return (&PermissionCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdate:
+		return (&PermissionUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdateOne:
+		return (&PermissionUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpDelete, OpDeleteOne:
+		return (&PermissionDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+	default:
+		return nil, fmt.Errorf("dao: unknown Permission mutation op: %q", m.Op())
 	}
 }
 
@@ -2931,30 +3730,14 @@ func (c *RiskClient) QueryRiskLocation(r *Risk) *RiskLocationQuery {
 	return query
 }
 
-// QueryReporter queries the reporter edge of a Risk.
-func (c *RiskClient) QueryReporter(r *Risk) *EmployeeQuery {
-	query := (&EmployeeClient{config: c.config}).Query()
-	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
-		id := r.ID
-		step := sqlgraph.NewStep(
-			sqlgraph.From(risk.Table, risk.FieldID, id),
-			sqlgraph.To(employee.Table, employee.FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, true, risk.ReporterTable, risk.ReporterColumn),
-		)
-		fromV = sqlgraph.Neighbors(r.driver.Dialect(), step)
-		return fromV, nil
-	}
-	return query
-}
-
 // QueryMaintainer queries the maintainer edge of a Risk.
-func (c *RiskClient) QueryMaintainer(r *Risk) *EmployeeQuery {
-	query := (&EmployeeClient{config: c.config}).Query()
+func (c *RiskClient) QueryMaintainer(r *Risk) *AdminQuery {
+	query := (&AdminClient{config: c.config}).Query()
 	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
 		id := r.ID
 		step := sqlgraph.NewStep(
 			sqlgraph.From(risk.Table, risk.FieldID, id),
-			sqlgraph.To(employee.Table, employee.FieldID),
+			sqlgraph.To(admin.Table, admin.FieldID),
 			sqlgraph.Edge(sqlgraph.M2O, true, risk.MaintainerTable, risk.MaintainerColumn),
 		)
 		fromV = sqlgraph.Neighbors(r.driver.Dialect(), step)
@@ -3145,6 +3928,22 @@ func (c *RiskCategoryClient) QueryRisk(rc *RiskCategory) *RiskQuery {
 	return query
 }
 
+// QuerySweep queries the sweep edge of a RiskCategory.
+func (c *RiskCategoryClient) QuerySweep(rc *RiskCategory) *SweepQuery {
+	query := (&SweepClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := rc.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(riskcategory.Table, riskcategory.FieldID, id),
+			sqlgraph.To(sweep.Table, sweep.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, riskcategory.SweepTable, riskcategory.SweepColumn),
+		)
+		fromV = sqlgraph.Neighbors(rc.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
 // Hooks returns the client hooks.
 func (c *RiskCategoryClient) Hooks() []Hook {
 	hooks := c.hooks.RiskCategory
@@ -3327,6 +4126,22 @@ func (c *RiskLocationClient) QueryRisk(rl *RiskLocation) *RiskQuery {
 	return query
 }
 
+// QuerySweep queries the sweep edge of a RiskLocation.
+func (c *RiskLocationClient) QuerySweep(rl *RiskLocation) *SweepQuery {
+	query := (&SweepClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := rl.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(risklocation.Table, risklocation.FieldID, id),
+			sqlgraph.To(sweep.Table, sweep.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, risklocation.SweepTable, risklocation.SweepColumn),
+		)
+		fromV = sqlgraph.Neighbors(rl.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
 // Hooks returns the client hooks.
 func (c *RiskLocationClient) Hooks() []Hook {
 	hooks := c.hooks.RiskLocation
@@ -3350,6 +4165,910 @@ func (c *RiskLocationClient) mutate(ctx context.Context, m *RiskLocationMutation
 		return (&RiskLocationDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
 	default:
 		return nil, fmt.Errorf("dao: unknown RiskLocation mutation op: %q", m.Op())
+	}
+}
+
+// SweepClient is a client for the Sweep schema.
+type SweepClient struct {
+	config
+}
+
+// NewSweepClient returns a client for the Sweep from the given config.
+func NewSweepClient(c config) *SweepClient {
+	return &SweepClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `sweep.Hooks(f(g(h())))`.
+func (c *SweepClient) Use(hooks ...Hook) {
+	c.hooks.Sweep = append(c.hooks.Sweep, hooks...)
+}
+
+// Intercept adds a list of query interceptors to the interceptors stack.
+// A call to `Intercept(f, g, h)` equals to `sweep.Intercept(f(g(h())))`.
+func (c *SweepClient) Intercept(interceptors ...Interceptor) {
+	c.inters.Sweep = append(c.inters.Sweep, interceptors...)
+}
+
+// Create returns a builder for creating a Sweep entity.
+func (c *SweepClient) Create() *SweepCreate {
+	mutation := newSweepMutation(c.config, OpCreate)
+	return &SweepCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of Sweep entities.
+func (c *SweepClient) CreateBulk(builders ...*SweepCreate) *SweepCreateBulk {
+	return &SweepCreateBulk{config: c.config, builders: builders}
+}
+
+// MapCreateBulk creates a bulk creation builder from the given slice. For each item in the slice, the function creates
+// a builder and applies setFunc on it.
+func (c *SweepClient) MapCreateBulk(slice any, setFunc func(*SweepCreate, int)) *SweepCreateBulk {
+	rv := reflect.ValueOf(slice)
+	if rv.Kind() != reflect.Slice {
+		return &SweepCreateBulk{err: fmt.Errorf("calling to SweepClient.MapCreateBulk with wrong type %T, need slice", slice)}
+	}
+	builders := make([]*SweepCreate, rv.Len())
+	for i := 0; i < rv.Len(); i++ {
+		builders[i] = c.Create()
+		setFunc(builders[i], i)
+	}
+	return &SweepCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for Sweep.
+func (c *SweepClient) Update() *SweepUpdate {
+	mutation := newSweepMutation(c.config, OpUpdate)
+	return &SweepUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *SweepClient) UpdateOne(s *Sweep) *SweepUpdateOne {
+	mutation := newSweepMutation(c.config, OpUpdateOne, withSweep(s))
+	return &SweepUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *SweepClient) UpdateOneID(id int) *SweepUpdateOne {
+	mutation := newSweepMutation(c.config, OpUpdateOne, withSweepID(id))
+	return &SweepUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for Sweep.
+func (c *SweepClient) Delete() *SweepDelete {
+	mutation := newSweepMutation(c.config, OpDelete)
+	return &SweepDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a builder for deleting the given entity.
+func (c *SweepClient) DeleteOne(s *Sweep) *SweepDeleteOne {
+	return c.DeleteOneID(s.ID)
+}
+
+// DeleteOneID returns a builder for deleting the given entity by its id.
+func (c *SweepClient) DeleteOneID(id int) *SweepDeleteOne {
+	builder := c.Delete().Where(sweep.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &SweepDeleteOne{builder}
+}
+
+// Query returns a query builder for Sweep.
+func (c *SweepClient) Query() *SweepQuery {
+	return &SweepQuery{
+		config: c.config,
+		ctx:    &QueryContext{Type: TypeSweep},
+		inters: c.Interceptors(),
+	}
+}
+
+// Get returns a Sweep entity by its id.
+func (c *SweepClient) Get(ctx context.Context, id int) (*Sweep, error) {
+	return c.Query().Where(sweep.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *SweepClient) GetX(ctx context.Context, id int) *Sweep {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// QueryCreator queries the creator edge of a Sweep.
+func (c *SweepClient) QueryCreator(s *Sweep) *AdminQuery {
+	query := (&AdminClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := s.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(sweep.Table, sweep.FieldID, id),
+			sqlgraph.To(admin.Table, admin.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, sweep.CreatorTable, sweep.CreatorColumn),
+		)
+		fromV = sqlgraph.Neighbors(s.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryUpdater queries the updater edge of a Sweep.
+func (c *SweepClient) QueryUpdater(s *Sweep) *AdminQuery {
+	query := (&AdminClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := s.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(sweep.Table, sweep.FieldID, id),
+			sqlgraph.To(admin.Table, admin.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, sweep.UpdaterTable, sweep.UpdaterColumn),
+		)
+		fromV = sqlgraph.Neighbors(s.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryRiskCategory queries the risk_category edge of a Sweep.
+func (c *SweepClient) QueryRiskCategory(s *Sweep) *RiskCategoryQuery {
+	query := (&RiskCategoryClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := s.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(sweep.Table, sweep.FieldID, id),
+			sqlgraph.To(riskcategory.Table, riskcategory.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, sweep.RiskCategoryTable, sweep.RiskCategoryColumn),
+		)
+		fromV = sqlgraph.Neighbors(s.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryRiskLocation queries the risk_location edge of a Sweep.
+func (c *SweepClient) QueryRiskLocation(s *Sweep) *RiskLocationQuery {
+	query := (&RiskLocationClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := s.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(sweep.Table, sweep.FieldID, id),
+			sqlgraph.To(risklocation.Table, risklocation.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, sweep.RiskLocationTable, sweep.RiskLocationColumn),
+		)
+		fromV = sqlgraph.Neighbors(s.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QuerySweepSchedule queries the sweep_schedule edge of a Sweep.
+func (c *SweepClient) QuerySweepSchedule(s *Sweep) *SweepScheduleQuery {
+	query := (&SweepScheduleClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := s.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(sweep.Table, sweep.FieldID, id),
+			sqlgraph.To(sweepschedule.Table, sweepschedule.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, sweep.SweepScheduleTable, sweep.SweepScheduleColumn),
+		)
+		fromV = sqlgraph.Neighbors(s.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QuerySweepResult queries the sweep_result edge of a Sweep.
+func (c *SweepClient) QuerySweepResult(s *Sweep) *SweepResultQuery {
+	query := (&SweepResultClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := s.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(sweep.Table, sweep.FieldID, id),
+			sqlgraph.To(sweepresult.Table, sweepresult.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, sweep.SweepResultTable, sweep.SweepResultColumn),
+		)
+		fromV = sqlgraph.Neighbors(s.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QuerySweepResultDetails queries the sweep_result_details edge of a Sweep.
+func (c *SweepClient) QuerySweepResultDetails(s *Sweep) *SweepResultDetailsQuery {
+	query := (&SweepResultDetailsClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := s.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(sweep.Table, sweep.FieldID, id),
+			sqlgraph.To(sweepresultdetails.Table, sweepresultdetails.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, sweep.SweepResultDetailsTable, sweep.SweepResultDetailsColumn),
+		)
+		fromV = sqlgraph.Neighbors(s.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// Hooks returns the client hooks.
+func (c *SweepClient) Hooks() []Hook {
+	hooks := c.hooks.Sweep
+	return append(hooks[:len(hooks):len(hooks)], sweep.Hooks[:]...)
+}
+
+// Interceptors returns the client interceptors.
+func (c *SweepClient) Interceptors() []Interceptor {
+	return c.inters.Sweep
+}
+
+func (c *SweepClient) mutate(ctx context.Context, m *SweepMutation) (Value, error) {
+	switch m.Op() {
+	case OpCreate:
+		return (&SweepCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdate:
+		return (&SweepUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdateOne:
+		return (&SweepUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpDelete, OpDeleteOne:
+		return (&SweepDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+	default:
+		return nil, fmt.Errorf("dao: unknown Sweep mutation op: %q", m.Op())
+	}
+}
+
+// SweepResultClient is a client for the SweepResult schema.
+type SweepResultClient struct {
+	config
+}
+
+// NewSweepResultClient returns a client for the SweepResult from the given config.
+func NewSweepResultClient(c config) *SweepResultClient {
+	return &SweepResultClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `sweepresult.Hooks(f(g(h())))`.
+func (c *SweepResultClient) Use(hooks ...Hook) {
+	c.hooks.SweepResult = append(c.hooks.SweepResult, hooks...)
+}
+
+// Intercept adds a list of query interceptors to the interceptors stack.
+// A call to `Intercept(f, g, h)` equals to `sweepresult.Intercept(f(g(h())))`.
+func (c *SweepResultClient) Intercept(interceptors ...Interceptor) {
+	c.inters.SweepResult = append(c.inters.SweepResult, interceptors...)
+}
+
+// Create returns a builder for creating a SweepResult entity.
+func (c *SweepResultClient) Create() *SweepResultCreate {
+	mutation := newSweepResultMutation(c.config, OpCreate)
+	return &SweepResultCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of SweepResult entities.
+func (c *SweepResultClient) CreateBulk(builders ...*SweepResultCreate) *SweepResultCreateBulk {
+	return &SweepResultCreateBulk{config: c.config, builders: builders}
+}
+
+// MapCreateBulk creates a bulk creation builder from the given slice. For each item in the slice, the function creates
+// a builder and applies setFunc on it.
+func (c *SweepResultClient) MapCreateBulk(slice any, setFunc func(*SweepResultCreate, int)) *SweepResultCreateBulk {
+	rv := reflect.ValueOf(slice)
+	if rv.Kind() != reflect.Slice {
+		return &SweepResultCreateBulk{err: fmt.Errorf("calling to SweepResultClient.MapCreateBulk with wrong type %T, need slice", slice)}
+	}
+	builders := make([]*SweepResultCreate, rv.Len())
+	for i := 0; i < rv.Len(); i++ {
+		builders[i] = c.Create()
+		setFunc(builders[i], i)
+	}
+	return &SweepResultCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for SweepResult.
+func (c *SweepResultClient) Update() *SweepResultUpdate {
+	mutation := newSweepResultMutation(c.config, OpUpdate)
+	return &SweepResultUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *SweepResultClient) UpdateOne(sr *SweepResult) *SweepResultUpdateOne {
+	mutation := newSweepResultMutation(c.config, OpUpdateOne, withSweepResult(sr))
+	return &SweepResultUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *SweepResultClient) UpdateOneID(id int) *SweepResultUpdateOne {
+	mutation := newSweepResultMutation(c.config, OpUpdateOne, withSweepResultID(id))
+	return &SweepResultUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for SweepResult.
+func (c *SweepResultClient) Delete() *SweepResultDelete {
+	mutation := newSweepResultMutation(c.config, OpDelete)
+	return &SweepResultDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a builder for deleting the given entity.
+func (c *SweepResultClient) DeleteOne(sr *SweepResult) *SweepResultDeleteOne {
+	return c.DeleteOneID(sr.ID)
+}
+
+// DeleteOneID returns a builder for deleting the given entity by its id.
+func (c *SweepResultClient) DeleteOneID(id int) *SweepResultDeleteOne {
+	builder := c.Delete().Where(sweepresult.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &SweepResultDeleteOne{builder}
+}
+
+// Query returns a query builder for SweepResult.
+func (c *SweepResultClient) Query() *SweepResultQuery {
+	return &SweepResultQuery{
+		config: c.config,
+		ctx:    &QueryContext{Type: TypeSweepResult},
+		inters: c.Interceptors(),
+	}
+}
+
+// Get returns a SweepResult entity by its id.
+func (c *SweepResultClient) Get(ctx context.Context, id int) (*SweepResult, error) {
+	return c.Query().Where(sweepresult.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *SweepResultClient) GetX(ctx context.Context, id int) *SweepResult {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// QueryCreator queries the creator edge of a SweepResult.
+func (c *SweepResultClient) QueryCreator(sr *SweepResult) *AdminQuery {
+	query := (&AdminClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := sr.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(sweepresult.Table, sweepresult.FieldID, id),
+			sqlgraph.To(admin.Table, admin.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, sweepresult.CreatorTable, sweepresult.CreatorColumn),
+		)
+		fromV = sqlgraph.Neighbors(sr.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryUpdater queries the updater edge of a SweepResult.
+func (c *SweepResultClient) QueryUpdater(sr *SweepResult) *AdminQuery {
+	query := (&AdminClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := sr.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(sweepresult.Table, sweepresult.FieldID, id),
+			sqlgraph.To(admin.Table, admin.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, sweepresult.UpdaterTable, sweepresult.UpdaterColumn),
+		)
+		fromV = sqlgraph.Neighbors(sr.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QuerySweep queries the sweep edge of a SweepResult.
+func (c *SweepResultClient) QuerySweep(sr *SweepResult) *SweepQuery {
+	query := (&SweepClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := sr.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(sweepresult.Table, sweepresult.FieldID, id),
+			sqlgraph.To(sweep.Table, sweep.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, sweepresult.SweepTable, sweepresult.SweepColumn),
+		)
+		fromV = sqlgraph.Neighbors(sr.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QuerySweepSchedule queries the sweep_schedule edge of a SweepResult.
+func (c *SweepResultClient) QuerySweepSchedule(sr *SweepResult) *SweepScheduleQuery {
+	query := (&SweepScheduleClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := sr.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(sweepresult.Table, sweepresult.FieldID, id),
+			sqlgraph.To(sweepschedule.Table, sweepschedule.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, sweepresult.SweepScheduleTable, sweepresult.SweepScheduleColumn),
+		)
+		fromV = sqlgraph.Neighbors(sr.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QuerySweepResultDetails queries the sweep_result_details edge of a SweepResult.
+func (c *SweepResultClient) QuerySweepResultDetails(sr *SweepResult) *SweepResultDetailsQuery {
+	query := (&SweepResultDetailsClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := sr.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(sweepresult.Table, sweepresult.FieldID, id),
+			sqlgraph.To(sweepresultdetails.Table, sweepresultdetails.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, sweepresult.SweepResultDetailsTable, sweepresult.SweepResultDetailsColumn),
+		)
+		fromV = sqlgraph.Neighbors(sr.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// Hooks returns the client hooks.
+func (c *SweepResultClient) Hooks() []Hook {
+	hooks := c.hooks.SweepResult
+	return append(hooks[:len(hooks):len(hooks)], sweepresult.Hooks[:]...)
+}
+
+// Interceptors returns the client interceptors.
+func (c *SweepResultClient) Interceptors() []Interceptor {
+	return c.inters.SweepResult
+}
+
+func (c *SweepResultClient) mutate(ctx context.Context, m *SweepResultMutation) (Value, error) {
+	switch m.Op() {
+	case OpCreate:
+		return (&SweepResultCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdate:
+		return (&SweepResultUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdateOne:
+		return (&SweepResultUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpDelete, OpDeleteOne:
+		return (&SweepResultDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+	default:
+		return nil, fmt.Errorf("dao: unknown SweepResult mutation op: %q", m.Op())
+	}
+}
+
+// SweepResultDetailsClient is a client for the SweepResultDetails schema.
+type SweepResultDetailsClient struct {
+	config
+}
+
+// NewSweepResultDetailsClient returns a client for the SweepResultDetails from the given config.
+func NewSweepResultDetailsClient(c config) *SweepResultDetailsClient {
+	return &SweepResultDetailsClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `sweepresultdetails.Hooks(f(g(h())))`.
+func (c *SweepResultDetailsClient) Use(hooks ...Hook) {
+	c.hooks.SweepResultDetails = append(c.hooks.SweepResultDetails, hooks...)
+}
+
+// Intercept adds a list of query interceptors to the interceptors stack.
+// A call to `Intercept(f, g, h)` equals to `sweepresultdetails.Intercept(f(g(h())))`.
+func (c *SweepResultDetailsClient) Intercept(interceptors ...Interceptor) {
+	c.inters.SweepResultDetails = append(c.inters.SweepResultDetails, interceptors...)
+}
+
+// Create returns a builder for creating a SweepResultDetails entity.
+func (c *SweepResultDetailsClient) Create() *SweepResultDetailsCreate {
+	mutation := newSweepResultDetailsMutation(c.config, OpCreate)
+	return &SweepResultDetailsCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of SweepResultDetails entities.
+func (c *SweepResultDetailsClient) CreateBulk(builders ...*SweepResultDetailsCreate) *SweepResultDetailsCreateBulk {
+	return &SweepResultDetailsCreateBulk{config: c.config, builders: builders}
+}
+
+// MapCreateBulk creates a bulk creation builder from the given slice. For each item in the slice, the function creates
+// a builder and applies setFunc on it.
+func (c *SweepResultDetailsClient) MapCreateBulk(slice any, setFunc func(*SweepResultDetailsCreate, int)) *SweepResultDetailsCreateBulk {
+	rv := reflect.ValueOf(slice)
+	if rv.Kind() != reflect.Slice {
+		return &SweepResultDetailsCreateBulk{err: fmt.Errorf("calling to SweepResultDetailsClient.MapCreateBulk with wrong type %T, need slice", slice)}
+	}
+	builders := make([]*SweepResultDetailsCreate, rv.Len())
+	for i := 0; i < rv.Len(); i++ {
+		builders[i] = c.Create()
+		setFunc(builders[i], i)
+	}
+	return &SweepResultDetailsCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for SweepResultDetails.
+func (c *SweepResultDetailsClient) Update() *SweepResultDetailsUpdate {
+	mutation := newSweepResultDetailsMutation(c.config, OpUpdate)
+	return &SweepResultDetailsUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *SweepResultDetailsClient) UpdateOne(srd *SweepResultDetails) *SweepResultDetailsUpdateOne {
+	mutation := newSweepResultDetailsMutation(c.config, OpUpdateOne, withSweepResultDetails(srd))
+	return &SweepResultDetailsUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *SweepResultDetailsClient) UpdateOneID(id int) *SweepResultDetailsUpdateOne {
+	mutation := newSweepResultDetailsMutation(c.config, OpUpdateOne, withSweepResultDetailsID(id))
+	return &SweepResultDetailsUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for SweepResultDetails.
+func (c *SweepResultDetailsClient) Delete() *SweepResultDetailsDelete {
+	mutation := newSweepResultDetailsMutation(c.config, OpDelete)
+	return &SweepResultDetailsDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a builder for deleting the given entity.
+func (c *SweepResultDetailsClient) DeleteOne(srd *SweepResultDetails) *SweepResultDetailsDeleteOne {
+	return c.DeleteOneID(srd.ID)
+}
+
+// DeleteOneID returns a builder for deleting the given entity by its id.
+func (c *SweepResultDetailsClient) DeleteOneID(id int) *SweepResultDetailsDeleteOne {
+	builder := c.Delete().Where(sweepresultdetails.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &SweepResultDetailsDeleteOne{builder}
+}
+
+// Query returns a query builder for SweepResultDetails.
+func (c *SweepResultDetailsClient) Query() *SweepResultDetailsQuery {
+	return &SweepResultDetailsQuery{
+		config: c.config,
+		ctx:    &QueryContext{Type: TypeSweepResultDetails},
+		inters: c.Interceptors(),
+	}
+}
+
+// Get returns a SweepResultDetails entity by its id.
+func (c *SweepResultDetailsClient) Get(ctx context.Context, id int) (*SweepResultDetails, error) {
+	return c.Query().Where(sweepresultdetails.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *SweepResultDetailsClient) GetX(ctx context.Context, id int) *SweepResultDetails {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// QueryCreator queries the creator edge of a SweepResultDetails.
+func (c *SweepResultDetailsClient) QueryCreator(srd *SweepResultDetails) *AdminQuery {
+	query := (&AdminClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := srd.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(sweepresultdetails.Table, sweepresultdetails.FieldID, id),
+			sqlgraph.To(admin.Table, admin.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, sweepresultdetails.CreatorTable, sweepresultdetails.CreatorColumn),
+		)
+		fromV = sqlgraph.Neighbors(srd.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryUpdater queries the updater edge of a SweepResultDetails.
+func (c *SweepResultDetailsClient) QueryUpdater(srd *SweepResultDetails) *AdminQuery {
+	query := (&AdminClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := srd.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(sweepresultdetails.Table, sweepresultdetails.FieldID, id),
+			sqlgraph.To(admin.Table, admin.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, sweepresultdetails.UpdaterTable, sweepresultdetails.UpdaterColumn),
+		)
+		fromV = sqlgraph.Neighbors(srd.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QuerySweep queries the sweep edge of a SweepResultDetails.
+func (c *SweepResultDetailsClient) QuerySweep(srd *SweepResultDetails) *SweepQuery {
+	query := (&SweepClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := srd.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(sweepresultdetails.Table, sweepresultdetails.FieldID, id),
+			sqlgraph.To(sweep.Table, sweep.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, sweepresultdetails.SweepTable, sweepresultdetails.SweepColumn),
+		)
+		fromV = sqlgraph.Neighbors(srd.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QuerySweepSchedule queries the sweep_schedule edge of a SweepResultDetails.
+func (c *SweepResultDetailsClient) QuerySweepSchedule(srd *SweepResultDetails) *SweepScheduleQuery {
+	query := (&SweepScheduleClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := srd.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(sweepresultdetails.Table, sweepresultdetails.FieldID, id),
+			sqlgraph.To(sweepschedule.Table, sweepschedule.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, sweepresultdetails.SweepScheduleTable, sweepresultdetails.SweepScheduleColumn),
+		)
+		fromV = sqlgraph.Neighbors(srd.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QuerySweepResult queries the sweep_result edge of a SweepResultDetails.
+func (c *SweepResultDetailsClient) QuerySweepResult(srd *SweepResultDetails) *SweepResultQuery {
+	query := (&SweepResultClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := srd.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(sweepresultdetails.Table, sweepresultdetails.FieldID, id),
+			sqlgraph.To(sweepresult.Table, sweepresult.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, sweepresultdetails.SweepResultTable, sweepresultdetails.SweepResultColumn),
+		)
+		fromV = sqlgraph.Neighbors(srd.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// Hooks returns the client hooks.
+func (c *SweepResultDetailsClient) Hooks() []Hook {
+	hooks := c.hooks.SweepResultDetails
+	return append(hooks[:len(hooks):len(hooks)], sweepresultdetails.Hooks[:]...)
+}
+
+// Interceptors returns the client interceptors.
+func (c *SweepResultDetailsClient) Interceptors() []Interceptor {
+	return c.inters.SweepResultDetails
+}
+
+func (c *SweepResultDetailsClient) mutate(ctx context.Context, m *SweepResultDetailsMutation) (Value, error) {
+	switch m.Op() {
+	case OpCreate:
+		return (&SweepResultDetailsCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdate:
+		return (&SweepResultDetailsUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdateOne:
+		return (&SweepResultDetailsUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpDelete, OpDeleteOne:
+		return (&SweepResultDetailsDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+	default:
+		return nil, fmt.Errorf("dao: unknown SweepResultDetails mutation op: %q", m.Op())
+	}
+}
+
+// SweepScheduleClient is a client for the SweepSchedule schema.
+type SweepScheduleClient struct {
+	config
+}
+
+// NewSweepScheduleClient returns a client for the SweepSchedule from the given config.
+func NewSweepScheduleClient(c config) *SweepScheduleClient {
+	return &SweepScheduleClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `sweepschedule.Hooks(f(g(h())))`.
+func (c *SweepScheduleClient) Use(hooks ...Hook) {
+	c.hooks.SweepSchedule = append(c.hooks.SweepSchedule, hooks...)
+}
+
+// Intercept adds a list of query interceptors to the interceptors stack.
+// A call to `Intercept(f, g, h)` equals to `sweepschedule.Intercept(f(g(h())))`.
+func (c *SweepScheduleClient) Intercept(interceptors ...Interceptor) {
+	c.inters.SweepSchedule = append(c.inters.SweepSchedule, interceptors...)
+}
+
+// Create returns a builder for creating a SweepSchedule entity.
+func (c *SweepScheduleClient) Create() *SweepScheduleCreate {
+	mutation := newSweepScheduleMutation(c.config, OpCreate)
+	return &SweepScheduleCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of SweepSchedule entities.
+func (c *SweepScheduleClient) CreateBulk(builders ...*SweepScheduleCreate) *SweepScheduleCreateBulk {
+	return &SweepScheduleCreateBulk{config: c.config, builders: builders}
+}
+
+// MapCreateBulk creates a bulk creation builder from the given slice. For each item in the slice, the function creates
+// a builder and applies setFunc on it.
+func (c *SweepScheduleClient) MapCreateBulk(slice any, setFunc func(*SweepScheduleCreate, int)) *SweepScheduleCreateBulk {
+	rv := reflect.ValueOf(slice)
+	if rv.Kind() != reflect.Slice {
+		return &SweepScheduleCreateBulk{err: fmt.Errorf("calling to SweepScheduleClient.MapCreateBulk with wrong type %T, need slice", slice)}
+	}
+	builders := make([]*SweepScheduleCreate, rv.Len())
+	for i := 0; i < rv.Len(); i++ {
+		builders[i] = c.Create()
+		setFunc(builders[i], i)
+	}
+	return &SweepScheduleCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for SweepSchedule.
+func (c *SweepScheduleClient) Update() *SweepScheduleUpdate {
+	mutation := newSweepScheduleMutation(c.config, OpUpdate)
+	return &SweepScheduleUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *SweepScheduleClient) UpdateOne(ss *SweepSchedule) *SweepScheduleUpdateOne {
+	mutation := newSweepScheduleMutation(c.config, OpUpdateOne, withSweepSchedule(ss))
+	return &SweepScheduleUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *SweepScheduleClient) UpdateOneID(id int) *SweepScheduleUpdateOne {
+	mutation := newSweepScheduleMutation(c.config, OpUpdateOne, withSweepScheduleID(id))
+	return &SweepScheduleUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for SweepSchedule.
+func (c *SweepScheduleClient) Delete() *SweepScheduleDelete {
+	mutation := newSweepScheduleMutation(c.config, OpDelete)
+	return &SweepScheduleDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a builder for deleting the given entity.
+func (c *SweepScheduleClient) DeleteOne(ss *SweepSchedule) *SweepScheduleDeleteOne {
+	return c.DeleteOneID(ss.ID)
+}
+
+// DeleteOneID returns a builder for deleting the given entity by its id.
+func (c *SweepScheduleClient) DeleteOneID(id int) *SweepScheduleDeleteOne {
+	builder := c.Delete().Where(sweepschedule.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &SweepScheduleDeleteOne{builder}
+}
+
+// Query returns a query builder for SweepSchedule.
+func (c *SweepScheduleClient) Query() *SweepScheduleQuery {
+	return &SweepScheduleQuery{
+		config: c.config,
+		ctx:    &QueryContext{Type: TypeSweepSchedule},
+		inters: c.Interceptors(),
+	}
+}
+
+// Get returns a SweepSchedule entity by its id.
+func (c *SweepScheduleClient) Get(ctx context.Context, id int) (*SweepSchedule, error) {
+	return c.Query().Where(sweepschedule.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *SweepScheduleClient) GetX(ctx context.Context, id int) *SweepSchedule {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// QueryCreator queries the creator edge of a SweepSchedule.
+func (c *SweepScheduleClient) QueryCreator(ss *SweepSchedule) *AdminQuery {
+	query := (&AdminClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := ss.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(sweepschedule.Table, sweepschedule.FieldID, id),
+			sqlgraph.To(admin.Table, admin.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, sweepschedule.CreatorTable, sweepschedule.CreatorColumn),
+		)
+		fromV = sqlgraph.Neighbors(ss.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryUpdater queries the updater edge of a SweepSchedule.
+func (c *SweepScheduleClient) QueryUpdater(ss *SweepSchedule) *AdminQuery {
+	query := (&AdminClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := ss.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(sweepschedule.Table, sweepschedule.FieldID, id),
+			sqlgraph.To(admin.Table, admin.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, sweepschedule.UpdaterTable, sweepschedule.UpdaterColumn),
+		)
+		fromV = sqlgraph.Neighbors(ss.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QuerySweep queries the sweep edge of a SweepSchedule.
+func (c *SweepScheduleClient) QuerySweep(ss *SweepSchedule) *SweepQuery {
+	query := (&SweepClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := ss.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(sweepschedule.Table, sweepschedule.FieldID, id),
+			sqlgraph.To(sweep.Table, sweep.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, sweepschedule.SweepTable, sweepschedule.SweepColumn),
+		)
+		fromV = sqlgraph.Neighbors(ss.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QueryWorkers queries the workers edge of a SweepSchedule.
+func (c *SweepScheduleClient) QueryWorkers(ss *SweepSchedule) *AdminQuery {
+	query := (&AdminClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := ss.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(sweepschedule.Table, sweepschedule.FieldID, id),
+			sqlgraph.To(admin.Table, admin.FieldID),
+			sqlgraph.Edge(sqlgraph.M2M, true, sweepschedule.WorkersTable, sweepschedule.WorkersPrimaryKey...),
+		)
+		fromV = sqlgraph.Neighbors(ss.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QuerySweepResult queries the sweep_result edge of a SweepSchedule.
+func (c *SweepScheduleClient) QuerySweepResult(ss *SweepSchedule) *SweepResultQuery {
+	query := (&SweepResultClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := ss.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(sweepschedule.Table, sweepschedule.FieldID, id),
+			sqlgraph.To(sweepresult.Table, sweepresult.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, sweepschedule.SweepResultTable, sweepschedule.SweepResultColumn),
+		)
+		fromV = sqlgraph.Neighbors(ss.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// QuerySweepResultDetails queries the sweep_result_details edge of a SweepSchedule.
+func (c *SweepScheduleClient) QuerySweepResultDetails(ss *SweepSchedule) *SweepResultDetailsQuery {
+	query := (&SweepResultDetailsClient{config: c.config}).Query()
+	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
+		id := ss.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(sweepschedule.Table, sweepschedule.FieldID, id),
+			sqlgraph.To(sweepresultdetails.Table, sweepresultdetails.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, sweepschedule.SweepResultDetailsTable, sweepschedule.SweepResultDetailsColumn),
+		)
+		fromV = sqlgraph.Neighbors(ss.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// Hooks returns the client hooks.
+func (c *SweepScheduleClient) Hooks() []Hook {
+	hooks := c.hooks.SweepSchedule
+	return append(hooks[:len(hooks):len(hooks)], sweepschedule.Hooks[:]...)
+}
+
+// Interceptors returns the client interceptors.
+func (c *SweepScheduleClient) Interceptors() []Interceptor {
+	return c.inters.SweepSchedule
+}
+
+func (c *SweepScheduleClient) mutate(ctx context.Context, m *SweepScheduleMutation) (Value, error) {
+	switch m.Op() {
+	case OpCreate:
+		return (&SweepScheduleCreate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdate:
+		return (&SweepScheduleUpdate{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpUpdateOne:
+		return (&SweepScheduleUpdateOne{config: c.config, hooks: c.Hooks(), mutation: m}).Save(ctx)
+	case OpDelete, OpDeleteOne:
+		return (&SweepScheduleDelete{config: c.config, hooks: c.Hooks(), mutation: m}).Exec(ctx)
+	default:
+		return nil, fmt.Errorf("dao: unknown SweepSchedule mutation op: %q", m.Op())
 	}
 }
 
@@ -3493,15 +5212,15 @@ func (c *VideoClient) QueryUpdater(v *Video) *AdminQuery {
 	return query
 }
 
-// QueryIpcEventVideo queries the ipc_event_video edge of a Video.
-func (c *VideoClient) QueryIpcEventVideo(v *Video) *IPCEventQuery {
-	query := (&IPCEventClient{config: c.config}).Query()
+// QueryEvent queries the event edge of a Video.
+func (c *VideoClient) QueryEvent(v *Video) *EventQuery {
+	query := (&EventClient{config: c.config}).Query()
 	query.path = func(context.Context) (fromV *sql.Selector, _ error) {
 		id := v.ID
 		step := sqlgraph.NewStep(
 			sqlgraph.From(video.Table, video.FieldID, id),
-			sqlgraph.To(ipcevent.Table, ipcevent.FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, false, video.IpcEventVideoTable, video.IpcEventVideoColumn),
+			sqlgraph.To(event.Table, event.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, video.EventTable, video.EventColumn),
 		)
 		fromV = sqlgraph.Neighbors(v.driver.Dialect(), step)
 		return fromV, nil
@@ -3538,13 +5257,15 @@ func (c *VideoClient) mutate(ctx context.Context, m *VideoMutation) (Value, erro
 // hooks and interceptors per client, for fast access.
 type (
 	hooks struct {
-		Admin, AdminRole, Area, Department, Device, DeviceInstallation, Employee,
-		EventLevel, IPCEvent, Occupation, Risk, RiskCategory, RiskLocation,
+		Admin, Area, Department, Device, DeviceInstallation, Employee, Event,
+		EventLevel, EventLog, Fixing, Occupation, Permission, Risk, RiskCategory,
+		RiskLocation, Sweep, SweepResult, SweepResultDetails, SweepSchedule,
 		Video []ent.Hook
 	}
 	inters struct {
-		Admin, AdminRole, Area, Department, Device, DeviceInstallation, Employee,
-		EventLevel, IPCEvent, Occupation, Risk, RiskCategory, RiskLocation,
+		Admin, Area, Department, Device, DeviceInstallation, Employee, Event,
+		EventLevel, EventLog, Fixing, Occupation, Permission, Risk, RiskCategory,
+		RiskLocation, Sweep, SweepResult, SweepResultDetails, SweepSchedule,
 		Video []ent.Interceptor
 	}
 )

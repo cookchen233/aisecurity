@@ -6,6 +6,7 @@ import (
 	"aisecurity/ent/dao/admin"
 	"aisecurity/ent/dao/risk"
 	"aisecurity/ent/dao/riskcategory"
+	"aisecurity/ent/dao/sweep"
 	"context"
 	"errors"
 	"fmt"
@@ -22,56 +23,56 @@ type RiskCategoryCreate struct {
 	hooks    []Hook
 }
 
-// SetCreatedAt sets the "created_at" field.
-func (rcc *RiskCategoryCreate) SetCreatedAt(t time.Time) *RiskCategoryCreate {
-	rcc.mutation.SetCreatedAt(t)
+// SetCreateTime sets the "create_time" field.
+func (rcc *RiskCategoryCreate) SetCreateTime(t time.Time) *RiskCategoryCreate {
+	rcc.mutation.SetCreateTime(t)
 	return rcc
 }
 
-// SetNillableCreatedAt sets the "created_at" field if the given value is not nil.
-func (rcc *RiskCategoryCreate) SetNillableCreatedAt(t *time.Time) *RiskCategoryCreate {
+// SetNillableCreateTime sets the "create_time" field if the given value is not nil.
+func (rcc *RiskCategoryCreate) SetNillableCreateTime(t *time.Time) *RiskCategoryCreate {
 	if t != nil {
-		rcc.SetCreatedAt(*t)
+		rcc.SetCreateTime(*t)
 	}
 	return rcc
 }
 
-// SetCreatedBy sets the "created_by" field.
-func (rcc *RiskCategoryCreate) SetCreatedBy(i int) *RiskCategoryCreate {
-	rcc.mutation.SetCreatedBy(i)
+// SetCreatorID sets the "creator_id" field.
+func (rcc *RiskCategoryCreate) SetCreatorID(i int) *RiskCategoryCreate {
+	rcc.mutation.SetCreatorID(i)
 	return rcc
 }
 
-// SetDeletedAt sets the "deleted_at" field.
-func (rcc *RiskCategoryCreate) SetDeletedAt(t time.Time) *RiskCategoryCreate {
-	rcc.mutation.SetDeletedAt(t)
+// SetDeleteTime sets the "delete_time" field.
+func (rcc *RiskCategoryCreate) SetDeleteTime(t time.Time) *RiskCategoryCreate {
+	rcc.mutation.SetDeleteTime(t)
 	return rcc
 }
 
-// SetNillableDeletedAt sets the "deleted_at" field if the given value is not nil.
-func (rcc *RiskCategoryCreate) SetNillableDeletedAt(t *time.Time) *RiskCategoryCreate {
+// SetNillableDeleteTime sets the "delete_time" field if the given value is not nil.
+func (rcc *RiskCategoryCreate) SetNillableDeleteTime(t *time.Time) *RiskCategoryCreate {
 	if t != nil {
-		rcc.SetDeletedAt(*t)
+		rcc.SetDeleteTime(*t)
 	}
 	return rcc
 }
 
-// SetUpdatedBy sets the "updated_by" field.
-func (rcc *RiskCategoryCreate) SetUpdatedBy(i int) *RiskCategoryCreate {
-	rcc.mutation.SetUpdatedBy(i)
+// SetUpdaterID sets the "updater_id" field.
+func (rcc *RiskCategoryCreate) SetUpdaterID(i int) *RiskCategoryCreate {
+	rcc.mutation.SetUpdaterID(i)
 	return rcc
 }
 
-// SetUpdatedAt sets the "updated_at" field.
-func (rcc *RiskCategoryCreate) SetUpdatedAt(t time.Time) *RiskCategoryCreate {
-	rcc.mutation.SetUpdatedAt(t)
+// SetUpdateTime sets the "update_time" field.
+func (rcc *RiskCategoryCreate) SetUpdateTime(t time.Time) *RiskCategoryCreate {
+	rcc.mutation.SetUpdateTime(t)
 	return rcc
 }
 
-// SetNillableUpdatedAt sets the "updated_at" field if the given value is not nil.
-func (rcc *RiskCategoryCreate) SetNillableUpdatedAt(t *time.Time) *RiskCategoryCreate {
+// SetNillableUpdateTime sets the "update_time" field if the given value is not nil.
+func (rcc *RiskCategoryCreate) SetNillableUpdateTime(t *time.Time) *RiskCategoryCreate {
 	if t != nil {
-		rcc.SetUpdatedAt(*t)
+		rcc.SetUpdateTime(*t)
 	}
 	return rcc
 }
@@ -82,21 +83,9 @@ func (rcc *RiskCategoryCreate) SetName(s string) *RiskCategoryCreate {
 	return rcc
 }
 
-// SetCreatorID sets the "creator" edge to the Admin entity by ID.
-func (rcc *RiskCategoryCreate) SetCreatorID(id int) *RiskCategoryCreate {
-	rcc.mutation.SetCreatorID(id)
-	return rcc
-}
-
 // SetCreator sets the "creator" edge to the Admin entity.
 func (rcc *RiskCategoryCreate) SetCreator(a *Admin) *RiskCategoryCreate {
 	return rcc.SetCreatorID(a.ID)
-}
-
-// SetUpdaterID sets the "updater" edge to the Admin entity by ID.
-func (rcc *RiskCategoryCreate) SetUpdaterID(id int) *RiskCategoryCreate {
-	rcc.mutation.SetUpdaterID(id)
-	return rcc
 }
 
 // SetUpdater sets the "updater" edge to the Admin entity.
@@ -117,6 +106,21 @@ func (rcc *RiskCategoryCreate) AddRisk(r ...*Risk) *RiskCategoryCreate {
 		ids[i] = r[i].ID
 	}
 	return rcc.AddRiskIDs(ids...)
+}
+
+// AddSweepIDs adds the "sweep" edge to the Sweep entity by IDs.
+func (rcc *RiskCategoryCreate) AddSweepIDs(ids ...int) *RiskCategoryCreate {
+	rcc.mutation.AddSweepIDs(ids...)
+	return rcc
+}
+
+// AddSweep adds the "sweep" edges to the Sweep entity.
+func (rcc *RiskCategoryCreate) AddSweep(s ...*Sweep) *RiskCategoryCreate {
+	ids := make([]int, len(s))
+	for i := range s {
+		ids[i] = s[i].ID
+	}
+	return rcc.AddSweepIDs(ids...)
 }
 
 // Mutation returns the RiskCategoryMutation object of the builder.
@@ -156,46 +160,46 @@ func (rcc *RiskCategoryCreate) ExecX(ctx context.Context) {
 
 // defaults sets the default values of the builder before save.
 func (rcc *RiskCategoryCreate) defaults() error {
-	if _, ok := rcc.mutation.CreatedAt(); !ok {
-		if riskcategory.DefaultCreatedAt == nil {
-			return fmt.Errorf("dao: uninitialized riskcategory.DefaultCreatedAt (forgotten import dao/runtime?)")
+	if _, ok := rcc.mutation.CreateTime(); !ok {
+		if riskcategory.DefaultCreateTime == nil {
+			return fmt.Errorf("dao: uninitialized riskcategory.DefaultCreateTime (forgotten import dao/runtime?)")
 		}
-		v := riskcategory.DefaultCreatedAt()
-		rcc.mutation.SetCreatedAt(v)
+		v := riskcategory.DefaultCreateTime()
+		rcc.mutation.SetCreateTime(v)
 	}
-	if _, ok := rcc.mutation.UpdatedAt(); !ok {
-		if riskcategory.DefaultUpdatedAt == nil {
-			return fmt.Errorf("dao: uninitialized riskcategory.DefaultUpdatedAt (forgotten import dao/runtime?)")
+	if _, ok := rcc.mutation.UpdateTime(); !ok {
+		if riskcategory.DefaultUpdateTime == nil {
+			return fmt.Errorf("dao: uninitialized riskcategory.DefaultUpdateTime (forgotten import dao/runtime?)")
 		}
-		v := riskcategory.DefaultUpdatedAt()
-		rcc.mutation.SetUpdatedAt(v)
+		v := riskcategory.DefaultUpdateTime()
+		rcc.mutation.SetUpdateTime(v)
 	}
 	return nil
 }
 
 // check runs all checks and user-defined validators on the builder.
 func (rcc *RiskCategoryCreate) check() error {
-	if _, ok := rcc.mutation.CreatedAt(); !ok {
-		return &ValidationError{Name: "created_at", err: errors.New(`dao: missing required field "RiskCategory.created_at"`)}
+	if _, ok := rcc.mutation.CreateTime(); !ok {
+		return &ValidationError{Name: "create_time", err: errors.New(`dao: missing required field "RiskCategory.create_time"`)}
 	}
-	if _, ok := rcc.mutation.CreatedBy(); !ok {
-		return &ValidationError{Name: "created_by", err: errors.New(`dao: missing required field "RiskCategory.created_by"`)}
+	if _, ok := rcc.mutation.CreatorID(); !ok {
+		return &ValidationError{Name: "creator_id", err: errors.New(`dao: missing required field "RiskCategory.creator_id"`)}
 	}
-	if v, ok := rcc.mutation.CreatedBy(); ok {
-		if err := riskcategory.CreatedByValidator(v); err != nil {
-			return &ValidationError{Name: "created_by", err: fmt.Errorf(`dao: validator failed for field "RiskCategory.created_by": %w`, err)}
+	if v, ok := rcc.mutation.CreatorID(); ok {
+		if err := riskcategory.CreatorIDValidator(v); err != nil {
+			return &ValidationError{Name: "creator_id", err: fmt.Errorf(`dao: validator failed for field "RiskCategory.creator_id": %w`, err)}
 		}
 	}
-	if _, ok := rcc.mutation.UpdatedBy(); !ok {
-		return &ValidationError{Name: "updated_by", err: errors.New(`dao: missing required field "RiskCategory.updated_by"`)}
+	if _, ok := rcc.mutation.UpdaterID(); !ok {
+		return &ValidationError{Name: "updater_id", err: errors.New(`dao: missing required field "RiskCategory.updater_id"`)}
 	}
-	if v, ok := rcc.mutation.UpdatedBy(); ok {
-		if err := riskcategory.UpdatedByValidator(v); err != nil {
-			return &ValidationError{Name: "updated_by", err: fmt.Errorf(`dao: validator failed for field "RiskCategory.updated_by": %w`, err)}
+	if v, ok := rcc.mutation.UpdaterID(); ok {
+		if err := riskcategory.UpdaterIDValidator(v); err != nil {
+			return &ValidationError{Name: "updater_id", err: fmt.Errorf(`dao: validator failed for field "RiskCategory.updater_id": %w`, err)}
 		}
 	}
-	if _, ok := rcc.mutation.UpdatedAt(); !ok {
-		return &ValidationError{Name: "updated_at", err: errors.New(`dao: missing required field "RiskCategory.updated_at"`)}
+	if _, ok := rcc.mutation.UpdateTime(); !ok {
+		return &ValidationError{Name: "update_time", err: errors.New(`dao: missing required field "RiskCategory.update_time"`)}
 	}
 	if _, ok := rcc.mutation.Name(); !ok {
 		return &ValidationError{Name: "name", err: errors.New(`dao: missing required field "RiskCategory.name"`)}
@@ -237,17 +241,17 @@ func (rcc *RiskCategoryCreate) createSpec() (*RiskCategory, *sqlgraph.CreateSpec
 		_node = &RiskCategory{config: rcc.config}
 		_spec = sqlgraph.NewCreateSpec(riskcategory.Table, sqlgraph.NewFieldSpec(riskcategory.FieldID, field.TypeInt))
 	)
-	if value, ok := rcc.mutation.CreatedAt(); ok {
-		_spec.SetField(riskcategory.FieldCreatedAt, field.TypeTime, value)
-		_node.CreatedAt = value
+	if value, ok := rcc.mutation.CreateTime(); ok {
+		_spec.SetField(riskcategory.FieldCreateTime, field.TypeTime, value)
+		_node.CreateTime = value
 	}
-	if value, ok := rcc.mutation.DeletedAt(); ok {
-		_spec.SetField(riskcategory.FieldDeletedAt, field.TypeTime, value)
-		_node.DeletedAt = &value
+	if value, ok := rcc.mutation.DeleteTime(); ok {
+		_spec.SetField(riskcategory.FieldDeleteTime, field.TypeTime, value)
+		_node.DeleteTime = &value
 	}
-	if value, ok := rcc.mutation.UpdatedAt(); ok {
-		_spec.SetField(riskcategory.FieldUpdatedAt, field.TypeTime, value)
-		_node.UpdatedAt = value
+	if value, ok := rcc.mutation.UpdateTime(); ok {
+		_spec.SetField(riskcategory.FieldUpdateTime, field.TypeTime, value)
+		_node.UpdateTime = value
 	}
 	if value, ok := rcc.mutation.Name(); ok {
 		_spec.SetField(riskcategory.FieldName, field.TypeString, value)
@@ -267,7 +271,7 @@ func (rcc *RiskCategoryCreate) createSpec() (*RiskCategory, *sqlgraph.CreateSpec
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
-		_node.CreatedBy = nodes[0]
+		_node.CreatorID = nodes[0]
 		_spec.Edges = append(_spec.Edges, edge)
 	}
 	if nodes := rcc.mutation.UpdaterIDs(); len(nodes) > 0 {
@@ -284,7 +288,7 @@ func (rcc *RiskCategoryCreate) createSpec() (*RiskCategory, *sqlgraph.CreateSpec
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
-		_node.UpdatedBy = nodes[0]
+		_node.UpdaterID = nodes[0]
 		_spec.Edges = append(_spec.Edges, edge)
 	}
 	if nodes := rcc.mutation.RiskIDs(); len(nodes) > 0 {
@@ -296,6 +300,22 @@ func (rcc *RiskCategoryCreate) createSpec() (*RiskCategory, *sqlgraph.CreateSpec
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(risk.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := rcc.mutation.SweepIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   riskcategory.SweepTable,
+			Columns: []string{riskcategory.SweepColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(sweep.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {
