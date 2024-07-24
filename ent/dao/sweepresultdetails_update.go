@@ -58,14 +58,6 @@ func (srdu *SweepResultDetailsUpdate) SetUpdaterID(i int) *SweepResultDetailsUpd
 	return srdu
 }
 
-// SetNillableUpdaterID sets the "updater_id" field if the given value is not nil.
-func (srdu *SweepResultDetailsUpdate) SetNillableUpdaterID(i *int) *SweepResultDetailsUpdate {
-	if i != nil {
-		srdu.SetUpdaterID(*i)
-	}
-	return srdu
-}
-
 // SetUpdateTime sets the "update_time" field.
 func (srdu *SweepResultDetailsUpdate) SetUpdateTime(t time.Time) *SweepResultDetailsUpdate {
 	srdu.mutation.SetUpdateTime(t)
@@ -78,25 +70,9 @@ func (srdu *SweepResultDetailsUpdate) SetSweepID(i int) *SweepResultDetailsUpdat
 	return srdu
 }
 
-// SetNillableSweepID sets the "sweep_id" field if the given value is not nil.
-func (srdu *SweepResultDetailsUpdate) SetNillableSweepID(i *int) *SweepResultDetailsUpdate {
-	if i != nil {
-		srdu.SetSweepID(*i)
-	}
-	return srdu
-}
-
 // SetSweepScheduleID sets the "sweep_schedule_id" field.
 func (srdu *SweepResultDetailsUpdate) SetSweepScheduleID(i int) *SweepResultDetailsUpdate {
 	srdu.mutation.SetSweepScheduleID(i)
-	return srdu
-}
-
-// SetNillableSweepScheduleID sets the "sweep_schedule_id" field if the given value is not nil.
-func (srdu *SweepResultDetailsUpdate) SetNillableSweepScheduleID(i *int) *SweepResultDetailsUpdate {
-	if i != nil {
-		srdu.SetSweepScheduleID(*i)
-	}
 	return srdu
 }
 
@@ -106,25 +82,9 @@ func (srdu *SweepResultDetailsUpdate) SetSweepResultID(i int) *SweepResultDetail
 	return srdu
 }
 
-// SetNillableSweepResultID sets the "sweep_result_id" field if the given value is not nil.
-func (srdu *SweepResultDetailsUpdate) SetNillableSweepResultID(i *int) *SweepResultDetailsUpdate {
-	if i != nil {
-		srdu.SetSweepResultID(*i)
-	}
-	return srdu
-}
-
 // SetTitle sets the "title" field.
 func (srdu *SweepResultDetailsUpdate) SetTitle(s string) *SweepResultDetailsUpdate {
 	srdu.mutation.SetTitle(s)
-	return srdu
-}
-
-// SetNillableTitle sets the "title" field if the given value is not nil.
-func (srdu *SweepResultDetailsUpdate) SetNillableTitle(s *string) *SweepResultDetailsUpdate {
-	if s != nil {
-		srdu.SetTitle(*s)
-	}
 	return srdu
 }
 
@@ -132,14 +92,6 @@ func (srdu *SweepResultDetailsUpdate) SetNillableTitle(s *string) *SweepResultDe
 func (srdu *SweepResultDetailsUpdate) SetResult(i int) *SweepResultDetailsUpdate {
 	srdu.mutation.ResetResult()
 	srdu.mutation.SetResult(i)
-	return srdu
-}
-
-// SetNillableResult sets the "result" field if the given value is not nil.
-func (srdu *SweepResultDetailsUpdate) SetNillableResult(i *int) *SweepResultDetailsUpdate {
-	if i != nil {
-		srdu.SetResult(*i)
-	}
 	return srdu
 }
 
@@ -482,14 +434,6 @@ func (srduo *SweepResultDetailsUpdateOne) SetUpdaterID(i int) *SweepResultDetail
 	return srduo
 }
 
-// SetNillableUpdaterID sets the "updater_id" field if the given value is not nil.
-func (srduo *SweepResultDetailsUpdateOne) SetNillableUpdaterID(i *int) *SweepResultDetailsUpdateOne {
-	if i != nil {
-		srduo.SetUpdaterID(*i)
-	}
-	return srduo
-}
-
 // SetUpdateTime sets the "update_time" field.
 func (srduo *SweepResultDetailsUpdateOne) SetUpdateTime(t time.Time) *SweepResultDetailsUpdateOne {
 	srduo.mutation.SetUpdateTime(t)
@@ -502,25 +446,9 @@ func (srduo *SweepResultDetailsUpdateOne) SetSweepID(i int) *SweepResultDetailsU
 	return srduo
 }
 
-// SetNillableSweepID sets the "sweep_id" field if the given value is not nil.
-func (srduo *SweepResultDetailsUpdateOne) SetNillableSweepID(i *int) *SweepResultDetailsUpdateOne {
-	if i != nil {
-		srduo.SetSweepID(*i)
-	}
-	return srduo
-}
-
 // SetSweepScheduleID sets the "sweep_schedule_id" field.
 func (srduo *SweepResultDetailsUpdateOne) SetSweepScheduleID(i int) *SweepResultDetailsUpdateOne {
 	srduo.mutation.SetSweepScheduleID(i)
-	return srduo
-}
-
-// SetNillableSweepScheduleID sets the "sweep_schedule_id" field if the given value is not nil.
-func (srduo *SweepResultDetailsUpdateOne) SetNillableSweepScheduleID(i *int) *SweepResultDetailsUpdateOne {
-	if i != nil {
-		srduo.SetSweepScheduleID(*i)
-	}
 	return srduo
 }
 
@@ -530,25 +458,9 @@ func (srduo *SweepResultDetailsUpdateOne) SetSweepResultID(i int) *SweepResultDe
 	return srduo
 }
 
-// SetNillableSweepResultID sets the "sweep_result_id" field if the given value is not nil.
-func (srduo *SweepResultDetailsUpdateOne) SetNillableSweepResultID(i *int) *SweepResultDetailsUpdateOne {
-	if i != nil {
-		srduo.SetSweepResultID(*i)
-	}
-	return srduo
-}
-
 // SetTitle sets the "title" field.
 func (srduo *SweepResultDetailsUpdateOne) SetTitle(s string) *SweepResultDetailsUpdateOne {
 	srduo.mutation.SetTitle(s)
-	return srduo
-}
-
-// SetNillableTitle sets the "title" field if the given value is not nil.
-func (srduo *SweepResultDetailsUpdateOne) SetNillableTitle(s *string) *SweepResultDetailsUpdateOne {
-	if s != nil {
-		srduo.SetTitle(*s)
-	}
 	return srduo
 }
 
@@ -556,14 +468,6 @@ func (srduo *SweepResultDetailsUpdateOne) SetNillableTitle(s *string) *SweepResu
 func (srduo *SweepResultDetailsUpdateOne) SetResult(i int) *SweepResultDetailsUpdateOne {
 	srduo.mutation.ResetResult()
 	srduo.mutation.SetResult(i)
-	return srduo
-}
-
-// SetNillableResult sets the "result" field if the given value is not nil.
-func (srduo *SweepResultDetailsUpdateOne) SetNillableResult(i *int) *SweepResultDetailsUpdateOne {
-	if i != nil {
-		srduo.SetResult(*i)
-	}
 	return srduo
 }
 

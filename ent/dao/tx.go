@@ -52,6 +52,8 @@ type Tx struct {
 	SweepResultDetails *SweepResultDetailsClient
 	// SweepSchedule is the client for interacting with the SweepSchedule builders.
 	SweepSchedule *SweepScheduleClient
+	// User is the client for interacting with the User builders.
+	User *UserClient
 	// Video is the client for interacting with the Video builders.
 	Video *VideoClient
 
@@ -204,6 +206,7 @@ func (tx *Tx) init() {
 	tx.SweepResult = NewSweepResultClient(tx.config)
 	tx.SweepResultDetails = NewSweepResultDetailsClient(tx.config)
 	tx.SweepSchedule = NewSweepScheduleClient(tx.config)
+	tx.User = NewUserClient(tx.config)
 	tx.Video = NewVideoClient(tx.config)
 }
 

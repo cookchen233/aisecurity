@@ -33,7 +33,7 @@ func (h *RiskHandler) GetEntity(c *gin.Context) structs.IEntity {
 	return h.Entity
 }
 func (h *RiskHandler) SetRequestContext(c *gin.Context, childHandler handlers.IHandler) {
-	h.Service = services.NewRiskService()
+	h.Service = services.NewRiskService(c)
 	h.Service.Ctx = c
 	h.Filter = &filters.Risk{}
 	h.Entity = &entities.Risk{}
@@ -53,14 +53,14 @@ func (h *RiskHandler) GetList(c *gin.Context) {
 	var err error
 	utils.Logger.Info("called default GetList")
 	if err := c.ShouldBindQuery(h.Filter); err != nil {
-		http.Error(c, err, 1000)
+		http.Error(c, err, 2000)
 		return
 	}
 	utils.Logger.Info("bound filter", zap.Any("filter", h.Filter))
 	var resp = struct {
-		Total        int                  `json:"total"`
-		List         []structs.IEntity    `json:"list"`
-		StatusCounts []*types.StatusCount `json:"status_counts"`
+		Total        int                 `json:"total"`
+		List         []structs.IEntity   `json:"list"`
+		StatusCounts []*types.GroupCount `json:"status_counts"`
 	}{}
 
 	var f2 filters.Risk // copy a filter
@@ -72,7 +72,7 @@ func (h *RiskHandler) GetList(c *gin.Context) {
 		var expectErr *expects.NotImplementedMethod
 		unwrappedErr := errors.Unwrap(err)
 		if unwrappedErr != nil && errors.As(unwrappedErr, &expectErr) {
-			resp.StatusCounts = []*types.StatusCount{}
+			resp.StatusCounts = []*types.GroupCount{}
 		} else {
 			http.Error(c, err, 2000)
 			return
@@ -97,4 +97,17 @@ func (h *RiskHandler) GetList(c *gin.Context) {
 	}
 	utils.Logger.Info("called service.GetList", zap.Int("length", len(resp.List)))
 	http.Success(c, resp)
+}
+
+func (h *RiskHandler) GetRiskCategoryCounts(c *gin.Context) {
+	if err := c.ShouldBindQuery(h.Handler.Filter); err != nil {
+		http.Error(c, err, 1000)
+		return
+	}
+	list, err := h.Service.GetRiskCategoryCounts(h.Handler.Filter)
+	if err != nil {
+		http.Error(c, err, 2000)
+		return
+	}
+	http.Success(c, list)
 }

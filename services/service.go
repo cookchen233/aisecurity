@@ -18,7 +18,7 @@ type IService interface {
 	Update(structs.IEntity) (structs.IEntity, error)
 	GetList(structs.IFilter) ([]structs.IEntity, error)
 	GetTotal(structs.IFilter) (int, error)
-	GetStatusCounts(structs.IFilter) ([]*types.StatusCount, error)
+	GetStatusCounts(structs.IFilter) ([]*types.GroupCount, error)
 	GetDetails(structs.IFilter) (structs.IEntity, error)
 	Delete(structs.IEntity) error
 }
@@ -55,7 +55,7 @@ func (s *Service) Delete(structs.IEntity) error {
 	utils.Logger.Error("called empty service method", zap.String("method", utils.GetMethodName()))
 	return utils.ErrorWithStack(expects.NewNotImplementedMethod())
 }
-func (s *Service) GetStatusCounts(filter structs.IFilter) ([]*types.StatusCount, error) {
+func (s *Service) GetStatusCounts(filter structs.IFilter) ([]*types.GroupCount, error) {
 	utils.Logger.Error("called empty service method", zap.String("method", utils.GetMethodName()))
 	return nil, utils.ErrorWithStack(expects.NewNotImplementedMethod())
 }
@@ -69,4 +69,7 @@ func (s *Service) rollback(tx *dao.Tx, err error) error {
 
 func (s *Service) GetCurrentAdminID() int {
 	return s.Ctx.(*gin.Context).GetInt("admin_id")
+}
+func (s *Service) GetCurrentAdmin() (structs.IEntity, error) {
+	return NewAdminService(s.Ctx).GetByID(s.Ctx.(*gin.Context).GetInt("admin_id"))
 }

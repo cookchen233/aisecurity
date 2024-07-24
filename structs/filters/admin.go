@@ -7,7 +7,7 @@ import (
 
 type Admin struct {
 	structs.StandardFilter
-	AdminStatus  enums.AdminStatus `form:"admin_status"`
-	DepartmentID int               `form:"department_id"`
-	OccupationID int               `form:"occupation_id"`
+	AdminStatus  enums.EnabledStatus `form:"admin_status"`
+	DepartmentID int                 `form:"department_id"`
+	OccupationID int                 `form:"occupation_id"`
 }

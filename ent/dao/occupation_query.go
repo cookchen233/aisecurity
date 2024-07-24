@@ -369,7 +369,7 @@ func (oq *OccupationQuery) WithEmployee(opts ...func(*EmployeeQuery)) *Occupatio
 // Example:
 //
 //	var v []struct {
-//		CreateTime time.Time `json:"create_time"`
+//		CreateTime time.Time `json:"create_time,omitempty"`
 //		Count int `json:"count,omitempty"`
 //	}
 //
@@ -392,7 +392,7 @@ func (oq *OccupationQuery) GroupBy(field string, fields ...string) *OccupationGr
 // Example:
 //
 //	var v []struct {
-//		CreateTime time.Time `json:"create_time"`
+//		CreateTime time.Time `json:"create_time,omitempty"`
 //	}
 //
 //	client.Occupation.Query().

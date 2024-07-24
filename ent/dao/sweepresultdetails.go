@@ -22,25 +22,25 @@ type SweepResultDetails struct {
 	// ID of the ent.
 	ID int `json:"id,omitempty"`
 	// 创建时间
-	CreateTime time.Time `json:"create_time"`
+	CreateTime time.Time `json:"create_time,omitempty"`
 	// 创建者
-	CreatorID int `json:"creator_id"`
+	CreatorID int `json:"creator_id,omitempty"`
 	// 删除时间
-	DeleteTime *time.Time `json:"delete_time"`
+	DeleteTime *time.Time `json:"delete_time,omitempty"`
 	// 最后更新者
-	UpdaterID int `json:"updater_id"`
+	UpdaterID int `json:"updater_id,omitempty"`
 	// 最后更新时间
-	UpdateTime time.Time `json:"update_time"`
+	UpdateTime time.Time `json:"update_time,omitempty"`
 	// 排查模板ID
-	SweepID int `json:"sweep_id"`
+	SweepID int `json:"sweep_id,omitempty"`
 	// 排查任务ID
-	SweepScheduleID int `json:"sweep_schedule_id"`
+	SweepScheduleID int `json:"sweep_schedule_id,omitempty"`
 	// 排查结果ID
-	SweepResultID int `json:"sweep_result_id"`
+	SweepResultID int `json:"sweep_result_id,omitempty"`
 	// 排查项标题
-	Title string `json:"title" validate:"required"`
+	Title string `json:"title,omitempty" validate:"required"`
 	// 排查结果
-	Result int `json:"result"`
+	Result int `json:"result,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the SweepResultDetailsQuery when eager-loading is set.
 	Edges        SweepResultDetailsEdges `json:"edges"`

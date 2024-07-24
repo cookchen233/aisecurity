@@ -60,14 +60,6 @@ func (ru *RiskUpdate) SetUpdaterID(i int) *RiskUpdate {
 	return ru
 }
 
-// SetNillableUpdaterID sets the "updater_id" field if the given value is not nil.
-func (ru *RiskUpdate) SetNillableUpdaterID(i *int) *RiskUpdate {
-	if i != nil {
-		ru.SetUpdaterID(*i)
-	}
-	return ru
-}
-
 // SetUpdateTime sets the "update_time" field.
 func (ru *RiskUpdate) SetUpdateTime(t time.Time) *RiskUpdate {
 	ru.mutation.SetUpdateTime(t)
@@ -77,14 +69,6 @@ func (ru *RiskUpdate) SetUpdateTime(t time.Time) *RiskUpdate {
 // SetTitle sets the "title" field.
 func (ru *RiskUpdate) SetTitle(s string) *RiskUpdate {
 	ru.mutation.SetTitle(s)
-	return ru
-}
-
-// SetNillableTitle sets the "title" field if the given value is not nil.
-func (ru *RiskUpdate) SetNillableTitle(s *string) *RiskUpdate {
-	if s != nil {
-		ru.SetTitle(*s)
-	}
 	return ru
 }
 
@@ -126,17 +110,27 @@ func (ru *RiskUpdate) ClearImages() *RiskUpdate {
 	return ru
 }
 
-// SetRiskCategoryID sets the "risk_category_id" field.
-func (ru *RiskUpdate) SetRiskCategoryID(i int) *RiskUpdate {
-	ru.mutation.SetRiskCategoryID(i)
+// SetMaintainedImages sets the "maintained_images" field.
+func (ru *RiskUpdate) SetMaintainedImages(ti []types.UploadedImage) *RiskUpdate {
+	ru.mutation.SetMaintainedImages(ti)
 	return ru
 }
 
-// SetNillableRiskCategoryID sets the "risk_category_id" field if the given value is not nil.
-func (ru *RiskUpdate) SetNillableRiskCategoryID(i *int) *RiskUpdate {
-	if i != nil {
-		ru.SetRiskCategoryID(*i)
-	}
+// AppendMaintainedImages appends ti to the "maintained_images" field.
+func (ru *RiskUpdate) AppendMaintainedImages(ti []types.UploadedImage) *RiskUpdate {
+	ru.mutation.AppendMaintainedImages(ti)
+	return ru
+}
+
+// ClearMaintainedImages clears the value of the "maintained_images" field.
+func (ru *RiskUpdate) ClearMaintainedImages() *RiskUpdate {
+	ru.mutation.ClearMaintainedImages()
+	return ru
+}
+
+// SetRiskCategoryID sets the "risk_category_id" field.
+func (ru *RiskUpdate) SetRiskCategoryID(i int) *RiskUpdate {
+	ru.mutation.SetRiskCategoryID(i)
 	return ru
 }
 
@@ -146,25 +140,9 @@ func (ru *RiskUpdate) SetRiskLocationID(i int) *RiskUpdate {
 	return ru
 }
 
-// SetNillableRiskLocationID sets the "risk_location_id" field if the given value is not nil.
-func (ru *RiskUpdate) SetNillableRiskLocationID(i *int) *RiskUpdate {
-	if i != nil {
-		ru.SetRiskLocationID(*i)
-	}
-	return ru
-}
-
 // SetMaintainerID sets the "maintainer_id" field.
 func (ru *RiskUpdate) SetMaintainerID(i int) *RiskUpdate {
 	ru.mutation.SetMaintainerID(i)
-	return ru
-}
-
-// SetNillableMaintainerID sets the "maintainer_id" field if the given value is not nil.
-func (ru *RiskUpdate) SetNillableMaintainerID(i *int) *RiskUpdate {
-	if i != nil {
-		ru.SetMaintainerID(*i)
-	}
 	return ru
 }
 
@@ -212,14 +190,6 @@ func (ru *RiskUpdate) AddMaintainStatus(mss maintain_status.MaintainStatus) *Ris
 // SetDueTime sets the "due_time" field.
 func (ru *RiskUpdate) SetDueTime(t time.Time) *RiskUpdate {
 	ru.mutation.SetDueTime(t)
-	return ru
-}
-
-// SetNillableDueTime sets the "due_time" field if the given value is not nil.
-func (ru *RiskUpdate) SetNillableDueTime(t *time.Time) *RiskUpdate {
-	if t != nil {
-		ru.SetDueTime(*t)
-	}
 	return ru
 }
 
@@ -405,6 +375,17 @@ func (ru *RiskUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	if ru.mutation.ImagesCleared() {
 		_spec.ClearField(risk.FieldImages, field.TypeJSON)
 	}
+	if value, ok := ru.mutation.MaintainedImages(); ok {
+		_spec.SetField(risk.FieldMaintainedImages, field.TypeJSON, value)
+	}
+	if value, ok := ru.mutation.AppendedMaintainedImages(); ok {
+		_spec.AddModifier(func(u *sql.UpdateBuilder) {
+			sqljson.Append(u, risk.FieldMaintainedImages, value)
+		})
+	}
+	if ru.mutation.MaintainedImagesCleared() {
+		_spec.ClearField(risk.FieldMaintainedImages, field.TypeJSON)
+	}
 	if value, ok := ru.mutation.Measures(); ok {
 		_spec.SetField(risk.FieldMeasures, field.TypeString, value)
 	}
@@ -582,14 +563,6 @@ func (ruo *RiskUpdateOne) SetUpdaterID(i int) *RiskUpdateOne {
 	return ruo
 }
 
-// SetNillableUpdaterID sets the "updater_id" field if the given value is not nil.
-func (ruo *RiskUpdateOne) SetNillableUpdaterID(i *int) *RiskUpdateOne {
-	if i != nil {
-		ruo.SetUpdaterID(*i)
-	}
-	return ruo
-}
-
 // SetUpdateTime sets the "update_time" field.
 func (ruo *RiskUpdateOne) SetUpdateTime(t time.Time) *RiskUpdateOne {
 	ruo.mutation.SetUpdateTime(t)
@@ -599,14 +572,6 @@ func (ruo *RiskUpdateOne) SetUpdateTime(t time.Time) *RiskUpdateOne {
 // SetTitle sets the "title" field.
 func (ruo *RiskUpdateOne) SetTitle(s string) *RiskUpdateOne {
 	ruo.mutation.SetTitle(s)
-	return ruo
-}
-
-// SetNillableTitle sets the "title" field if the given value is not nil.
-func (ruo *RiskUpdateOne) SetNillableTitle(s *string) *RiskUpdateOne {
-	if s != nil {
-		ruo.SetTitle(*s)
-	}
 	return ruo
 }
 
@@ -648,17 +613,27 @@ func (ruo *RiskUpdateOne) ClearImages() *RiskUpdateOne {
 	return ruo
 }
 
-// SetRiskCategoryID sets the "risk_category_id" field.
-func (ruo *RiskUpdateOne) SetRiskCategoryID(i int) *RiskUpdateOne {
-	ruo.mutation.SetRiskCategoryID(i)
+// SetMaintainedImages sets the "maintained_images" field.
+func (ruo *RiskUpdateOne) SetMaintainedImages(ti []types.UploadedImage) *RiskUpdateOne {
+	ruo.mutation.SetMaintainedImages(ti)
 	return ruo
 }
 
-// SetNillableRiskCategoryID sets the "risk_category_id" field if the given value is not nil.
-func (ruo *RiskUpdateOne) SetNillableRiskCategoryID(i *int) *RiskUpdateOne {
-	if i != nil {
-		ruo.SetRiskCategoryID(*i)
-	}
+// AppendMaintainedImages appends ti to the "maintained_images" field.
+func (ruo *RiskUpdateOne) AppendMaintainedImages(ti []types.UploadedImage) *RiskUpdateOne {
+	ruo.mutation.AppendMaintainedImages(ti)
+	return ruo
+}
+
+// ClearMaintainedImages clears the value of the "maintained_images" field.
+func (ruo *RiskUpdateOne) ClearMaintainedImages() *RiskUpdateOne {
+	ruo.mutation.ClearMaintainedImages()
+	return ruo
+}
+
+// SetRiskCategoryID sets the "risk_category_id" field.
+func (ruo *RiskUpdateOne) SetRiskCategoryID(i int) *RiskUpdateOne {
+	ruo.mutation.SetRiskCategoryID(i)
 	return ruo
 }
 
@@ -668,25 +643,9 @@ func (ruo *RiskUpdateOne) SetRiskLocationID(i int) *RiskUpdateOne {
 	return ruo
 }
 
-// SetNillableRiskLocationID sets the "risk_location_id" field if the given value is not nil.
-func (ruo *RiskUpdateOne) SetNillableRiskLocationID(i *int) *RiskUpdateOne {
-	if i != nil {
-		ruo.SetRiskLocationID(*i)
-	}
-	return ruo
-}
-
 // SetMaintainerID sets the "maintainer_id" field.
 func (ruo *RiskUpdateOne) SetMaintainerID(i int) *RiskUpdateOne {
 	ruo.mutation.SetMaintainerID(i)
-	return ruo
-}
-
-// SetNillableMaintainerID sets the "maintainer_id" field if the given value is not nil.
-func (ruo *RiskUpdateOne) SetNillableMaintainerID(i *int) *RiskUpdateOne {
-	if i != nil {
-		ruo.SetMaintainerID(*i)
-	}
 	return ruo
 }
 
@@ -734,14 +693,6 @@ func (ruo *RiskUpdateOne) AddMaintainStatus(mss maintain_status.MaintainStatus) 
 // SetDueTime sets the "due_time" field.
 func (ruo *RiskUpdateOne) SetDueTime(t time.Time) *RiskUpdateOne {
 	ruo.mutation.SetDueTime(t)
-	return ruo
-}
-
-// SetNillableDueTime sets the "due_time" field if the given value is not nil.
-func (ruo *RiskUpdateOne) SetNillableDueTime(t *time.Time) *RiskUpdateOne {
-	if t != nil {
-		ruo.SetDueTime(*t)
-	}
 	return ruo
 }
 
@@ -956,6 +907,17 @@ func (ruo *RiskUpdateOne) sqlSave(ctx context.Context) (_node *Risk, err error) 
 	}
 	if ruo.mutation.ImagesCleared() {
 		_spec.ClearField(risk.FieldImages, field.TypeJSON)
+	}
+	if value, ok := ruo.mutation.MaintainedImages(); ok {
+		_spec.SetField(risk.FieldMaintainedImages, field.TypeJSON, value)
+	}
+	if value, ok := ruo.mutation.AppendedMaintainedImages(); ok {
+		_spec.AddModifier(func(u *sql.UpdateBuilder) {
+			sqljson.Append(u, risk.FieldMaintainedImages, value)
+		})
+	}
+	if ruo.mutation.MaintainedImagesCleared() {
+		_spec.ClearField(risk.FieldMaintainedImages, field.TypeJSON)
 	}
 	if value, ok := ruo.mutation.Measures(); ok {
 		_spec.SetField(risk.FieldMeasures, field.TypeString, value)

@@ -236,6 +236,18 @@ func (f SweepScheduleFunc) Mutate(ctx context.Context, m dao.Mutation) (dao.Valu
 	return nil, fmt.Errorf("unexpected mutation type %T. expect *dao.SweepScheduleMutation", m)
 }
 
+// The UserFunc type is an adapter to allow the use of ordinary
+// function as User mutator.
+type UserFunc func(context.Context, *dao.UserMutation) (dao.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f UserFunc) Mutate(ctx context.Context, m dao.Mutation) (dao.Value, error) {
+	if mv, ok := m.(*dao.UserMutation); ok {
+		return f(ctx, mv)
+	}
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *dao.UserMutation", m)
+}
+
 // The VideoFunc type is an adapter to allow the use of ordinary
 // function as Video mutator.
 type VideoFunc func(context.Context, *dao.VideoMutation) (dao.Value, error)

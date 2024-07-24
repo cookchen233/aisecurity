@@ -477,7 +477,7 @@ func (dq *DeviceQuery) WithFixing(opts ...func(*FixingQuery)) *DeviceQuery {
 // Example:
 //
 //	var v []struct {
-//		CreateTime time.Time `json:"create_time"`
+//		CreateTime time.Time `json:"create_time,omitempty"`
 //		Count int `json:"count,omitempty"`
 //	}
 //
@@ -500,7 +500,7 @@ func (dq *DeviceQuery) GroupBy(field string, fields ...string) *DeviceGroupBy {
 // Example:
 //
 //	var v []struct {
-//		CreateTime time.Time `json:"create_time"`
+//		CreateTime time.Time `json:"create_time,omitempty"`
 //	}
 //
 //	client.Device.Query().

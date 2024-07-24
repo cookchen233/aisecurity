@@ -73,7 +73,7 @@ func (h *FuyouHandler) ReportEvent(c *gin.Context) {
 	}
 
 	// device
-	deviceService := services.NewDevice(c)
+	deviceService := services.NewDeviceService(c)
 	device, err := deviceService.GetBySn(p.BoardID)
 	if err != nil {
 		if dao.IsNotFound(err) {
@@ -119,7 +119,7 @@ func (h *FuyouHandler) ReportEvent(c *gin.Context) {
 		}
 	}
 
-	ent := entities.Event{
+	evt := entities.Event{
 		Event: dao.Event{
 			DeviceID:    d.ID,
 			DataID:      p.AlarmID,
@@ -144,7 +144,7 @@ func (h *FuyouHandler) ReportEvent(c *gin.Context) {
 		http.Error(c, err, 2000)
 		return
 	}
-	ent.Images = append(ent.Images, &types.UploadedImage{UploadedFile: types.UploadedFile{
+	evt.Images = append(evt.Images, &types.UploadedImage{UploadedFile: types.UploadedFile{
 		Name:       p.LocalRawPath,
 		URL:        image,
 		Size:       imageInfo.Size(),
@@ -165,7 +165,7 @@ func (h *FuyouHandler) ReportEvent(c *gin.Context) {
 			http.Error(c, err, 2000)
 			return
 		}
-		ent.LabeledImages = append(ent.LabeledImages, &types.UploadedImage{UploadedFile: types.UploadedFile{
+		evt.LabeledImages = append(evt.LabeledImages, &types.UploadedImage{UploadedFile: types.UploadedFile{
 			Name:       p.LocalLabeledPath,
 			URL:        labeledImage,
 			Size:       labeledImageInfo.Size(),
@@ -186,9 +186,9 @@ func (h *FuyouHandler) ReportEvent(c *gin.Context) {
 	//if video != nil {
 	//	ent.VideoID = video.(*entities.Video).ID
 	//}
-	ent.VideoID = gconv.Int(p.VideoFile)
+	evt.VideoID = gconv.Int(p.VideoFile)
 
-	saved, err := h.Service.Create(&ent)
+	saved, err := h.Service.Create(&evt)
 	if err != nil {
 		http.Error(c, err, 2000)
 		return
@@ -203,6 +203,12 @@ func (h *FuyouHandler) ReportEvent(c *gin.Context) {
 			LogType:  enums.ELT1,
 		},
 	})
+
+	// send WeChat template message
+	go func() {
+		h.Service.SendTemplateMsg(evt.EventTime, eventType.Label(), d.Name, d.ID)
+	}()
+
 	http.Success(c, saved)
 }
 

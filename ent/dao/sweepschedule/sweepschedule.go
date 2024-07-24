@@ -30,8 +30,8 @@ const (
 	FieldName = "name"
 	// FieldSweepID holds the string denoting the sweep_id field in the database.
 	FieldSweepID = "sweep_id"
-	// FieldScheduleStatus holds the string denoting the schedule_status field in the database.
-	FieldScheduleStatus = "schedule_status"
+	// FieldEnabledStatus holds the string denoting the enabled_status field in the database.
+	FieldEnabledStatus = "enabled_status"
 	// FieldActionTime holds the string denoting the action_time field in the database.
 	FieldActionTime = "action_time"
 	// FieldRemind holds the string denoting the remind field in the database.
@@ -104,7 +104,7 @@ var Columns = []string{
 	FieldUpdateTime,
 	FieldName,
 	FieldSweepID,
-	FieldScheduleStatus,
+	FieldEnabledStatus,
 	FieldActionTime,
 	FieldRemind,
 	FieldRepeat,
@@ -147,10 +147,10 @@ var (
 	NameValidator func(string) error
 	// SweepIDValidator is a validator for the "sweep_id" field. It is called by the builders before save.
 	SweepIDValidator func(int) error
-	// DefaultScheduleStatus holds the default value on creation for the "schedule_status" field.
-	DefaultScheduleStatus enums.AdminStatus
-	// ScheduleStatusValidator is a validator for the "schedule_status" field. It is called by the builders before save.
-	ScheduleStatusValidator func(int) error
+	// DefaultEnabledStatus holds the default value on creation for the "enabled_status" field.
+	DefaultEnabledStatus enums.EnabledStatus
+	// EnabledStatusValidator is a validator for the "enabled_status" field. It is called by the builders before save.
+	EnabledStatusValidator func(int) error
 )
 
 // OrderOption defines the ordering options for the SweepSchedule queries.
@@ -196,9 +196,9 @@ func BySweepID(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldSweepID, opts...).ToFunc()
 }
 
-// ByScheduleStatus orders the results by the schedule_status field.
-func ByScheduleStatus(opts ...sql.OrderTermOption) OrderOption {
-	return sql.OrderByField(FieldScheduleStatus, opts...).ToFunc()
+// ByEnabledStatus orders the results by the enabled_status field.
+func ByEnabledStatus(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldEnabledStatus, opts...).ToFunc()
 }
 
 // ByActionTime orders the results by the action_time field.

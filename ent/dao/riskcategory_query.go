@@ -405,7 +405,7 @@ func (rcq *RiskCategoryQuery) WithSweep(opts ...func(*SweepQuery)) *RiskCategory
 // Example:
 //
 //	var v []struct {
-//		CreateTime time.Time `json:"create_time"`
+//		CreateTime time.Time `json:"create_time,omitempty"`
 //		Count int `json:"count,omitempty"`
 //	}
 //
@@ -428,7 +428,7 @@ func (rcq *RiskCategoryQuery) GroupBy(field string, fields ...string) *RiskCateg
 // Example:
 //
 //	var v []struct {
-//		CreateTime time.Time `json:"create_time"`
+//		CreateTime time.Time `json:"create_time,omitempty"`
 //	}
 //
 //	client.RiskCategory.Query().

@@ -8,6 +8,7 @@ import (
 	"aisecurity/structs/filters"
 	"aisecurity/utils"
 	"aisecurity/utils/db"
+	"context"
 )
 
 type RiskLocationService struct {
@@ -15,10 +16,10 @@ type RiskLocationService struct {
 	entClient *dao.RiskLocationClient
 }
 
-func NewRiskLocationService() *RiskLocationService {
-	return &RiskLocationService{
-		entClient: db.EntClient.RiskLocation,
-	}
+func NewRiskLocationService(ctx context.Context) *RiskLocationService {
+	s := &RiskLocationService{entClient: db.EntClient.RiskLocation}
+	s.Ctx = ctx
+	return s
 }
 
 func (s *RiskLocationService) Create(ent structs.IEntity) (structs.IEntity, error) {

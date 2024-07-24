@@ -23,6 +23,7 @@ import (
 	"aisecurity/ent/dao/sweepresult"
 	"aisecurity/ent/dao/sweepresultdetails"
 	"aisecurity/ent/dao/sweepschedule"
+	"aisecurity/ent/dao/user"
 	"aisecurity/ent/dao/video"
 
 	"entgo.io/ent/dialect/sql"
@@ -33,7 +34,7 @@ import (
 
 // schemaGraph holds a representation of ent/schema at runtime.
 var schemaGraph = func() *sqlgraph.Schema {
-	graph := &sqlgraph.Schema{Nodes: make([]*sqlgraph.Node, 20)}
+	graph := &sqlgraph.Schema{Nodes: make([]*sqlgraph.Node, 21)}
 	graph.Nodes[0] = &sqlgraph.Node{
 		NodeSpec: sqlgraph.NodeSpec{
 			Table:   admin.Table,
@@ -45,18 +46,19 @@ var schemaGraph = func() *sqlgraph.Schema {
 		},
 		Type: "Admin",
 		Fields: map[string]*sqlgraph.FieldSpec{
-			admin.FieldCreateTime:  {Type: field.TypeTime, Column: admin.FieldCreateTime},
-			admin.FieldCreatorID:   {Type: field.TypeInt, Column: admin.FieldCreatorID},
-			admin.FieldDeleteTime:  {Type: field.TypeTime, Column: admin.FieldDeleteTime},
-			admin.FieldUpdaterID:   {Type: field.TypeInt, Column: admin.FieldUpdaterID},
-			admin.FieldUpdateTime:  {Type: field.TypeTime, Column: admin.FieldUpdateTime},
-			admin.FieldUsername:    {Type: field.TypeString, Column: admin.FieldUsername},
-			admin.FieldPassword:    {Type: field.TypeString, Column: admin.FieldPassword},
-			admin.FieldNickname:    {Type: field.TypeString, Column: admin.FieldNickname},
-			admin.FieldRealName:    {Type: field.TypeString, Column: admin.FieldRealName},
-			admin.FieldMobile:      {Type: field.TypeString, Column: admin.FieldMobile},
-			admin.FieldAvatar:      {Type: field.TypeJSON, Column: admin.FieldAvatar},
-			admin.FieldAdminStatus: {Type: field.TypeInt, Column: admin.FieldAdminStatus},
+			admin.FieldCreateTime:   {Type: field.TypeTime, Column: admin.FieldCreateTime},
+			admin.FieldCreatorID:    {Type: field.TypeInt, Column: admin.FieldCreatorID},
+			admin.FieldDeleteTime:   {Type: field.TypeTime, Column: admin.FieldDeleteTime},
+			admin.FieldUpdaterID:    {Type: field.TypeInt, Column: admin.FieldUpdaterID},
+			admin.FieldUpdateTime:   {Type: field.TypeTime, Column: admin.FieldUpdateTime},
+			admin.FieldUsername:     {Type: field.TypeString, Column: admin.FieldUsername},
+			admin.FieldPassword:     {Type: field.TypeString, Column: admin.FieldPassword},
+			admin.FieldNickname:     {Type: field.TypeString, Column: admin.FieldNickname},
+			admin.FieldRealName:     {Type: field.TypeString, Column: admin.FieldRealName},
+			admin.FieldMobile:       {Type: field.TypeString, Column: admin.FieldMobile},
+			admin.FieldWechatOpenid: {Type: field.TypeString, Column: admin.FieldWechatOpenid},
+			admin.FieldAvatar:       {Type: field.TypeJSON, Column: admin.FieldAvatar},
+			admin.FieldAdminStatus:  {Type: field.TypeInt, Column: admin.FieldAdminStatus},
 		},
 	}
 	graph.Nodes[1] = &sqlgraph.Node{
@@ -322,20 +324,21 @@ var schemaGraph = func() *sqlgraph.Schema {
 		},
 		Type: "Risk",
 		Fields: map[string]*sqlgraph.FieldSpec{
-			risk.FieldCreateTime:     {Type: field.TypeTime, Column: risk.FieldCreateTime},
-			risk.FieldCreatorID:      {Type: field.TypeInt, Column: risk.FieldCreatorID},
-			risk.FieldDeleteTime:     {Type: field.TypeTime, Column: risk.FieldDeleteTime},
-			risk.FieldUpdaterID:      {Type: field.TypeInt, Column: risk.FieldUpdaterID},
-			risk.FieldUpdateTime:     {Type: field.TypeTime, Column: risk.FieldUpdateTime},
-			risk.FieldTitle:          {Type: field.TypeString, Column: risk.FieldTitle},
-			risk.FieldContent:        {Type: field.TypeString, Column: risk.FieldContent},
-			risk.FieldImages:         {Type: field.TypeJSON, Column: risk.FieldImages},
-			risk.FieldRiskCategoryID: {Type: field.TypeInt, Column: risk.FieldRiskCategoryID},
-			risk.FieldRiskLocationID: {Type: field.TypeInt, Column: risk.FieldRiskLocationID},
-			risk.FieldMaintainerID:   {Type: field.TypeInt, Column: risk.FieldMaintainerID},
-			risk.FieldMeasures:       {Type: field.TypeString, Column: risk.FieldMeasures},
-			risk.FieldMaintainStatus: {Type: field.TypeInt, Column: risk.FieldMaintainStatus},
-			risk.FieldDueTime:        {Type: field.TypeTime, Column: risk.FieldDueTime},
+			risk.FieldCreateTime:       {Type: field.TypeTime, Column: risk.FieldCreateTime},
+			risk.FieldCreatorID:        {Type: field.TypeInt, Column: risk.FieldCreatorID},
+			risk.FieldDeleteTime:       {Type: field.TypeTime, Column: risk.FieldDeleteTime},
+			risk.FieldUpdaterID:        {Type: field.TypeInt, Column: risk.FieldUpdaterID},
+			risk.FieldUpdateTime:       {Type: field.TypeTime, Column: risk.FieldUpdateTime},
+			risk.FieldTitle:            {Type: field.TypeString, Column: risk.FieldTitle},
+			risk.FieldContent:          {Type: field.TypeString, Column: risk.FieldContent},
+			risk.FieldImages:           {Type: field.TypeJSON, Column: risk.FieldImages},
+			risk.FieldMaintainedImages: {Type: field.TypeJSON, Column: risk.FieldMaintainedImages},
+			risk.FieldRiskCategoryID:   {Type: field.TypeInt, Column: risk.FieldRiskCategoryID},
+			risk.FieldRiskLocationID:   {Type: field.TypeInt, Column: risk.FieldRiskLocationID},
+			risk.FieldMaintainerID:     {Type: field.TypeInt, Column: risk.FieldMaintainerID},
+			risk.FieldMeasures:         {Type: field.TypeString, Column: risk.FieldMeasures},
+			risk.FieldMaintainStatus:   {Type: field.TypeInt, Column: risk.FieldMaintainStatus},
+			risk.FieldDueTime:          {Type: field.TypeTime, Column: risk.FieldDueTime},
 		},
 	}
 	graph.Nodes[13] = &sqlgraph.Node{
@@ -455,20 +458,45 @@ var schemaGraph = func() *sqlgraph.Schema {
 		},
 		Type: "SweepSchedule",
 		Fields: map[string]*sqlgraph.FieldSpec{
-			sweepschedule.FieldCreateTime:     {Type: field.TypeTime, Column: sweepschedule.FieldCreateTime},
-			sweepschedule.FieldCreatorID:      {Type: field.TypeInt, Column: sweepschedule.FieldCreatorID},
-			sweepschedule.FieldDeleteTime:     {Type: field.TypeTime, Column: sweepschedule.FieldDeleteTime},
-			sweepschedule.FieldUpdaterID:      {Type: field.TypeInt, Column: sweepschedule.FieldUpdaterID},
-			sweepschedule.FieldUpdateTime:     {Type: field.TypeTime, Column: sweepschedule.FieldUpdateTime},
-			sweepschedule.FieldName:           {Type: field.TypeString, Column: sweepschedule.FieldName},
-			sweepschedule.FieldSweepID:        {Type: field.TypeInt, Column: sweepschedule.FieldSweepID},
-			sweepschedule.FieldScheduleStatus: {Type: field.TypeInt, Column: sweepschedule.FieldScheduleStatus},
-			sweepschedule.FieldActionTime:     {Type: field.TypeTime, Column: sweepschedule.FieldActionTime},
-			sweepschedule.FieldRemind:         {Type: field.TypeJSON, Column: sweepschedule.FieldRemind},
-			sweepschedule.FieldRepeat:         {Type: field.TypeJSON, Column: sweepschedule.FieldRepeat},
+			sweepschedule.FieldCreateTime:    {Type: field.TypeTime, Column: sweepschedule.FieldCreateTime},
+			sweepschedule.FieldCreatorID:     {Type: field.TypeInt, Column: sweepschedule.FieldCreatorID},
+			sweepschedule.FieldDeleteTime:    {Type: field.TypeTime, Column: sweepschedule.FieldDeleteTime},
+			sweepschedule.FieldUpdaterID:     {Type: field.TypeInt, Column: sweepschedule.FieldUpdaterID},
+			sweepschedule.FieldUpdateTime:    {Type: field.TypeTime, Column: sweepschedule.FieldUpdateTime},
+			sweepschedule.FieldName:          {Type: field.TypeString, Column: sweepschedule.FieldName},
+			sweepschedule.FieldSweepID:       {Type: field.TypeInt, Column: sweepschedule.FieldSweepID},
+			sweepschedule.FieldEnabledStatus: {Type: field.TypeInt, Column: sweepschedule.FieldEnabledStatus},
+			sweepschedule.FieldActionTime:    {Type: field.TypeTime, Column: sweepschedule.FieldActionTime},
+			sweepschedule.FieldRemind:        {Type: field.TypeJSON, Column: sweepschedule.FieldRemind},
+			sweepschedule.FieldRepeat:        {Type: field.TypeJSON, Column: sweepschedule.FieldRepeat},
 		},
 	}
 	graph.Nodes[19] = &sqlgraph.Node{
+		NodeSpec: sqlgraph.NodeSpec{
+			Table:   user.Table,
+			Columns: user.Columns,
+			ID: &sqlgraph.FieldSpec{
+				Type:   field.TypeInt,
+				Column: user.FieldID,
+			},
+		},
+		Type: "User",
+		Fields: map[string]*sqlgraph.FieldSpec{
+			user.FieldCreateTime:   {Type: field.TypeTime, Column: user.FieldCreateTime},
+			user.FieldDeleteTime:   {Type: field.TypeTime, Column: user.FieldDeleteTime},
+			user.FieldUpdateTime:   {Type: field.TypeTime, Column: user.FieldUpdateTime},
+			user.FieldUpdaterID:    {Type: field.TypeInt, Column: user.FieldUpdaterID},
+			user.FieldUsername:     {Type: field.TypeString, Column: user.FieldUsername},
+			user.FieldPassword:     {Type: field.TypeString, Column: user.FieldPassword},
+			user.FieldNickname:     {Type: field.TypeString, Column: user.FieldNickname},
+			user.FieldRealName:     {Type: field.TypeString, Column: user.FieldRealName},
+			user.FieldMobile:       {Type: field.TypeString, Column: user.FieldMobile},
+			user.FieldWechatOpenid: {Type: field.TypeString, Column: user.FieldWechatOpenid},
+			user.FieldAvatar:       {Type: field.TypeJSON, Column: user.FieldAvatar},
+			user.FieldUserStatus:   {Type: field.TypeInt, Column: user.FieldUserStatus},
+		},
+	}
+	graph.Nodes[20] = &sqlgraph.Node{
 		NodeSpec: sqlgraph.NodeSpec{
 			Table:   video.Table,
 			Columns: video.Columns,
@@ -1078,6 +1106,18 @@ var schemaGraph = func() *sqlgraph.Schema {
 		},
 		"Admin",
 		"SweepResultDetails",
+	)
+	graph.MustAddE(
+		"user_updater",
+		&sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   admin.UserUpdaterTable,
+			Columns: []string{admin.UserUpdaterColumn},
+			Bidi:    false,
+		},
+		"Admin",
+		"User",
 	)
 	graph.MustAddE(
 		"creator",
@@ -2112,6 +2152,18 @@ var schemaGraph = func() *sqlgraph.Schema {
 		"SweepResultDetails",
 	)
 	graph.MustAddE(
+		"updater",
+		&sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.M2O,
+			Inverse: true,
+			Table:   user.UpdaterTable,
+			Columns: []string{user.UpdaterColumn},
+			Bidi:    false,
+		},
+		"User",
+		"Admin",
+	)
+	graph.MustAddE(
 		"creator",
 		&sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
@@ -2244,6 +2296,11 @@ func (f *AdminFilter) WhereRealName(p entql.StringP) {
 // WhereMobile applies the entql string predicate on the mobile field.
 func (f *AdminFilter) WhereMobile(p entql.StringP) {
 	f.Where(p.Field(admin.FieldMobile))
+}
+
+// WhereWechatOpenid applies the entql string predicate on the wechat_openid field.
+func (f *AdminFilter) WhereWechatOpenid(p entql.StringP) {
+	f.Where(p.Field(admin.FieldWechatOpenid))
 }
 
 // WhereAvatar applies the entql json.RawMessage predicate on the avatar field.
@@ -2936,6 +2993,20 @@ func (f *AdminFilter) WhereHasSweepResultDetailsUpdater() {
 // WhereHasSweepResultDetailsUpdaterWith applies a predicate to check if query has an edge sweep_result_details_updater with a given conditions (other predicates).
 func (f *AdminFilter) WhereHasSweepResultDetailsUpdaterWith(preds ...predicate.SweepResultDetails) {
 	f.Where(entql.HasEdgeWith("sweep_result_details_updater", sqlgraph.WrapFunc(func(s *sql.Selector) {
+		for _, p := range preds {
+			p(s)
+		}
+	})))
+}
+
+// WhereHasUserUpdater applies a predicate to check if query has an edge user_updater.
+func (f *AdminFilter) WhereHasUserUpdater() {
+	f.Where(entql.HasEdge("user_updater"))
+}
+
+// WhereHasUserUpdaterWith applies a predicate to check if query has an edge user_updater with a given conditions (other predicates).
+func (f *AdminFilter) WhereHasUserUpdaterWith(preds ...predicate.User) {
+	f.Where(entql.HasEdgeWith("user_updater", sqlgraph.WrapFunc(func(s *sql.Selector) {
 		for _, p := range preds {
 			p(s)
 		}
@@ -4707,6 +4778,11 @@ func (f *RiskFilter) WhereImages(p entql.BytesP) {
 	f.Where(p.Field(risk.FieldImages))
 }
 
+// WhereMaintainedImages applies the entql json.RawMessage predicate on the maintained_images field.
+func (f *RiskFilter) WhereMaintainedImages(p entql.BytesP) {
+	f.Where(p.Field(risk.FieldMaintainedImages))
+}
+
 // WhereRiskCategoryID applies the entql int predicate on the risk_category_id field.
 func (f *RiskFilter) WhereRiskCategoryID(p entql.IntP) {
 	f.Where(p.Field(risk.FieldRiskCategoryID))
@@ -5637,9 +5713,9 @@ func (f *SweepScheduleFilter) WhereSweepID(p entql.IntP) {
 	f.Where(p.Field(sweepschedule.FieldSweepID))
 }
 
-// WhereScheduleStatus applies the entql int predicate on the schedule_status field.
-func (f *SweepScheduleFilter) WhereScheduleStatus(p entql.IntP) {
-	f.Where(p.Field(sweepschedule.FieldScheduleStatus))
+// WhereEnabledStatus applies the entql int predicate on the enabled_status field.
+func (f *SweepScheduleFilter) WhereEnabledStatus(p entql.IntP) {
+	f.Where(p.Field(sweepschedule.FieldEnabledStatus))
 }
 
 // WhereActionTime applies the entql time.Time predicate on the action_time field.
@@ -5742,6 +5818,120 @@ func (f *SweepScheduleFilter) WhereHasSweepResultDetailsWith(preds ...predicate.
 }
 
 // addPredicate implements the predicateAdder interface.
+func (uq *UserQuery) addPredicate(pred func(s *sql.Selector)) {
+	uq.predicates = append(uq.predicates, pred)
+}
+
+// Filter returns a Filter implementation to apply filters on the UserQuery builder.
+func (uq *UserQuery) Filter() *UserFilter {
+	return &UserFilter{config: uq.config, predicateAdder: uq}
+}
+
+// addPredicate implements the predicateAdder interface.
+func (m *UserMutation) addPredicate(pred func(s *sql.Selector)) {
+	m.predicates = append(m.predicates, pred)
+}
+
+// Filter returns an entql.Where implementation to apply filters on the UserMutation builder.
+func (m *UserMutation) Filter() *UserFilter {
+	return &UserFilter{config: m.config, predicateAdder: m}
+}
+
+// UserFilter provides a generic filtering capability at runtime for UserQuery.
+type UserFilter struct {
+	predicateAdder
+	config
+}
+
+// Where applies the entql predicate on the query filter.
+func (f *UserFilter) Where(p entql.P) {
+	f.addPredicate(func(s *sql.Selector) {
+		if err := schemaGraph.EvalP(schemaGraph.Nodes[19].Type, p, s); err != nil {
+			s.AddError(err)
+		}
+	})
+}
+
+// WhereID applies the entql int predicate on the id field.
+func (f *UserFilter) WhereID(p entql.IntP) {
+	f.Where(p.Field(user.FieldID))
+}
+
+// WhereCreateTime applies the entql time.Time predicate on the create_time field.
+func (f *UserFilter) WhereCreateTime(p entql.TimeP) {
+	f.Where(p.Field(user.FieldCreateTime))
+}
+
+// WhereDeleteTime applies the entql time.Time predicate on the delete_time field.
+func (f *UserFilter) WhereDeleteTime(p entql.TimeP) {
+	f.Where(p.Field(user.FieldDeleteTime))
+}
+
+// WhereUpdateTime applies the entql time.Time predicate on the update_time field.
+func (f *UserFilter) WhereUpdateTime(p entql.TimeP) {
+	f.Where(p.Field(user.FieldUpdateTime))
+}
+
+// WhereUpdaterID applies the entql int predicate on the updater_id field.
+func (f *UserFilter) WhereUpdaterID(p entql.IntP) {
+	f.Where(p.Field(user.FieldUpdaterID))
+}
+
+// WhereUsername applies the entql string predicate on the username field.
+func (f *UserFilter) WhereUsername(p entql.StringP) {
+	f.Where(p.Field(user.FieldUsername))
+}
+
+// WherePassword applies the entql string predicate on the password field.
+func (f *UserFilter) WherePassword(p entql.StringP) {
+	f.Where(p.Field(user.FieldPassword))
+}
+
+// WhereNickname applies the entql string predicate on the nickname field.
+func (f *UserFilter) WhereNickname(p entql.StringP) {
+	f.Where(p.Field(user.FieldNickname))
+}
+
+// WhereRealName applies the entql string predicate on the real_name field.
+func (f *UserFilter) WhereRealName(p entql.StringP) {
+	f.Where(p.Field(user.FieldRealName))
+}
+
+// WhereMobile applies the entql string predicate on the mobile field.
+func (f *UserFilter) WhereMobile(p entql.StringP) {
+	f.Where(p.Field(user.FieldMobile))
+}
+
+// WhereWechatOpenid applies the entql string predicate on the wechat_openid field.
+func (f *UserFilter) WhereWechatOpenid(p entql.StringP) {
+	f.Where(p.Field(user.FieldWechatOpenid))
+}
+
+// WhereAvatar applies the entql json.RawMessage predicate on the avatar field.
+func (f *UserFilter) WhereAvatar(p entql.BytesP) {
+	f.Where(p.Field(user.FieldAvatar))
+}
+
+// WhereUserStatus applies the entql int predicate on the user_status field.
+func (f *UserFilter) WhereUserStatus(p entql.IntP) {
+	f.Where(p.Field(user.FieldUserStatus))
+}
+
+// WhereHasUpdater applies a predicate to check if query has an edge updater.
+func (f *UserFilter) WhereHasUpdater() {
+	f.Where(entql.HasEdge("updater"))
+}
+
+// WhereHasUpdaterWith applies a predicate to check if query has an edge updater with a given conditions (other predicates).
+func (f *UserFilter) WhereHasUpdaterWith(preds ...predicate.Admin) {
+	f.Where(entql.HasEdgeWith("updater", sqlgraph.WrapFunc(func(s *sql.Selector) {
+		for _, p := range preds {
+			p(s)
+		}
+	})))
+}
+
+// addPredicate implements the predicateAdder interface.
 func (vq *VideoQuery) addPredicate(pred func(s *sql.Selector)) {
 	vq.predicates = append(vq.predicates, pred)
 }
@@ -5770,7 +5960,7 @@ type VideoFilter struct {
 // Where applies the entql predicate on the query filter.
 func (f *VideoFilter) Where(p entql.P) {
 	f.addPredicate(func(s *sql.Selector) {
-		if err := schemaGraph.EvalP(schemaGraph.Nodes[19].Type, p, s); err != nil {
+		if err := schemaGraph.EvalP(schemaGraph.Nodes[20].Type, p, s); err != nil {
 			s.AddError(err)
 		}
 	})

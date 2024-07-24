@@ -168,8 +168,8 @@ func (s *DepartmentService) GetList(fit structs.IFilter) ([]structs.IEntity, err
 		if err != nil {
 			log.Fatalf("failed to get employees for department %v: %v", v.ID, err)
 		}
-		v.AllEmployees = allEmployees
 		v2 := new(entities.Department)
+		v2.AllEmployees = allEmployees
 		ents[i] = v
 		err = gconv.Struct(v, v2)
 		if err != nil {
@@ -184,6 +184,13 @@ func (s *DepartmentService) query(fit structs.IFilter) *dao.DepartmentQuery {
 	q := s.entClient.Query()
 	if f.ID != 0 {
 		q = q.Where(department.IDEQ(f.ID))
+	}
+	if f.Keywords != "" {
+		q = q.Where(
+			department.Or(
+				department.NameContainsFold(f.Keywords),
+			),
+		)
 	}
 	if f.Name != "" {
 		q = q.Where(department.NameEQ(f.Name))

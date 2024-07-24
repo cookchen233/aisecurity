@@ -6,12 +6,14 @@ import (
 	"aisecurity/ent/dao/department"
 	employee2 "aisecurity/ent/dao/employee"
 	"aisecurity/ent/dao/occupation"
+	"aisecurity/enums"
 	"aisecurity/expects"
 	"aisecurity/structs"
 	"aisecurity/structs/entities"
 	"aisecurity/structs/filters"
 	"aisecurity/utils"
 	"aisecurity/utils/db"
+	"context"
 	"fmt"
 	"github.com/pkg/errors"
 	"time"
@@ -22,10 +24,12 @@ type AdminService struct {
 	entClient *dao.AdminClient
 }
 
-func NewAdminService() *AdminService {
-	return &AdminService{
+func NewAdminService(ctx context.Context) *AdminService {
+	s := &AdminService{
 		entClient: db.EntClient.Admin,
 	}
+	s.Ctx = ctx
+	return s
 }
 
 func (s *AdminService) Create(ent structs.IEntity) (structs.IEntity, error) {
@@ -40,7 +44,7 @@ func (s *AdminService) Create(ent structs.IEntity) (structs.IEntity, error) {
 		return nil, s.rollback(tx, utils.ErrorWithStack(expects.NewAlreadyExistedUsername()))
 	}
 
-	hashedPassword, err := utils.HashPassword(e.Password)
+	hashedPassword, err := utils.HashPassword(e.SetPassword)
 	if err != nil {
 		return nil, utils.ErrorWithStack(err)
 	}
@@ -50,7 +54,13 @@ func (s *AdminService) Create(ent structs.IEntity) (structs.IEntity, error) {
 		SetNickname(e.Nickname).
 		SetRealName(e.RealName).
 		SetPassword(hashedPassword).
+		SetMobile(e.Mobile).
+		SetAdminStatus(enums.ENS1).
 		SetAvatar(e.Avatar)
+
+	if e.CreatorID > 0 {
+		c.SetCreatorID(e.CreatorID)
+	}
 
 	if len(e.Permissions) > 0 {
 		c.AddPermissions(e.Permissions...)
@@ -75,6 +85,7 @@ func (s *AdminService) Create(ent structs.IEntity) (structs.IEntity, error) {
 	if err != nil {
 		return nil, s.rollback(tx, utils.ErrorWrap(err, "commit failed"))
 	}
+	utils.Logger.Debug("hehe")
 
 	return saved, nil
 }
@@ -92,8 +103,8 @@ func (s *AdminService) Update(ent structs.IEntity) (structs.IEntity, error) {
 	}
 
 	u := tx.Admin.UpdateOneID(e.ID)
-	if e.Password != "" {
-		hashedPassword, err := utils.HashPassword(e.Password)
+	if e.SetPassword != "" {
+		hashedPassword, err := utils.HashPassword(e.SetPassword)
 		if err != nil {
 			return nil, utils.ErrorWithStack(err)
 		}
@@ -103,6 +114,8 @@ func (s *AdminService) Update(ent structs.IEntity) (structs.IEntity, error) {
 		SetNickname(e.Nickname).
 		SetRealName(e.RealName).
 		SetAvatar(e.Avatar).
+		SetMobile(e.Mobile).
+		SetAdminStatus(enums.ENS1).
 		ClearPermissions()
 
 	if len(e.Permissions) > 0 {
@@ -258,7 +271,7 @@ func (s *AdminService) CreateSuperAdmin() (structs.IEntity, error) {
 		return nil, utils.ErrorWithStack(err)
 	}
 	_, err = tx.ExecContext(s.Ctx, `INSERT INTO "admins" (
-                      "create_time",
+                    "create_time",
                     "update_time",
                     "username",
                     "password",
@@ -298,4 +311,25 @@ func (s *AdminService) GetByUserName(username string) (structs.IEntity, error) {
 
 	o.Password = one.Password
 	return o, nil
+}
+
+//func (s *AdminService) GetWechatOpenid(admin structs.IEntity) (string, error) {
+//	adm := admin.(*entities.Admin)
+//	if adm.Mobile == "" {
+//		return "", utils.ErrorWithStack(fmt.Errorf("the admin has not set mobile, username: %s", adm.Username))
+//	}
+//	userService := NewUserService(s.Ctx)
+//	user, err := userService.GetByMobile(adm.Mobile)
+//	if err != nil {
+//		return "", utils.ErrorWithStack(err)
+//	}
+//	return user.(*entities.User).WechatOpenid, nil
+//}
+
+func (s *AdminService) GetByWechatOpenid(openid string) (structs.IEntity, error) {
+	first, err := s.entClient.Query().Where(admin.WechatOpenidEQ(openid)).First(s.Ctx)
+	if err != nil {
+		return nil, utils.ErrorWithStack(err)
+	}
+	return structs.ConvertTo[*dao.Admin, entities.Admin](first), nil
 }

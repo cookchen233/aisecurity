@@ -1,6 +1,7 @@
 package filters
 
 import (
+	"aisecurity/enums"
 	"aisecurity/structs"
 	"time"
 )
@@ -15,8 +16,9 @@ type SweepSchedule struct {
 		Start time.Time `form:"action_time_range[start]"`
 		End   time.Time `form:"action_time_range[end]"`
 	}
-	SweepID   int   `form:"sweep_id"`
-	SweepIDs  []int `form:"sweep_ids[]"`
-	WorkerID  int   `form:"worker_id"`
-	WorkerIDs []int `form:"worker_ids[]"`
+	EnabledStatus enums.EnabledStatus `form:"enabled_status"`
+	SweepID       int                 `form:"sweep_id"`
+	SweepIDs      []int               `form:"sweep_ids[]"`
+	WorkerID      int                 `form:"worker_id"`
+	WorkerIDs     []int               `form:"worker_ids[]"`
 }

@@ -9,4 +9,5 @@ type Department struct {
 	EmployeeAdmins []*dao.Admin      `json:"employee_admins"`
 	Permissions    []*dao.Permission `json:"permissions"`
 	Parent         *dao.Department   `json:"parent"`
+	AllEmployees   []*dao.Employee   `json:"all_employees"`
 }

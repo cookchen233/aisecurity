@@ -92,16 +92,16 @@ func (ssc *SweepScheduleCreate) SetSweepID(i int) *SweepScheduleCreate {
 	return ssc
 }
 
-// SetScheduleStatus sets the "schedule_status" field.
-func (ssc *SweepScheduleCreate) SetScheduleStatus(es enums.AdminStatus) *SweepScheduleCreate {
-	ssc.mutation.SetScheduleStatus(es)
+// SetEnabledStatus sets the "enabled_status" field.
+func (ssc *SweepScheduleCreate) SetEnabledStatus(es enums.EnabledStatus) *SweepScheduleCreate {
+	ssc.mutation.SetEnabledStatus(es)
 	return ssc
 }
 
-// SetNillableScheduleStatus sets the "schedule_status" field if the given value is not nil.
-func (ssc *SweepScheduleCreate) SetNillableScheduleStatus(es *enums.AdminStatus) *SweepScheduleCreate {
+// SetNillableEnabledStatus sets the "enabled_status" field if the given value is not nil.
+func (ssc *SweepScheduleCreate) SetNillableEnabledStatus(es *enums.EnabledStatus) *SweepScheduleCreate {
 	if es != nil {
-		ssc.SetScheduleStatus(*es)
+		ssc.SetEnabledStatus(*es)
 	}
 	return ssc
 }
@@ -235,9 +235,9 @@ func (ssc *SweepScheduleCreate) defaults() error {
 		v := sweepschedule.DefaultUpdateTime()
 		ssc.mutation.SetUpdateTime(v)
 	}
-	if _, ok := ssc.mutation.ScheduleStatus(); !ok {
-		v := sweepschedule.DefaultScheduleStatus
-		ssc.mutation.SetScheduleStatus(v)
+	if _, ok := ssc.mutation.EnabledStatus(); !ok {
+		v := sweepschedule.DefaultEnabledStatus
+		ssc.mutation.SetEnabledStatus(v)
 	}
 	return nil
 }
@@ -282,9 +282,9 @@ func (ssc *SweepScheduleCreate) check() error {
 			return &ValidationError{Name: "sweep_id", err: fmt.Errorf(`dao: validator failed for field "SweepSchedule.sweep_id": %w`, err)}
 		}
 	}
-	if v, ok := ssc.mutation.ScheduleStatus(); ok {
-		if err := sweepschedule.ScheduleStatusValidator(int(v)); err != nil {
-			return &ValidationError{Name: "schedule_status", err: fmt.Errorf(`dao: validator failed for field "SweepSchedule.schedule_status": %w`, err)}
+	if v, ok := ssc.mutation.EnabledStatus(); ok {
+		if err := sweepschedule.EnabledStatusValidator(int(v)); err != nil {
+			return &ValidationError{Name: "enabled_status", err: fmt.Errorf(`dao: validator failed for field "SweepSchedule.enabled_status": %w`, err)}
 		}
 	}
 	if _, ok := ssc.mutation.ActionTime(); !ok {
@@ -347,9 +347,9 @@ func (ssc *SweepScheduleCreate) createSpec() (*SweepSchedule, *sqlgraph.CreateSp
 		_spec.SetField(sweepschedule.FieldName, field.TypeString, value)
 		_node.Name = value
 	}
-	if value, ok := ssc.mutation.ScheduleStatus(); ok {
-		_spec.SetField(sweepschedule.FieldScheduleStatus, field.TypeInt, value)
-		_node.ScheduleStatus = value
+	if value, ok := ssc.mutation.EnabledStatus(); ok {
+		_spec.SetField(sweepschedule.FieldEnabledStatus, field.TypeInt, value)
+		_node.EnabledStatus = value
 	}
 	if value, ok := ssc.mutation.ActionTime(); ok {
 		_spec.SetField(sweepschedule.FieldActionTime, field.TypeTime, value)

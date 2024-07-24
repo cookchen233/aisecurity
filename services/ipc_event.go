@@ -19,7 +19,10 @@ import (
 	stdsql "database/sql"
 	"encoding/json"
 	"entgo.io/ent/dialect/sql"
+	"github.com/gogf/gf/v2/util/gconv"
 	"go.uber.org/zap"
+	"sort"
+	"time"
 )
 
 type EventService struct {
@@ -149,7 +152,7 @@ func (s *EventService) GetTotal(fit structs.IFilter) (int, error) {
 	return total, nil
 }
 
-func (s *EventService) GetStatusCounts(fit structs.IFilter) ([]*types.StatusCount, error) {
+func (s *EventService) GetStatusCounts(fit structs.IFilter) ([]*types.GroupCount, error) {
 	// status counts
 	var queryCounts []struct {
 		EventStatus enums.EventStatus `json:"event_status"`
@@ -161,7 +164,7 @@ func (s *EventService) GetStatusCounts(fit structs.IFilter) ([]*types.StatusCoun
 	if err != nil {
 		return nil, utils.ErrorWithStack(err)
 	}
-	var statusCounts []*types.StatusCount
+	var statusCounts []*types.GroupCount
 	for _, s := range enums.EventStatus(0).GetAll() {
 		var c int
 		for _, q := range queryCounts {
@@ -173,7 +176,7 @@ func (s *EventService) GetStatusCounts(fit structs.IFilter) ([]*types.StatusCoun
 				c += q.Count
 			}
 		}
-		statusCounts = append(statusCounts, &types.StatusCount{
+		statusCounts = append(statusCounts, &types.GroupCount{
 			Value: int(s),
 			Label: s.Label(),
 			Count: c,
@@ -217,17 +220,18 @@ func (s *EventService) GetList(fit structs.IFilter) ([]structs.IEntity, error) {
 	}
 	ents := make([]structs.IEntity, len(list))
 	for i, v := range list {
-		v.EventTypeLabel = v.EventType.Label()
-		v.EventStatusLabel = v.EventStatus.Label()
+		v2 := structs.ConvertTo[*dao.Event, entities.Event](v)
+		v2.EventTypeLabel = v.EventType.Label()
+		v2.EventStatusLabel = v.EventStatus.Label()
 		if len(v.Edges.Device.Edges.DeviceInstallation) > 0 {
 			d := v.Edges.Device.Edges.DeviceInstallation[0]
-			v.Location = d.Location
-			v.LocationWithAliasName = d.Location
-			if d.AreaName != "" {
-				v.LocationWithAliasName = d.Location + " (" + d.AliasName + ")"
+			v2.Location = d.Location
+			v2.LocationWithAliasName = d.Location
+			if d.Edges.Area.Name != "" {
+				v2.LocationWithAliasName = d.Location + " (" + d.AliasName + ")"
 			}
 		}
-		ents[i] = structs.ConvertTo[*dao.Event, entities.Event](v)
+		ents[i] = v2
 	}
 	return ents, nil
 }
@@ -280,4 +284,122 @@ func (s *EventService) GetByVideoName(name string) (structs.IEntity, error) {
 		return nil, utils.ErrorWithStack(err)
 	}
 	return structs.ConvertTo[*dao.Event, entities.Event](first), nil
+}
+
+func (s *EventService) GetEventTypeCounts(fit structs.IFilter) ([]*types.GroupCount, error) {
+	type GroupCount struct {
+		Value int    `json:"event_type"`
+		Label string `json:"label"`
+		Count int    `json:"count"`
+	}
+	var groupCounts []*GroupCount
+	err := s.query(fit).GroupBy(event.FieldEventType).
+		Aggregate(dao.Count()).
+		Scan(s.Ctx, &groupCounts)
+	if err != nil {
+		return nil, utils.ErrorWithStack(err)
+	}
+	sort.Slice(groupCounts, func(i, j int) bool {
+		return groupCounts[i].Count > groupCounts[j].Count
+	})
+
+	var groupCounts2 []*types.GroupCount
+
+	for _, group := range groupCounts[:min(len(groupCounts), fit.GetLimit())] {
+		var group2 = structs.ConvertTo[*GroupCount, types.GroupCount](group)
+		group2.Value = group.Value
+		group2.Label = enums.EventType(group.Value).Label()
+		groupCounts2 = append(groupCounts2, group2)
+	}
+	return groupCounts2, nil
+}
+
+func (s *EventService) GetEventDeviceCounts(fit structs.IFilter) ([]*types.GroupCount, error) {
+	type GroupCount struct {
+		Value int    `json:"device_id"`
+		Label string `json:"label"`
+		Count int    `json:"count"`
+	}
+	var groupCounts []*GroupCount
+	err := s.query(fit).GroupBy(event.FieldDeviceID).
+		Aggregate(dao.Count()).
+		Scan(s.Ctx, &groupCounts)
+	if err != nil {
+		return nil, utils.ErrorWithStack(err)
+	}
+	sort.Slice(groupCounts, func(i, j int) bool {
+		return groupCounts[i].Count > groupCounts[j].Count
+	})
+
+	var groupCounts2 []*types.GroupCount
+
+	deviceService := NewDeviceService(s.Ctx)
+	for _, group := range groupCounts[:min(len(groupCounts), fit.GetLimit())] {
+		var group2 = structs.ConvertTo[*GroupCount, types.GroupCount](group)
+		group2.Value = group.Value
+		d, err := deviceService.GetByID(group.Value)
+		if err != nil {
+			return nil, err
+		}
+		group2.Label = d.(*entities.Device).Name
+		groupCounts2 = append(groupCounts2, group2)
+	}
+	return groupCounts2, nil
+}
+
+func (s *EventService) GetEventTimeCounts(fit structs.IFilter) ([]*types.GroupCount, error) {
+	//result, err := s.entClient.QueryContext(s.Ctx, "SELECT extract(second from event_time AT TIME ZONE 'Asia/Shanghai') AS time_label, COUNT(*) AS count FROM events GROUP BY time_label ORDER BY time_label ASC")
+	result, err := s.entClient.QueryContext(s.Ctx, "SELECT TO_CHAR(event_time AT TIME ZONE 'Asia/Shanghai', 'HH24:00') AS time_label, COUNT(*) AS count FROM events GROUP BY time_label ORDER BY time_label ASC")
+	if err != nil {
+		return nil, utils.ErrorWithStack(err)
+	}
+	defer func(result *stdsql.Rows) {
+		err := result.Close()
+		if err != nil {
+			utils.Logger.Error("failed closing rows", zap.Error(err))
+		}
+	}(result)
+
+	var groupCounts []*types.GroupCount
+	for result.Next() {
+		var groupCount = types.GroupCount{}
+		err = result.Scan(&groupCount.Label, &groupCount.Count)
+		if err != nil {
+			return nil, utils.ErrorWithStack(err)
+		}
+
+		groupCounts = append(groupCounts, &groupCount)
+	}
+
+	return groupCounts, nil
+}
+
+func (s *EventService) SendTemplateMsg(eventTime time.Time, eventType string, deviceName string, deviceID int) {
+	// send WeChat template message
+	msgData := make(map[string]*utils.TemplateDataItem)
+	msgData["time2"] = &utils.TemplateDataItem{Value: eventTime.Format("2006年1月2日 15:04:05")}
+	msgData["thing3"] = &utils.TemplateDataItem{Value: deviceName}
+	msgData["thing18"] = &utils.TemplateDataItem{Value: eventType}
+	msgData["character_string27"] = &utils.TemplateDataItem{Value: gconv.String(deviceID)}
+	msgData["character_string8"] = &utils.TemplateDataItem{Value: ""}
+	var fit = &filters.SweepSchedule{
+		EnabledStatus: enums.ENS1,
+	}
+	adminService := NewAdminService(s.Ctx)
+	admins, err := adminService.GetList(fit)
+	if err != nil {
+		utils.Logger.Error("failed getting admins", zap.Error(err))
+		return
+	}
+	for _, admin := range admins {
+		adm := admin.(*entities.Admin)
+		if err != nil {
+			utils.Logger.Error("GetWechatOpenid error", zap.Error(err), zap.String("username", adm.Username))
+			continue
+		}
+		_, err = utils.SendTemplateMsg(msgData, adm.WechatOpenid, "OPcCnhuyujvm2QeGAZieCy18hkuVJTsTGJJo0FoZgFI", "https://baidu.com")
+		if err != nil {
+			utils.Logger.Error("sending template msg failed", zap.Error(err), zap.String("username", adm.Username))
+		}
+	}
 }

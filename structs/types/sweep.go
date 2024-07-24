@@ -25,3 +25,9 @@ type ScheduleRemind struct {
 	RemindTypes     []*enums.RemindType `json:"remind_types"`
 	AdvancedSeconds int                 `json:"advanced_seconds"`
 }
+
+type ScheduledTask struct {
+	SweepScheduleID int // Unique identifier for the task, could be based on the task details
+	CronSchedule    string
+	NextRunTime     time.Time
+}

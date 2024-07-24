@@ -21,21 +21,21 @@ type Employee struct {
 	// ID of the ent.
 	ID int `json:"id,omitempty"`
 	// 创建时间
-	CreateTime time.Time `json:"create_time"`
+	CreateTime time.Time `json:"create_time,omitempty"`
 	// 创建者
-	CreatorID int `json:"creator_id"`
+	CreatorID int `json:"creator_id,omitempty"`
 	// 删除时间
-	DeleteTime *time.Time `json:"delete_time"`
+	DeleteTime *time.Time `json:"delete_time,omitempty"`
 	// 最后更新者
-	UpdaterID int `json:"updater_id"`
+	UpdaterID int `json:"updater_id,omitempty"`
 	// 最后更新时间
-	UpdateTime time.Time `json:"update_time"`
+	UpdateTime time.Time `json:"update_time,omitempty"`
 	// 管理员id
-	AdminID int `json:"admin_id"`
+	AdminID int `json:"admin_id,omitempty"`
 	// 部门id
-	DepartmentID int `json:"department_id"`
+	DepartmentID int `json:"department_id,omitempty"`
 	// 岗位ID
-	OccupationID int `json:"occupation_id"`
+	OccupationID int `json:"occupation_id,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the EmployeeQuery when eager-loading is set.
 	Edges        EmployeeEdges `json:"edges"`

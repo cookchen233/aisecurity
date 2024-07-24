@@ -22,6 +22,7 @@ import (
 	"aisecurity/ent/dao/sweepresult"
 	"aisecurity/ent/dao/sweepresultdetails"
 	"aisecurity/ent/dao/sweepschedule"
+	"aisecurity/ent/dao/user"
 	"aisecurity/ent/dao/video"
 	"aisecurity/enums"
 	"aisecurity/structs/types"
@@ -133,6 +134,20 @@ func (ac *AdminCreate) SetNillableMobile(s *string) *AdminCreate {
 	return ac
 }
 
+// SetWechatOpenid sets the "wechat_openid" field.
+func (ac *AdminCreate) SetWechatOpenid(s string) *AdminCreate {
+	ac.mutation.SetWechatOpenid(s)
+	return ac
+}
+
+// SetNillableWechatOpenid sets the "wechat_openid" field if the given value is not nil.
+func (ac *AdminCreate) SetNillableWechatOpenid(s *string) *AdminCreate {
+	if s != nil {
+		ac.SetWechatOpenid(*s)
+	}
+	return ac
+}
+
 // SetAvatar sets the "avatar" field.
 func (ac *AdminCreate) SetAvatar(ti types.UploadedImage) *AdminCreate {
 	ac.mutation.SetAvatar(ti)
@@ -148,13 +163,13 @@ func (ac *AdminCreate) SetNillableAvatar(ti *types.UploadedImage) *AdminCreate {
 }
 
 // SetAdminStatus sets the "admin_status" field.
-func (ac *AdminCreate) SetAdminStatus(es enums.AdminStatus) *AdminCreate {
+func (ac *AdminCreate) SetAdminStatus(es enums.EnabledStatus) *AdminCreate {
 	ac.mutation.SetAdminStatus(es)
 	return ac
 }
 
 // SetNillableAdminStatus sets the "admin_status" field if the given value is not nil.
-func (ac *AdminCreate) SetNillableAdminStatus(es *enums.AdminStatus) *AdminCreate {
+func (ac *AdminCreate) SetNillableAdminStatus(es *enums.EnabledStatus) *AdminCreate {
 	if es != nil {
 		ac.SetAdminStatus(*es)
 	}
@@ -880,6 +895,21 @@ func (ac *AdminCreate) AddSweepResultDetailsUpdater(s ...*SweepResultDetails) *A
 	return ac.AddSweepResultDetailsUpdaterIDs(ids...)
 }
 
+// AddUserUpdaterIDs adds the "user_updater" edge to the User entity by IDs.
+func (ac *AdminCreate) AddUserUpdaterIDs(ids ...int) *AdminCreate {
+	ac.mutation.AddUserUpdaterIDs(ids...)
+	return ac
+}
+
+// AddUserUpdater adds the "user_updater" edges to the User entity.
+func (ac *AdminCreate) AddUserUpdater(u ...*User) *AdminCreate {
+	ids := make([]int, len(u))
+	for i := range u {
+		ids[i] = u[i].ID
+	}
+	return ac.AddUserUpdaterIDs(ids...)
+}
+
 // Mutation returns the AdminMutation object of the builder.
 func (ac *AdminCreate) Mutation() *AdminMutation {
 	return ac.mutation
@@ -999,6 +1029,11 @@ func (ac *AdminCreate) check() error {
 			return &ValidationError{Name: "mobile", err: fmt.Errorf(`dao: validator failed for field "Admin.mobile": %w`, err)}
 		}
 	}
+	if v, ok := ac.mutation.WechatOpenid(); ok {
+		if err := admin.WechatOpenidValidator(v); err != nil {
+			return &ValidationError{Name: "wechat_openid", err: fmt.Errorf(`dao: validator failed for field "Admin.wechat_openid": %w`, err)}
+		}
+	}
 	if _, ok := ac.mutation.AdminStatus(); !ok {
 		return &ValidationError{Name: "admin_status", err: errors.New(`dao: missing required field "Admin.admin_status"`)}
 	}
@@ -1070,6 +1105,10 @@ func (ac *AdminCreate) createSpec() (*Admin, *sqlgraph.CreateSpec) {
 	if value, ok := ac.mutation.Mobile(); ok {
 		_spec.SetField(admin.FieldMobile, field.TypeString, value)
 		_node.Mobile = value
+	}
+	if value, ok := ac.mutation.WechatOpenid(); ok {
+		_spec.SetField(admin.FieldWechatOpenid, field.TypeString, value)
+		_node.WechatOpenid = value
 	}
 	if value, ok := ac.mutation.Avatar(); ok {
 		_spec.SetField(admin.FieldAvatar, field.TypeJSON, value)
@@ -1858,6 +1897,22 @@ func (ac *AdminCreate) createSpec() (*Admin, *sqlgraph.CreateSpec) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(sweepresultdetails.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := ac.mutation.UserUpdaterIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   admin.UserUpdaterTable,
+			Columns: []string{admin.UserUpdaterColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(user.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {

@@ -19,21 +19,21 @@ type Department struct {
 	// ID of the ent.
 	ID int `json:"id,omitempty"`
 	// 创建时间
-	CreateTime time.Time `json:"create_time"`
+	CreateTime time.Time `json:"create_time,omitempty"`
 	// 创建者
-	CreatorID int `json:"creator_id"`
+	CreatorID int `json:"creator_id,omitempty"`
 	// 删除时间
-	DeleteTime *time.Time `json:"delete_time"`
+	DeleteTime *time.Time `json:"delete_time,omitempty"`
 	// 最后更新者
-	UpdaterID int `json:"updater_id"`
+	UpdaterID int `json:"updater_id,omitempty"`
 	// 最后更新时间
-	UpdateTime time.Time `json:"update_time"`
+	UpdateTime time.Time `json:"update_time,omitempty"`
 	// 名称
-	Name string `json:"name" validate:"required"`
+	Name string `json:"name,omitempty" validate:"required"`
 	// 上级部门id
-	ParentID int `json:"parent_id"`
+	ParentID int `json:"parent_id,omitempty"`
 	// 备注
-	Notes string `json:"notes"`
+	Notes string `json:"notes,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the DepartmentQuery when eager-loading is set.
 	Edges        DepartmentEdges `json:"edges"`

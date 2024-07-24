@@ -23,6 +23,7 @@ import (
 	"aisecurity/ent/dao/sweepresult"
 	"aisecurity/ent/dao/sweepresultdetails"
 	"aisecurity/ent/dao/sweepschedule"
+	"aisecurity/ent/dao/user"
 	"aisecurity/ent/dao/video"
 	"aisecurity/enums"
 	"aisecurity/structs/types"
@@ -75,14 +76,6 @@ func (au *AdminUpdate) SetUpdaterID(i int) *AdminUpdate {
 	return au
 }
 
-// SetNillableUpdaterID sets the "updater_id" field if the given value is not nil.
-func (au *AdminUpdate) SetNillableUpdaterID(i *int) *AdminUpdate {
-	if i != nil {
-		au.SetUpdaterID(*i)
-	}
-	return au
-}
-
 // SetUpdateTime sets the "update_time" field.
 func (au *AdminUpdate) SetUpdateTime(t time.Time) *AdminUpdate {
 	au.mutation.SetUpdateTime(t)
@@ -95,25 +88,9 @@ func (au *AdminUpdate) SetUsername(s string) *AdminUpdate {
 	return au
 }
 
-// SetNillableUsername sets the "username" field if the given value is not nil.
-func (au *AdminUpdate) SetNillableUsername(s *string) *AdminUpdate {
-	if s != nil {
-		au.SetUsername(*s)
-	}
-	return au
-}
-
 // SetPassword sets the "password" field.
 func (au *AdminUpdate) SetPassword(s string) *AdminUpdate {
 	au.mutation.SetPassword(s)
-	return au
-}
-
-// SetNillablePassword sets the "password" field if the given value is not nil.
-func (au *AdminUpdate) SetNillablePassword(s *string) *AdminUpdate {
-	if s != nil {
-		au.SetPassword(*s)
-	}
 	return au
 }
 
@@ -123,25 +100,9 @@ func (au *AdminUpdate) SetNickname(s string) *AdminUpdate {
 	return au
 }
 
-// SetNillableNickname sets the "nickname" field if the given value is not nil.
-func (au *AdminUpdate) SetNillableNickname(s *string) *AdminUpdate {
-	if s != nil {
-		au.SetNickname(*s)
-	}
-	return au
-}
-
 // SetRealName sets the "real_name" field.
 func (au *AdminUpdate) SetRealName(s string) *AdminUpdate {
 	au.mutation.SetRealName(s)
-	return au
-}
-
-// SetNillableRealName sets the "real_name" field if the given value is not nil.
-func (au *AdminUpdate) SetNillableRealName(s *string) *AdminUpdate {
-	if s != nil {
-		au.SetRealName(*s)
-	}
 	return au
 }
 
@@ -162,6 +123,26 @@ func (au *AdminUpdate) SetNillableMobile(s *string) *AdminUpdate {
 // ClearMobile clears the value of the "mobile" field.
 func (au *AdminUpdate) ClearMobile() *AdminUpdate {
 	au.mutation.ClearMobile()
+	return au
+}
+
+// SetWechatOpenid sets the "wechat_openid" field.
+func (au *AdminUpdate) SetWechatOpenid(s string) *AdminUpdate {
+	au.mutation.SetWechatOpenid(s)
+	return au
+}
+
+// SetNillableWechatOpenid sets the "wechat_openid" field if the given value is not nil.
+func (au *AdminUpdate) SetNillableWechatOpenid(s *string) *AdminUpdate {
+	if s != nil {
+		au.SetWechatOpenid(*s)
+	}
+	return au
+}
+
+// ClearWechatOpenid clears the value of the "wechat_openid" field.
+func (au *AdminUpdate) ClearWechatOpenid() *AdminUpdate {
+	au.mutation.ClearWechatOpenid()
 	return au
 }
 
@@ -186,14 +167,14 @@ func (au *AdminUpdate) ClearAvatar() *AdminUpdate {
 }
 
 // SetAdminStatus sets the "admin_status" field.
-func (au *AdminUpdate) SetAdminStatus(es enums.AdminStatus) *AdminUpdate {
+func (au *AdminUpdate) SetAdminStatus(es enums.EnabledStatus) *AdminUpdate {
 	au.mutation.ResetAdminStatus()
 	au.mutation.SetAdminStatus(es)
 	return au
 }
 
 // SetNillableAdminStatus sets the "admin_status" field if the given value is not nil.
-func (au *AdminUpdate) SetNillableAdminStatus(es *enums.AdminStatus) *AdminUpdate {
+func (au *AdminUpdate) SetNillableAdminStatus(es *enums.EnabledStatus) *AdminUpdate {
 	if es != nil {
 		au.SetAdminStatus(*es)
 	}
@@ -201,7 +182,7 @@ func (au *AdminUpdate) SetNillableAdminStatus(es *enums.AdminStatus) *AdminUpdat
 }
 
 // AddAdminStatus adds es to the "admin_status" field.
-func (au *AdminUpdate) AddAdminStatus(es enums.AdminStatus) *AdminUpdate {
+func (au *AdminUpdate) AddAdminStatus(es enums.EnabledStatus) *AdminUpdate {
 	au.mutation.AddAdminStatus(es)
 	return au
 }
@@ -918,6 +899,21 @@ func (au *AdminUpdate) AddSweepResultDetailsUpdater(s ...*SweepResultDetails) *A
 		ids[i] = s[i].ID
 	}
 	return au.AddSweepResultDetailsUpdaterIDs(ids...)
+}
+
+// AddUserUpdaterIDs adds the "user_updater" edge to the User entity by IDs.
+func (au *AdminUpdate) AddUserUpdaterIDs(ids ...int) *AdminUpdate {
+	au.mutation.AddUserUpdaterIDs(ids...)
+	return au
+}
+
+// AddUserUpdater adds the "user_updater" edges to the User entity.
+func (au *AdminUpdate) AddUserUpdater(u ...*User) *AdminUpdate {
+	ids := make([]int, len(u))
+	for i := range u {
+		ids[i] = u[i].ID
+	}
+	return au.AddUserUpdaterIDs(ids...)
 }
 
 // Mutation returns the AdminMutation object of the builder.
@@ -1903,6 +1899,27 @@ func (au *AdminUpdate) RemoveSweepResultDetailsUpdater(s ...*SweepResultDetails)
 	return au.RemoveSweepResultDetailsUpdaterIDs(ids...)
 }
 
+// ClearUserUpdater clears all "user_updater" edges to the User entity.
+func (au *AdminUpdate) ClearUserUpdater() *AdminUpdate {
+	au.mutation.ClearUserUpdater()
+	return au
+}
+
+// RemoveUserUpdaterIDs removes the "user_updater" edge to User entities by IDs.
+func (au *AdminUpdate) RemoveUserUpdaterIDs(ids ...int) *AdminUpdate {
+	au.mutation.RemoveUserUpdaterIDs(ids...)
+	return au
+}
+
+// RemoveUserUpdater removes "user_updater" edges to User entities.
+func (au *AdminUpdate) RemoveUserUpdater(u ...*User) *AdminUpdate {
+	ids := make([]int, len(u))
+	for i := range u {
+		ids[i] = u[i].ID
+	}
+	return au.RemoveUserUpdaterIDs(ids...)
+}
+
 // Save executes the query and returns the number of nodes affected by the update operation.
 func (au *AdminUpdate) Save(ctx context.Context) (int, error) {
 	if err := au.defaults(); err != nil {
@@ -1977,6 +1994,11 @@ func (au *AdminUpdate) check() error {
 			return &ValidationError{Name: "mobile", err: fmt.Errorf(`dao: validator failed for field "Admin.mobile": %w`, err)}
 		}
 	}
+	if v, ok := au.mutation.WechatOpenid(); ok {
+		if err := admin.WechatOpenidValidator(v); err != nil {
+			return &ValidationError{Name: "wechat_openid", err: fmt.Errorf(`dao: validator failed for field "Admin.wechat_openid": %w`, err)}
+		}
+	}
 	if v, ok := au.mutation.AdminStatus(); ok {
 		if err := admin.AdminStatusValidator(int(v)); err != nil {
 			return &ValidationError{Name: "admin_status", err: fmt.Errorf(`dao: validator failed for field "Admin.admin_status": %w`, err)}
@@ -2029,6 +2051,12 @@ func (au *AdminUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	}
 	if au.mutation.MobileCleared() {
 		_spec.ClearField(admin.FieldMobile, field.TypeString)
+	}
+	if value, ok := au.mutation.WechatOpenid(); ok {
+		_spec.SetField(admin.FieldWechatOpenid, field.TypeString, value)
+	}
+	if au.mutation.WechatOpenidCleared() {
+		_spec.ClearField(admin.FieldWechatOpenid, field.TypeString)
 	}
 	if value, ok := au.mutation.Avatar(); ok {
 		_spec.SetField(admin.FieldAvatar, field.TypeJSON, value)
@@ -4170,6 +4198,51 @@ func (au *AdminUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
+	if au.mutation.UserUpdaterCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   admin.UserUpdaterTable,
+			Columns: []string{admin.UserUpdaterColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(user.FieldID, field.TypeInt),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := au.mutation.RemovedUserUpdaterIDs(); len(nodes) > 0 && !au.mutation.UserUpdaterCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   admin.UserUpdaterTable,
+			Columns: []string{admin.UserUpdaterColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(user.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := au.mutation.UserUpdaterIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   admin.UserUpdaterTable,
+			Columns: []string{admin.UserUpdaterColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(user.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
 	if n, err = sqlgraph.UpdateNodes(ctx, au.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
 			err = &NotFoundError{admin.Label}
@@ -4216,14 +4289,6 @@ func (auo *AdminUpdateOne) SetUpdaterID(i int) *AdminUpdateOne {
 	return auo
 }
 
-// SetNillableUpdaterID sets the "updater_id" field if the given value is not nil.
-func (auo *AdminUpdateOne) SetNillableUpdaterID(i *int) *AdminUpdateOne {
-	if i != nil {
-		auo.SetUpdaterID(*i)
-	}
-	return auo
-}
-
 // SetUpdateTime sets the "update_time" field.
 func (auo *AdminUpdateOne) SetUpdateTime(t time.Time) *AdminUpdateOne {
 	auo.mutation.SetUpdateTime(t)
@@ -4236,25 +4301,9 @@ func (auo *AdminUpdateOne) SetUsername(s string) *AdminUpdateOne {
 	return auo
 }
 
-// SetNillableUsername sets the "username" field if the given value is not nil.
-func (auo *AdminUpdateOne) SetNillableUsername(s *string) *AdminUpdateOne {
-	if s != nil {
-		auo.SetUsername(*s)
-	}
-	return auo
-}
-
 // SetPassword sets the "password" field.
 func (auo *AdminUpdateOne) SetPassword(s string) *AdminUpdateOne {
 	auo.mutation.SetPassword(s)
-	return auo
-}
-
-// SetNillablePassword sets the "password" field if the given value is not nil.
-func (auo *AdminUpdateOne) SetNillablePassword(s *string) *AdminUpdateOne {
-	if s != nil {
-		auo.SetPassword(*s)
-	}
 	return auo
 }
 
@@ -4264,25 +4313,9 @@ func (auo *AdminUpdateOne) SetNickname(s string) *AdminUpdateOne {
 	return auo
 }
 
-// SetNillableNickname sets the "nickname" field if the given value is not nil.
-func (auo *AdminUpdateOne) SetNillableNickname(s *string) *AdminUpdateOne {
-	if s != nil {
-		auo.SetNickname(*s)
-	}
-	return auo
-}
-
 // SetRealName sets the "real_name" field.
 func (auo *AdminUpdateOne) SetRealName(s string) *AdminUpdateOne {
 	auo.mutation.SetRealName(s)
-	return auo
-}
-
-// SetNillableRealName sets the "real_name" field if the given value is not nil.
-func (auo *AdminUpdateOne) SetNillableRealName(s *string) *AdminUpdateOne {
-	if s != nil {
-		auo.SetRealName(*s)
-	}
 	return auo
 }
 
@@ -4303,6 +4336,26 @@ func (auo *AdminUpdateOne) SetNillableMobile(s *string) *AdminUpdateOne {
 // ClearMobile clears the value of the "mobile" field.
 func (auo *AdminUpdateOne) ClearMobile() *AdminUpdateOne {
 	auo.mutation.ClearMobile()
+	return auo
+}
+
+// SetWechatOpenid sets the "wechat_openid" field.
+func (auo *AdminUpdateOne) SetWechatOpenid(s string) *AdminUpdateOne {
+	auo.mutation.SetWechatOpenid(s)
+	return auo
+}
+
+// SetNillableWechatOpenid sets the "wechat_openid" field if the given value is not nil.
+func (auo *AdminUpdateOne) SetNillableWechatOpenid(s *string) *AdminUpdateOne {
+	if s != nil {
+		auo.SetWechatOpenid(*s)
+	}
+	return auo
+}
+
+// ClearWechatOpenid clears the value of the "wechat_openid" field.
+func (auo *AdminUpdateOne) ClearWechatOpenid() *AdminUpdateOne {
+	auo.mutation.ClearWechatOpenid()
 	return auo
 }
 
@@ -4327,14 +4380,14 @@ func (auo *AdminUpdateOne) ClearAvatar() *AdminUpdateOne {
 }
 
 // SetAdminStatus sets the "admin_status" field.
-func (auo *AdminUpdateOne) SetAdminStatus(es enums.AdminStatus) *AdminUpdateOne {
+func (auo *AdminUpdateOne) SetAdminStatus(es enums.EnabledStatus) *AdminUpdateOne {
 	auo.mutation.ResetAdminStatus()
 	auo.mutation.SetAdminStatus(es)
 	return auo
 }
 
 // SetNillableAdminStatus sets the "admin_status" field if the given value is not nil.
-func (auo *AdminUpdateOne) SetNillableAdminStatus(es *enums.AdminStatus) *AdminUpdateOne {
+func (auo *AdminUpdateOne) SetNillableAdminStatus(es *enums.EnabledStatus) *AdminUpdateOne {
 	if es != nil {
 		auo.SetAdminStatus(*es)
 	}
@@ -4342,7 +4395,7 @@ func (auo *AdminUpdateOne) SetNillableAdminStatus(es *enums.AdminStatus) *AdminU
 }
 
 // AddAdminStatus adds es to the "admin_status" field.
-func (auo *AdminUpdateOne) AddAdminStatus(es enums.AdminStatus) *AdminUpdateOne {
+func (auo *AdminUpdateOne) AddAdminStatus(es enums.EnabledStatus) *AdminUpdateOne {
 	auo.mutation.AddAdminStatus(es)
 	return auo
 }
@@ -5059,6 +5112,21 @@ func (auo *AdminUpdateOne) AddSweepResultDetailsUpdater(s ...*SweepResultDetails
 		ids[i] = s[i].ID
 	}
 	return auo.AddSweepResultDetailsUpdaterIDs(ids...)
+}
+
+// AddUserUpdaterIDs adds the "user_updater" edge to the User entity by IDs.
+func (auo *AdminUpdateOne) AddUserUpdaterIDs(ids ...int) *AdminUpdateOne {
+	auo.mutation.AddUserUpdaterIDs(ids...)
+	return auo
+}
+
+// AddUserUpdater adds the "user_updater" edges to the User entity.
+func (auo *AdminUpdateOne) AddUserUpdater(u ...*User) *AdminUpdateOne {
+	ids := make([]int, len(u))
+	for i := range u {
+		ids[i] = u[i].ID
+	}
+	return auo.AddUserUpdaterIDs(ids...)
 }
 
 // Mutation returns the AdminMutation object of the builder.
@@ -6044,6 +6112,27 @@ func (auo *AdminUpdateOne) RemoveSweepResultDetailsUpdater(s ...*SweepResultDeta
 	return auo.RemoveSweepResultDetailsUpdaterIDs(ids...)
 }
 
+// ClearUserUpdater clears all "user_updater" edges to the User entity.
+func (auo *AdminUpdateOne) ClearUserUpdater() *AdminUpdateOne {
+	auo.mutation.ClearUserUpdater()
+	return auo
+}
+
+// RemoveUserUpdaterIDs removes the "user_updater" edge to User entities by IDs.
+func (auo *AdminUpdateOne) RemoveUserUpdaterIDs(ids ...int) *AdminUpdateOne {
+	auo.mutation.RemoveUserUpdaterIDs(ids...)
+	return auo
+}
+
+// RemoveUserUpdater removes "user_updater" edges to User entities.
+func (auo *AdminUpdateOne) RemoveUserUpdater(u ...*User) *AdminUpdateOne {
+	ids := make([]int, len(u))
+	for i := range u {
+		ids[i] = u[i].ID
+	}
+	return auo.RemoveUserUpdaterIDs(ids...)
+}
+
 // Where appends a list predicates to the AdminUpdate builder.
 func (auo *AdminUpdateOne) Where(ps ...predicate.Admin) *AdminUpdateOne {
 	auo.mutation.Where(ps...)
@@ -6131,6 +6220,11 @@ func (auo *AdminUpdateOne) check() error {
 			return &ValidationError{Name: "mobile", err: fmt.Errorf(`dao: validator failed for field "Admin.mobile": %w`, err)}
 		}
 	}
+	if v, ok := auo.mutation.WechatOpenid(); ok {
+		if err := admin.WechatOpenidValidator(v); err != nil {
+			return &ValidationError{Name: "wechat_openid", err: fmt.Errorf(`dao: validator failed for field "Admin.wechat_openid": %w`, err)}
+		}
+	}
 	if v, ok := auo.mutation.AdminStatus(); ok {
 		if err := admin.AdminStatusValidator(int(v)); err != nil {
 			return &ValidationError{Name: "admin_status", err: fmt.Errorf(`dao: validator failed for field "Admin.admin_status": %w`, err)}
@@ -6200,6 +6294,12 @@ func (auo *AdminUpdateOne) sqlSave(ctx context.Context) (_node *Admin, err error
 	}
 	if auo.mutation.MobileCleared() {
 		_spec.ClearField(admin.FieldMobile, field.TypeString)
+	}
+	if value, ok := auo.mutation.WechatOpenid(); ok {
+		_spec.SetField(admin.FieldWechatOpenid, field.TypeString, value)
+	}
+	if auo.mutation.WechatOpenidCleared() {
+		_spec.ClearField(admin.FieldWechatOpenid, field.TypeString)
 	}
 	if value, ok := auo.mutation.Avatar(); ok {
 		_spec.SetField(admin.FieldAvatar, field.TypeJSON, value)
@@ -8334,6 +8434,51 @@ func (auo *AdminUpdateOne) sqlSave(ctx context.Context) (_node *Admin, err error
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(sweepresultdetails.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if auo.mutation.UserUpdaterCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   admin.UserUpdaterTable,
+			Columns: []string{admin.UserUpdaterColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(user.FieldID, field.TypeInt),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := auo.mutation.RemovedUserUpdaterIDs(); len(nodes) > 0 && !auo.mutation.UserUpdaterCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   admin.UserUpdaterTable,
+			Columns: []string{admin.UserUpdaterColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(user.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := auo.mutation.UserUpdaterIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   admin.UserUpdaterTable,
+			Columns: []string{admin.UserUpdaterColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(user.FieldID, field.TypeInt),
 			},
 		}
 		for _, k := range nodes {

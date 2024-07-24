@@ -22,6 +22,7 @@ import (
 	"aisecurity/ent/dao/sweepresult"
 	"aisecurity/ent/dao/sweepresultdetails"
 	"aisecurity/ent/dao/sweepschedule"
+	"aisecurity/ent/dao/user"
 	"aisecurity/ent/dao/video"
 	"aisecurity/ent/schema"
 	"aisecurity/enums"
@@ -98,21 +99,7 @@ func init() {
 	// adminDescNickname is the schema descriptor for nickname field.
 	adminDescNickname := adminFields[2].Descriptor()
 	// admin.NicknameValidator is a validator for the "nickname" field. It is called by the builders before save.
-	admin.NicknameValidator = func() func(string) error {
-		validators := adminDescNickname.Validators
-		fns := [...]func(string) error{
-			validators[0].(func(string) error),
-			validators[1].(func(string) error),
-		}
-		return func(nickname string) error {
-			for _, fn := range fns {
-				if err := fn(nickname); err != nil {
-					return err
-				}
-			}
-			return nil
-		}
-	}()
+	admin.NicknameValidator = adminDescNickname.Validators[0].(func(string) error)
 	// adminDescRealName is the schema descriptor for real_name field.
 	adminDescRealName := adminFields[3].Descriptor()
 	// admin.RealNameValidator is a validator for the "real_name" field. It is called by the builders before save.
@@ -121,10 +108,14 @@ func init() {
 	adminDescMobile := adminFields[4].Descriptor()
 	// admin.MobileValidator is a validator for the "mobile" field. It is called by the builders before save.
 	admin.MobileValidator = adminDescMobile.Validators[0].(func(string) error)
+	// adminDescWechatOpenid is the schema descriptor for wechat_openid field.
+	adminDescWechatOpenid := adminFields[5].Descriptor()
+	// admin.WechatOpenidValidator is a validator for the "wechat_openid" field. It is called by the builders before save.
+	admin.WechatOpenidValidator = adminDescWechatOpenid.Validators[0].(func(string) error)
 	// adminDescAdminStatus is the schema descriptor for admin_status field.
-	adminDescAdminStatus := adminFields[6].Descriptor()
+	adminDescAdminStatus := adminFields[7].Descriptor()
 	// admin.DefaultAdminStatus holds the default value on creation for the admin_status field.
-	admin.DefaultAdminStatus = enums.AdminStatus(adminDescAdminStatus.Default.(int))
+	admin.DefaultAdminStatus = enums.EnabledStatus(adminDescAdminStatus.Default.(int))
 	// admin.AdminStatusValidator is a validator for the "admin_status" field. It is called by the builders before save.
 	admin.AdminStatusValidator = adminDescAdminStatus.Validators[0].(func(int) error)
 	areaMixin := schema.Area{}.Mixin()
@@ -643,20 +634,24 @@ func init() {
 	riskDescImages := riskFields[2].Descriptor()
 	// risk.DefaultImages holds the default value on creation for the images field.
 	risk.DefaultImages = riskDescImages.Default.([]types.UploadedImage)
+	// riskDescMaintainedImages is the schema descriptor for maintained_images field.
+	riskDescMaintainedImages := riskFields[3].Descriptor()
+	// risk.DefaultMaintainedImages holds the default value on creation for the maintained_images field.
+	risk.DefaultMaintainedImages = riskDescMaintainedImages.Default.([]types.UploadedImage)
 	// riskDescRiskCategoryID is the schema descriptor for risk_category_id field.
-	riskDescRiskCategoryID := riskFields[3].Descriptor()
+	riskDescRiskCategoryID := riskFields[4].Descriptor()
 	// risk.RiskCategoryIDValidator is a validator for the "risk_category_id" field. It is called by the builders before save.
 	risk.RiskCategoryIDValidator = riskDescRiskCategoryID.Validators[0].(func(int) error)
 	// riskDescRiskLocationID is the schema descriptor for risk_location_id field.
-	riskDescRiskLocationID := riskFields[4].Descriptor()
+	riskDescRiskLocationID := riskFields[5].Descriptor()
 	// risk.RiskLocationIDValidator is a validator for the "risk_location_id" field. It is called by the builders before save.
 	risk.RiskLocationIDValidator = riskDescRiskLocationID.Validators[0].(func(int) error)
 	// riskDescMaintainerID is the schema descriptor for maintainer_id field.
-	riskDescMaintainerID := riskFields[5].Descriptor()
+	riskDescMaintainerID := riskFields[6].Descriptor()
 	// risk.MaintainerIDValidator is a validator for the "maintainer_id" field. It is called by the builders before save.
 	risk.MaintainerIDValidator = riskDescMaintainerID.Validators[0].(func(int) error)
 	// riskDescMaintainStatus is the schema descriptor for maintain_status field.
-	riskDescMaintainStatus := riskFields[7].Descriptor()
+	riskDescMaintainStatus := riskFields[8].Descriptor()
 	// risk.DefaultMaintainStatus holds the default value on creation for the maintain_status field.
 	risk.DefaultMaintainStatus = maintain_status.MaintainStatus(riskDescMaintainStatus.Default.(int))
 	// risk.MaintainStatusValidator is a validator for the "maintain_status" field. It is called by the builders before save.
@@ -937,12 +932,77 @@ func init() {
 	sweepscheduleDescSweepID := sweepscheduleFields[1].Descriptor()
 	// sweepschedule.SweepIDValidator is a validator for the "sweep_id" field. It is called by the builders before save.
 	sweepschedule.SweepIDValidator = sweepscheduleDescSweepID.Validators[0].(func(int) error)
-	// sweepscheduleDescScheduleStatus is the schema descriptor for schedule_status field.
-	sweepscheduleDescScheduleStatus := sweepscheduleFields[2].Descriptor()
-	// sweepschedule.DefaultScheduleStatus holds the default value on creation for the schedule_status field.
-	sweepschedule.DefaultScheduleStatus = enums.AdminStatus(sweepscheduleDescScheduleStatus.Default.(int))
-	// sweepschedule.ScheduleStatusValidator is a validator for the "schedule_status" field. It is called by the builders before save.
-	sweepschedule.ScheduleStatusValidator = sweepscheduleDescScheduleStatus.Validators[0].(func(int) error)
+	// sweepscheduleDescEnabledStatus is the schema descriptor for enabled_status field.
+	sweepscheduleDescEnabledStatus := sweepscheduleFields[2].Descriptor()
+	// sweepschedule.DefaultEnabledStatus holds the default value on creation for the enabled_status field.
+	sweepschedule.DefaultEnabledStatus = enums.EnabledStatus(sweepscheduleDescEnabledStatus.Default.(int))
+	// sweepschedule.EnabledStatusValidator is a validator for the "enabled_status" field. It is called by the builders before save.
+	sweepschedule.EnabledStatusValidator = sweepscheduleDescEnabledStatus.Validators[0].(func(int) error)
+	userMixin := schema.User{}.Mixin()
+	userMixinHooks0 := userMixin[0].Hooks()
+	user.Hooks[0] = userMixinHooks0[0]
+	userMixinFields0 := userMixin[0].Fields()
+	_ = userMixinFields0
+	userFields := schema.User{}.Fields()
+	_ = userFields
+	// userDescCreateTime is the schema descriptor for create_time field.
+	userDescCreateTime := userMixinFields0[0].Descriptor()
+	// user.DefaultCreateTime holds the default value on creation for the create_time field.
+	user.DefaultCreateTime = userDescCreateTime.Default.(func() time.Time)
+	// userDescUpdateTime is the schema descriptor for update_time field.
+	userDescUpdateTime := userMixinFields0[2].Descriptor()
+	// user.DefaultUpdateTime holds the default value on creation for the update_time field.
+	user.DefaultUpdateTime = userDescUpdateTime.Default.(func() time.Time)
+	// user.UpdateDefaultUpdateTime holds the default value on update for the update_time field.
+	user.UpdateDefaultUpdateTime = userDescUpdateTime.UpdateDefault.(func() time.Time)
+	// userDescUpdaterID is the schema descriptor for updater_id field.
+	userDescUpdaterID := userMixinFields0[3].Descriptor()
+	// user.UpdaterIDValidator is a validator for the "updater_id" field. It is called by the builders before save.
+	user.UpdaterIDValidator = userDescUpdaterID.Validators[0].(func(int) error)
+	// userDescUsername is the schema descriptor for username field.
+	userDescUsername := userFields[0].Descriptor()
+	// user.UsernameValidator is a validator for the "username" field. It is called by the builders before save.
+	user.UsernameValidator = func() func(string) error {
+		validators := userDescUsername.Validators
+		fns := [...]func(string) error{
+			validators[0].(func(string) error),
+			validators[1].(func(string) error),
+		}
+		return func(username string) error {
+			for _, fn := range fns {
+				if err := fn(username); err != nil {
+					return err
+				}
+			}
+			return nil
+		}
+	}()
+	// userDescPassword is the schema descriptor for password field.
+	userDescPassword := userFields[1].Descriptor()
+	// user.PasswordValidator is a validator for the "password" field. It is called by the builders before save.
+	user.PasswordValidator = userDescPassword.Validators[0].(func(string) error)
+	// userDescNickname is the schema descriptor for nickname field.
+	userDescNickname := userFields[2].Descriptor()
+	// user.NicknameValidator is a validator for the "nickname" field. It is called by the builders before save.
+	user.NicknameValidator = userDescNickname.Validators[0].(func(string) error)
+	// userDescRealName is the schema descriptor for real_name field.
+	userDescRealName := userFields[3].Descriptor()
+	// user.RealNameValidator is a validator for the "real_name" field. It is called by the builders before save.
+	user.RealNameValidator = userDescRealName.Validators[0].(func(string) error)
+	// userDescMobile is the schema descriptor for mobile field.
+	userDescMobile := userFields[4].Descriptor()
+	// user.MobileValidator is a validator for the "mobile" field. It is called by the builders before save.
+	user.MobileValidator = userDescMobile.Validators[0].(func(string) error)
+	// userDescWechatOpenid is the schema descriptor for wechat_openid field.
+	userDescWechatOpenid := userFields[5].Descriptor()
+	// user.WechatOpenidValidator is a validator for the "wechat_openid" field. It is called by the builders before save.
+	user.WechatOpenidValidator = userDescWechatOpenid.Validators[0].(func(string) error)
+	// userDescUserStatus is the schema descriptor for user_status field.
+	userDescUserStatus := userFields[7].Descriptor()
+	// user.DefaultUserStatus holds the default value on creation for the user_status field.
+	user.DefaultUserStatus = enums.EnabledStatus(userDescUserStatus.Default.(int))
+	// user.UserStatusValidator is a validator for the "user_status" field. It is called by the builders before save.
+	user.UserStatusValidator = userDescUserStatus.Validators[0].(func(int) error)
 	videoMixin := schema.Video{}.Mixin()
 	videoMixinHooks0 := videoMixin[0].Hooks()
 	video.Hooks[0] = videoMixinHooks0[0]
@@ -975,6 +1035,6 @@ func init() {
 }
 
 const (
-	Version = "v0.12.5"                                         // Version of ent codegen.
-	Sum     = "h1:KREM5E4CSoej4zeGa88Ou/gfturAnpUv0mzAjch1sj4=" // Sum of ent codegen.
+	Version = "v0.12.4"                                         // Version of ent codegen.
+	Sum     = "h1:LddPnAyxls/O7DTXZvUGDj0NZIdGSu317+aoNLJWbD8=" // Sum of ent codegen.
 )

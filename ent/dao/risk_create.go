@@ -105,6 +105,12 @@ func (rc *RiskCreate) SetImages(ti []types.UploadedImage) *RiskCreate {
 	return rc
 }
 
+// SetMaintainedImages sets the "maintained_images" field.
+func (rc *RiskCreate) SetMaintainedImages(ti []types.UploadedImage) *RiskCreate {
+	rc.mutation.SetMaintainedImages(ti)
+	return rc
+}
+
 // SetRiskCategoryID sets the "risk_category_id" field.
 func (rc *RiskCreate) SetRiskCategoryID(i int) *RiskCreate {
 	rc.mutation.SetRiskCategoryID(i)
@@ -236,6 +242,10 @@ func (rc *RiskCreate) defaults() error {
 	if _, ok := rc.mutation.Images(); !ok {
 		v := risk.DefaultImages
 		rc.mutation.SetImages(v)
+	}
+	if _, ok := rc.mutation.MaintainedImages(); !ok {
+		v := risk.DefaultMaintainedImages
+		rc.mutation.SetMaintainedImages(v)
 	}
 	if _, ok := rc.mutation.MaintainStatus(); !ok {
 		v := risk.DefaultMaintainStatus
@@ -375,6 +385,10 @@ func (rc *RiskCreate) createSpec() (*Risk, *sqlgraph.CreateSpec) {
 	if value, ok := rc.mutation.Images(); ok {
 		_spec.SetField(risk.FieldImages, field.TypeJSON, value)
 		_node.Images = value
+	}
+	if value, ok := rc.mutation.MaintainedImages(); ok {
+		_spec.SetField(risk.FieldMaintainedImages, field.TypeJSON, value)
+		_node.MaintainedImages = value
 	}
 	if value, ok := rc.mutation.Measures(); ok {
 		_spec.SetField(risk.FieldMeasures, field.TypeString, value)

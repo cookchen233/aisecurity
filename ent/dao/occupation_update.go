@@ -56,14 +56,6 @@ func (ou *OccupationUpdate) SetUpdaterID(i int) *OccupationUpdate {
 	return ou
 }
 
-// SetNillableUpdaterID sets the "updater_id" field if the given value is not nil.
-func (ou *OccupationUpdate) SetNillableUpdaterID(i *int) *OccupationUpdate {
-	if i != nil {
-		ou.SetUpdaterID(*i)
-	}
-	return ou
-}
-
 // SetUpdateTime sets the "update_time" field.
 func (ou *OccupationUpdate) SetUpdateTime(t time.Time) *OccupationUpdate {
 	ou.mutation.SetUpdateTime(t)
@@ -73,14 +65,6 @@ func (ou *OccupationUpdate) SetUpdateTime(t time.Time) *OccupationUpdate {
 // SetName sets the "name" field.
 func (ou *OccupationUpdate) SetName(s string) *OccupationUpdate {
 	ou.mutation.SetName(s)
-	return ou
-}
-
-// SetNillableName sets the "name" field if the given value is not nil.
-func (ou *OccupationUpdate) SetNillableName(s *string) *OccupationUpdate {
-	if s != nil {
-		ou.SetName(*s)
-	}
 	return ou
 }
 
@@ -369,14 +353,6 @@ func (ouo *OccupationUpdateOne) SetUpdaterID(i int) *OccupationUpdateOne {
 	return ouo
 }
 
-// SetNillableUpdaterID sets the "updater_id" field if the given value is not nil.
-func (ouo *OccupationUpdateOne) SetNillableUpdaterID(i *int) *OccupationUpdateOne {
-	if i != nil {
-		ouo.SetUpdaterID(*i)
-	}
-	return ouo
-}
-
 // SetUpdateTime sets the "update_time" field.
 func (ouo *OccupationUpdateOne) SetUpdateTime(t time.Time) *OccupationUpdateOne {
 	ouo.mutation.SetUpdateTime(t)
@@ -386,14 +362,6 @@ func (ouo *OccupationUpdateOne) SetUpdateTime(t time.Time) *OccupationUpdateOne 
 // SetName sets the "name" field.
 func (ouo *OccupationUpdateOne) SetName(s string) *OccupationUpdateOne {
 	ouo.mutation.SetName(s)
-	return ouo
-}
-
-// SetNillableName sets the "name" field if the given value is not nil.
-func (ouo *OccupationUpdateOne) SetNillableName(s *string) *OccupationUpdateOne {
-	if s != nil {
-		ouo.SetName(*s)
-	}
 	return ouo
 }
 

@@ -36,6 +36,8 @@ const (
 	FieldRealName = "real_name"
 	// FieldMobile holds the string denoting the mobile field in the database.
 	FieldMobile = "mobile"
+	// FieldWechatOpenid holds the string denoting the wechat_openid field in the database.
+	FieldWechatOpenid = "wechat_openid"
 	// FieldAvatar holds the string denoting the avatar field in the database.
 	FieldAvatar = "avatar"
 	// FieldAdminStatus holds the string denoting the admin_status field in the database.
@@ -138,6 +140,8 @@ const (
 	EdgeSweepResultDetailsCreator = "sweep_result_details_creator"
 	// EdgeSweepResultDetailsUpdater holds the string denoting the sweep_result_details_updater edge name in mutations.
 	EdgeSweepResultDetailsUpdater = "sweep_result_details_updater"
+	// EdgeUserUpdater holds the string denoting the user_updater edge name in mutations.
+	EdgeUserUpdater = "user_updater"
 	// Table holds the table name of the admin in the database.
 	Table = "admins"
 	// CreatorTable is the table that holds the creator relation/edge.
@@ -467,6 +471,13 @@ const (
 	SweepResultDetailsUpdaterInverseTable = "sweep_result_details"
 	// SweepResultDetailsUpdaterColumn is the table column denoting the sweep_result_details_updater relation/edge.
 	SweepResultDetailsUpdaterColumn = "updater_id"
+	// UserUpdaterTable is the table that holds the user_updater relation/edge.
+	UserUpdaterTable = "users"
+	// UserUpdaterInverseTable is the table name for the User entity.
+	// It exists in this package in order to avoid circular dependency with the "user" package.
+	UserUpdaterInverseTable = "users"
+	// UserUpdaterColumn is the table column denoting the user_updater relation/edge.
+	UserUpdaterColumn = "updater_id"
 )
 
 // Columns holds all SQL columns for admin fields.
@@ -482,6 +493,7 @@ var Columns = []string{
 	FieldNickname,
 	FieldRealName,
 	FieldMobile,
+	FieldWechatOpenid,
 	FieldAvatar,
 	FieldAdminStatus,
 }
@@ -532,8 +544,10 @@ var (
 	RealNameValidator func(string) error
 	// MobileValidator is a validator for the "mobile" field. It is called by the builders before save.
 	MobileValidator func(string) error
+	// WechatOpenidValidator is a validator for the "wechat_openid" field. It is called by the builders before save.
+	WechatOpenidValidator func(string) error
 	// DefaultAdminStatus holds the default value on creation for the "admin_status" field.
-	DefaultAdminStatus enums.AdminStatus
+	DefaultAdminStatus enums.EnabledStatus
 	// AdminStatusValidator is a validator for the "admin_status" field. It is called by the builders before save.
 	AdminStatusValidator func(int) error
 )
@@ -594,6 +608,11 @@ func ByRealName(opts ...sql.OrderTermOption) OrderOption {
 // ByMobile orders the results by the mobile field.
 func ByMobile(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldMobile, opts...).ToFunc()
+}
+
+// ByWechatOpenid orders the results by the wechat_openid field.
+func ByWechatOpenid(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldWechatOpenid, opts...).ToFunc()
 }
 
 // ByAdminStatus orders the results by the admin_status field.
@@ -1265,6 +1284,20 @@ func BySweepResultDetailsUpdater(term sql.OrderTerm, terms ...sql.OrderTerm) Ord
 		sqlgraph.OrderByNeighborTerms(s, newSweepResultDetailsUpdaterStep(), append([]sql.OrderTerm{term}, terms...)...)
 	}
 }
+
+// ByUserUpdaterCount orders the results by user_updater count.
+func ByUserUpdaterCount(opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborsCount(s, newUserUpdaterStep(), opts...)
+	}
+}
+
+// ByUserUpdater orders the results by user_updater terms.
+func ByUserUpdater(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newUserUpdaterStep(), append([]sql.OrderTerm{term}, terms...)...)
+	}
+}
 func newCreatorStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
@@ -1606,5 +1639,12 @@ func newSweepResultDetailsUpdaterStep() *sqlgraph.Step {
 		sqlgraph.From(Table, FieldID),
 		sqlgraph.To(SweepResultDetailsUpdaterInverseTable, FieldID),
 		sqlgraph.Edge(sqlgraph.O2M, false, SweepResultDetailsUpdaterTable, SweepResultDetailsUpdaterColumn),
+	)
+}
+func newUserUpdaterStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(UserUpdaterInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.O2M, false, UserUpdaterTable, UserUpdaterColumn),
 	)
 }

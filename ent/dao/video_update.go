@@ -56,14 +56,6 @@ func (vu *VideoUpdate) SetUpdaterID(i int) *VideoUpdate {
 	return vu
 }
 
-// SetNillableUpdaterID sets the "updater_id" field if the given value is not nil.
-func (vu *VideoUpdate) SetNillableUpdaterID(i *int) *VideoUpdate {
-	if i != nil {
-		vu.SetUpdaterID(*i)
-	}
-	return vu
-}
-
 // SetUpdateTime sets the "update_time" field.
 func (vu *VideoUpdate) SetUpdateTime(t time.Time) *VideoUpdate {
 	vu.mutation.SetUpdateTime(t)
@@ -449,14 +441,6 @@ func (vuo *VideoUpdateOne) ClearDeleteTime() *VideoUpdateOne {
 // SetUpdaterID sets the "updater_id" field.
 func (vuo *VideoUpdateOne) SetUpdaterID(i int) *VideoUpdateOne {
 	vuo.mutation.SetUpdaterID(i)
-	return vuo
-}
-
-// SetNillableUpdaterID sets the "updater_id" field if the given value is not nil.
-func (vuo *VideoUpdateOne) SetNillableUpdaterID(i *int) *VideoUpdateOne {
-	if i != nil {
-		vuo.SetUpdaterID(*i)
-	}
 	return vuo
 }
 

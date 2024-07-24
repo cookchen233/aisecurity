@@ -475,7 +475,7 @@ func (dq *DepartmentQuery) WithChildren(opts ...func(*DepartmentQuery)) *Departm
 // Example:
 //
 //	var v []struct {
-//		CreateTime time.Time `json:"create_time"`
+//		CreateTime time.Time `json:"create_time,omitempty"`
 //		Count int `json:"count,omitempty"`
 //	}
 //
@@ -498,7 +498,7 @@ func (dq *DepartmentQuery) GroupBy(field string, fields ...string) *DepartmentGr
 // Example:
 //
 //	var v []struct {
-//		CreateTime time.Time `json:"create_time"`
+//		CreateTime time.Time `json:"create_time,omitempty"`
 //	}
 //
 //	client.Department.Query().

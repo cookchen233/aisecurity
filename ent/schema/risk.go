@@ -27,6 +27,7 @@ func (Risk) Fields() []ent.Field {
 		field.String("title").Comment("标题").NotEmpty().MaxLen(255).StructTag(`validate:"required"`),
 		field.String("content").Comment("内容").Optional(),
 		field.JSON("images", []types.UploadedImage{}).Optional().Default([]types.UploadedImage{}).Comment("图片"),
+		field.JSON("maintained_images", []types.UploadedImage{}).Optional().Default([]types.UploadedImage{}).Comment("整改后的图片"),
 		field.Int("risk_category_id").Comment("隐患类别").Positive(),
 		field.Int("risk_location_id").Comment("隐患地点").Positive(),
 		field.Int("maintainer_id").Comment("整改人").Positive(),

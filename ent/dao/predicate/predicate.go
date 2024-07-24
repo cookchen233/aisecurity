@@ -63,5 +63,8 @@ type SweepResultDetails func(*sql.Selector)
 // SweepSchedule is the predicate function for sweepschedule builders.
 type SweepSchedule func(*sql.Selector)
 
+// User is the predicate function for user builders.
+type User func(*sql.Selector)
+
 // Video is the predicate function for video builders.
 type Video func(*sql.Selector)

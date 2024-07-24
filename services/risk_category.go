@@ -8,6 +8,7 @@ import (
 	"aisecurity/structs/filters"
 	"aisecurity/utils"
 	"aisecurity/utils/db"
+	"context"
 )
 
 type RiskCategoryService struct {
@@ -15,10 +16,10 @@ type RiskCategoryService struct {
 	entClient *dao.RiskCategoryClient
 }
 
-func NewRiskCategoryService() *RiskCategoryService {
-	return &RiskCategoryService{
-		entClient: db.EntClient.RiskCategory,
-	}
+func NewRiskCategoryService(ctx context.Context) *RiskCategoryService {
+	s := &RiskCategoryService{entClient: db.EntClient.RiskCategory}
+	s.Ctx = ctx
+	return s
 }
 
 func (s *RiskCategoryService) Create(ent structs.IEntity) (structs.IEntity, error) {
@@ -90,4 +91,12 @@ func (s *RiskCategoryService) Delete(ent structs.IEntity) error {
 		return utils.ErrorWrap(err, "failed deleting RiskCategory")
 	}
 	return nil
+}
+
+func (s *RiskCategoryService) GetByID(ID int) (structs.IEntity, error) {
+	first, err := s.entClient.Query().Where(riskcategory.IDEQ(ID)).First(s.Ctx)
+	if err != nil {
+		return nil, utils.ErrorWithStack(err)
+	}
+	return structs.ConvertTo[*dao.RiskCategory, entities.RiskCategory](first), nil
 }

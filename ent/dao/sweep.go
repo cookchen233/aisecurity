@@ -23,23 +23,23 @@ type Sweep struct {
 	// ID of the ent.
 	ID int `json:"id,omitempty"`
 	// 创建时间
-	CreateTime time.Time `json:"create_time"`
+	CreateTime time.Time `json:"create_time,omitempty"`
 	// 创建者
-	CreatorID int `json:"creator_id"`
+	CreatorID int `json:"creator_id,omitempty"`
 	// 删除时间
-	DeleteTime *time.Time `json:"delete_time"`
+	DeleteTime *time.Time `json:"delete_time,omitempty"`
 	// 最后更新者
-	UpdaterID int `json:"updater_id"`
+	UpdaterID int `json:"updater_id,omitempty"`
 	// 最后更新时间
-	UpdateTime time.Time `json:"update_time"`
+	UpdateTime time.Time `json:"update_time,omitempty"`
 	// 名称
-	Name string `json:"name" validate:"required"`
+	Name string `json:"name,omitempty" validate:"required"`
 	// 隐患类别
-	RiskCategoryID int `json:"risk_category_id"`
+	RiskCategoryID int `json:"risk_category_id,omitempty"`
 	// 隐患地点
-	RiskLocationID int `json:"risk_location_id"`
+	RiskLocationID int `json:"risk_location_id,omitempty"`
 	// 排查内容
-	SweepJobs []*types.SweepJob `json:"sweep_jobs"`
+	SweepJobs []*types.SweepJob `json:"sweep_jobs,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the SweepQuery when eager-loading is set.
 	Edges        SweepEdges `json:"edges"`

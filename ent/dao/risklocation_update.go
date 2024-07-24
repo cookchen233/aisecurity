@@ -57,14 +57,6 @@ func (rlu *RiskLocationUpdate) SetUpdaterID(i int) *RiskLocationUpdate {
 	return rlu
 }
 
-// SetNillableUpdaterID sets the "updater_id" field if the given value is not nil.
-func (rlu *RiskLocationUpdate) SetNillableUpdaterID(i *int) *RiskLocationUpdate {
-	if i != nil {
-		rlu.SetUpdaterID(*i)
-	}
-	return rlu
-}
-
 // SetUpdateTime sets the "update_time" field.
 func (rlu *RiskLocationUpdate) SetUpdateTime(t time.Time) *RiskLocationUpdate {
 	rlu.mutation.SetUpdateTime(t)
@@ -74,14 +66,6 @@ func (rlu *RiskLocationUpdate) SetUpdateTime(t time.Time) *RiskLocationUpdate {
 // SetName sets the "name" field.
 func (rlu *RiskLocationUpdate) SetName(s string) *RiskLocationUpdate {
 	rlu.mutation.SetName(s)
-	return rlu
-}
-
-// SetNillableName sets the "name" field if the given value is not nil.
-func (rlu *RiskLocationUpdate) SetNillableName(s *string) *RiskLocationUpdate {
-	if s != nil {
-		rlu.SetName(*s)
-	}
 	return rlu
 }
 
@@ -425,14 +409,6 @@ func (rluo *RiskLocationUpdateOne) SetUpdaterID(i int) *RiskLocationUpdateOne {
 	return rluo
 }
 
-// SetNillableUpdaterID sets the "updater_id" field if the given value is not nil.
-func (rluo *RiskLocationUpdateOne) SetNillableUpdaterID(i *int) *RiskLocationUpdateOne {
-	if i != nil {
-		rluo.SetUpdaterID(*i)
-	}
-	return rluo
-}
-
 // SetUpdateTime sets the "update_time" field.
 func (rluo *RiskLocationUpdateOne) SetUpdateTime(t time.Time) *RiskLocationUpdateOne {
 	rluo.mutation.SetUpdateTime(t)
@@ -442,14 +418,6 @@ func (rluo *RiskLocationUpdateOne) SetUpdateTime(t time.Time) *RiskLocationUpdat
 // SetName sets the "name" field.
 func (rluo *RiskLocationUpdateOne) SetName(s string) *RiskLocationUpdateOne {
 	rluo.mutation.SetName(s)
-	return rluo
-}
-
-// SetNillableName sets the "name" field if the given value is not nil.
-func (rluo *RiskLocationUpdateOne) SetNillableName(s *string) *RiskLocationUpdateOne {
-	if s != nil {
-		rluo.SetName(*s)
-	}
 	return rluo
 }
 

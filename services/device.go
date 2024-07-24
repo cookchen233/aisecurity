@@ -19,7 +19,7 @@ type Device struct {
 	entClient *dao.DeviceClient
 }
 
-func NewDevice(ctx context.Context) *Device {
+func NewDeviceService(ctx context.Context) *Device {
 	s := &Device{entClient: db.EntClient.Device}
 	s.Ctx = ctx
 	return s
@@ -119,6 +119,14 @@ func (s *Device) GetTotal(fit structs.IFilter) (int, error) {
 
 func (s *Device) GetByName(name string) (structs.IEntity, error) {
 	first, err := s.entClient.Query().Where(device.NameEQ(name)).First(s.Ctx)
+	if err != nil {
+		return nil, utils.ErrorWithStack(err)
+	}
+	return structs.ConvertTo[*dao.Device, entities.Device](first), nil
+}
+
+func (s *Device) GetByID(ID int) (structs.IEntity, error) {
+	first, err := s.entClient.Query().Where(device.IDEQ(ID)).First(s.Ctx)
 	if err != nil {
 		return nil, utils.ErrorWithStack(err)
 	}

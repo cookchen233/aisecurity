@@ -476,7 +476,7 @@ func (ssq *SweepScheduleQuery) WithSweepResultDetails(opts ...func(*SweepResultD
 // Example:
 //
 //	var v []struct {
-//		CreateTime time.Time `json:"create_time"`
+//		CreateTime time.Time `json:"create_time,omitempty"`
 //		Count int `json:"count,omitempty"`
 //	}
 //
@@ -499,7 +499,7 @@ func (ssq *SweepScheduleQuery) GroupBy(field string, fields ...string) *SweepSch
 // Example:
 //
 //	var v []struct {
-//		CreateTime time.Time `json:"create_time"`
+//		CreateTime time.Time `json:"create_time,omitempty"`
 //	}
 //
 //	client.SweepSchedule.Query().

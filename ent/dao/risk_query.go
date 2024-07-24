@@ -439,7 +439,7 @@ func (rq *RiskQuery) WithMaintainer(opts ...func(*AdminQuery)) *RiskQuery {
 // Example:
 //
 //	var v []struct {
-//		CreateTime time.Time `json:"create_time"`
+//		CreateTime time.Time `json:"create_time,omitempty"`
 //		Count int `json:"count,omitempty"`
 //	}
 //
@@ -462,7 +462,7 @@ func (rq *RiskQuery) GroupBy(field string, fields ...string) *RiskGroupBy {
 // Example:
 //
 //	var v []struct {
-//		CreateTime time.Time `json:"create_time"`
+//		CreateTime time.Time `json:"create_time,omitempty"`
 //	}
 //
 //	client.Risk.Query().

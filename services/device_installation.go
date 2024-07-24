@@ -95,8 +95,8 @@ func (s *DeviceInstallationService) GetList(fit structs.IFilter) ([]structs.IEnt
 	}
 	ents := make([]structs.IEntity, len(list))
 	for i, v := range list {
-		v.AreaName = v.Edges.Area.Name
 		v2 := new(entities.DeviceInstallation)
+		v2.AreaName = v.Edges.Area.Name
 		ents[i] = v
 		err := gconv.Struct(v, v2)
 		if err != nil {

@@ -29,6 +29,7 @@ func (routes *DashboardRoutes) Setup() {
 		routes.RouterGroup.POST("/admin/update", handlers.Convert(adminHandler, adminHandler.Update))
 		routes.RouterGroup.GET("/admin/list", handlers.Convert(adminHandler, adminHandler.GetList))
 		routes.RouterGroup.GET("/admin/details", handlers.Convert(adminHandler, adminHandler.GetDetails))
+		routes.RouterGroup.GET("/admin/invite-qr-code", handlers.Convert(adminHandler, adminHandler.GetInviteQRCode))
 	}
 
 	permissionHandler := dashboard.NewPermissionHandler()
@@ -99,6 +100,7 @@ func (routes *DashboardRoutes) Setup() {
 		routes.RouterGroup.GET("/risk/list", handlers.Convert(riskHandler, riskHandler.GetList))
 		routes.RouterGroup.GET("/risk/details", handlers.Convert(riskHandler, riskHandler.GetDetails))
 		routes.RouterGroup.GET("/risk/status-counts", handlers.Convert(riskHandler, riskHandler.GetStatusCounts))
+		routes.RouterGroup.GET("/risk/risk-category-counts", handlers.Convert(riskHandler, riskHandler.GetRiskCategoryCounts))
 	}
 
 	riskCategoryHandler := dashboard.NewRiskCategoryHandler()
@@ -123,6 +125,9 @@ func (routes *DashboardRoutes) Setup() {
 		routes.RouterGroup.GET("/ipc-event/list", handlers.Convert(ipcEventHandler, ipcEventHandler.GetList))
 		routes.RouterGroup.GET("/ipc-event/details", handlers.Convert(ipcEventHandler, ipcEventHandler.GetDetails))
 		routes.RouterGroup.GET("/ipc-event/status-counts", handlers.Convert(ipcEventHandler, ipcEventHandler.GetStatusCounts))
+		routes.RouterGroup.GET("/ipc-event/event-type-counts", handlers.Convert(ipcEventHandler, ipcEventHandler.GetEventTypeCounts))
+		routes.RouterGroup.GET("/ipc-event/event-device-counts", handlers.Convert(ipcEventHandler, ipcEventHandler.GetEventDeviceCounts))
+		routes.RouterGroup.GET("/ipc-event/event-time-counts", handlers.Convert(ipcEventHandler, ipcEventHandler.GetEventTimeCounts))
 	}
 
 	eventLevelHandler := dashboard.NewEventLevelHandler()

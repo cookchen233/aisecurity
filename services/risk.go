@@ -12,8 +12,12 @@ import (
 	"aisecurity/structs/types"
 	"aisecurity/utils"
 	"aisecurity/utils/db"
+	"context"
+	"fmt"
 	"github.com/gogf/gf/v2/util/gconv"
 	"go.uber.org/zap"
+	"os"
+	"sort"
 )
 
 type RiskService struct {
@@ -21,10 +25,10 @@ type RiskService struct {
 	entClient *dao.RiskClient
 }
 
-func NewRiskService() *RiskService {
-	return &RiskService{
-		entClient: db.EntClient.Risk,
-	}
+func NewRiskService(ctx context.Context) *RiskService {
+	s := &RiskService{entClient: db.EntClient.Risk}
+	s.Ctx = ctx
+	return s
 }
 
 func (s *RiskService) Create(ent structs.IEntity) (structs.IEntity, error) {
@@ -34,6 +38,9 @@ func (s *RiskService) Create(ent structs.IEntity) (structs.IEntity, error) {
 		SetContent(e.Content)
 	if e.Images != nil {
 		c.SetImages(e.Images)
+	}
+	if e.MaintainedImages != nil {
+		c.SetMaintainedImages(e.MaintainedImages)
 	}
 	if e.Maintainer != nil {
 		c.SetMaintainer(e.Maintainer)
@@ -48,6 +55,24 @@ func (s *RiskService) Create(ent structs.IEntity) (structs.IEntity, error) {
 	if err != nil {
 		return nil, utils.ErrorWrap(err, "failed creating RiskLocation")
 	}
+
+	// notify the maintainer
+	if e.Maintainer.WechatOpenid == "" {
+		utils.Logger.Error("the maintainer has not bond Wechat", zap.Error(err), zap.String("username", e.Maintainer.Username))
+	} else {
+		msgData := make(map[string]*utils.TemplateDataItem)
+		msgData["thing1"] = &utils.TemplateDataItem{Value: e.Title}
+		msgData["thing2"] = &utils.TemplateDataItem{Value: e.RiskLocation.Name}
+		msgData["thing3"] = &utils.TemplateDataItem{Value: e.Maintainer.RealName}
+		msgData["time4"] = &utils.TemplateDataItem{Value: e.DueTime.Format("2006-01-02")}
+		_, err = utils.SendTemplateMsg(msgData, e.Maintainer.WechatOpenid, "QKSRiLo8D6hyQrP4UqESgXXATBqG-2NGZh_FyYRkcaA", fmt.Sprintf("%s/dashboard/work/risk/%d/edit", os.Getenv("DASHBOARD_SITE"), save.ID))
+		if err != nil {
+			utils.Logger.Error("sending template msg failed", zap.Error(err), zap.String("username", e.Maintainer.Username))
+		} else {
+			utils.Logger.Error("sending template successfully", zap.Error(err), zap.String("username", e.Maintainer.Username))
+		}
+	}
+
 	return save, nil
 }
 
@@ -60,6 +85,7 @@ func (s *RiskService) Update(ent structs.IEntity) (structs.IEntity, error) {
 	save, err := u.SetTitle(e.Title).
 		SetContent(e.Content).
 		SetImages(e.Images).
+		SetMaintainedImages(e.MaintainedImages).
 		SetRiskLocation(e.RiskLocation).
 		SetRiskCategory(e.RiskCategory).
 		SetMeasures(e.Measures).
@@ -68,6 +94,24 @@ func (s *RiskService) Update(ent structs.IEntity) (structs.IEntity, error) {
 		Save(s.Ctx)
 	if err != nil {
 		return nil, utils.ErrorWrap(err, "failed updating RiskLocation")
+	}
+	// notify the maintainer
+	if e.Maintainer.WechatOpenid == "" {
+		utils.Logger.Error("the maintainer has not bond Wechat", zap.Error(err), zap.String("username", e.Maintainer.Username))
+	} else {
+		go func() {
+			msgData := make(map[string]*utils.TemplateDataItem)
+			msgData["thing1"] = &utils.TemplateDataItem{Value: e.Title}
+			msgData["thing2"] = &utils.TemplateDataItem{Value: e.RiskLocation.Name}
+			msgData["thing3"] = &utils.TemplateDataItem{Value: e.Maintainer.RealName}
+			msgData["time4"] = &utils.TemplateDataItem{Value: e.DueTime.Format("2006-01-02")}
+			_, err = utils.SendTemplateMsg(msgData, e.Maintainer.WechatOpenid, "QKSRiLo8D6hyQrP4UqESgXXATBqG-2NGZh_FyYRkcaA", fmt.Sprintf("%s/dashboard/work/risk/%d/edit", os.Getenv("DASHBOARD_SITE"), save.ID))
+			if err != nil {
+				utils.Logger.Error("sending template msg failed", zap.Error(err), zap.String("username", e.Maintainer.Username))
+			} else {
+				utils.Logger.Error("sending template successfully", zap.Error(err), zap.String("username", e.Maintainer.Username))
+			}
+		}()
 	}
 	return save, nil
 }
@@ -177,7 +221,7 @@ func (s *RiskService) GetTotal(fit structs.IFilter) (int, error) {
 	return total, nil
 }
 
-func (s *RiskService) GetStatusCounts(fit structs.IFilter) ([]*types.StatusCount, error) {
+func (s *RiskService) GetStatusCounts(fit structs.IFilter) ([]*types.GroupCount, error) {
 	// status counts
 	var queryCounts []struct {
 		MaintainStatus enums.MaintainStatus `json:"maintain_status"`
@@ -189,7 +233,7 @@ func (s *RiskService) GetStatusCounts(fit structs.IFilter) ([]*types.StatusCount
 	if err != nil {
 		return nil, utils.ErrorWithStack(err)
 	}
-	var statusCounts []*types.StatusCount
+	var statusCounts []*types.GroupCount
 	for _, s := range enums.MaintainStatus(0).GetAll() {
 		var c int
 		for _, q := range queryCounts {
@@ -201,11 +245,44 @@ func (s *RiskService) GetStatusCounts(fit structs.IFilter) ([]*types.StatusCount
 				c += q.Count
 			}
 		}
-		statusCounts = append(statusCounts, &types.StatusCount{
+		statusCounts = append(statusCounts, &types.GroupCount{
 			Value: int(s),
 			Label: s.Label(),
 			Count: c,
 		})
 	}
 	return statusCounts, nil
+}
+
+func (s *RiskService) GetRiskCategoryCounts(fit structs.IFilter) ([]*types.GroupCount, error) {
+	type GroupCount struct {
+		Value int    `json:"risk_category_id"`
+		Label string `json:"label"`
+		Count int    `json:"count"`
+	}
+	var groupCounts []*GroupCount
+	err := s.query(fit).GroupBy(risk.FieldRiskCategoryID).
+		Aggregate(dao.Count()).
+		Scan(s.Ctx, &groupCounts)
+	if err != nil {
+		return nil, utils.ErrorWithStack(err)
+	}
+	sort.Slice(groupCounts, func(i, j int) bool {
+		return groupCounts[i].Count > groupCounts[j].Count
+	})
+
+	var groupCounts2 []*types.GroupCount
+
+	cateService := NewRiskCategoryService(s.Ctx)
+	for _, group := range groupCounts[:min(len(groupCounts), fit.GetLimit())] {
+		var group2 = structs.ConvertTo[*GroupCount, types.GroupCount](group)
+		group2.Value = group.Value
+		d, err := cateService.GetByID(group.Value)
+		if err != nil {
+			return nil, err
+		}
+		group2.Label = d.(*entities.RiskCategory).Name
+		groupCounts2 = append(groupCounts2, group2)
+	}
+	return groupCounts2, nil
 }

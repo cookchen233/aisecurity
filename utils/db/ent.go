@@ -67,7 +67,7 @@ func InitEntClient(driverName string) {
 	//EntClient = dao.NewClient(dao.Driver(drv))
 }
 
-func Gen() {
+func Generate() {
 	err := entc.Generate("./ent/schema", &gen.Config{
 		Hooks:   []gen.Hook{TagFields("json")},
 		Target:  "./ent/dao",
@@ -78,7 +78,7 @@ func Gen() {
 			gen.FeaturePrivacy,
 		},
 	}, []entc.Option{
-		entc.TemplateDir("./ent/templates"),
+		//entc.TemplateDir("./ent/templates"),
 	}...)
 	if err != nil {
 		log.Fatalf("running ent codegen: %v", err)

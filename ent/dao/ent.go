@@ -22,6 +22,7 @@ import (
 	"aisecurity/ent/dao/sweepresult"
 	"aisecurity/ent/dao/sweepresultdetails"
 	"aisecurity/ent/dao/sweepschedule"
+	"aisecurity/ent/dao/user"
 	"aisecurity/ent/dao/video"
 	"context"
 	"errors"
@@ -111,6 +112,7 @@ func checkColumn(table, column string) error {
 			sweepresult.Table:        sweepresult.ValidColumn,
 			sweepresultdetails.Table: sweepresultdetails.ValidColumn,
 			sweepschedule.Table:      sweepschedule.ValidColumn,
+			user.Table:               user.ValidColumn,
 			video.Table:              video.ValidColumn,
 		})
 	})

@@ -55,14 +55,6 @@ func (fu *FixingUpdate) SetUpdaterID(i int) *FixingUpdate {
 	return fu
 }
 
-// SetNillableUpdaterID sets the "updater_id" field if the given value is not nil.
-func (fu *FixingUpdate) SetNillableUpdaterID(i *int) *FixingUpdate {
-	if i != nil {
-		fu.SetUpdaterID(*i)
-	}
-	return fu
-}
-
 // SetUpdateTime sets the "update_time" field.
 func (fu *FixingUpdate) SetUpdateTime(t time.Time) *FixingUpdate {
 	fu.mutation.SetUpdateTime(t)
@@ -72,14 +64,6 @@ func (fu *FixingUpdate) SetUpdateTime(t time.Time) *FixingUpdate {
 // SetFixerID sets the "fixer_id" field.
 func (fu *FixingUpdate) SetFixerID(i int) *FixingUpdate {
 	fu.mutation.SetFixerID(i)
-	return fu
-}
-
-// SetNillableFixerID sets the "fixer_id" field if the given value is not nil.
-func (fu *FixingUpdate) SetNillableFixerID(i *int) *FixingUpdate {
-	if i != nil {
-		fu.SetFixerID(*i)
-	}
 	return fu
 }
 
@@ -388,14 +372,6 @@ func (fuo *FixingUpdateOne) SetUpdaterID(i int) *FixingUpdateOne {
 	return fuo
 }
 
-// SetNillableUpdaterID sets the "updater_id" field if the given value is not nil.
-func (fuo *FixingUpdateOne) SetNillableUpdaterID(i *int) *FixingUpdateOne {
-	if i != nil {
-		fuo.SetUpdaterID(*i)
-	}
-	return fuo
-}
-
 // SetUpdateTime sets the "update_time" field.
 func (fuo *FixingUpdateOne) SetUpdateTime(t time.Time) *FixingUpdateOne {
 	fuo.mutation.SetUpdateTime(t)
@@ -405,14 +381,6 @@ func (fuo *FixingUpdateOne) SetUpdateTime(t time.Time) *FixingUpdateOne {
 // SetFixerID sets the "fixer_id" field.
 func (fuo *FixingUpdateOne) SetFixerID(i int) *FixingUpdateOne {
 	fuo.mutation.SetFixerID(i)
-	return fuo
-}
-
-// SetNillableFixerID sets the "fixer_id" field if the given value is not nil.
-func (fuo *FixingUpdateOne) SetNillableFixerID(i *int) *FixingUpdateOne {
-	if i != nil {
-		fuo.SetFixerID(*i)
-	}
 	return fuo
 }
 

@@ -30,10 +30,10 @@ type Unauthorized struct {
 	StandardExpect
 }
 
-func NewUnauthorized() *DataNotFound {
+func NewUnauthorized(message string) *DataNotFound {
 	e := &DataNotFound{
 		StandardExpect{
-			Message: "未授权",
+			Message: message,
 			Code:    1002,
 		}}
 	return e

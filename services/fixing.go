@@ -11,8 +11,10 @@ import (
 	"aisecurity/utils"
 	"aisecurity/utils/db"
 	"context"
+	"fmt"
 	"github.com/gogf/gf/v2/util/gconv"
 	"go.uber.org/zap"
+	"os"
 	"time"
 )
 
@@ -133,6 +135,29 @@ func (s *FixingService) Flow(ent structs.IEntity) (structs.IEntity, error) {
 		if err != nil {
 			return nil, err
 		}
+		if e.Fixer.WechatOpenid == "" {
+			utils.Logger.Error("the fixer has not bond Wechat", zap.Error(err), zap.String("username", e.Fixer.Username))
+		} else {
+			go func() {
+				admin, err := s.GetCurrentAdmin()
+				if err != nil {
+					utils.Logger.Error("get current admin failed", zap.Error(err))
+					return
+				}
+				adm := admin.(*entities.Admin)
+				msgData := make(map[string]*utils.TemplateDataItem)
+				msgData["thing2"] = &utils.TemplateDataItem{Value: adm.RealName}
+				msgData["thing3"] = &utils.TemplateDataItem{Value: e.Fixer.RealName}
+				msgData["thing7"] = &utils.TemplateDataItem{Value: e.Device.Edges.DeviceInstallation[0].Edges.Area.Name}
+				msgData["thing10"] = &utils.TemplateDataItem{Value: e.Event.EventType.Label()}
+				_, err = utils.SendTemplateMsg(msgData, e.Fixer.WechatOpenid, "fu66XPPCgHpc9yKYrIb3kpwtPywI9k7Wficmb9RvwN8", fmt.Sprintf("%s/dashboard/ipc-event/%d", os.Getenv("DASHBOARD_SITE"), e.Event.ID))
+				if err != nil {
+					utils.Logger.Error("sending template msg failed", zap.Error(err), zap.String("username", e.Fixer.Username))
+				} else {
+					utils.Logger.Error("sending template successfully", zap.Error(err), zap.String("username", e.Fixer.Username))
+				}
+			}()
+		}
 	} else {
 		switch e.EventLog.LogType {
 		case enums.ELT5:
@@ -162,6 +187,27 @@ func (s *FixingService) Flow(ent structs.IEntity) (structs.IEntity, error) {
 	_, err = NewEventService(s.Ctx).Update(structs.ConvertTo[*dao.Event, entities.Event](e.Event))
 	if err != nil {
 		utils.Logger.Error("failed creating EventLog", zap.Error(err))
+	}
+
+	if e.EventLog.LogType == enums.ELT4 {
+		if e.Edges.Creator.WechatOpenid == "" {
+			utils.Logger.Error("the creator has not bond Wechat", zap.Error(err), zap.String("username", e.Edges.Creator.Username))
+		} else {
+			go func() {
+				msgData := make(map[string]*utils.TemplateDataItem)
+				msgData["thing9"] = &utils.TemplateDataItem{Value: e.Device.Name}
+				msgData["thing2"] = &utils.TemplateDataItem{Value: e.Device.Edges.DeviceInstallation[0].Edges.Area.Name}
+				msgData["thing5"] = &utils.TemplateDataItem{Value: e.Event.EventType.Label()}
+				msgData["thing6"] = &utils.TemplateDataItem{Value: e.EventLog.Notes}
+				msgData["thing4"] = &utils.TemplateDataItem{Value: e.Fixer.RealName}
+				_, err = utils.SendTemplateMsg(msgData, e.Fixer.WechatOpenid, "nxke99tmcJomvFBfTZXHxKmc33vuUX9R-3_DztiLlt8", fmt.Sprintf("%s/dashboard/ipc-event/%d", os.Getenv("DASHBOARD_SITE"), e.Event.ID))
+				if err != nil {
+					utils.Logger.Error("sending template msg failed", zap.Error(err), zap.String("username", e.Fixer.Username))
+				} else {
+					utils.Logger.Error("sending template successfully", zap.Error(err), zap.String("username", e.Fixer.Username))
+				}
+			}()
+		}
 	}
 	return saved, nil
 }

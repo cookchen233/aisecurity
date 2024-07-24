@@ -56,14 +56,6 @@ func (au *AreaUpdate) SetUpdaterID(i int) *AreaUpdate {
 	return au
 }
 
-// SetNillableUpdaterID sets the "updater_id" field if the given value is not nil.
-func (au *AreaUpdate) SetNillableUpdaterID(i *int) *AreaUpdate {
-	if i != nil {
-		au.SetUpdaterID(*i)
-	}
-	return au
-}
-
 // SetUpdateTime sets the "update_time" field.
 func (au *AreaUpdate) SetUpdateTime(t time.Time) *AreaUpdate {
 	au.mutation.SetUpdateTime(t)
@@ -375,14 +367,6 @@ func (auo *AreaUpdateOne) ClearDeleteTime() *AreaUpdateOne {
 // SetUpdaterID sets the "updater_id" field.
 func (auo *AreaUpdateOne) SetUpdaterID(i int) *AreaUpdateOne {
 	auo.mutation.SetUpdaterID(i)
-	return auo
-}
-
-// SetNillableUpdaterID sets the "updater_id" field if the given value is not nil.
-func (auo *AreaUpdateOne) SetNillableUpdaterID(i *int) *AreaUpdateOne {
-	if i != nil {
-		auo.SetUpdaterID(*i)
-	}
 	return auo
 }
 

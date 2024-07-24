@@ -57,14 +57,6 @@ func (diu *DeviceInstallationUpdate) SetUpdaterID(i int) *DeviceInstallationUpda
 	return diu
 }
 
-// SetNillableUpdaterID sets the "updater_id" field if the given value is not nil.
-func (diu *DeviceInstallationUpdate) SetNillableUpdaterID(i *int) *DeviceInstallationUpdate {
-	if i != nil {
-		diu.SetUpdaterID(*i)
-	}
-	return diu
-}
-
 // SetUpdateTime sets the "update_time" field.
 func (diu *DeviceInstallationUpdate) SetUpdateTime(t time.Time) *DeviceInstallationUpdate {
 	diu.mutation.SetUpdateTime(t)
@@ -77,25 +69,9 @@ func (diu *DeviceInstallationUpdate) SetDeviceID(i int) *DeviceInstallationUpdat
 	return diu
 }
 
-// SetNillableDeviceID sets the "device_id" field if the given value is not nil.
-func (diu *DeviceInstallationUpdate) SetNillableDeviceID(i *int) *DeviceInstallationUpdate {
-	if i != nil {
-		diu.SetDeviceID(*i)
-	}
-	return diu
-}
-
 // SetAreaID sets the "area_id" field.
 func (diu *DeviceInstallationUpdate) SetAreaID(i int) *DeviceInstallationUpdate {
 	diu.mutation.SetAreaID(i)
-	return diu
-}
-
-// SetNillableAreaID sets the "area_id" field if the given value is not nil.
-func (diu *DeviceInstallationUpdate) SetNillableAreaID(i *int) *DeviceInstallationUpdate {
-	if i != nil {
-		diu.SetAreaID(*i)
-	}
 	return diu
 }
 
@@ -126,14 +102,6 @@ func (diu *DeviceInstallationUpdate) SetLongitude(f float64) *DeviceInstallation
 	return diu
 }
 
-// SetNillableLongitude sets the "longitude" field if the given value is not nil.
-func (diu *DeviceInstallationUpdate) SetNillableLongitude(f *float64) *DeviceInstallationUpdate {
-	if f != nil {
-		diu.SetLongitude(*f)
-	}
-	return diu
-}
-
 // AddLongitude adds f to the "longitude" field.
 func (diu *DeviceInstallationUpdate) AddLongitude(f float64) *DeviceInstallationUpdate {
 	diu.mutation.AddLongitude(f)
@@ -144,14 +112,6 @@ func (diu *DeviceInstallationUpdate) AddLongitude(f float64) *DeviceInstallation
 func (diu *DeviceInstallationUpdate) SetLatitude(f float64) *DeviceInstallationUpdate {
 	diu.mutation.ResetLatitude()
 	diu.mutation.SetLatitude(f)
-	return diu
-}
-
-// SetNillableLatitude sets the "latitude" field if the given value is not nil.
-func (diu *DeviceInstallationUpdate) SetNillableLatitude(f *float64) *DeviceInstallationUpdate {
-	if f != nil {
-		diu.SetLatitude(*f)
-	}
 	return diu
 }
 
@@ -554,14 +514,6 @@ func (diuo *DeviceInstallationUpdateOne) SetUpdaterID(i int) *DeviceInstallation
 	return diuo
 }
 
-// SetNillableUpdaterID sets the "updater_id" field if the given value is not nil.
-func (diuo *DeviceInstallationUpdateOne) SetNillableUpdaterID(i *int) *DeviceInstallationUpdateOne {
-	if i != nil {
-		diuo.SetUpdaterID(*i)
-	}
-	return diuo
-}
-
 // SetUpdateTime sets the "update_time" field.
 func (diuo *DeviceInstallationUpdateOne) SetUpdateTime(t time.Time) *DeviceInstallationUpdateOne {
 	diuo.mutation.SetUpdateTime(t)
@@ -574,25 +526,9 @@ func (diuo *DeviceInstallationUpdateOne) SetDeviceID(i int) *DeviceInstallationU
 	return diuo
 }
 
-// SetNillableDeviceID sets the "device_id" field if the given value is not nil.
-func (diuo *DeviceInstallationUpdateOne) SetNillableDeviceID(i *int) *DeviceInstallationUpdateOne {
-	if i != nil {
-		diuo.SetDeviceID(*i)
-	}
-	return diuo
-}
-
 // SetAreaID sets the "area_id" field.
 func (diuo *DeviceInstallationUpdateOne) SetAreaID(i int) *DeviceInstallationUpdateOne {
 	diuo.mutation.SetAreaID(i)
-	return diuo
-}
-
-// SetNillableAreaID sets the "area_id" field if the given value is not nil.
-func (diuo *DeviceInstallationUpdateOne) SetNillableAreaID(i *int) *DeviceInstallationUpdateOne {
-	if i != nil {
-		diuo.SetAreaID(*i)
-	}
 	return diuo
 }
 
@@ -623,14 +559,6 @@ func (diuo *DeviceInstallationUpdateOne) SetLongitude(f float64) *DeviceInstalla
 	return diuo
 }
 
-// SetNillableLongitude sets the "longitude" field if the given value is not nil.
-func (diuo *DeviceInstallationUpdateOne) SetNillableLongitude(f *float64) *DeviceInstallationUpdateOne {
-	if f != nil {
-		diuo.SetLongitude(*f)
-	}
-	return diuo
-}
-
 // AddLongitude adds f to the "longitude" field.
 func (diuo *DeviceInstallationUpdateOne) AddLongitude(f float64) *DeviceInstallationUpdateOne {
 	diuo.mutation.AddLongitude(f)
@@ -641,14 +569,6 @@ func (diuo *DeviceInstallationUpdateOne) AddLongitude(f float64) *DeviceInstalla
 func (diuo *DeviceInstallationUpdateOne) SetLatitude(f float64) *DeviceInstallationUpdateOne {
 	diuo.mutation.ResetLatitude()
 	diuo.mutation.SetLatitude(f)
-	return diuo
-}
-
-// SetNillableLatitude sets the "latitude" field if the given value is not nil.
-func (diuo *DeviceInstallationUpdateOne) SetNillableLatitude(f *float64) *DeviceInstallationUpdateOne {
-	if f != nil {
-		diuo.SetLatitude(*f)
-	}
 	return diuo
 }
 

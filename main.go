@@ -4,9 +4,11 @@ import (
 	_ "aisecurity/ent/dao/runtime"
 	"aisecurity/middlewares"
 	"aisecurity/routes"
+	"aisecurity/services"
 	"aisecurity/utils"
 	"aisecurity/utils/db"
 	zap2 "aisecurity/utils/log/zap"
+	"context"
 	"github.com/gin-contrib/sessions"
 	"github.com/gin-contrib/sessions/cookie"
 	"github.com/gin-gonic/gin"
@@ -17,7 +19,7 @@ import (
 	"time"
 )
 
-func main() {
+func InitMain() {
 	loc, err := time.LoadLocation("Asia/Shanghai")
 	if err != nil {
 		log.Fatalf("Error loading location: %v", err)
@@ -31,12 +33,33 @@ func main() {
 
 	// Init logging
 	utils.InitLogger2()
+
+	// Open the database connection
+	db.InitEntClient("postgres")
+
+}
+func main() {
+	InitMain()
+
 	defer func(Logger *zap2.Logger) {
 		err := Logger.Sync()
 		if err != nil {
 			log.Fatalf("failed syncing logger: %v", err)
 		}
 	}(utils.Logger)
+
+	defer func() {
+		err := db.EntClient.Close()
+		if err != nil {
+			log.Fatalf("failed closing connection to postgres: %v", err)
+		}
+	}()
+
+	logger, _ := zap.NewProduction()
+	logger.With()
+
+	utils.InitWechatOfficialAccount()
+	services.NewSweepScheduleService(context.Background()).SetCrontab()
 
 	// Logging to a file.
 	//f, _ := os.Create("gin.log")
@@ -56,24 +79,8 @@ func main() {
 		middlewares.CORSMiddleware(),
 	)
 
-	// Open the database connection
-	db.InitEntClient("postgres")
-	defer func() {
-		err := db.EntClient.Close()
-		if err != nil {
-			log.Fatalf("failed closing connection to postgres: %v", err)
-		}
-	}()
-	if os.Getenv("GIN_MODE") != "release" {
-		db.Gen()
-		db.Migrate()
-	}
-
 	// Register routes
 	routes.Setup(r)
-
-	logger, _ := zap.NewProduction()
-	logger.With()
 
 	// Run the server
 	if err := r.Run("0.0.0.0:8024"); err != nil {

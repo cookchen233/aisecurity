@@ -405,7 +405,7 @@ func (rlq *RiskLocationQuery) WithSweep(opts ...func(*SweepQuery)) *RiskLocation
 // Example:
 //
 //	var v []struct {
-//		CreateTime time.Time `json:"create_time"`
+//		CreateTime time.Time `json:"create_time,omitempty"`
 //		Count int `json:"count,omitempty"`
 //	}
 //
@@ -428,7 +428,7 @@ func (rlq *RiskLocationQuery) GroupBy(field string, fields ...string) *RiskLocat
 // Example:
 //
 //	var v []struct {
-//		CreateTime time.Time `json:"create_time"`
+//		CreateTime time.Time `json:"create_time,omitempty"`
 //	}
 //
 //	client.RiskLocation.Query().

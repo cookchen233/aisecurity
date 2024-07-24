@@ -21,29 +21,29 @@ type Fixing struct {
 	// ID of the ent.
 	ID int `json:"id,omitempty"`
 	// 创建时间
-	CreateTime time.Time `json:"create_time"`
+	CreateTime time.Time `json:"create_time,omitempty"`
 	// 创建者
-	CreatorID int `json:"creator_id"`
+	CreatorID int `json:"creator_id,omitempty"`
 	// 删除时间
-	DeleteTime *time.Time `json:"delete_time"`
+	DeleteTime *time.Time `json:"delete_time,omitempty"`
 	// 最后更新者
-	UpdaterID int `json:"updater_id"`
+	UpdaterID int `json:"updater_id,omitempty"`
 	// 最后更新时间
-	UpdateTime time.Time `json:"update_time"`
+	UpdateTime time.Time `json:"update_time,omitempty"`
 	// 处理人ID
-	FixerID int `json:"fixer_id"`
+	FixerID int `json:"fixer_id,omitempty"`
 	// 事件ID
-	EventID int `json:"event_id"`
+	EventID int `json:"event_id,omitempty"`
 	// 设备ID
-	DeviceID int `json:"device_id"`
+	DeviceID int `json:"device_id,omitempty"`
 	// 分派备注
-	AssignNotes string `json:"assign_notes"`
+	AssignNotes string `json:"assign_notes,omitempty"`
 	// 处理时间
-	FixTime time.Time `json:"fix_time"`
+	FixTime time.Time `json:"fix_time,omitempty"`
 	// 处理完成时间
-	CompleteTime time.Time `json:"complete_time"`
+	CompleteTime time.Time `json:"complete_time,omitempty"`
 	// 处理完成备注
-	CompleteNotes string `json:"complete_notes"`
+	CompleteNotes string `json:"complete_notes,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the FixingQuery when eager-loading is set.
 	Edges        FixingEdges `json:"edges"`

@@ -6,5 +6,5 @@ import (
 
 type Fixing struct {
 	structs.StandardFilter
-	EventID int `json:"event_id"`
+	EventID int `form:"event_id"`
 }

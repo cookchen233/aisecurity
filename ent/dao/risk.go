@@ -24,33 +24,35 @@ type Risk struct {
 	// ID of the ent.
 	ID int `json:"id,omitempty"`
 	// 创建时间
-	CreateTime time.Time `json:"create_time"`
+	CreateTime time.Time `json:"create_time,omitempty"`
 	// 创建者
-	CreatorID int `json:"creator_id"`
+	CreatorID int `json:"creator_id,omitempty"`
 	// 删除时间
-	DeleteTime *time.Time `json:"delete_time"`
+	DeleteTime *time.Time `json:"delete_time,omitempty"`
 	// 最后更新者
-	UpdaterID int `json:"updater_id"`
+	UpdaterID int `json:"updater_id,omitempty"`
 	// 最后更新时间
-	UpdateTime time.Time `json:"update_time"`
+	UpdateTime time.Time `json:"update_time,omitempty"`
 	// 标题
-	Title string `json:"title" validate:"required"`
+	Title string `json:"title,omitempty" validate:"required"`
 	// 内容
-	Content string `json:"content"`
+	Content string `json:"content,omitempty"`
 	// 图片
-	Images []types.UploadedImage `json:"images"`
+	Images []types.UploadedImage `json:"images,omitempty"`
+	// 整改后的图片
+	MaintainedImages []types.UploadedImage `json:"maintained_images,omitempty"`
 	// 隐患类别
-	RiskCategoryID int `json:"risk_category_id"`
+	RiskCategoryID int `json:"risk_category_id,omitempty"`
 	// 隐患地点
-	RiskLocationID int `json:"risk_location_id"`
+	RiskLocationID int `json:"risk_location_id,omitempty"`
 	// 整改人
-	MaintainerID int `json:"maintainer_id"`
+	MaintainerID int `json:"maintainer_id,omitempty"`
 	// 整改措施
-	Measures string `json:"measures"`
+	Measures string `json:"measures,omitempty"`
 	// 整改状态
-	MaintainStatus maintain_status.MaintainStatus `json:"maintain_status"`
+	MaintainStatus maintain_status.MaintainStatus `json:"maintain_status,omitempty"`
 	// 计划完成日期
-	DueTime time.Time `json:"due_time"`
+	DueTime time.Time `json:"due_time,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the RiskQuery when eager-loading is set.
 	Edges        RiskEdges `json:"edges"`
@@ -144,7 +146,7 @@ func (*Risk) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
 	for i := range columns {
 		switch columns[i] {
-		case risk.FieldImages:
+		case risk.FieldImages, risk.FieldMaintainedImages:
 			values[i] = new([]byte)
 		case risk.FieldID, risk.FieldCreatorID, risk.FieldUpdaterID, risk.FieldRiskCategoryID, risk.FieldRiskLocationID, risk.FieldMaintainerID, risk.FieldMaintainStatus:
 			values[i] = new(sql.NullInt64)
@@ -222,6 +224,14 @@ func (r *Risk) assignValues(columns []string, values []any) error {
 			} else if value != nil && len(*value) > 0 {
 				if err := json.Unmarshal(*value, &r.Images); err != nil {
 					return fmt.Errorf("unmarshal field images: %w", err)
+				}
+			}
+		case risk.FieldMaintainedImages:
+			if value, ok := values[i].(*[]byte); !ok {
+				return fmt.Errorf("unexpected type %T for field maintained_images", values[i])
+			} else if value != nil && len(*value) > 0 {
+				if err := json.Unmarshal(*value, &r.MaintainedImages); err != nil {
+					return fmt.Errorf("unmarshal field maintained_images: %w", err)
 				}
 			}
 		case risk.FieldRiskCategoryID:
@@ -346,6 +356,9 @@ func (r *Risk) String() string {
 	builder.WriteString(", ")
 	builder.WriteString("images=")
 	builder.WriteString(fmt.Sprintf("%v", r.Images))
+	builder.WriteString(", ")
+	builder.WriteString("maintained_images=")
+	builder.WriteString(fmt.Sprintf("%v", r.MaintainedImages))
 	builder.WriteString(", ")
 	builder.WriteString("risk_category_id=")
 	builder.WriteString(fmt.Sprintf("%v", r.RiskCategoryID))

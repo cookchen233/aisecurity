@@ -57,14 +57,6 @@ func (du *DepartmentUpdate) SetUpdaterID(i int) *DepartmentUpdate {
 	return du
 }
 
-// SetNillableUpdaterID sets the "updater_id" field if the given value is not nil.
-func (du *DepartmentUpdate) SetNillableUpdaterID(i *int) *DepartmentUpdate {
-	if i != nil {
-		du.SetUpdaterID(*i)
-	}
-	return du
-}
-
 // SetUpdateTime sets the "update_time" field.
 func (du *DepartmentUpdate) SetUpdateTime(t time.Time) *DepartmentUpdate {
 	du.mutation.SetUpdateTime(t)
@@ -74,14 +66,6 @@ func (du *DepartmentUpdate) SetUpdateTime(t time.Time) *DepartmentUpdate {
 // SetName sets the "name" field.
 func (du *DepartmentUpdate) SetName(s string) *DepartmentUpdate {
 	du.mutation.SetName(s)
-	return du
-}
-
-// SetNillableName sets the "name" field if the given value is not nil.
-func (du *DepartmentUpdate) SetNillableName(s *string) *DepartmentUpdate {
-	if s != nil {
-		du.SetName(*s)
-	}
 	return du
 }
 
@@ -597,14 +581,6 @@ func (duo *DepartmentUpdateOne) SetUpdaterID(i int) *DepartmentUpdateOne {
 	return duo
 }
 
-// SetNillableUpdaterID sets the "updater_id" field if the given value is not nil.
-func (duo *DepartmentUpdateOne) SetNillableUpdaterID(i *int) *DepartmentUpdateOne {
-	if i != nil {
-		duo.SetUpdaterID(*i)
-	}
-	return duo
-}
-
 // SetUpdateTime sets the "update_time" field.
 func (duo *DepartmentUpdateOne) SetUpdateTime(t time.Time) *DepartmentUpdateOne {
 	duo.mutation.SetUpdateTime(t)
@@ -614,14 +590,6 @@ func (duo *DepartmentUpdateOne) SetUpdateTime(t time.Time) *DepartmentUpdateOne 
 // SetName sets the "name" field.
 func (duo *DepartmentUpdateOne) SetName(s string) *DepartmentUpdateOne {
 	duo.mutation.SetName(s)
-	return duo
-}
-
-// SetNillableName sets the "name" field if the given value is not nil.
-func (duo *DepartmentUpdateOne) SetNillableName(s *string) *DepartmentUpdateOne {
-	if s != nil {
-		duo.SetName(*s)
-	}
 	return duo
 }
 

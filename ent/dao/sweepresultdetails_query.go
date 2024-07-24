@@ -440,7 +440,7 @@ func (srdq *SweepResultDetailsQuery) WithSweepResult(opts ...func(*SweepResultQu
 // Example:
 //
 //	var v []struct {
-//		CreateTime time.Time `json:"create_time"`
+//		CreateTime time.Time `json:"create_time,omitempty"`
 //		Count int `json:"count,omitempty"`
 //	}
 //
@@ -463,7 +463,7 @@ func (srdq *SweepResultDetailsQuery) GroupBy(field string, fields ...string) *Sw
 // Example:
 //
 //	var v []struct {
-//		CreateTime time.Time `json:"create_time"`
+//		CreateTime time.Time `json:"create_time,omitempty"`
 //	}
 //
 //	client.SweepResultDetails.Query().

@@ -23,6 +23,7 @@ import (
 	"aisecurity/ent/dao/sweepresult"
 	"aisecurity/ent/dao/sweepresultdetails"
 	"aisecurity/ent/dao/sweepschedule"
+	"aisecurity/ent/dao/user"
 	"aisecurity/ent/dao/video"
 	"context"
 	"database/sql/driver"
@@ -90,6 +91,7 @@ type AdminQuery struct {
 	withSweepResultUpdater        *SweepResultQuery
 	withSweepResultDetailsCreator *SweepResultDetailsQuery
 	withSweepResultDetailsUpdater *SweepResultDetailsQuery
+	withUserUpdater               *UserQuery
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
 	path func(context.Context) (*sql.Selector, error)
@@ -1204,6 +1206,28 @@ func (aq *AdminQuery) QuerySweepResultDetailsUpdater() *SweepResultDetailsQuery 
 	return query
 }
 
+// QueryUserUpdater chains the current query on the "user_updater" edge.
+func (aq *AdminQuery) QueryUserUpdater() *UserQuery {
+	query := (&UserClient{config: aq.config}).Query()
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := aq.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := aq.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(admin.Table, admin.FieldID, selector),
+			sqlgraph.To(user.Table, user.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, admin.UserUpdaterTable, admin.UserUpdaterColumn),
+		)
+		fromU = sqlgraph.SetNeighbors(aq.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
+}
+
 // First returns the first Admin entity from the query.
 // Returns a *NotFoundError when no Admin was found.
 func (aq *AdminQuery) First(ctx context.Context) (*Admin, error) {
@@ -1445,6 +1469,7 @@ func (aq *AdminQuery) Clone() *AdminQuery {
 		withSweepResultUpdater:        aq.withSweepResultUpdater.Clone(),
 		withSweepResultDetailsCreator: aq.withSweepResultDetailsCreator.Clone(),
 		withSweepResultDetailsUpdater: aq.withSweepResultDetailsUpdater.Clone(),
+		withUserUpdater:               aq.withUserUpdater.Clone(),
 		// clone intermediate query.
 		sql:  aq.sql.Clone(),
 		path: aq.path,
@@ -1990,13 +2015,24 @@ func (aq *AdminQuery) WithSweepResultDetailsUpdater(opts ...func(*SweepResultDet
 	return aq
 }
 
+// WithUserUpdater tells the query-builder to eager-load the nodes that are connected to
+// the "user_updater" edge. The optional arguments are used to configure the query builder of the edge.
+func (aq *AdminQuery) WithUserUpdater(opts ...func(*UserQuery)) *AdminQuery {
+	query := (&UserClient{config: aq.config}).Query()
+	for _, opt := range opts {
+		opt(query)
+	}
+	aq.withUserUpdater = query
+	return aq
+}
+
 // GroupBy is used to group vertices by one or more fields/columns.
 // It is often used with aggregate functions, like: count, max, mean, min, sum.
 //
 // Example:
 //
 //	var v []struct {
-//		CreateTime time.Time `json:"create_time"`
+//		CreateTime time.Time `json:"create_time,omitempty"`
 //		Count int `json:"count,omitempty"`
 //	}
 //
@@ -2019,7 +2055,7 @@ func (aq *AdminQuery) GroupBy(field string, fields ...string) *AdminGroupBy {
 // Example:
 //
 //	var v []struct {
-//		CreateTime time.Time `json:"create_time"`
+//		CreateTime time.Time `json:"create_time,omitempty"`
 //	}
 //
 //	client.Admin.Query().
@@ -2068,7 +2104,7 @@ func (aq *AdminQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Admin,
 	var (
 		nodes       = []*Admin{}
 		_spec       = aq.querySpec()
-		loadedTypes = [49]bool{
+		loadedTypes = [50]bool{
 			aq.withCreator != nil,
 			aq.withUpdater != nil,
 			aq.withPermissions != nil,
@@ -2118,6 +2154,7 @@ func (aq *AdminQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Admin,
 			aq.withSweepResultUpdater != nil,
 			aq.withSweepResultDetailsCreator != nil,
 			aq.withSweepResultDetailsUpdater != nil,
+			aq.withUserUpdater != nil,
 		}
 	)
 	_spec.ScanValues = func(columns []string) ([]any, error) {
@@ -2487,6 +2524,13 @@ func (aq *AdminQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Admin,
 			func(n *Admin, e *SweepResultDetails) {
 				n.Edges.SweepResultDetailsUpdater = append(n.Edges.SweepResultDetailsUpdater, e)
 			}); err != nil {
+			return nil, err
+		}
+	}
+	if query := aq.withUserUpdater; query != nil {
+		if err := aq.loadUserUpdater(ctx, query, nodes,
+			func(n *Admin) { n.Edges.UserUpdater = []*User{} },
+			func(n *Admin, e *User) { n.Edges.UserUpdater = append(n.Edges.UserUpdater, e) }); err != nil {
 			return nil, err
 		}
 	}
@@ -4005,6 +4049,36 @@ func (aq *AdminQuery) loadSweepResultDetailsUpdater(ctx context.Context, query *
 	}
 	query.Where(predicate.SweepResultDetails(func(s *sql.Selector) {
 		s.Where(sql.InValues(s.C(admin.SweepResultDetailsUpdaterColumn), fks...))
+	}))
+	neighbors, err := query.All(ctx)
+	if err != nil {
+		return err
+	}
+	for _, n := range neighbors {
+		fk := n.UpdaterID
+		node, ok := nodeids[fk]
+		if !ok {
+			return fmt.Errorf(`unexpected referenced foreign-key "updater_id" returned %v for node %v`, fk, n.ID)
+		}
+		assign(node, n)
+	}
+	return nil
+}
+func (aq *AdminQuery) loadUserUpdater(ctx context.Context, query *UserQuery, nodes []*Admin, init func(*Admin), assign func(*Admin, *User)) error {
+	fks := make([]driver.Value, 0, len(nodes))
+	nodeids := make(map[int]*Admin)
+	for i := range nodes {
+		fks = append(fks, nodes[i].ID)
+		nodeids[nodes[i].ID] = nodes[i]
+		if init != nil {
+			init(nodes[i])
+		}
+	}
+	if len(query.ctx.Fields) > 0 {
+		query.ctx.AppendFieldOnce(user.FieldUpdaterID)
+	}
+	query.Where(predicate.User(func(s *sql.Selector) {
+		s.Where(sql.InValues(s.C(admin.UserUpdaterColumn), fks...))
 	}))
 	neighbors, err := query.All(ctx)
 	if err != nil {

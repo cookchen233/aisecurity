@@ -6,6 +6,6 @@ import (
 
 type EventLog struct {
 	structs.StandardFilter
-	DeviceID int `json:"device_id"`
-	EventID  int `json:"event_id"`
+	DeviceID int `form:"device_id"`
+	EventID  int `form:"event_id"`
 }

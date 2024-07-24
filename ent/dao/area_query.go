@@ -369,7 +369,7 @@ func (aq *AreaQuery) WithDeviceInstallation(opts ...func(*DeviceInstallationQuer
 // Example:
 //
 //	var v []struct {
-//		CreateTime time.Time `json:"create_time"`
+//		CreateTime time.Time `json:"create_time,omitempty"`
 //		Count int `json:"count,omitempty"`
 //	}
 //
@@ -392,7 +392,7 @@ func (aq *AreaQuery) GroupBy(field string, fields ...string) *AreaGroupBy {
 // Example:
 //
 //	var v []struct {
-//		CreateTime time.Time `json:"create_time"`
+//		CreateTime time.Time `json:"create_time,omitempty"`
 //	}
 //
 //	client.Area.Query().

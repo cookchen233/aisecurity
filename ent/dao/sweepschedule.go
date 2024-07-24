@@ -23,27 +23,27 @@ type SweepSchedule struct {
 	// ID of the ent.
 	ID int `json:"id,omitempty"`
 	// 创建时间
-	CreateTime time.Time `json:"create_time"`
+	CreateTime time.Time `json:"create_time,omitempty"`
 	// 创建者
-	CreatorID int `json:"creator_id"`
+	CreatorID int `json:"creator_id,omitempty"`
 	// 删除时间
-	DeleteTime *time.Time `json:"delete_time"`
+	DeleteTime *time.Time `json:"delete_time,omitempty"`
 	// 最后更新者
-	UpdaterID int `json:"updater_id"`
+	UpdaterID int `json:"updater_id,omitempty"`
 	// 最后更新时间
-	UpdateTime time.Time `json:"update_time"`
+	UpdateTime time.Time `json:"update_time,omitempty"`
 	// 名称
-	Name string `json:"name" validate:"required"`
+	Name string `json:"name,omitempty" validate:"required"`
 	// 排查ID
-	SweepID int `json:"sweep_id"`
-	// 任务状态
-	ScheduleStatus enums.AdminStatus `json:"schedule_status"`
+	SweepID int `json:"sweep_id,omitempty"`
+	// 是否开启
+	EnabledStatus enums.EnabledStatus `json:"enabled_status,omitempty"`
 	// 任务开始时间
-	ActionTime time.Time `json:"action_time"`
+	ActionTime time.Time `json:"action_time,omitempty"`
 	// 提醒
-	Remind types.ScheduleRemind `json:"remind"`
+	Remind types.ScheduleRemind `json:"remind,omitempty"`
 	// 重复
-	Repeat types.ScheduleRepeat `json:"repeat" validate:"required"`
+	Repeat types.ScheduleRepeat `json:"repeat,omitempty" validate:"required"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the SweepScheduleQuery when eager-loading is set.
 	Edges        SweepScheduleEdges `json:"edges"`
@@ -142,7 +142,7 @@ func (*SweepSchedule) scanValues(columns []string) ([]any, error) {
 		switch columns[i] {
 		case sweepschedule.FieldRemind, sweepschedule.FieldRepeat:
 			values[i] = new([]byte)
-		case sweepschedule.FieldID, sweepschedule.FieldCreatorID, sweepschedule.FieldUpdaterID, sweepschedule.FieldSweepID, sweepschedule.FieldScheduleStatus:
+		case sweepschedule.FieldID, sweepschedule.FieldCreatorID, sweepschedule.FieldUpdaterID, sweepschedule.FieldSweepID, sweepschedule.FieldEnabledStatus:
 			values[i] = new(sql.NullInt64)
 		case sweepschedule.FieldName:
 			values[i] = new(sql.NullString)
@@ -212,11 +212,11 @@ func (ss *SweepSchedule) assignValues(columns []string, values []any) error {
 			} else if value.Valid {
 				ss.SweepID = int(value.Int64)
 			}
-		case sweepschedule.FieldScheduleStatus:
+		case sweepschedule.FieldEnabledStatus:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
-				return fmt.Errorf("unexpected type %T for field schedule_status", values[i])
+				return fmt.Errorf("unexpected type %T for field enabled_status", values[i])
 			} else if value.Valid {
-				ss.ScheduleStatus = enums.AdminStatus(value.Int64)
+				ss.EnabledStatus = enums.EnabledStatus(value.Int64)
 			}
 		case sweepschedule.FieldActionTime:
 			if value, ok := values[i].(*sql.NullTime); !ok {
@@ -329,8 +329,8 @@ func (ss *SweepSchedule) String() string {
 	builder.WriteString("sweep_id=")
 	builder.WriteString(fmt.Sprintf("%v", ss.SweepID))
 	builder.WriteString(", ")
-	builder.WriteString("schedule_status=")
-	builder.WriteString(fmt.Sprintf("%v", ss.ScheduleStatus))
+	builder.WriteString("enabled_status=")
+	builder.WriteString(fmt.Sprintf("%v", ss.EnabledStatus))
 	builder.WriteString(", ")
 	builder.WriteString("action_time=")
 	builder.WriteString(ss.ActionTime.Format(time.ANSIC))

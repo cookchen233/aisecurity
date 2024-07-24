@@ -566,6 +566,30 @@ func (f SweepScheduleMutationRuleFunc) EvalMutation(ctx context.Context, m dao.M
 	return Denyf("dao/privacy: unexpected mutation type %T, expect *dao.SweepScheduleMutation", m)
 }
 
+// The UserQueryRuleFunc type is an adapter to allow the use of ordinary
+// functions as a query rule.
+type UserQueryRuleFunc func(context.Context, *dao.UserQuery) error
+
+// EvalQuery return f(ctx, q).
+func (f UserQueryRuleFunc) EvalQuery(ctx context.Context, q dao.Query) error {
+	if q, ok := q.(*dao.UserQuery); ok {
+		return f(ctx, q)
+	}
+	return Denyf("dao/privacy: unexpected query type %T, expect *dao.UserQuery", q)
+}
+
+// The UserMutationRuleFunc type is an adapter to allow the use of ordinary
+// functions as a mutation rule.
+type UserMutationRuleFunc func(context.Context, *dao.UserMutation) error
+
+// EvalMutation calls f(ctx, m).
+func (f UserMutationRuleFunc) EvalMutation(ctx context.Context, m dao.Mutation) error {
+	if m, ok := m.(*dao.UserMutation); ok {
+		return f(ctx, m)
+	}
+	return Denyf("dao/privacy: unexpected mutation type %T, expect *dao.UserMutation", m)
+}
+
 // The VideoQueryRuleFunc type is an adapter to allow the use of ordinary
 // functions as a query rule.
 type VideoQueryRuleFunc func(context.Context, *dao.VideoQuery) error
@@ -663,6 +687,8 @@ func queryFilter(q dao.Query) (Filter, error) {
 		return q.Filter(), nil
 	case *dao.SweepScheduleQuery:
 		return q.Filter(), nil
+	case *dao.UserQuery:
+		return q.Filter(), nil
 	case *dao.VideoQuery:
 		return q.Filter(), nil
 	default:
@@ -709,6 +735,8 @@ func mutationFilter(m dao.Mutation) (Filter, error) {
 	case *dao.SweepResultDetailsMutation:
 		return m.Filter(), nil
 	case *dao.SweepScheduleMutation:
+		return m.Filter(), nil
+	case *dao.UserMutation:
 		return m.Filter(), nil
 	case *dao.VideoMutation:
 		return m.Filter(), nil

@@ -22,29 +22,31 @@ type Admin struct {
 	// ID of the ent.
 	ID int `json:"id,omitempty"`
 	// 创建时间
-	CreateTime time.Time `json:"create_time"`
+	CreateTime time.Time `json:"create_time,omitempty"`
 	// 创建者
-	CreatorID int `json:"creator_id"`
+	CreatorID int `json:"creator_id,omitempty"`
 	// 删除时间
-	DeleteTime *time.Time `json:"delete_time"`
+	DeleteTime *time.Time `json:"delete_time,omitempty"`
 	// 最后更新者
-	UpdaterID int `json:"updater_id"`
+	UpdaterID int `json:"updater_id,omitempty"`
 	// 最后更新时间
-	UpdateTime time.Time `json:"update_time"`
+	UpdateTime time.Time `json:"update_time,omitempty"`
 	// 用户名
-	Username string `json:"username" validate:"required"`
+	Username string `json:"username,omitempty" validate:"required"`
 	// 密码
 	Password string `json:"-" validate:"-"`
 	// 昵称
-	Nickname string `json:"nickname" validate:"required"`
+	Nickname string `json:"nickname,omitempty"`
 	// 姓名
-	RealName string `json:"real_name" validate:"required"`
+	RealName string `json:"real_name,omitempty" validate:"required"`
 	// 手机号
-	Mobile string `json:"mobile"`
+	Mobile string `json:"mobile,omitempty"`
+	// 微信openid
+	WechatOpenid string `json:"wechat_openid,omitempty"`
 	// 头像
-	Avatar types.UploadedImage `json:"avatar"`
+	Avatar types.UploadedImage `json:"avatar,omitempty"`
 	// 账户状态
-	AdminStatus enums.AdminStatus `json:"admin_status" validate:"required"`
+	AdminStatus enums.EnabledStatus `json:"admin_status,omitempty" validate:"required"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the AdminQuery when eager-loading is set.
 	Edges        AdminEdges `json:"edges"`
@@ -151,9 +153,11 @@ type AdminEdges struct {
 	SweepResultDetailsCreator []*SweepResultDetails `json:"sweep_result_details_creator,omitempty"`
 	// SweepResultDetailsUpdater holds the value of the sweep_result_details_updater edge.
 	SweepResultDetailsUpdater []*SweepResultDetails `json:"sweep_result_details_updater,omitempty"`
+	// UserUpdater holds the value of the user_updater edge.
+	UserUpdater []*User `json:"user_updater,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
-	loadedTypes [49]bool
+	loadedTypes [50]bool
 }
 
 // CreatorOrErr returns the Creator value or an error if the edge
@@ -609,6 +613,15 @@ func (e AdminEdges) SweepResultDetailsUpdaterOrErr() ([]*SweepResultDetails, err
 	return nil, &NotLoadedError{edge: "sweep_result_details_updater"}
 }
 
+// UserUpdaterOrErr returns the UserUpdater value or an error if the edge
+// was not loaded in eager-loading.
+func (e AdminEdges) UserUpdaterOrErr() ([]*User, error) {
+	if e.loadedTypes[49] {
+		return e.UserUpdater, nil
+	}
+	return nil, &NotLoadedError{edge: "user_updater"}
+}
+
 // scanValues returns the types for scanning values from sql.Rows.
 func (*Admin) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
@@ -618,7 +631,7 @@ func (*Admin) scanValues(columns []string) ([]any, error) {
 			values[i] = new([]byte)
 		case admin.FieldID, admin.FieldCreatorID, admin.FieldUpdaterID, admin.FieldAdminStatus:
 			values[i] = new(sql.NullInt64)
-		case admin.FieldUsername, admin.FieldPassword, admin.FieldNickname, admin.FieldRealName, admin.FieldMobile:
+		case admin.FieldUsername, admin.FieldPassword, admin.FieldNickname, admin.FieldRealName, admin.FieldMobile, admin.FieldWechatOpenid:
 			values[i] = new(sql.NullString)
 		case admin.FieldCreateTime, admin.FieldDeleteTime, admin.FieldUpdateTime:
 			values[i] = new(sql.NullTime)
@@ -704,6 +717,12 @@ func (a *Admin) assignValues(columns []string, values []any) error {
 			} else if value.Valid {
 				a.Mobile = value.String
 			}
+		case admin.FieldWechatOpenid:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field wechat_openid", values[i])
+			} else if value.Valid {
+				a.WechatOpenid = value.String
+			}
 		case admin.FieldAvatar:
 			if value, ok := values[i].(*[]byte); !ok {
 				return fmt.Errorf("unexpected type %T for field avatar", values[i])
@@ -716,7 +735,7 @@ func (a *Admin) assignValues(columns []string, values []any) error {
 			if value, ok := values[i].(*sql.NullInt64); !ok {
 				return fmt.Errorf("unexpected type %T for field admin_status", values[i])
 			} else if value.Valid {
-				a.AdminStatus = enums.AdminStatus(value.Int64)
+				a.AdminStatus = enums.EnabledStatus(value.Int64)
 			}
 		default:
 			a.selectValues.Set(columns[i], values[i])
@@ -976,6 +995,11 @@ func (a *Admin) QuerySweepResultDetailsUpdater() *SweepResultDetailsQuery {
 	return NewAdminClient(a.config).QuerySweepResultDetailsUpdater(a)
 }
 
+// QueryUserUpdater queries the "user_updater" edge of the Admin entity.
+func (a *Admin) QueryUserUpdater() *UserQuery {
+	return NewAdminClient(a.config).QueryUserUpdater(a)
+}
+
 // Update returns a builder for updating this Admin.
 // Note that you need to call Admin.Unwrap() before calling this method if this Admin
 // was returned from a transaction, and the transaction was committed or rolled back.
@@ -1029,6 +1053,9 @@ func (a *Admin) String() string {
 	builder.WriteString(", ")
 	builder.WriteString("mobile=")
 	builder.WriteString(a.Mobile)
+	builder.WriteString(", ")
+	builder.WriteString("wechat_openid=")
+	builder.WriteString(a.WechatOpenid)
 	builder.WriteString(", ")
 	builder.WriteString("avatar=")
 	builder.WriteString(fmt.Sprintf("%v", a.Avatar))

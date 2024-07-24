@@ -57,14 +57,6 @@ func (eu *EmployeeUpdate) SetUpdaterID(i int) *EmployeeUpdate {
 	return eu
 }
 
-// SetNillableUpdaterID sets the "updater_id" field if the given value is not nil.
-func (eu *EmployeeUpdate) SetNillableUpdaterID(i *int) *EmployeeUpdate {
-	if i != nil {
-		eu.SetUpdaterID(*i)
-	}
-	return eu
-}
-
 // SetUpdateTime sets the "update_time" field.
 func (eu *EmployeeUpdate) SetUpdateTime(t time.Time) *EmployeeUpdate {
 	eu.mutation.SetUpdateTime(t)
@@ -371,14 +363,6 @@ func (euo *EmployeeUpdateOne) ClearDeleteTime() *EmployeeUpdateOne {
 // SetUpdaterID sets the "updater_id" field.
 func (euo *EmployeeUpdateOne) SetUpdaterID(i int) *EmployeeUpdateOne {
 	euo.mutation.SetUpdaterID(i)
-	return euo
-}
-
-// SetNillableUpdaterID sets the "updater_id" field if the given value is not nil.
-func (euo *EmployeeUpdateOne) SetNillableUpdaterID(i *int) *EmployeeUpdateOne {
-	if i != nil {
-		euo.SetUpdaterID(*i)
-	}
 	return euo
 }
 

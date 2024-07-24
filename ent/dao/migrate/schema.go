@@ -19,6 +19,7 @@ var (
 		{Name: "nickname", Type: field.TypeString, Size: 255},
 		{Name: "real_name", Type: field.TypeString, Size: 255},
 		{Name: "mobile", Type: field.TypeString, Nullable: true, Size: 255},
+		{Name: "wechat_openid", Type: field.TypeString, Nullable: true, Size: 255},
 		{Name: "avatar", Type: field.TypeJSON, Nullable: true},
 		{Name: "admin_status", Type: field.TypeInt, Default: 1},
 		{Name: "creator_id", Type: field.TypeInt, Nullable: true},
@@ -32,13 +33,13 @@ var (
 		ForeignKeys: []*schema.ForeignKey{
 			{
 				Symbol:     "admins_admins_admin_creator",
-				Columns:    []*schema.Column{AdminsColumns[11]},
+				Columns:    []*schema.Column{AdminsColumns[12]},
 				RefColumns: []*schema.Column{AdminsColumns[0]},
 				OnDelete:   schema.SetNull,
 			},
 			{
 				Symbol:     "admins_admins_admin_updater",
-				Columns:    []*schema.Column{AdminsColumns[12]},
+				Columns:    []*schema.Column{AdminsColumns[13]},
 				RefColumns: []*schema.Column{AdminsColumns[0]},
 				OnDelete:   schema.SetNull,
 			},
@@ -516,6 +517,7 @@ var (
 		{Name: "title", Type: field.TypeString, Size: 255},
 		{Name: "content", Type: field.TypeString, Nullable: true},
 		{Name: "images", Type: field.TypeJSON, Nullable: true},
+		{Name: "maintained_images", Type: field.TypeJSON, Nullable: true},
 		{Name: "measures", Type: field.TypeString, Nullable: true},
 		{Name: "maintain_status", Type: field.TypeInt, Default: 0},
 		{Name: "due_time", Type: field.TypeTime},
@@ -533,31 +535,31 @@ var (
 		ForeignKeys: []*schema.ForeignKey{
 			{
 				Symbol:     "risks_admins_risk_creator",
-				Columns:    []*schema.Column{RisksColumns[10]},
-				RefColumns: []*schema.Column{AdminsColumns[0]},
-				OnDelete:   schema.NoAction,
-			},
-			{
-				Symbol:     "risks_admins_risk_updater",
 				Columns:    []*schema.Column{RisksColumns[11]},
 				RefColumns: []*schema.Column{AdminsColumns[0]},
 				OnDelete:   schema.NoAction,
 			},
 			{
-				Symbol:     "risks_admins_risk_maintainer",
+				Symbol:     "risks_admins_risk_updater",
 				Columns:    []*schema.Column{RisksColumns[12]},
 				RefColumns: []*schema.Column{AdminsColumns[0]},
 				OnDelete:   schema.NoAction,
 			},
 			{
-				Symbol:     "risks_risk_categories_risk",
+				Symbol:     "risks_admins_risk_maintainer",
 				Columns:    []*schema.Column{RisksColumns[13]},
+				RefColumns: []*schema.Column{AdminsColumns[0]},
+				OnDelete:   schema.NoAction,
+			},
+			{
+				Symbol:     "risks_risk_categories_risk",
+				Columns:    []*schema.Column{RisksColumns[14]},
 				RefColumns: []*schema.Column{RiskCategoriesColumns[0]},
 				OnDelete:   schema.NoAction,
 			},
 			{
 				Symbol:     "risks_risk_locations_risk",
-				Columns:    []*schema.Column{RisksColumns[14]},
+				Columns:    []*schema.Column{RisksColumns[15]},
 				RefColumns: []*schema.Column{RiskLocationsColumns[0]},
 				OnDelete:   schema.NoAction,
 			},
@@ -773,7 +775,7 @@ var (
 		{Name: "delete_time", Type: field.TypeTime, Nullable: true},
 		{Name: "update_time", Type: field.TypeTime},
 		{Name: "name", Type: field.TypeString, Size: 255},
-		{Name: "schedule_status", Type: field.TypeInt, Nullable: true, Default: 1},
+		{Name: "enabled_status", Type: field.TypeInt, Nullable: true, Default: 1},
 		{Name: "action_time", Type: field.TypeTime},
 		{Name: "remind", Type: field.TypeJSON},
 		{Name: "repeat", Type: field.TypeJSON},
@@ -803,6 +805,36 @@ var (
 				Symbol:     "sweep_schedules_sweeps_sweep_schedule",
 				Columns:    []*schema.Column{SweepSchedulesColumns[11]},
 				RefColumns: []*schema.Column{SweepsColumns[0]},
+				OnDelete:   schema.NoAction,
+			},
+		},
+	}
+	// UsersColumns holds the columns for the "users" table.
+	UsersColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeInt, Increment: true},
+		{Name: "create_time", Type: field.TypeTime},
+		{Name: "delete_time", Type: field.TypeTime, Nullable: true},
+		{Name: "update_time", Type: field.TypeTime},
+		{Name: "username", Type: field.TypeString, Size: 64},
+		{Name: "password", Type: field.TypeString, Size: 255},
+		{Name: "nickname", Type: field.TypeString, Size: 255},
+		{Name: "real_name", Type: field.TypeString, Size: 255},
+		{Name: "mobile", Type: field.TypeString, Nullable: true, Size: 255},
+		{Name: "wechat_openid", Type: field.TypeString, Nullable: true, Size: 255},
+		{Name: "avatar", Type: field.TypeJSON, Nullable: true},
+		{Name: "user_status", Type: field.TypeInt, Default: 1},
+		{Name: "updater_id", Type: field.TypeInt},
+	}
+	// UsersTable holds the schema information for the "users" table.
+	UsersTable = &schema.Table{
+		Name:       "users",
+		Columns:    UsersColumns,
+		PrimaryKey: []*schema.Column{UsersColumns[0]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:     "users_admins_user_updater",
+				Columns:    []*schema.Column{UsersColumns[12]},
+				RefColumns: []*schema.Column{AdminsColumns[0]},
 				OnDelete:   schema.NoAction,
 			},
 		},
@@ -937,6 +969,7 @@ var (
 		SweepResultsTable,
 		SweepResultDetailsTable,
 		SweepSchedulesTable,
+		UsersTable,
 		VideosTable,
 		AdminSweepScheduleTable,
 		PermissionAdminTable,
@@ -1009,6 +1042,7 @@ func init() {
 	SweepSchedulesTable.ForeignKeys[0].RefTable = AdminsTable
 	SweepSchedulesTable.ForeignKeys[1].RefTable = AdminsTable
 	SweepSchedulesTable.ForeignKeys[2].RefTable = SweepsTable
+	UsersTable.ForeignKeys[0].RefTable = AdminsTable
 	VideosTable.ForeignKeys[0].RefTable = AdminsTable
 	VideosTable.ForeignKeys[1].RefTable = AdminsTable
 	AdminSweepScheduleTable.ForeignKeys[0].RefTable = AdminsTable

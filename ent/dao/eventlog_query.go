@@ -474,7 +474,7 @@ func (elq *EventLogQuery) WithActor2(opts ...func(*AdminQuery)) *EventLogQuery {
 // Example:
 //
 //	var v []struct {
-//		CreateTime time.Time `json:"create_time"`
+//		CreateTime time.Time `json:"create_time,omitempty"`
 //		Count int `json:"count,omitempty"`
 //	}
 //
@@ -497,7 +497,7 @@ func (elq *EventLogQuery) GroupBy(field string, fields ...string) *EventLogGroup
 // Example:
 //
 //	var v []struct {
-//		CreateTime time.Time `json:"create_time"`
+//		CreateTime time.Time `json:"create_time,omitempty"`
 //	}
 //
 //	client.EventLog.Query().

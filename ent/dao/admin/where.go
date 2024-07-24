@@ -106,8 +106,13 @@ func Mobile(v string) predicate.Admin {
 	return predicate.Admin(sql.FieldEQ(FieldMobile, v))
 }
 
+// WechatOpenid applies equality check predicate on the "wechat_openid" field. It's identical to WechatOpenidEQ.
+func WechatOpenid(v string) predicate.Admin {
+	return predicate.Admin(sql.FieldEQ(FieldWechatOpenid, v))
+}
+
 // AdminStatus applies equality check predicate on the "admin_status" field. It's identical to AdminStatusEQ.
-func AdminStatus(v enums.AdminStatus) predicate.Admin {
+func AdminStatus(v enums.EnabledStatus) predicate.Admin {
 	vc := int(v)
 	return predicate.Admin(sql.FieldEQ(FieldAdminStatus, vc))
 }
@@ -617,6 +622,81 @@ func MobileContainsFold(v string) predicate.Admin {
 	return predicate.Admin(sql.FieldContainsFold(FieldMobile, v))
 }
 
+// WechatOpenidEQ applies the EQ predicate on the "wechat_openid" field.
+func WechatOpenidEQ(v string) predicate.Admin {
+	return predicate.Admin(sql.FieldEQ(FieldWechatOpenid, v))
+}
+
+// WechatOpenidNEQ applies the NEQ predicate on the "wechat_openid" field.
+func WechatOpenidNEQ(v string) predicate.Admin {
+	return predicate.Admin(sql.FieldNEQ(FieldWechatOpenid, v))
+}
+
+// WechatOpenidIn applies the In predicate on the "wechat_openid" field.
+func WechatOpenidIn(vs ...string) predicate.Admin {
+	return predicate.Admin(sql.FieldIn(FieldWechatOpenid, vs...))
+}
+
+// WechatOpenidNotIn applies the NotIn predicate on the "wechat_openid" field.
+func WechatOpenidNotIn(vs ...string) predicate.Admin {
+	return predicate.Admin(sql.FieldNotIn(FieldWechatOpenid, vs...))
+}
+
+// WechatOpenidGT applies the GT predicate on the "wechat_openid" field.
+func WechatOpenidGT(v string) predicate.Admin {
+	return predicate.Admin(sql.FieldGT(FieldWechatOpenid, v))
+}
+
+// WechatOpenidGTE applies the GTE predicate on the "wechat_openid" field.
+func WechatOpenidGTE(v string) predicate.Admin {
+	return predicate.Admin(sql.FieldGTE(FieldWechatOpenid, v))
+}
+
+// WechatOpenidLT applies the LT predicate on the "wechat_openid" field.
+func WechatOpenidLT(v string) predicate.Admin {
+	return predicate.Admin(sql.FieldLT(FieldWechatOpenid, v))
+}
+
+// WechatOpenidLTE applies the LTE predicate on the "wechat_openid" field.
+func WechatOpenidLTE(v string) predicate.Admin {
+	return predicate.Admin(sql.FieldLTE(FieldWechatOpenid, v))
+}
+
+// WechatOpenidContains applies the Contains predicate on the "wechat_openid" field.
+func WechatOpenidContains(v string) predicate.Admin {
+	return predicate.Admin(sql.FieldContains(FieldWechatOpenid, v))
+}
+
+// WechatOpenidHasPrefix applies the HasPrefix predicate on the "wechat_openid" field.
+func WechatOpenidHasPrefix(v string) predicate.Admin {
+	return predicate.Admin(sql.FieldHasPrefix(FieldWechatOpenid, v))
+}
+
+// WechatOpenidHasSuffix applies the HasSuffix predicate on the "wechat_openid" field.
+func WechatOpenidHasSuffix(v string) predicate.Admin {
+	return predicate.Admin(sql.FieldHasSuffix(FieldWechatOpenid, v))
+}
+
+// WechatOpenidIsNil applies the IsNil predicate on the "wechat_openid" field.
+func WechatOpenidIsNil() predicate.Admin {
+	return predicate.Admin(sql.FieldIsNull(FieldWechatOpenid))
+}
+
+// WechatOpenidNotNil applies the NotNil predicate on the "wechat_openid" field.
+func WechatOpenidNotNil() predicate.Admin {
+	return predicate.Admin(sql.FieldNotNull(FieldWechatOpenid))
+}
+
+// WechatOpenidEqualFold applies the EqualFold predicate on the "wechat_openid" field.
+func WechatOpenidEqualFold(v string) predicate.Admin {
+	return predicate.Admin(sql.FieldEqualFold(FieldWechatOpenid, v))
+}
+
+// WechatOpenidContainsFold applies the ContainsFold predicate on the "wechat_openid" field.
+func WechatOpenidContainsFold(v string) predicate.Admin {
+	return predicate.Admin(sql.FieldContainsFold(FieldWechatOpenid, v))
+}
+
 // AvatarIsNil applies the IsNil predicate on the "avatar" field.
 func AvatarIsNil() predicate.Admin {
 	return predicate.Admin(sql.FieldIsNull(FieldAvatar))
@@ -628,19 +708,19 @@ func AvatarNotNil() predicate.Admin {
 }
 
 // AdminStatusEQ applies the EQ predicate on the "admin_status" field.
-func AdminStatusEQ(v enums.AdminStatus) predicate.Admin {
+func AdminStatusEQ(v enums.EnabledStatus) predicate.Admin {
 	vc := int(v)
 	return predicate.Admin(sql.FieldEQ(FieldAdminStatus, vc))
 }
 
 // AdminStatusNEQ applies the NEQ predicate on the "admin_status" field.
-func AdminStatusNEQ(v enums.AdminStatus) predicate.Admin {
+func AdminStatusNEQ(v enums.EnabledStatus) predicate.Admin {
 	vc := int(v)
 	return predicate.Admin(sql.FieldNEQ(FieldAdminStatus, vc))
 }
 
 // AdminStatusIn applies the In predicate on the "admin_status" field.
-func AdminStatusIn(vs ...enums.AdminStatus) predicate.Admin {
+func AdminStatusIn(vs ...enums.EnabledStatus) predicate.Admin {
 	v := make([]any, len(vs))
 	for i := range v {
 		v[i] = int(vs[i])
@@ -649,7 +729,7 @@ func AdminStatusIn(vs ...enums.AdminStatus) predicate.Admin {
 }
 
 // AdminStatusNotIn applies the NotIn predicate on the "admin_status" field.
-func AdminStatusNotIn(vs ...enums.AdminStatus) predicate.Admin {
+func AdminStatusNotIn(vs ...enums.EnabledStatus) predicate.Admin {
 	v := make([]any, len(vs))
 	for i := range v {
 		v[i] = int(vs[i])
@@ -658,25 +738,25 @@ func AdminStatusNotIn(vs ...enums.AdminStatus) predicate.Admin {
 }
 
 // AdminStatusGT applies the GT predicate on the "admin_status" field.
-func AdminStatusGT(v enums.AdminStatus) predicate.Admin {
+func AdminStatusGT(v enums.EnabledStatus) predicate.Admin {
 	vc := int(v)
 	return predicate.Admin(sql.FieldGT(FieldAdminStatus, vc))
 }
 
 // AdminStatusGTE applies the GTE predicate on the "admin_status" field.
-func AdminStatusGTE(v enums.AdminStatus) predicate.Admin {
+func AdminStatusGTE(v enums.EnabledStatus) predicate.Admin {
 	vc := int(v)
 	return predicate.Admin(sql.FieldGTE(FieldAdminStatus, vc))
 }
 
 // AdminStatusLT applies the LT predicate on the "admin_status" field.
-func AdminStatusLT(v enums.AdminStatus) predicate.Admin {
+func AdminStatusLT(v enums.EnabledStatus) predicate.Admin {
 	vc := int(v)
 	return predicate.Admin(sql.FieldLT(FieldAdminStatus, vc))
 }
 
 // AdminStatusLTE applies the LTE predicate on the "admin_status" field.
-func AdminStatusLTE(v enums.AdminStatus) predicate.Admin {
+func AdminStatusLTE(v enums.EnabledStatus) predicate.Admin {
 	vc := int(v)
 	return predicate.Admin(sql.FieldLTE(FieldAdminStatus, vc))
 }
@@ -1800,6 +1880,29 @@ func HasSweepResultDetailsUpdater() predicate.Admin {
 func HasSweepResultDetailsUpdaterWith(preds ...predicate.SweepResultDetails) predicate.Admin {
 	return predicate.Admin(func(s *sql.Selector) {
 		step := newSweepResultDetailsUpdaterStep()
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
+}
+
+// HasUserUpdater applies the HasEdge predicate on the "user_updater" edge.
+func HasUserUpdater() predicate.Admin {
+	return predicate.Admin(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, UserUpdaterTable, UserUpdaterColumn),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasUserUpdaterWith applies the HasEdge predicate on the "user_updater" edge with a given conditions (other predicates).
+func HasUserUpdaterWith(preds ...predicate.User) predicate.Admin {
+	return predicate.Admin(func(s *sql.Selector) {
+		step := newUserUpdaterStep()
 		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
 			for _, p := range preds {
 				p(s)

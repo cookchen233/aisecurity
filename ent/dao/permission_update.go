@@ -57,14 +57,6 @@ func (pu *PermissionUpdate) SetUpdaterID(i int) *PermissionUpdate {
 	return pu
 }
 
-// SetNillableUpdaterID sets the "updater_id" field if the given value is not nil.
-func (pu *PermissionUpdate) SetNillableUpdaterID(i *int) *PermissionUpdate {
-	if i != nil {
-		pu.SetUpdaterID(*i)
-	}
-	return pu
-}
-
 // SetUpdateTime sets the "update_time" field.
 func (pu *PermissionUpdate) SetUpdateTime(t time.Time) *PermissionUpdate {
 	pu.mutation.SetUpdateTime(t)
@@ -74,14 +66,6 @@ func (pu *PermissionUpdate) SetUpdateTime(t time.Time) *PermissionUpdate {
 // SetName sets the "name" field.
 func (pu *PermissionUpdate) SetName(s string) *PermissionUpdate {
 	pu.mutation.SetName(s)
-	return pu
-}
-
-// SetNillableName sets the "name" field if the given value is not nil.
-func (pu *PermissionUpdate) SetNillableName(s *string) *PermissionUpdate {
-	if s != nil {
-		pu.SetName(*s)
-	}
 	return pu
 }
 
@@ -445,14 +429,6 @@ func (puo *PermissionUpdateOne) SetUpdaterID(i int) *PermissionUpdateOne {
 	return puo
 }
 
-// SetNillableUpdaterID sets the "updater_id" field if the given value is not nil.
-func (puo *PermissionUpdateOne) SetNillableUpdaterID(i *int) *PermissionUpdateOne {
-	if i != nil {
-		puo.SetUpdaterID(*i)
-	}
-	return puo
-}
-
 // SetUpdateTime sets the "update_time" field.
 func (puo *PermissionUpdateOne) SetUpdateTime(t time.Time) *PermissionUpdateOne {
 	puo.mutation.SetUpdateTime(t)
@@ -462,14 +438,6 @@ func (puo *PermissionUpdateOne) SetUpdateTime(t time.Time) *PermissionUpdateOne 
 // SetName sets the "name" field.
 func (puo *PermissionUpdateOne) SetName(s string) *PermissionUpdateOne {
 	puo.mutation.SetName(s)
-	return puo
-}
-
-// SetNillableName sets the "name" field if the given value is not nil.
-func (puo *PermissionUpdateOne) SetNillableName(s *string) *PermissionUpdateOne {
-	if s != nil {
-		puo.SetName(*s)
-	}
 	return puo
 }
 

@@ -91,10 +91,10 @@ func SweepID(v int) predicate.SweepSchedule {
 	return predicate.SweepSchedule(sql.FieldEQ(FieldSweepID, v))
 }
 
-// ScheduleStatus applies equality check predicate on the "schedule_status" field. It's identical to ScheduleStatusEQ.
-func ScheduleStatus(v enums.AdminStatus) predicate.SweepSchedule {
+// EnabledStatus applies equality check predicate on the "enabled_status" field. It's identical to EnabledStatusEQ.
+func EnabledStatus(v enums.EnabledStatus) predicate.SweepSchedule {
 	vc := int(v)
-	return predicate.SweepSchedule(sql.FieldEQ(FieldScheduleStatus, vc))
+	return predicate.SweepSchedule(sql.FieldEQ(FieldEnabledStatus, vc))
 }
 
 // ActionTime applies equality check predicate on the "action_time" field. It's identical to ActionTimeEQ.
@@ -357,68 +357,68 @@ func SweepIDNotIn(vs ...int) predicate.SweepSchedule {
 	return predicate.SweepSchedule(sql.FieldNotIn(FieldSweepID, vs...))
 }
 
-// ScheduleStatusEQ applies the EQ predicate on the "schedule_status" field.
-func ScheduleStatusEQ(v enums.AdminStatus) predicate.SweepSchedule {
+// EnabledStatusEQ applies the EQ predicate on the "enabled_status" field.
+func EnabledStatusEQ(v enums.EnabledStatus) predicate.SweepSchedule {
 	vc := int(v)
-	return predicate.SweepSchedule(sql.FieldEQ(FieldScheduleStatus, vc))
+	return predicate.SweepSchedule(sql.FieldEQ(FieldEnabledStatus, vc))
 }
 
-// ScheduleStatusNEQ applies the NEQ predicate on the "schedule_status" field.
-func ScheduleStatusNEQ(v enums.AdminStatus) predicate.SweepSchedule {
+// EnabledStatusNEQ applies the NEQ predicate on the "enabled_status" field.
+func EnabledStatusNEQ(v enums.EnabledStatus) predicate.SweepSchedule {
 	vc := int(v)
-	return predicate.SweepSchedule(sql.FieldNEQ(FieldScheduleStatus, vc))
+	return predicate.SweepSchedule(sql.FieldNEQ(FieldEnabledStatus, vc))
 }
 
-// ScheduleStatusIn applies the In predicate on the "schedule_status" field.
-func ScheduleStatusIn(vs ...enums.AdminStatus) predicate.SweepSchedule {
+// EnabledStatusIn applies the In predicate on the "enabled_status" field.
+func EnabledStatusIn(vs ...enums.EnabledStatus) predicate.SweepSchedule {
 	v := make([]any, len(vs))
 	for i := range v {
 		v[i] = int(vs[i])
 	}
-	return predicate.SweepSchedule(sql.FieldIn(FieldScheduleStatus, v...))
+	return predicate.SweepSchedule(sql.FieldIn(FieldEnabledStatus, v...))
 }
 
-// ScheduleStatusNotIn applies the NotIn predicate on the "schedule_status" field.
-func ScheduleStatusNotIn(vs ...enums.AdminStatus) predicate.SweepSchedule {
+// EnabledStatusNotIn applies the NotIn predicate on the "enabled_status" field.
+func EnabledStatusNotIn(vs ...enums.EnabledStatus) predicate.SweepSchedule {
 	v := make([]any, len(vs))
 	for i := range v {
 		v[i] = int(vs[i])
 	}
-	return predicate.SweepSchedule(sql.FieldNotIn(FieldScheduleStatus, v...))
+	return predicate.SweepSchedule(sql.FieldNotIn(FieldEnabledStatus, v...))
 }
 
-// ScheduleStatusGT applies the GT predicate on the "schedule_status" field.
-func ScheduleStatusGT(v enums.AdminStatus) predicate.SweepSchedule {
+// EnabledStatusGT applies the GT predicate on the "enabled_status" field.
+func EnabledStatusGT(v enums.EnabledStatus) predicate.SweepSchedule {
 	vc := int(v)
-	return predicate.SweepSchedule(sql.FieldGT(FieldScheduleStatus, vc))
+	return predicate.SweepSchedule(sql.FieldGT(FieldEnabledStatus, vc))
 }
 
-// ScheduleStatusGTE applies the GTE predicate on the "schedule_status" field.
-func ScheduleStatusGTE(v enums.AdminStatus) predicate.SweepSchedule {
+// EnabledStatusGTE applies the GTE predicate on the "enabled_status" field.
+func EnabledStatusGTE(v enums.EnabledStatus) predicate.SweepSchedule {
 	vc := int(v)
-	return predicate.SweepSchedule(sql.FieldGTE(FieldScheduleStatus, vc))
+	return predicate.SweepSchedule(sql.FieldGTE(FieldEnabledStatus, vc))
 }
 
-// ScheduleStatusLT applies the LT predicate on the "schedule_status" field.
-func ScheduleStatusLT(v enums.AdminStatus) predicate.SweepSchedule {
+// EnabledStatusLT applies the LT predicate on the "enabled_status" field.
+func EnabledStatusLT(v enums.EnabledStatus) predicate.SweepSchedule {
 	vc := int(v)
-	return predicate.SweepSchedule(sql.FieldLT(FieldScheduleStatus, vc))
+	return predicate.SweepSchedule(sql.FieldLT(FieldEnabledStatus, vc))
 }
 
-// ScheduleStatusLTE applies the LTE predicate on the "schedule_status" field.
-func ScheduleStatusLTE(v enums.AdminStatus) predicate.SweepSchedule {
+// EnabledStatusLTE applies the LTE predicate on the "enabled_status" field.
+func EnabledStatusLTE(v enums.EnabledStatus) predicate.SweepSchedule {
 	vc := int(v)
-	return predicate.SweepSchedule(sql.FieldLTE(FieldScheduleStatus, vc))
+	return predicate.SweepSchedule(sql.FieldLTE(FieldEnabledStatus, vc))
 }
 
-// ScheduleStatusIsNil applies the IsNil predicate on the "schedule_status" field.
-func ScheduleStatusIsNil() predicate.SweepSchedule {
-	return predicate.SweepSchedule(sql.FieldIsNull(FieldScheduleStatus))
+// EnabledStatusIsNil applies the IsNil predicate on the "enabled_status" field.
+func EnabledStatusIsNil() predicate.SweepSchedule {
+	return predicate.SweepSchedule(sql.FieldIsNull(FieldEnabledStatus))
 }
 
-// ScheduleStatusNotNil applies the NotNil predicate on the "schedule_status" field.
-func ScheduleStatusNotNil() predicate.SweepSchedule {
-	return predicate.SweepSchedule(sql.FieldNotNull(FieldScheduleStatus))
+// EnabledStatusNotNil applies the NotNil predicate on the "enabled_status" field.
+func EnabledStatusNotNil() predicate.SweepSchedule {
+	return predicate.SweepSchedule(sql.FieldNotNull(FieldEnabledStatus))
 }
 
 // ActionTimeEQ applies the EQ predicate on the "action_time" field.

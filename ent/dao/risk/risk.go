@@ -33,6 +33,8 @@ const (
 	FieldContent = "content"
 	// FieldImages holds the string denoting the images field in the database.
 	FieldImages = "images"
+	// FieldMaintainedImages holds the string denoting the maintained_images field in the database.
+	FieldMaintainedImages = "maintained_images"
 	// FieldRiskCategoryID holds the string denoting the risk_category_id field in the database.
 	FieldRiskCategoryID = "risk_category_id"
 	// FieldRiskLocationID holds the string denoting the risk_location_id field in the database.
@@ -105,6 +107,7 @@ var Columns = []string{
 	FieldTitle,
 	FieldContent,
 	FieldImages,
+	FieldMaintainedImages,
 	FieldRiskCategoryID,
 	FieldRiskLocationID,
 	FieldMaintainerID,
@@ -144,6 +147,8 @@ var (
 	TitleValidator func(string) error
 	// DefaultImages holds the default value on creation for the "images" field.
 	DefaultImages []types.UploadedImage
+	// DefaultMaintainedImages holds the default value on creation for the "maintained_images" field.
+	DefaultMaintainedImages []types.UploadedImage
 	// RiskCategoryIDValidator is a validator for the "risk_category_id" field. It is called by the builders before save.
 	RiskCategoryIDValidator func(int) error
 	// RiskLocationIDValidator is a validator for the "risk_location_id" field. It is called by the builders before save.

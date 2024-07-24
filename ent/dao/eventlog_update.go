@@ -55,14 +55,6 @@ func (elu *EventLogUpdate) SetUpdaterID(i int) *EventLogUpdate {
 	return elu
 }
 
-// SetNillableUpdaterID sets the "updater_id" field if the given value is not nil.
-func (elu *EventLogUpdate) SetNillableUpdaterID(i *int) *EventLogUpdate {
-	if i != nil {
-		elu.SetUpdaterID(*i)
-	}
-	return elu
-}
-
 // SetUpdateTime sets the "update_time" field.
 func (elu *EventLogUpdate) SetUpdateTime(t time.Time) *EventLogUpdate {
 	elu.mutation.SetUpdateTime(t)
@@ -245,14 +237,6 @@ func (eluo *EventLogUpdateOne) ClearDeleteTime() *EventLogUpdateOne {
 // SetUpdaterID sets the "updater_id" field.
 func (eluo *EventLogUpdateOne) SetUpdaterID(i int) *EventLogUpdateOne {
 	eluo.mutation.SetUpdaterID(i)
-	return eluo
-}
-
-// SetNillableUpdaterID sets the "updater_id" field if the given value is not nil.
-func (eluo *EventLogUpdateOne) SetNillableUpdaterID(i *int) *EventLogUpdateOne {
-	if i != nil {
-		eluo.SetUpdaterID(*i)
-	}
 	return eluo
 }
 

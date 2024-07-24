@@ -25,7 +25,7 @@ func (SweepSchedule) Fields() []ent.Field {
 	return []ent.Field{
 		field.String("name").Comment("名称").NotEmpty().MaxLen(255).StructTag(`validate:"required"`),
 		field.Int("sweep_id").Comment("排查ID").Positive(),
-		field.Int("schedule_status").Comment("任务状态").NonNegative().Optional().Default(int(enums.SS1)).GoType(enums.AdminStatus(0)),
+		field.Int("enabled_status").Comment("是否开启").NonNegative().Optional().Default(int(enums.ENS1)).GoType(enums.EnabledStatus(0)),
 		field.Time("action_time").Comment("任务开始时间"),
 		field.JSON("remind", types.ScheduleRemind{}).Comment("提醒"),
 		field.JSON("repeat", types.ScheduleRepeat{}).Comment("重复").StructTag(`validate:"required"`),

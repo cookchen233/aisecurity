@@ -20,25 +20,25 @@ type Device struct {
 	// ID of the ent.
 	ID int `json:"id,omitempty"`
 	// 创建时间
-	CreateTime time.Time `json:"create_time"`
+	CreateTime time.Time `json:"create_time,omitempty"`
 	// 创建者
-	CreatorID int `json:"creator_id"`
+	CreatorID int `json:"creator_id,omitempty"`
 	// 删除时间
-	DeleteTime *time.Time `json:"delete_time"`
+	DeleteTime *time.Time `json:"delete_time,omitempty"`
 	// 最后更新者
-	UpdaterID int `json:"updater_id"`
+	UpdaterID int `json:"updater_id,omitempty"`
 	// 最后更新时间
-	UpdateTime time.Time `json:"update_time"`
+	UpdateTime time.Time `json:"update_time,omitempty"`
 	// 设备品牌
-	Brand enums.DeviceBrand `json:"brand" validate:"required"`
+	Brand enums.DeviceBrand `json:"brand,omitempty" validate:"required"`
 	// 设备型号
-	Model enums.DeviceModel `json:"model" validate:"required"`
+	Model enums.DeviceModel `json:"model,omitempty" validate:"required"`
 	// 设备名称
-	Name string `json:"name" validate:"required"`
+	Name string `json:"name,omitempty" validate:"required"`
 	// 设备序列号
-	Sn string `json:"sn" validate:"required"`
+	Sn string `json:"sn,omitempty" validate:"required"`
 	// 设备类型
-	DeviceType enums.DeviceType `json:"device_type" validate:"required"`
+	DeviceType enums.DeviceType `json:"device_type,omitempty" validate:"required"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the DeviceQuery when eager-loading is set.
 	Edges        DeviceEdges `json:"edges"`

@@ -60,14 +60,6 @@ func (du *DeviceUpdate) SetUpdaterID(i int) *DeviceUpdate {
 	return du
 }
 
-// SetNillableUpdaterID sets the "updater_id" field if the given value is not nil.
-func (du *DeviceUpdate) SetNillableUpdaterID(i *int) *DeviceUpdate {
-	if i != nil {
-		du.SetUpdaterID(*i)
-	}
-	return du
-}
-
 // SetUpdateTime sets the "update_time" field.
 func (du *DeviceUpdate) SetUpdateTime(t time.Time) *DeviceUpdate {
 	du.mutation.SetUpdateTime(t)
@@ -741,14 +733,6 @@ func (duo *DeviceUpdateOne) ClearDeleteTime() *DeviceUpdateOne {
 // SetUpdaterID sets the "updater_id" field.
 func (duo *DeviceUpdateOne) SetUpdaterID(i int) *DeviceUpdateOne {
 	duo.mutation.SetUpdaterID(i)
-	return duo
-}
-
-// SetNillableUpdaterID sets the "updater_id" field if the given value is not nil.
-func (duo *DeviceUpdateOne) SetNillableUpdaterID(i *int) *DeviceUpdateOne {
-	if i != nil {
-		duo.SetUpdaterID(*i)
-	}
 	return duo
 }
 

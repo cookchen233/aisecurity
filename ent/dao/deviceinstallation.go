@@ -21,33 +21,33 @@ type DeviceInstallation struct {
 	// ID of the ent.
 	ID int `json:"id,omitempty"`
 	// 创建时间
-	CreateTime time.Time `json:"create_time"`
+	CreateTime time.Time `json:"create_time,omitempty"`
 	// 创建者
-	CreatorID int `json:"creator_id"`
+	CreatorID int `json:"creator_id,omitempty"`
 	// 删除时间
-	DeleteTime *time.Time `json:"delete_time"`
+	DeleteTime *time.Time `json:"delete_time,omitempty"`
 	// 最后更新者
-	UpdaterID int `json:"updater_id"`
+	UpdaterID int `json:"updater_id,omitempty"`
 	// 最后更新时间
-	UpdateTime time.Time `json:"update_time"`
+	UpdateTime time.Time `json:"update_time,omitempty"`
 	// 设备ID
-	DeviceID int `json:"device_id" validate:"required"`
+	DeviceID int `json:"device_id,omitempty" validate:"required"`
 	// 区域ID
-	AreaID int `json:"area_id" validate:"required"`
+	AreaID int `json:"area_id,omitempty" validate:"required"`
 	// 设备别名
-	AliasName string `json:"alias_name"`
+	AliasName string `json:"alias_name,omitempty"`
 	// 经度
-	Longitude float64 `json:"longitude" validate:"required"`
+	Longitude float64 `json:"longitude,omitempty" validate:"required"`
 	// 纬度
-	Latitude float64 `json:"latitude" validate:"required"`
+	Latitude float64 `json:"latitude,omitempty" validate:"required"`
 	// 其他位置数据
-	LocationData string `json:"location_data"`
+	LocationData string `json:"location_data,omitempty"`
 	// 位置描述
-	Location string `json:"location"`
+	Location string `json:"location,omitempty"`
 	// 安装人
-	Installer string `json:"installer"`
+	Installer string `json:"installer,omitempty"`
 	// 安装时间
-	InstallTime time.Time `json:"install_time"`
+	InstallTime time.Time `json:"install_time,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the DeviceInstallationQuery when eager-loading is set.
 	Edges        DeviceInstallationEdges `json:"edges"`

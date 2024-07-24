@@ -1,14 +1,16 @@
 # AI Security
 
-AI Security is a project developed in Go, using the Gin framework for handling HTTP requests and the Ent framework for database operations. It also uses the Qodana linter for code analysis.
+AI Security is a project developed in Go, using Gin framework for handling HTTP requests and the Ent framework for database operations. It also uses the Qodana linter for code analysis.
 
 ## Project Structure
 
 The project is organized into several packages:
 
+- `config`: Configurate
 - `middlewares`: Contains middleware functions for request logging and error recovery.
 - `routes`: Defines the HTTP routes for the application.
 - `utils`: Contains utility functions and configurations for logging and database operations.
+- structs: Contains
 
 ## Setup
 

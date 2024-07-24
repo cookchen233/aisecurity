@@ -25,33 +25,33 @@ type Event struct {
 	// ID of the ent.
 	ID int `json:"id,omitempty"`
 	// 创建时间
-	CreateTime time.Time `json:"create_time"`
+	CreateTime time.Time `json:"create_time,omitempty"`
 	// 创建者
-	CreatorID int `json:"creator_id"`
+	CreatorID int `json:"creator_id,omitempty"`
 	// 删除时间
-	DeleteTime *time.Time `json:"delete_time"`
+	DeleteTime *time.Time `json:"delete_time,omitempty"`
 	// 最后更新者
-	UpdaterID int `json:"updater_id"`
+	UpdaterID int `json:"updater_id,omitempty"`
 	// 最后更新时间
-	UpdateTime time.Time `json:"update_time"`
+	UpdateTime time.Time `json:"update_time,omitempty"`
 	// 设备ID
-	DeviceID int `json:"device_id" validate:"required"`
+	DeviceID int `json:"device_id,omitempty" validate:"required"`
 	// 视频ID
-	VideoID int `json:"video_id"`
+	VideoID int `json:"video_id,omitempty"`
 	// 事件发生时间
-	EventTime time.Time `json:"event_time" validate:"required"`
+	EventTime time.Time `json:"event_time,omitempty" validate:"required"`
 	// 事件类型
-	EventType enums.EventType `json:"event_type" validate:"required"`
+	EventType enums.EventType `json:"event_type,omitempty" validate:"required"`
 	// 事件状态
-	EventStatus enums.EventStatus `json:"event_status"`
+	EventStatus enums.EventStatus `json:"event_status,omitempty"`
 	// 图片
-	Images []*types.UploadedImage `json:"images" validate:"required"`
+	Images []*types.UploadedImage `json:"images,omitempty" validate:"required"`
 	// 标记的图片
-	LabeledImages []*types.UploadedImage `json:"labeled_images"`
+	LabeledImages []*types.UploadedImage `json:"labeled_images,omitempty"`
 	// 请求数据ID
-	DataID string `json:"data_id" validate:"required"`
+	DataID string `json:"data_id,omitempty" validate:"required"`
 	// 描述
-	Description string `json:"description"`
+	Description string `json:"description,omitempty"`
 	// 设备商原始上报数据
 	RawData string `json:"-"`
 	// Edges holds the relations/edges for other nodes in the graph.

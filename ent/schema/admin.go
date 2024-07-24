@@ -25,11 +25,12 @@ func (Admin) Fields() []ent.Field {
 	return []ent.Field{
 		field.String("username").Comment("用户名").NotEmpty().MaxLen(64).StructTag(`validate:"required"`),
 		field.String("password").Comment("密码").NotEmpty().MaxLen(255).Sensitive(),
-		field.String("nickname").Comment("昵称").NotEmpty().MaxLen(255).StructTag(`validate:"required"`),
+		field.String("nickname").Comment("昵称").MaxLen(255),
 		field.String("real_name").Comment("姓名").MaxLen(255).StructTag(`validate:"required"`),
 		field.String("mobile").Comment("手机号").MaxLen(255).Optional(),
+		field.String("wechat_openid").Comment("微信openid").MaxLen(255).Optional(),
 		field.JSON("avatar", types.UploadedImage{}).Optional().Comment("头像"),
-		field.Int("admin_status").Comment("账户状态").NonNegative().Default(int(enums.AS1)).GoType(enums.AdminStatus(0)).StructTag(`validate:"required"`),
+		field.Int("admin_status").Comment("账户状态").NonNegative().Default(int(enums.ENS1)).GoType(enums.EnabledStatus(0)).StructTag(`validate:"required"`),
 	}
 }
 
@@ -105,5 +106,7 @@ func (Admin) Edges() []ent.Edge {
 
 		edge.To("sweep_result_details_creator", SweepResultDetails.Type),
 		edge.To("sweep_result_details_updater", SweepResultDetails.Type),
+
+		edge.To("user_updater", User.Type),
 	}
 }

@@ -62,14 +62,6 @@ func (su *SweepUpdate) SetUpdaterID(i int) *SweepUpdate {
 	return su
 }
 
-// SetNillableUpdaterID sets the "updater_id" field if the given value is not nil.
-func (su *SweepUpdate) SetNillableUpdaterID(i *int) *SweepUpdate {
-	if i != nil {
-		su.SetUpdaterID(*i)
-	}
-	return su
-}
-
 // SetUpdateTime sets the "update_time" field.
 func (su *SweepUpdate) SetUpdateTime(t time.Time) *SweepUpdate {
 	su.mutation.SetUpdateTime(t)
@@ -82,39 +74,15 @@ func (su *SweepUpdate) SetName(s string) *SweepUpdate {
 	return su
 }
 
-// SetNillableName sets the "name" field if the given value is not nil.
-func (su *SweepUpdate) SetNillableName(s *string) *SweepUpdate {
-	if s != nil {
-		su.SetName(*s)
-	}
-	return su
-}
-
 // SetRiskCategoryID sets the "risk_category_id" field.
 func (su *SweepUpdate) SetRiskCategoryID(i int) *SweepUpdate {
 	su.mutation.SetRiskCategoryID(i)
 	return su
 }
 
-// SetNillableRiskCategoryID sets the "risk_category_id" field if the given value is not nil.
-func (su *SweepUpdate) SetNillableRiskCategoryID(i *int) *SweepUpdate {
-	if i != nil {
-		su.SetRiskCategoryID(*i)
-	}
-	return su
-}
-
 // SetRiskLocationID sets the "risk_location_id" field.
 func (su *SweepUpdate) SetRiskLocationID(i int) *SweepUpdate {
 	su.mutation.SetRiskLocationID(i)
-	return su
-}
-
-// SetNillableRiskLocationID sets the "risk_location_id" field if the given value is not nil.
-func (su *SweepUpdate) SetNillableRiskLocationID(i *int) *SweepUpdate {
-	if i != nil {
-		su.SetRiskLocationID(*i)
-	}
 	return su
 }
 
@@ -664,14 +632,6 @@ func (suo *SweepUpdateOne) SetUpdaterID(i int) *SweepUpdateOne {
 	return suo
 }
 
-// SetNillableUpdaterID sets the "updater_id" field if the given value is not nil.
-func (suo *SweepUpdateOne) SetNillableUpdaterID(i *int) *SweepUpdateOne {
-	if i != nil {
-		suo.SetUpdaterID(*i)
-	}
-	return suo
-}
-
 // SetUpdateTime sets the "update_time" field.
 func (suo *SweepUpdateOne) SetUpdateTime(t time.Time) *SweepUpdateOne {
 	suo.mutation.SetUpdateTime(t)
@@ -684,39 +644,15 @@ func (suo *SweepUpdateOne) SetName(s string) *SweepUpdateOne {
 	return suo
 }
 
-// SetNillableName sets the "name" field if the given value is not nil.
-func (suo *SweepUpdateOne) SetNillableName(s *string) *SweepUpdateOne {
-	if s != nil {
-		suo.SetName(*s)
-	}
-	return suo
-}
-
 // SetRiskCategoryID sets the "risk_category_id" field.
 func (suo *SweepUpdateOne) SetRiskCategoryID(i int) *SweepUpdateOne {
 	suo.mutation.SetRiskCategoryID(i)
 	return suo
 }
 
-// SetNillableRiskCategoryID sets the "risk_category_id" field if the given value is not nil.
-func (suo *SweepUpdateOne) SetNillableRiskCategoryID(i *int) *SweepUpdateOne {
-	if i != nil {
-		suo.SetRiskCategoryID(*i)
-	}
-	return suo
-}
-
 // SetRiskLocationID sets the "risk_location_id" field.
 func (suo *SweepUpdateOne) SetRiskLocationID(i int) *SweepUpdateOne {
 	suo.mutation.SetRiskLocationID(i)
-	return suo
-}
-
-// SetNillableRiskLocationID sets the "risk_location_id" field if the given value is not nil.
-func (suo *SweepUpdateOne) SetNillableRiskLocationID(i *int) *SweepUpdateOne {
-	if i != nil {
-		suo.SetRiskLocationID(*i)
-	}
 	return suo
 }
 

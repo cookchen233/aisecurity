@@ -36,7 +36,7 @@ func (h *IndexHandler) GetFilter(c *gin.Context) structs.IFilter {
 }
 func (h *IndexHandler) GetEntity(c *gin.Context) structs.IEntity { return h.Entity }
 func (h *IndexHandler) SetRequestContext(c *gin.Context, childHandler handlers.IHandler) {
-	h.Service = services.NewAdminService()
+	h.Service = services.NewAdminService(c)
 	h.Service.Ctx = c
 	h.Filter = &filters.Admin{}
 	h.Entity = &entities.Admin{}
@@ -97,7 +97,18 @@ func (h *IndexHandler) Login(c *gin.Context) {
 		return
 	}
 
-	resp, err := h.GetJWTResponse(a, time.Duration(max(3600*24, persistSeconds))*time.Second)
+	var accessIDs []string
+	for _, v := range a.Edges.Permissions {
+		accessIDs = append(accessIDs, v.AccessIds...)
+	}
+	var jwtAdmin = types.JWTAdmin{
+		ID:          a.ID,
+		DisplayName: a.Nickname,
+		PhotoURL:    a.Avatar.URL,
+		PhoneNumber: a.Mobile,
+		AccessIDs:   accessIDs,
+	}
+	resp, err := h.GetJWTResponse(jwtAdmin, time.Duration(max(3600*24, persistSeconds))*time.Second)
 	if err != nil {
 		http.Error(c, err, 2000)
 		return
@@ -112,16 +123,9 @@ func (h *IndexHandler) GetCurrentAdmin(c *gin.Context) {
 		http.Error(c, utils.ErrorWithStack(fmt.Errorf("jwt data does not exist")), 2000)
 		return
 	}
-	j := jwtData.(map[string]any)
+	j := jwtData.(*types.JWTData)
 
-	admin, err := h.Service.GetByID(c.GetInt("admin_id"))
-	if err != nil {
-		http.Error(c, err, 2000)
-		return
-	}
-	a := admin.(*entities.Admin)
-
-	resp, err := h.GetJWTResponse(a, gconv.Duration(j["persist"]))
+	resp, err := h.GetJWTResponse(j.Admin, gconv.Duration(j.Persist))
 	if err != nil {
 		http.Error(c, err, 2000)
 		return
@@ -130,22 +134,11 @@ func (h *IndexHandler) GetCurrentAdmin(c *gin.Context) {
 	http.Success(c, resp)
 }
 
-func (h *IndexHandler) GetJWTResponse(admin *entities.Admin, persist time.Duration) (*types.JWTResponse, error) {
-	var accessIDs []string
-	for _, v := range admin.Edges.Permissions {
-		accessIDs = append(accessIDs, v.AccessIds...)
-	}
-	jwtAdmin := types.JWTAdmin{
-		ID:          admin.ID,
-		DisplayName: admin.Nickname,
-		Email:       admin.Username,
-		PhotoURL:    admin.Avatar.URL,
-		PhoneNumber: admin.Username,
-		AccessIDs:   accessIDs,
-	}
-	jwtData := map[string]any{
-		"admin":   jwtAdmin,
-		"persist": persist,
+func (h *IndexHandler) GetJWTResponse(jwtAdmin types.JWTAdmin, persist time.Duration) (*types.JWTResponse, error) {
+
+	jwtData := types.JWTData{
+		Admin:   jwtAdmin,
+		Persist: persist,
 	}
 	// Create a new map for jwt claims
 	claims := jwt.MapClaims{

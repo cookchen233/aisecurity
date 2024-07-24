@@ -57,14 +57,6 @@ func (rcu *RiskCategoryUpdate) SetUpdaterID(i int) *RiskCategoryUpdate {
 	return rcu
 }
 
-// SetNillableUpdaterID sets the "updater_id" field if the given value is not nil.
-func (rcu *RiskCategoryUpdate) SetNillableUpdaterID(i *int) *RiskCategoryUpdate {
-	if i != nil {
-		rcu.SetUpdaterID(*i)
-	}
-	return rcu
-}
-
 // SetUpdateTime sets the "update_time" field.
 func (rcu *RiskCategoryUpdate) SetUpdateTime(t time.Time) *RiskCategoryUpdate {
 	rcu.mutation.SetUpdateTime(t)
@@ -74,14 +66,6 @@ func (rcu *RiskCategoryUpdate) SetUpdateTime(t time.Time) *RiskCategoryUpdate {
 // SetName sets the "name" field.
 func (rcu *RiskCategoryUpdate) SetName(s string) *RiskCategoryUpdate {
 	rcu.mutation.SetName(s)
-	return rcu
-}
-
-// SetNillableName sets the "name" field if the given value is not nil.
-func (rcu *RiskCategoryUpdate) SetNillableName(s *string) *RiskCategoryUpdate {
-	if s != nil {
-		rcu.SetName(*s)
-	}
 	return rcu
 }
 
@@ -425,14 +409,6 @@ func (rcuo *RiskCategoryUpdateOne) SetUpdaterID(i int) *RiskCategoryUpdateOne {
 	return rcuo
 }
 
-// SetNillableUpdaterID sets the "updater_id" field if the given value is not nil.
-func (rcuo *RiskCategoryUpdateOne) SetNillableUpdaterID(i *int) *RiskCategoryUpdateOne {
-	if i != nil {
-		rcuo.SetUpdaterID(*i)
-	}
-	return rcuo
-}
-
 // SetUpdateTime sets the "update_time" field.
 func (rcuo *RiskCategoryUpdateOne) SetUpdateTime(t time.Time) *RiskCategoryUpdateOne {
 	rcuo.mutation.SetUpdateTime(t)
@@ -442,14 +418,6 @@ func (rcuo *RiskCategoryUpdateOne) SetUpdateTime(t time.Time) *RiskCategoryUpdat
 // SetName sets the "name" field.
 func (rcuo *RiskCategoryUpdateOne) SetName(s string) *RiskCategoryUpdateOne {
 	rcuo.mutation.SetName(s)
-	return rcuo
-}
-
-// SetNillableName sets the "name" field if the given value is not nil.
-func (rcuo *RiskCategoryUpdateOne) SetNillableName(s *string) *RiskCategoryUpdateOne {
-	if s != nil {
-		rcuo.SetName(*s)
-	}
 	return rcuo
 }
 

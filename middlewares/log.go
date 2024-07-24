@@ -41,7 +41,6 @@ func RequestLog() gin.HandlerFunc {
 		traceid := sessid.(string) + "_" + fmt.Sprintf("%08x", crc32.ChecksumIEEE([]byte(uuid.NewString())))
 		// set the context information
 		c.Set("traceid", traceid)
-		var oriLoggerL = utils.Logger.L
 		utils.Logger.L = utils.Logger.With(
 			zap.String("traceid", traceid),
 			zap.String("url", c.Request.URL.String()))
@@ -121,7 +120,7 @@ func RequestLog() gin.HandlerFunc {
 		}
 
 		// clear the with fields
-		utils.Logger.L = oriLoggerL
+		utils.InitLogger2()
 
 	}
 }

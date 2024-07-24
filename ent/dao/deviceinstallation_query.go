@@ -404,7 +404,7 @@ func (diq *DeviceInstallationQuery) WithDevice(opts ...func(*DeviceQuery)) *Devi
 // Example:
 //
 //	var v []struct {
-//		CreateTime time.Time `json:"create_time"`
+//		CreateTime time.Time `json:"create_time,omitempty"`
 //		Count int `json:"count,omitempty"`
 //	}
 //
@@ -427,7 +427,7 @@ func (diq *DeviceInstallationQuery) GroupBy(field string, fields ...string) *Dev
 // Example:
 //
 //	var v []struct {
-//		CreateTime time.Time `json:"create_time"`
+//		CreateTime time.Time `json:"create_time,omitempty"`
 //	}
 //
 //	client.DeviceInstallation.Query().

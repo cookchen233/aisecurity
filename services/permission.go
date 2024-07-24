@@ -67,7 +67,7 @@ func (s *PermissionService) Create(ent structs.IEntity) (structs.IEntity, error)
 	e := ent.(*entities.Permission)
 	saved, err := s.entClient.Create().
 		SetName(e.Name).
-		SetAccessIds(e.AccessIds).
+		SetAccessIds(s.getCurrentAdminInterAccessIds(e.AccessIds)).
 		Save(s.Ctx)
 	if err != nil {
 		return nil, utils.ErrorWrap(err, "failed creating Permission")
@@ -79,12 +79,38 @@ func (s *PermissionService) Update(ent structs.IEntity) (structs.IEntity, error)
 	e := ent.(*entities.Permission)
 	saved, err := s.entClient.UpdateOneID(e.ID).
 		SetName(e.Name).
-		SetAccessIds(e.AccessIds).
+		SetAccessIds(s.getCurrentAdminInterAccessIds(e.AccessIds)).
 		Save(s.Ctx)
 	if err != nil {
 		return nil, utils.ErrorWrap(err, "failed updating Permission")
 	}
 	return saved, nil
+}
+
+func (s *PermissionService) getCurrentAdminInterAccessIds(accessIDs []string) []string {
+	var interAccessIds []string
+	admin, err := s.GetCurrentAdmin()
+	if err != nil {
+		utils.Logger.Error("get current admin failed", zap.Error(err))
+		return interAccessIds
+	}
+	a := admin.(*entities.Admin)
+	if a.ID == 1 {
+		return accessIDs
+	}
+	var allowedAccessIds []string
+	for _, v := range a.Edges.Permissions {
+		allowedAccessIds = append(allowedAccessIds, v.AccessIds...)
+	}
+	for _, accessId := range accessIDs {
+		for _, allowedAccessId := range allowedAccessIds {
+			if accessId == allowedAccessId {
+				interAccessIds = append(interAccessIds, accessId)
+				break
+			}
+		}
+	}
+	return interAccessIds
 }
 
 func (s *PermissionService) GetDetails(fit structs.IFilter) (structs.IEntity, error) {
@@ -103,6 +129,7 @@ func (s *PermissionService) GetDetails(fit structs.IFilter) (structs.IEntity, er
 func (s *PermissionService) GetList(fit structs.IFilter) ([]structs.IEntity, error) {
 	// list
 	list, err := s.query(fit).
+		WithCreator().
 		Limit(fit.GetLimit()).
 		Offset(fit.GetOffset()).
 		Order(dao.Desc(permission.FieldID)).
@@ -135,6 +162,10 @@ func (s *PermissionService) query(fit structs.IFilter) *dao.PermissionQuery {
 	}
 	if f.Name != "" {
 		q = q.Where(permission.NameEQ(f.Name))
+	}
+	adminID := s.GetCurrentAdminID()
+	if adminID != 1 {
+		q = q.Where(permission.CreatorID(s.GetCurrentAdminID()))
 	}
 	return q.Clone()
 }

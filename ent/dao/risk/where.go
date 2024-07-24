@@ -442,6 +442,16 @@ func ImagesNotNil() predicate.Risk {
 	return predicate.Risk(sql.FieldNotNull(FieldImages))
 }
 
+// MaintainedImagesIsNil applies the IsNil predicate on the "maintained_images" field.
+func MaintainedImagesIsNil() predicate.Risk {
+	return predicate.Risk(sql.FieldIsNull(FieldMaintainedImages))
+}
+
+// MaintainedImagesNotNil applies the NotNil predicate on the "maintained_images" field.
+func MaintainedImagesNotNil() predicate.Risk {
+	return predicate.Risk(sql.FieldNotNull(FieldMaintainedImages))
+}
+
 // RiskCategoryIDEQ applies the EQ predicate on the "risk_category_id" field.
 func RiskCategoryIDEQ(v int) predicate.Risk {
 	return predicate.Risk(sql.FieldEQ(FieldRiskCategoryID, v))

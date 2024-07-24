@@ -60,14 +60,6 @@ func (ssu *SweepScheduleUpdate) SetUpdaterID(i int) *SweepScheduleUpdate {
 	return ssu
 }
 
-// SetNillableUpdaterID sets the "updater_id" field if the given value is not nil.
-func (ssu *SweepScheduleUpdate) SetNillableUpdaterID(i *int) *SweepScheduleUpdate {
-	if i != nil {
-		ssu.SetUpdaterID(*i)
-	}
-	return ssu
-}
-
 // SetUpdateTime sets the "update_time" field.
 func (ssu *SweepScheduleUpdate) SetUpdateTime(t time.Time) *SweepScheduleUpdate {
 	ssu.mutation.SetUpdateTime(t)
@@ -80,52 +72,36 @@ func (ssu *SweepScheduleUpdate) SetName(s string) *SweepScheduleUpdate {
 	return ssu
 }
 
-// SetNillableName sets the "name" field if the given value is not nil.
-func (ssu *SweepScheduleUpdate) SetNillableName(s *string) *SweepScheduleUpdate {
-	if s != nil {
-		ssu.SetName(*s)
-	}
-	return ssu
-}
-
 // SetSweepID sets the "sweep_id" field.
 func (ssu *SweepScheduleUpdate) SetSweepID(i int) *SweepScheduleUpdate {
 	ssu.mutation.SetSweepID(i)
 	return ssu
 }
 
-// SetNillableSweepID sets the "sweep_id" field if the given value is not nil.
-func (ssu *SweepScheduleUpdate) SetNillableSweepID(i *int) *SweepScheduleUpdate {
-	if i != nil {
-		ssu.SetSweepID(*i)
-	}
+// SetEnabledStatus sets the "enabled_status" field.
+func (ssu *SweepScheduleUpdate) SetEnabledStatus(es enums.EnabledStatus) *SweepScheduleUpdate {
+	ssu.mutation.ResetEnabledStatus()
+	ssu.mutation.SetEnabledStatus(es)
 	return ssu
 }
 
-// SetScheduleStatus sets the "schedule_status" field.
-func (ssu *SweepScheduleUpdate) SetScheduleStatus(es enums.AdminStatus) *SweepScheduleUpdate {
-	ssu.mutation.ResetScheduleStatus()
-	ssu.mutation.SetScheduleStatus(es)
-	return ssu
-}
-
-// SetNillableScheduleStatus sets the "schedule_status" field if the given value is not nil.
-func (ssu *SweepScheduleUpdate) SetNillableScheduleStatus(es *enums.AdminStatus) *SweepScheduleUpdate {
+// SetNillableEnabledStatus sets the "enabled_status" field if the given value is not nil.
+func (ssu *SweepScheduleUpdate) SetNillableEnabledStatus(es *enums.EnabledStatus) *SweepScheduleUpdate {
 	if es != nil {
-		ssu.SetScheduleStatus(*es)
+		ssu.SetEnabledStatus(*es)
 	}
 	return ssu
 }
 
-// AddScheduleStatus adds es to the "schedule_status" field.
-func (ssu *SweepScheduleUpdate) AddScheduleStatus(es enums.AdminStatus) *SweepScheduleUpdate {
-	ssu.mutation.AddScheduleStatus(es)
+// AddEnabledStatus adds es to the "enabled_status" field.
+func (ssu *SweepScheduleUpdate) AddEnabledStatus(es enums.EnabledStatus) *SweepScheduleUpdate {
+	ssu.mutation.AddEnabledStatus(es)
 	return ssu
 }
 
-// ClearScheduleStatus clears the value of the "schedule_status" field.
-func (ssu *SweepScheduleUpdate) ClearScheduleStatus() *SweepScheduleUpdate {
-	ssu.mutation.ClearScheduleStatus()
+// ClearEnabledStatus clears the value of the "enabled_status" field.
+func (ssu *SweepScheduleUpdate) ClearEnabledStatus() *SweepScheduleUpdate {
+	ssu.mutation.ClearEnabledStatus()
 	return ssu
 }
 
@@ -135,39 +111,15 @@ func (ssu *SweepScheduleUpdate) SetActionTime(t time.Time) *SweepScheduleUpdate 
 	return ssu
 }
 
-// SetNillableActionTime sets the "action_time" field if the given value is not nil.
-func (ssu *SweepScheduleUpdate) SetNillableActionTime(t *time.Time) *SweepScheduleUpdate {
-	if t != nil {
-		ssu.SetActionTime(*t)
-	}
-	return ssu
-}
-
 // SetRemind sets the "remind" field.
 func (ssu *SweepScheduleUpdate) SetRemind(tr types.ScheduleRemind) *SweepScheduleUpdate {
 	ssu.mutation.SetRemind(tr)
 	return ssu
 }
 
-// SetNillableRemind sets the "remind" field if the given value is not nil.
-func (ssu *SweepScheduleUpdate) SetNillableRemind(tr *types.ScheduleRemind) *SweepScheduleUpdate {
-	if tr != nil {
-		ssu.SetRemind(*tr)
-	}
-	return ssu
-}
-
 // SetRepeat sets the "repeat" field.
 func (ssu *SweepScheduleUpdate) SetRepeat(tr types.ScheduleRepeat) *SweepScheduleUpdate {
 	ssu.mutation.SetRepeat(tr)
-	return ssu
-}
-
-// SetNillableRepeat sets the "repeat" field if the given value is not nil.
-func (ssu *SweepScheduleUpdate) SetNillableRepeat(tr *types.ScheduleRepeat) *SweepScheduleUpdate {
-	if tr != nil {
-		ssu.SetRepeat(*tr)
-	}
 	return ssu
 }
 
@@ -365,9 +317,9 @@ func (ssu *SweepScheduleUpdate) check() error {
 			return &ValidationError{Name: "sweep_id", err: fmt.Errorf(`dao: validator failed for field "SweepSchedule.sweep_id": %w`, err)}
 		}
 	}
-	if v, ok := ssu.mutation.ScheduleStatus(); ok {
-		if err := sweepschedule.ScheduleStatusValidator(int(v)); err != nil {
-			return &ValidationError{Name: "schedule_status", err: fmt.Errorf(`dao: validator failed for field "SweepSchedule.schedule_status": %w`, err)}
+	if v, ok := ssu.mutation.EnabledStatus(); ok {
+		if err := sweepschedule.EnabledStatusValidator(int(v)); err != nil {
+			return &ValidationError{Name: "enabled_status", err: fmt.Errorf(`dao: validator failed for field "SweepSchedule.enabled_status": %w`, err)}
 		}
 	}
 	if _, ok := ssu.mutation.CreatorID(); ssu.mutation.CreatorCleared() && !ok {
@@ -406,14 +358,14 @@ func (ssu *SweepScheduleUpdate) sqlSave(ctx context.Context) (n int, err error) 
 	if value, ok := ssu.mutation.Name(); ok {
 		_spec.SetField(sweepschedule.FieldName, field.TypeString, value)
 	}
-	if value, ok := ssu.mutation.ScheduleStatus(); ok {
-		_spec.SetField(sweepschedule.FieldScheduleStatus, field.TypeInt, value)
+	if value, ok := ssu.mutation.EnabledStatus(); ok {
+		_spec.SetField(sweepschedule.FieldEnabledStatus, field.TypeInt, value)
 	}
-	if value, ok := ssu.mutation.AddedScheduleStatus(); ok {
-		_spec.AddField(sweepschedule.FieldScheduleStatus, field.TypeInt, value)
+	if value, ok := ssu.mutation.AddedEnabledStatus(); ok {
+		_spec.AddField(sweepschedule.FieldEnabledStatus, field.TypeInt, value)
 	}
-	if ssu.mutation.ScheduleStatusCleared() {
-		_spec.ClearField(sweepschedule.FieldScheduleStatus, field.TypeInt)
+	if ssu.mutation.EnabledStatusCleared() {
+		_spec.ClearField(sweepschedule.FieldEnabledStatus, field.TypeInt)
 	}
 	if value, ok := ssu.mutation.ActionTime(); ok {
 		_spec.SetField(sweepschedule.FieldActionTime, field.TypeTime, value)
@@ -663,14 +615,6 @@ func (ssuo *SweepScheduleUpdateOne) SetUpdaterID(i int) *SweepScheduleUpdateOne 
 	return ssuo
 }
 
-// SetNillableUpdaterID sets the "updater_id" field if the given value is not nil.
-func (ssuo *SweepScheduleUpdateOne) SetNillableUpdaterID(i *int) *SweepScheduleUpdateOne {
-	if i != nil {
-		ssuo.SetUpdaterID(*i)
-	}
-	return ssuo
-}
-
 // SetUpdateTime sets the "update_time" field.
 func (ssuo *SweepScheduleUpdateOne) SetUpdateTime(t time.Time) *SweepScheduleUpdateOne {
 	ssuo.mutation.SetUpdateTime(t)
@@ -683,52 +627,36 @@ func (ssuo *SweepScheduleUpdateOne) SetName(s string) *SweepScheduleUpdateOne {
 	return ssuo
 }
 
-// SetNillableName sets the "name" field if the given value is not nil.
-func (ssuo *SweepScheduleUpdateOne) SetNillableName(s *string) *SweepScheduleUpdateOne {
-	if s != nil {
-		ssuo.SetName(*s)
-	}
-	return ssuo
-}
-
 // SetSweepID sets the "sweep_id" field.
 func (ssuo *SweepScheduleUpdateOne) SetSweepID(i int) *SweepScheduleUpdateOne {
 	ssuo.mutation.SetSweepID(i)
 	return ssuo
 }
 
-// SetNillableSweepID sets the "sweep_id" field if the given value is not nil.
-func (ssuo *SweepScheduleUpdateOne) SetNillableSweepID(i *int) *SweepScheduleUpdateOne {
-	if i != nil {
-		ssuo.SetSweepID(*i)
-	}
+// SetEnabledStatus sets the "enabled_status" field.
+func (ssuo *SweepScheduleUpdateOne) SetEnabledStatus(es enums.EnabledStatus) *SweepScheduleUpdateOne {
+	ssuo.mutation.ResetEnabledStatus()
+	ssuo.mutation.SetEnabledStatus(es)
 	return ssuo
 }
 
-// SetScheduleStatus sets the "schedule_status" field.
-func (ssuo *SweepScheduleUpdateOne) SetScheduleStatus(es enums.AdminStatus) *SweepScheduleUpdateOne {
-	ssuo.mutation.ResetScheduleStatus()
-	ssuo.mutation.SetScheduleStatus(es)
-	return ssuo
-}
-
-// SetNillableScheduleStatus sets the "schedule_status" field if the given value is not nil.
-func (ssuo *SweepScheduleUpdateOne) SetNillableScheduleStatus(es *enums.AdminStatus) *SweepScheduleUpdateOne {
+// SetNillableEnabledStatus sets the "enabled_status" field if the given value is not nil.
+func (ssuo *SweepScheduleUpdateOne) SetNillableEnabledStatus(es *enums.EnabledStatus) *SweepScheduleUpdateOne {
 	if es != nil {
-		ssuo.SetScheduleStatus(*es)
+		ssuo.SetEnabledStatus(*es)
 	}
 	return ssuo
 }
 
-// AddScheduleStatus adds es to the "schedule_status" field.
-func (ssuo *SweepScheduleUpdateOne) AddScheduleStatus(es enums.AdminStatus) *SweepScheduleUpdateOne {
-	ssuo.mutation.AddScheduleStatus(es)
+// AddEnabledStatus adds es to the "enabled_status" field.
+func (ssuo *SweepScheduleUpdateOne) AddEnabledStatus(es enums.EnabledStatus) *SweepScheduleUpdateOne {
+	ssuo.mutation.AddEnabledStatus(es)
 	return ssuo
 }
 
-// ClearScheduleStatus clears the value of the "schedule_status" field.
-func (ssuo *SweepScheduleUpdateOne) ClearScheduleStatus() *SweepScheduleUpdateOne {
-	ssuo.mutation.ClearScheduleStatus()
+// ClearEnabledStatus clears the value of the "enabled_status" field.
+func (ssuo *SweepScheduleUpdateOne) ClearEnabledStatus() *SweepScheduleUpdateOne {
+	ssuo.mutation.ClearEnabledStatus()
 	return ssuo
 }
 
@@ -738,39 +666,15 @@ func (ssuo *SweepScheduleUpdateOne) SetActionTime(t time.Time) *SweepScheduleUpd
 	return ssuo
 }
 
-// SetNillableActionTime sets the "action_time" field if the given value is not nil.
-func (ssuo *SweepScheduleUpdateOne) SetNillableActionTime(t *time.Time) *SweepScheduleUpdateOne {
-	if t != nil {
-		ssuo.SetActionTime(*t)
-	}
-	return ssuo
-}
-
 // SetRemind sets the "remind" field.
 func (ssuo *SweepScheduleUpdateOne) SetRemind(tr types.ScheduleRemind) *SweepScheduleUpdateOne {
 	ssuo.mutation.SetRemind(tr)
 	return ssuo
 }
 
-// SetNillableRemind sets the "remind" field if the given value is not nil.
-func (ssuo *SweepScheduleUpdateOne) SetNillableRemind(tr *types.ScheduleRemind) *SweepScheduleUpdateOne {
-	if tr != nil {
-		ssuo.SetRemind(*tr)
-	}
-	return ssuo
-}
-
 // SetRepeat sets the "repeat" field.
 func (ssuo *SweepScheduleUpdateOne) SetRepeat(tr types.ScheduleRepeat) *SweepScheduleUpdateOne {
 	ssuo.mutation.SetRepeat(tr)
-	return ssuo
-}
-
-// SetNillableRepeat sets the "repeat" field if the given value is not nil.
-func (ssuo *SweepScheduleUpdateOne) SetNillableRepeat(tr *types.ScheduleRepeat) *SweepScheduleUpdateOne {
-	if tr != nil {
-		ssuo.SetRepeat(*tr)
-	}
 	return ssuo
 }
 
@@ -981,9 +885,9 @@ func (ssuo *SweepScheduleUpdateOne) check() error {
 			return &ValidationError{Name: "sweep_id", err: fmt.Errorf(`dao: validator failed for field "SweepSchedule.sweep_id": %w`, err)}
 		}
 	}
-	if v, ok := ssuo.mutation.ScheduleStatus(); ok {
-		if err := sweepschedule.ScheduleStatusValidator(int(v)); err != nil {
-			return &ValidationError{Name: "schedule_status", err: fmt.Errorf(`dao: validator failed for field "SweepSchedule.schedule_status": %w`, err)}
+	if v, ok := ssuo.mutation.EnabledStatus(); ok {
+		if err := sweepschedule.EnabledStatusValidator(int(v)); err != nil {
+			return &ValidationError{Name: "enabled_status", err: fmt.Errorf(`dao: validator failed for field "SweepSchedule.enabled_status": %w`, err)}
 		}
 	}
 	if _, ok := ssuo.mutation.CreatorID(); ssuo.mutation.CreatorCleared() && !ok {
@@ -1039,14 +943,14 @@ func (ssuo *SweepScheduleUpdateOne) sqlSave(ctx context.Context) (_node *SweepSc
 	if value, ok := ssuo.mutation.Name(); ok {
 		_spec.SetField(sweepschedule.FieldName, field.TypeString, value)
 	}
-	if value, ok := ssuo.mutation.ScheduleStatus(); ok {
-		_spec.SetField(sweepschedule.FieldScheduleStatus, field.TypeInt, value)
+	if value, ok := ssuo.mutation.EnabledStatus(); ok {
+		_spec.SetField(sweepschedule.FieldEnabledStatus, field.TypeInt, value)
 	}
-	if value, ok := ssuo.mutation.AddedScheduleStatus(); ok {
-		_spec.AddField(sweepschedule.FieldScheduleStatus, field.TypeInt, value)
+	if value, ok := ssuo.mutation.AddedEnabledStatus(); ok {
+		_spec.AddField(sweepschedule.FieldEnabledStatus, field.TypeInt, value)
 	}
-	if ssuo.mutation.ScheduleStatusCleared() {
-		_spec.ClearField(sweepschedule.FieldScheduleStatus, field.TypeInt)
+	if ssuo.mutation.EnabledStatusCleared() {
+		_spec.ClearField(sweepschedule.FieldEnabledStatus, field.TypeInt)
 	}
 	if value, ok := ssuo.mutation.ActionTime(); ok {
 		_spec.SetField(sweepschedule.FieldActionTime, field.TypeTime, value)
